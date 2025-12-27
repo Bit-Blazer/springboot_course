@@ -1,0 +1,26 @@
+{
+  "environment": "web",
+  "format": "html",
+  "prefix": "https://storage.googleapis.com",
+  "mainga": "UA-49880327-14",
+  "updated": "2025-12-27T18:48:58+05:30",
+  "id": "collections-generics",
+  "duration": 113,
+  "title": "Collections Framework \u0026 Generics",
+  "summary": "Master Java Collections Framework and Generics by building an inventory management system using List, Set, Map, and Queue with type-safe generic utilities",
+  "source": "codelab-1.4-collections-generics.md",
+  "theme": "",
+  "status": [
+    "published"
+  ],
+  "category": [
+    "java",
+    "collections",
+    "generics",
+    "datastructures"
+  ],
+  "tags": [
+    "web"
+  ],
+  "url": "collections-generics"
+}

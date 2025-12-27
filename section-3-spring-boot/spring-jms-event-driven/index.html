@@ -1,0 +1,1288 @@
+<!doctype html>
+
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+    <meta name="theme-color" content="#4F7DC9">
+    <meta charset="UTF-8">
+    <title>Spring JMS &amp; Event-Driven Architecture</title>
+    <link rel="stylesheet"
+        href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
+    <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
+    <style>
+        .success {
+            color: #1e8e3e;
+        }
+
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+    <google-codelab-analytics gaid="UA-49880327-14"></google-codelab-analytics>
+    <google-codelab codelab-gaid="" id="spring-jms-event-driven" title="Spring JMS &amp; Event-Driven Architecture"
+        environment="web" feedback-link="">
+
+        <google-codelab-step label="Introduction" duration="3">
+            <p>Add asynchronous messaging and event-driven architecture to the Task Management API using Spring JMS and
+                ActiveMQ Artemis.</p>
+            <h2 class="checklist" is-upgraded>What You&#39;ll Learn</h2>
+            <ul class="checklist">
+                <li><strong>JMS Basics:</strong> Java Message Service fundamentals</li>
+                <li><strong>Message Brokers:</strong> ActiveMQ Artemis embedded server</li>
+                <li><strong>Queue vs Topic:</strong> Point-to-point and publish-subscribe</li>
+                <li><strong>Spring JMS:</strong> JmsTemplate and @JmsListener</li>
+                <li><strong>Event-Driven Design:</strong> Domain events and event handlers</li>
+                <li><strong>Async Messaging:</strong> Non-blocking message sending</li>
+                <li><strong>Message Patterns:</strong> Request-reply, fire-and-forget</li>
+                <li><strong>Error Handling:</strong> Dead letter queues and retry</li>
+                <li><strong>Transaction Management:</strong> Message transactions</li>
+                <li><strong>Event Sourcing:</strong> Audit trail with events</li>
+            </ul>
+            <h2 is-upgraded>What You&#39;ll Build</h2>
+            <p>Event-driven Task Management API with:</p>
+            <ul>
+                <li><strong>Task Events:</strong> TaskCreated, TaskUpdated, TaskDeleted</li>
+                <li><strong>Email Notifications:</strong> Async email on task events</li>
+                <li><strong>Audit Log:</strong> Event sourcing for task history</li>
+                <li><strong>JMS Queues:</strong> Task events, notifications, audit</li>
+                <li><strong>Event Publishers:</strong> Domain event publishing</li>
+                <li><strong>Event Listeners:</strong> Async event processing</li>
+                <li><strong>Dead Letter Queue:</strong> Failed message handling</li>
+                <li><strong>Embedded Artemis:</strong> No external broker needed (dev)</li>
+                <li><strong>Message Priority:</strong> Urgent vs normal notifications</li>
+                <li><strong>Scheduled Messages:</strong> Delayed task reminders</li>
+            </ul>
+            <h2 is-upgraded>Prerequisites</h2>
+            <ul>
+                <li>Completed Codelab 3.6 (Reactive &amp; R2DBC)</li>
+                <li>Understanding of async programming</li>
+            </ul>
+            <h2 is-upgraded>Messaging Patterns</h2>
+            <p><strong>Queue (Point-to-Point):</strong></p>
+            <pre><code>Producer → [Queue] → Consumer
+           1 message = 1 consumer
+</code></pre>
+            <p><strong>Topic (Publish-Subscribe):</strong></p>
+            <pre><code>Publisher → [Topic] → Subscriber 1
+                   → Subscriber 2
+                   → Subscriber 3
+           1 message = N subscribers
+</code></pre>
+            <h2 is-upgraded>New Dependencies</h2>
+            <p>Add to <code>pom.xml</code>:</p>
+            <pre><code language="language-xml" class="language-xml">&lt;!-- Spring JMS --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-artemis&lt;/artifactId&gt;
+&lt;/dependency&gt;
+
+&lt;!-- ActiveMQ Artemis (embedded broker) --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.apache.activemq&lt;/groupId&gt;
+    &lt;artifactId&gt;artemis-jakarta-server&lt;/artifactId&gt;
+&lt;/dependency&gt;
+
+&lt;!-- JSON serialization for messages --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;com.fasterxml.jackson.core&lt;/groupId&gt;
+    &lt;artifactId&gt;jackson-databind&lt;/artifactId&gt;
+&lt;/dependency&gt;
+
+&lt;!-- Email (optional, for email notifications) --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-mail&lt;/artifactId&gt;
+&lt;/dependency&gt;
+</code></pre>
+            <aside class="special">
+                <p><strong>Event-Driven Benefits:</strong> Loose coupling, async processing, better scalability,
+                    resilience to failures, and audit trail out of the box!</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Understanding Event-Driven Architecture" duration="8">
+            <p>Learn event-driven design principles and messaging patterns.</p>
+            <h2 is-upgraded>Traditional vs Event-Driven</h2>
+            <p><strong>Traditional (Synchronous):</strong></p>
+            <pre><code language="language-java" class="language-java">@Transactional
+public Task createTask(Task task) {
+    Task saved = taskRepository.save(task);
+    emailService.sendEmail(saved);        // Blocks
+    auditService.logCreate(saved);        // Blocks
+    notificationService.notify(saved);    // Blocks
+    return saved;
+}
+
+// Problems:
+// - Slow response (waits for all operations)
+// - Tight coupling (task creation knows about email, audit)
+// - Single point of failure (email down = task creation fails)
+</code></pre>
+            <p><strong>Event-Driven (Asynchronous):</strong></p>
+            <pre><code language="language-java" class="language-java">@Transactional
+public Task createTask(Task task) {
+    Task saved = taskRepository.save(task);
+    eventPublisher.publish(new TaskCreatedEvent(saved));  // Fire and forget
+    return saved;  // Immediate response
+}
+
+@JmsListener(destination = &#34;task.created&#34;)
+public void handleTaskCreated(TaskCreatedEvent event) {
+    emailService.sendEmail(event.getTask());     // Async
+}
+
+@JmsListener(destination = &#34;task.created&#34;)
+public void handleAudit(TaskCreatedEvent event) {
+    auditService.logCreate(event.getTask());     // Async
+}
+
+// Benefits:
+// ✅ Fast response (doesn&#39;t wait)
+// ✅ Loose coupling (task doesn&#39;t know about email)
+// ✅ Resilient (email down = task still created)
+</code></pre>
+            <h2 is-upgraded>Domain Events</h2>
+            <pre><code language="language-java" class="language-java">// Event = Something that happened in the past
+public class TaskCreatedEvent {
+    private Long taskId;
+    private String title;
+    private Long userId;
+    private LocalDateTime occurredAt;
+}
+
+public class TaskStatusChangedEvent {
+    private Long taskId;
+    private TaskStatus oldStatus;
+    private TaskStatus newStatus;
+    private LocalDateTime changedAt;
+}
+
+public class TaskAssignedEvent {
+    private Long taskId;
+    private Long fromUserId;
+    private Long toUserId;
+    private LocalDateTime assignedAt;
+}
+</code></pre>
+            <h2 is-upgraded>Event-Driven Patterns</h2>
+            <p><strong>1. Event Notification:</strong></p>
+            <pre><code>Service A → Event → Service B (reacts)
+</code></pre>
+            <p><strong>2. Event-Carried State Transfer:</strong></p>
+            <pre><code>Service A → Event (with full state) → Service B (stores copy)
+</code></pre>
+            <p><strong>3. Event Sourcing:</strong></p>
+            <pre><code>All changes stored as events
+Current state = replay all events
+</code></pre>
+            <p><strong>4. CQRS (Command Query Responsibility Segregation):</strong></p>
+            <pre><code>Write Model → Events → Read Model
+(Commands)            (Queries)
+</code></pre>
+            <h2 is-upgraded>JMS Components</h2>
+            <pre><code>Producer                     Broker                    Consumer
+  |                            |                         |
+  |---(1) Send Message--------&gt;|                         |
+  |                            |                         |
+  |                            |&lt;--(2) Subscribe---------|
+  |                            |                         |
+  |                            |---(3) Deliver Message--&gt;|
+  |                            |                         |
+  |&lt;--(4) Ack (optional)-------|&lt;--(4) Acknowledge------|
+</code></pre>
+            <h2 is-upgraded>Queue vs Topic</h2>
+            <p><strong>Queue (Task Distribution):</strong></p>
+            <pre><code>Producer → [Queue: task.processing]
+              ↓
+          Consumer 1 ✓ (processes)
+          Consumer 2 (idle)
+          Consumer 3 (idle)
+
+Use for: Work distribution, load balancing
+</code></pre>
+            <p><strong>Topic (Event Broadcasting):</strong></p>
+            <pre><code>Publisher → [Topic: task.created]
+               ↓
+          Subscriber 1: Email ✓
+          Subscriber 2: Audit ✓
+          Subscriber 3: Analytics ✓
+
+Use for: Notifications, event broadcasting
+</code></pre>
+            <h2 is-upgraded>Message Properties</h2>
+            <pre><code language="language-java" class="language-java">// Priority: 0-9 (0=lowest, 9=highest)
+jmsTemplate.setPriority(9);
+
+// Time-to-live: Message expiration
+jmsTemplate.setTimeToLive(60000); // 60 seconds
+
+// Delivery mode: PERSISTENT vs NON_PERSISTENT
+jmsTemplate.setDeliveryMode(DeliveryMode.PERSISTENT);
+
+// Message ID: Unique identifier
+String messageId = message.getJMSMessageID();
+
+// Correlation ID: Link request-reply
+message.setJMSCorrelationID(requestId);
+</code></pre>
+            <aside class="special">
+                <p><strong>Best Practice:</strong> Use events for inter-service communication in microservices. Events
+                    provide loose coupling and enable independent evolution.</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Configure ActiveMQ Artemis" duration="5">
+            <p>Set up embedded ActiveMQ Artemis message broker.</p>
+            <h2 is-upgraded>Update application.yml</h2>
+            <pre><code language="language-yaml" class="language-yaml">spring:
+  application:
+    name: task-manager
+  
+  # ActiveMQ Artemis Configuration
+  artemis:
+    mode: embedded
+    embedded:
+      enabled: true
+      persistent: false  # In-memory for development
+      data-directory: ${java.io.tmpdir}/artemis-data
+      queues:
+        - task.created
+        - task.updated
+        - task.deleted
+        - task.assigned
+        - task.notification
+        - task.audit
+        - task.email
+        - task.dlq  # Dead Letter Queue
+      topics:
+        - task.events
+  
+  # JMS Configuration
+  jms:
+    template:
+      default-destination: task.events
+      delivery-mode: persistent
+      priority: 5
+      time-to-live: 3600000  # 1 hour
+    listener:
+      acknowledge-mode: auto
+      concurrency: 3-10
+      max-concurrency: 10
+
+# Logging
+logging:
+  level:
+    org.apache.activemq: INFO
+    org.springframework.jms: DEBUG
+    com.example.taskmanager: DEBUG
+</code></pre>
+            <h2 is-upgraded>Production Configuration</h2>
+            <p><strong>application-prod.yml:</strong></p>
+            <pre><code language="language-yaml" class="language-yaml">spring:
+  artemis:
+    mode: native
+    host: localhost
+    port: 61616
+    user: admin
+    password: ${ARTEMIS_PASSWORD}
+    
+  jms:
+    template:
+      delivery-mode: persistent
+    listener:
+      concurrency: 5-20
+</code></pre>
+            <h2 is-upgraded>JMS Configuration Class</h2>
+            <pre><code language="language-java" class="language-java">package com.example.taskmanager.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.jms.annotation.EnableJms;
+import org.springframework.jms.support.converter.MappingJackson2MessageConverter;
+import org.springframework.jms.support.converter.MessageConverter;
+import org.springframework.jms.support.converter.MessageType;
+
+@Configuration
+@EnableJms
+public class JmsConfig {
+    
+    @Bean
+    public MessageConverter jacksonJmsMessageConverter() {
+        MappingJackson2MessageConverter converter = new MappingJackson2MessageConverter();
+        converter.setTargetType(MessageType.TEXT);
+        converter.setTypeIdPropertyName(&#34;_type&#34;);
+        return converter;
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Queue Constants</h2>
+            <pre><code language="language-java" class="language-java">package com.example.taskmanager.messaging;
+
+public class QueueConstants {
+    
+    // Queues
+    public static final String TASK_CREATED_QUEUE = &#34;task.created&#34;;
+    public static final String TASK_UPDATED_QUEUE = &#34;task.updated&#34;;
+    public static final String TASK_DELETED_QUEUE = &#34;task.deleted&#34;;
+    public static final String TASK_ASSIGNED_QUEUE = &#34;task.assigned&#34;;
+    public static final String TASK_NOTIFICATION_QUEUE = &#34;task.notification&#34;;
+    public static final String TASK_AUDIT_QUEUE = &#34;task.audit&#34;;
+    public static final String TASK_EMAIL_QUEUE = &#34;task.email&#34;;
+    public static final String DEAD_LETTER_QUEUE = &#34;task.dlq&#34;;
+    
+    // Topics
+    public static final String TASK_EVENTS_TOPIC = &#34;task.events&#34;;
+    
+    private QueueConstants() {}
+}
+</code></pre>
+            <aside class="warning">
+                <p><strong>Production Note:</strong> Use external Artemis broker in production for reliability and
+                    clustering. Embedded mode is for development only!</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Create Domain Events" duration="8">
+            <p>Define events for task lifecycle.</p>
+            <h2 is-upgraded>Base Event</h2>
+            <pre><code language="language-java" class="language-java">package com.example.taskmanager.event;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public abstract class DomainEvent implements Serializable {
+    
+    private String eventId;
+    private LocalDateTime occurredAt;
+    private String eventType;
+    
+    protected DomainEvent(String eventType) {
+        this.eventId = UUID.randomUUID().toString();
+        this.occurredAt = LocalDateTime.now();
+        this.eventType = eventType;
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Task Events</h2>
+            <pre><code language="language-java" class="language-java">package com.example.taskmanager.event;
+
+import com.example.taskmanager.model.TaskStatus;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
+@Data
+@EqualsAndHashCode(callSuper = true)
+@NoArgsConstructor
+@AllArgsConstructor
+public class TaskCreatedEvent extends DomainEvent {
+    
+    private Long taskId;
+    private String title;
+    private String description;
+    private TaskStatus status;
+    private Long userId;
+    
+    public TaskCreatedEvent(Long taskId, String title, String description, 
+                           TaskStatus status, Long userId) {
+        super(&#34;TaskCreated&#34;);
+        this.taskId = taskId;
+        this.title = title;
+        this.description = description;
+        this.status = status;
+        this.userId = userId;
+    }
+}
+</code></pre>
+            <pre><code language="language-java" class="language-java">package com.example.taskmanager.event;
+
+import com.example.taskmanager.model.TaskStatus;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
+@Data
+@EqualsAndHashCode(callSuper = true)
+@NoArgsConstructor
+@AllArgsConstructor
+public class TaskUpdatedEvent extends DomainEvent {
+    
+    private Long taskId;
+    private String title;
+    private String description;
+    private TaskStatus status;
+    private Long userId;
+    
+    public TaskUpdatedEvent(Long taskId, String title, String description,
+                           TaskStatus status, Long userId) {
+        super(&#34;TaskUpdated&#34;);
+        this.taskId = taskId;
+        this.title = title;
+        this.description = description;
+        this.status = status;
+        this.userId = userId;
+    }
+}
+</code></pre>
+            <pre><code language="language-java" class="language-java">package com.example.taskmanager.event;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
+@Data
+@EqualsAndHashCode(callSuper = true)
+@NoArgsConstructor
+@AllArgsConstructor
+public class TaskDeletedEvent extends DomainEvent {
+    
+    private Long taskId;
+    private String title;
+    private Long userId;
+    
+    public TaskDeletedEvent(Long taskId, String title, Long userId) {
+        super(&#34;TaskDeleted&#34;);
+        this.taskId = taskId;
+        this.title = title;
+        this.userId = userId;
+    }
+}
+</code></pre>
+            <pre><code language="language-java" class="language-java">package com.example.taskmanager.event;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
+@Data
+@EqualsAndHashCode(callSuper = true)
+@NoArgsConstructor
+@AllArgsConstructor
+public class TaskAssignedEvent extends DomainEvent {
+    
+    private Long taskId;
+    private String title;
+    private Long fromUserId;
+    private Long toUserId;
+    
+    public TaskAssignedEvent(Long taskId, String title, Long fromUserId, Long toUserId) {
+        super(&#34;TaskAssigned&#34;);
+        this.taskId = taskId;
+        this.title = title;
+        this.fromUserId = fromUserId;
+        this.toUserId = toUserId;
+    }
+}
+</code></pre>
+            <pre><code language="language-java" class="language-java">package com.example.taskmanager.event;
+
+import com.example.taskmanager.model.TaskStatus;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
+@Data
+@EqualsAndHashCode(callSuper = true)
+@NoArgsConstructor
+@AllArgsConstructor
+public class TaskStatusChangedEvent extends DomainEvent {
+    
+    private Long taskId;
+    private String title;
+    private TaskStatus oldStatus;
+    private TaskStatus newStatus;
+    private Long userId;
+    
+    public TaskStatusChangedEvent(Long taskId, String title, 
+                                 TaskStatus oldStatus, TaskStatus newStatus, Long userId) {
+        super(&#34;TaskStatusChanged&#34;);
+        this.taskId = taskId;
+        this.title = title;
+        this.oldStatus = oldStatus;
+        this.newStatus = newStatus;
+        this.userId = userId;
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Notification Event</h2>
+            <pre><code language="language-java" class="language-java">package com.example.taskmanager.event;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class NotificationEvent implements Serializable {
+    
+    private Long userId;
+    private String email;
+    private String subject;
+    private String message;
+    private NotificationType type;
+    
+    public enum NotificationType {
+        EMAIL,
+        SMS,
+        PUSH
+    }
+}
+</code></pre>
+            <aside class="special">
+                <p><strong>Event Design:</strong> Events are immutable, past tense (TaskCreated not CreateTask), and
+                    contain all data needed by subscribers.</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Event Publisher Service" duration="8">
+            <p>Create service to publish events to JMS queues.</p>
+            <h2 is-upgraded>EventPublisher</h2>
+            <pre><code language="language-java" class="language-java">package com.example.taskmanager.messaging;
+
+import com.example.taskmanager.event.DomainEvent;
+import com.example.taskmanager.event.NotificationEvent;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.jms.core.JmsTemplate;
+import org.springframework.stereotype.Service;
+
+@Service
+@Slf4j
+public class EventPublisher {
+    
+    private final JmsTemplate jmsTemplate;
+    
+    public EventPublisher(JmsTemplate jmsTemplate) {
+        this.jmsTemplate = jmsTemplate;
+    }
+    
+    public void publishTaskCreated(DomainEvent event) {
+        log.info(&#34;Publishing TaskCreated event: {}&#34;, event.getEventId());
+        jmsTemplate.convertAndSend(QueueConstants.TASK_CREATED_QUEUE, event);
+        publishToTopic(event);
+    }
+    
+    public void publishTaskUpdated(DomainEvent event) {
+        log.info(&#34;Publishing TaskUpdated event: {}&#34;, event.getEventId());
+        jmsTemplate.convertAndSend(QueueConstants.TASK_UPDATED_QUEUE, event);
+        publishToTopic(event);
+    }
+    
+    public void publishTaskDeleted(DomainEvent event) {
+        log.info(&#34;Publishing TaskDeleted event: {}&#34;, event.getEventId());
+        jmsTemplate.convertAndSend(QueueConstants.TASK_DELETED_QUEUE, event);
+        publishToTopic(event);
+    }
+    
+    public void publishTaskAssigned(DomainEvent event) {
+        log.info(&#34;Publishing TaskAssigned event: {}&#34;, event.getEventId());
+        jmsTemplate.convertAndSend(QueueConstants.TASK_ASSIGNED_QUEUE, event);
+        publishToTopic(event);
+    }
+    
+    public void publishNotification(NotificationEvent notification) {
+        log.info(&#34;Publishing notification to user: {}&#34;, notification.getUserId());
+        jmsTemplate.convertAndSend(QueueConstants.TASK_NOTIFICATION_QUEUE, notification);
+    }
+    
+    public void publishAuditEvent(DomainEvent event) {
+        log.info(&#34;Publishing audit event: {}&#34;, event.getEventId());
+        jmsTemplate.convertAndSend(QueueConstants.TASK_AUDIT_QUEUE, event);
+    }
+    
+    public void publishEmailNotification(NotificationEvent notification) {
+        log.info(&#34;Publishing email notification: {}&#34;, notification.getSubject());
+        jmsTemplate.convertAndSend(QueueConstants.TASK_EMAIL_QUEUE, notification);
+    }
+    
+    // Publish to topic for broadcast
+    private void publishToTopic(DomainEvent event) {
+        log.debug(&#34;Publishing to topic: {}&#34;, QueueConstants.TASK_EVENTS_TOPIC);
+        jmsTemplate.convertAndSend(QueueConstants.TASK_EVENTS_TOPIC, event);
+    }
+    
+    // Priority message
+    public void publishUrgentNotification(NotificationEvent notification) {
+        log.warn(&#34;Publishing URGENT notification: {}&#34;, notification.getSubject());
+        jmsTemplate.convertAndSend(QueueConstants.TASK_NOTIFICATION_QUEUE, notification, message -&gt; {
+            message.setJMSPriority(9);  // Highest priority
+            return message;
+        });
+    }
+    
+    // Delayed message
+    public void publishDelayedNotification(NotificationEvent notification, long delayMs) {
+        log.info(&#34;Publishing delayed notification ({}ms): {}&#34;, delayMs, notification.getSubject());
+        jmsTemplate.convertAndSend(QueueConstants.TASK_NOTIFICATION_QUEUE, notification, message -&gt; {
+            message.setLongProperty(&#34;_AMQ_SCHED_DELIVERY&#34;, System.currentTimeMillis() + delayMs);
+            return message;
+        });
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Update TaskService</h2>
+            <pre><code language="language-java" class="language-java">package com.example.taskmanager.service;
+
+import com.example.taskmanager.event.*;
+import com.example.taskmanager.exception.TaskNotFoundException;
+import com.example.taskmanager.messaging.EventPublisher;
+import com.example.taskmanager.model.Task;
+import com.example.taskmanager.model.TaskStatus;
+import com.example.taskmanager.repository.TaskRepository;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Service
+@Slf4j
+public class TaskService {
+    
+    private final TaskRepository taskRepository;
+    private final EventPublisher eventPublisher;
+    
+    public TaskService(TaskRepository taskRepository, EventPublisher eventPublisher) {
+        this.taskRepository = taskRepository;
+        this.eventPublisher = eventPublisher;
+    }
+    
+    @Transactional
+    public Task createTask(Task task) {
+        log.debug(&#34;Creating task: {}&#34;, task.getTitle());
+        
+        task.setCreatedAt(LocalDateTime.now());
+        task.setUpdatedAt(LocalDateTime.now());
+        
+        if (task.getStatus() == null) {
+            task.setStatus(TaskStatus.TODO);
+        }
+        
+        Task saved = taskRepository.save(task);
+        
+        // Publish event
+        TaskCreatedEvent event = new TaskCreatedEvent(
+            saved.getId(),
+            saved.getTitle(),
+            saved.getDescription(),
+            saved.getStatus(),
+            saved.getUserId()
+        );
+        eventPublisher.publishTaskCreated(event);
+        
+        log.info(&#34;Task created with ID: {}&#34;, saved.getId());
+        return saved;
+    }
+    
+    @Transactional
+    public Task updateTask(Long id, Task taskDetails) {
+        log.debug(&#34;Updating task: {}&#34;, id);
+        
+        Task task = taskRepository.findById(id)
+            .orElseThrow(() -&gt; new TaskNotFoundException(id));
+        
+        TaskStatus oldStatus = task.getStatus();
+        
+        task.setTitle(taskDetails.getTitle());
+        task.setDescription(taskDetails.getDescription());
+        task.setStatus(taskDetails.getStatus());
+        task.setUpdatedAt(LocalDateTime.now());
+        
+        Task updated = taskRepository.save(task);
+        
+        // Publish events
+        TaskUpdatedEvent event = new TaskUpdatedEvent(
+            updated.getId(),
+            updated.getTitle(),
+            updated.getDescription(),
+            updated.getStatus(),
+            updated.getUserId()
+        );
+        eventPublisher.publishTaskUpdated(event);
+        
+        // Publish status change event if status changed
+        if (!oldStatus.equals(updated.getStatus())) {
+            TaskStatusChangedEvent statusEvent = new TaskStatusChangedEvent(
+                updated.getId(),
+                updated.getTitle(),
+                oldStatus,
+                updated.getStatus(),
+                updated.getUserId()
+            );
+            eventPublisher.publishTaskUpdated(statusEvent);
+        }
+        
+        log.info(&#34;Task updated: {}&#34;, id);
+        return updated;
+    }
+    
+    @Transactional
+    public void deleteTask(Long id) {
+        log.debug(&#34;Deleting task: {}&#34;, id);
+        
+        Task task = taskRepository.findById(id)
+            .orElseThrow(() -&gt; new TaskNotFoundException(id));
+        
+        taskRepository.delete(task);
+        
+        // Publish event
+        TaskDeletedEvent event = new TaskDeletedEvent(
+            task.getId(),
+            task.getTitle(),
+            task.getUserId()
+        );
+        eventPublisher.publishTaskDeleted(event);
+        
+        log.info(&#34;Task deleted: {}&#34;, id);
+    }
+    
+    @Transactional
+    public Task assignTaskToUser(Long taskId, Long userId) {
+        log.debug(&#34;Assigning task {} to user {}&#34;, taskId, userId);
+        
+        Task task = taskRepository.findById(taskId)
+            .orElseThrow(() -&gt; new TaskNotFoundException(taskId));
+        
+        Long oldUserId = task.getUserId();
+        task.setUserId(userId);
+        task.setUpdatedAt(LocalDateTime.now());
+        
+        Task updated = taskRepository.save(task);
+        
+        // Publish event
+        TaskAssignedEvent event = new TaskAssignedEvent(
+            updated.getId(),
+            updated.getTitle(),
+            oldUserId,
+            userId
+        );
+        eventPublisher.publishTaskAssigned(event);
+        
+        return updated;
+    }
+    
+    // ... other methods remain the same ...
+}
+</code></pre>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Event Listeners" duration="10">
+            <p>Create listeners to handle events asynchronously.</p>
+            <h2 is-upgraded>Audit Event Listener</h2>
+            <pre><code language="language-java" class="language-java">package com.example.taskmanager.messaging.listener;
+
+import com.example.taskmanager.event.*;
+import com.example.taskmanager.model.AuditLog;
+import com.example.taskmanager.repository.AuditLogRepository;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.jms.annotation.JmsListener;
+import org.springframework.stereotype.Component;
+
+import java.time.LocalDateTime;
+
+@Component
+@Slf4j
+public class AuditEventListener {
+    
+    private final AuditLogRepository auditLogRepository;
+    
+    public AuditEventListener(AuditLogRepository auditLogRepository) {
+        this.auditLogRepository = auditLogRepository;
+    }
+    
+    @JmsListener(destination = &#34;task.created&#34;)
+    public void handleTaskCreated(TaskCreatedEvent event) {
+        log.info(&#34;Audit: Task created - ID: {}, Title: {}&#34;, event.getTaskId(), event.getTitle());
+        
+        AuditLog auditLog = new AuditLog();
+        auditLog.setEventType(&#34;TASK_CREATED&#34;);
+        auditLog.setEntityId(event.getTaskId());
+        auditLog.setEntityType(&#34;Task&#34;);
+        auditLog.setUserId(event.getUserId());
+        auditLog.setEventData(String.format(&#34;Created task: %s&#34;, event.getTitle()));
+        auditLog.setOccurredAt(event.getOccurredAt());
+        auditLog.setCreatedAt(LocalDateTime.now());
+        
+        auditLogRepository.save(auditLog);
+    }
+    
+    @JmsListener(destination = &#34;task.updated&#34;)
+    public void handleTaskUpdated(TaskUpdatedEvent event) {
+        log.info(&#34;Audit: Task updated - ID: {}&#34;, event.getTaskId());
+        
+        AuditLog auditLog = new AuditLog();
+        auditLog.setEventType(&#34;TASK_UPDATED&#34;);
+        auditLog.setEntityId(event.getTaskId());
+        auditLog.setEntityType(&#34;Task&#34;);
+        auditLog.setUserId(event.getUserId());
+        auditLog.setEventData(String.format(&#34;Updated task: %s (Status: %s)&#34;, 
+            event.getTitle(), event.getStatus()));
+        auditLog.setOccurredAt(event.getOccurredAt());
+        auditLog.setCreatedAt(LocalDateTime.now());
+        
+        auditLogRepository.save(auditLog);
+    }
+    
+    @JmsListener(destination = &#34;task.deleted&#34;)
+    public void handleTaskDeleted(TaskDeletedEvent event) {
+        log.info(&#34;Audit: Task deleted - ID: {}&#34;, event.getTaskId());
+        
+        AuditLog auditLog = new AuditLog();
+        auditLog.setEventType(&#34;TASK_DELETED&#34;);
+        auditLog.setEntityId(event.getTaskId());
+        auditLog.setEntityType(&#34;Task&#34;);
+        auditLog.setUserId(event.getUserId());
+        auditLog.setEventData(String.format(&#34;Deleted task: %s&#34;, event.getTitle()));
+        auditLog.setOccurredAt(event.getOccurredAt());
+        auditLog.setCreatedAt(LocalDateTime.now());
+        
+        auditLogRepository.save(auditLog);
+    }
+    
+    @JmsListener(destination = &#34;task.assigned&#34;)
+    public void handleTaskAssigned(TaskAssignedEvent event) {
+        log.info(&#34;Audit: Task assigned - ID: {} to User: {}&#34;, 
+            event.getTaskId(), event.getToUserId());
+        
+        AuditLog auditLog = new AuditLog();
+        auditLog.setEventType(&#34;TASK_ASSIGNED&#34;);
+        auditLog.setEntityId(event.getTaskId());
+        auditLog.setEntityType(&#34;Task&#34;);
+        auditLog.setUserId(event.getToUserId());
+        auditLog.setEventData(String.format(&#34;Assigned task &#39;%s&#39; from user %d to user %d&#34;, 
+            event.getTitle(), event.getFromUserId(), event.getToUserId()));
+        auditLog.setOccurredAt(event.getOccurredAt());
+        auditLog.setCreatedAt(LocalDateTime.now());
+        
+        auditLogRepository.save(auditLog);
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Notification Event Listener</h2>
+            <pre><code language="language-java" class="language-java">package com.example.taskmanager.messaging.listener;
+
+import com.example.taskmanager.event.*;
+import com.example.taskmanager.messaging.EventPublisher;
+import com.example.taskmanager.model.User;
+import com.example.taskmanager.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.jms.annotation.JmsListener;
+import org.springframework.stereotype.Component;
+
+@Component
+@Slf4j
+public class NotificationEventListener {
+    
+    private final UserRepository userRepository;
+    private final EventPublisher eventPublisher;
+    
+    public NotificationEventListener(UserRepository userRepository, 
+                                     EventPublisher eventPublisher) {
+        this.userRepository = userRepository;
+        this.eventPublisher = eventPublisher;
+    }
+    
+    @JmsListener(destination = &#34;task.created&#34;)
+    public void handleTaskCreated(TaskCreatedEvent event) {
+        log.info(&#34;Notification: Task created - sending notification to user: {}&#34;, 
+            event.getUserId());
+        
+        if (event.getUserId() != null) {
+            userRepository.findById(event.getUserId()).ifPresent(user -&gt; {
+                NotificationEvent notification = new NotificationEvent(
+                    user.getId(),
+                    user.getEmail(),
+                    &#34;Task Created&#34;,
+                    String.format(&#34;Your task &#39;%s&#39; has been created successfully.&#34;, event.getTitle()),
+                    NotificationEvent.NotificationType.EMAIL
+                );
+                eventPublisher.publishEmailNotification(notification);
+            });
+        }
+    }
+    
+    @JmsListener(destination = &#34;task.assigned&#34;)
+    public void handleTaskAssigned(TaskAssignedEvent event) {
+        log.info(&#34;Notification: Task assigned - notifying user: {}&#34;, event.getToUserId());
+        
+        if (event.getToUserId() != null) {
+            userRepository.findById(event.getToUserId()).ifPresent(user -&gt; {
+                NotificationEvent notification = new NotificationEvent(
+                    user.getId(),
+                    user.getEmail(),
+                    &#34;Task Assigned to You&#34;,
+                    String.format(&#34;Task &#39;%s&#39; has been assigned to you.&#34;, event.getTitle()),
+                    NotificationEvent.NotificationType.EMAIL
+                );
+                // Urgent notification
+                eventPublisher.publishUrgentNotification(notification);
+            });
+        }
+    }
+    
+    @JmsListener(destination = &#34;task.updated&#34;)
+    public void handleTaskStatusChanged(TaskStatusChangedEvent event) {
+        if (event == null || event.getOldStatus().equals(event.getNewStatus())) {
+            return;
+        }
+        
+        log.info(&#34;Notification: Task status changed - {} to {}&#34;, 
+            event.getOldStatus(), event.getNewStatus());
+        
+        if (event.getUserId() != null) {
+            userRepository.findById(event.getUserId()).ifPresent(user -&gt; {
+                NotificationEvent notification = new NotificationEvent(
+                    user.getId(),
+                    user.getEmail(),
+                    &#34;Task Status Changed&#34;,
+                    String.format(&#34;Task &#39;%s&#39; status changed from %s to %s.&#34;, 
+                        event.getTitle(), event.getOldStatus(), event.getNewStatus()),
+                    NotificationEvent.NotificationType.EMAIL
+                );
+                eventPublisher.publishNotification(notification);
+            });
+        }
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Email Event Listener</h2>
+            <pre><code language="language-java" class="language-java">package com.example.taskmanager.messaging.listener;
+
+import com.example.taskmanager.event.NotificationEvent;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.jms.annotation.JmsListener;
+import org.springframework.stereotype.Component;
+
+@Component
+@Slf4j
+public class EmailEventListener {
+    
+    // Simulate email service (replace with real EmailService in production)
+    
+    @JmsListener(destination = &#34;task.email&#34;)
+    public void handleEmailNotification(NotificationEvent notification) {
+        log.info(&#34;📧 Sending email to: {}&#34;, notification.getEmail());
+        log.info(&#34;   Subject: {}&#34;, notification.getSubject());
+        log.info(&#34;   Message: {}&#34;, notification.getMessage());
+        
+        // Simulate email sending
+        try {
+            Thread.sleep(1000); // Simulate network delay
+            log.info(&#34;✅ Email sent successfully to: {}&#34;, notification.getEmail());
+        } catch (InterruptedException e) {
+            log.error(&#34;❌ Failed to send email: {}&#34;, e.getMessage());
+            throw new RuntimeException(&#34;Email sending failed&#34;, e);
+        }
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Dead Letter Queue Listener</h2>
+            <pre><code language="language-java" class="language-java">package com.example.taskmanager.messaging.listener;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.jms.annotation.JmsListener;
+import org.springframework.stereotype.Component;
+
+import jakarta.jms.Message;
+
+@Component
+@Slf4j
+public class DeadLetterQueueListener {
+    
+    @JmsListener(destination = &#34;task.dlq&#34;)
+    public void handleDeadLetter(Message message) {
+        try {
+            log.error(&#34;💀 Message moved to DLQ: {}&#34;, message.getJMSMessageID());
+            log.error(&#34;   Type: {}&#34;, message.getJMSType());
+            log.error(&#34;   Timestamp: {}&#34;, message.getJMSTimestamp());
+            
+            // Log for manual intervention
+            // In production: alert admin, store for replay, etc.
+            
+        } catch (Exception e) {
+            log.error(&#34;Error processing DLQ message: {}&#34;, e.getMessage());
+        }
+    }
+}
+</code></pre>
+            <h2 is-upgraded>AuditLog Entity</h2>
+            <pre><code language="language-java" class="language-java">package com.example.taskmanager.model;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class AuditLog {
+    
+    private Long id;
+    private String eventType;
+    private Long entityId;
+    private String entityType;
+    private Long userId;
+    private String eventData;
+    private LocalDateTime occurredAt;
+    private LocalDateTime createdAt;
+}
+</code></pre>
+            <h2 is-upgraded>AuditLogRepository</h2>
+            <pre><code language="language-java" class="language-java">package com.example.taskmanager.repository;
+
+import com.example.taskmanager.model.AuditLog;
+import org.springframework.stereotype.Repository;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
+
+@Repository
+public class AuditLogRepository {
+    
+    private final ConcurrentHashMap&lt;Long, AuditLog&gt; auditLogs = new ConcurrentHashMap&lt;&gt;();
+    private final AtomicLong idGenerator = new AtomicLong(1);
+    
+    public AuditLog save(AuditLog auditLog) {
+        if (auditLog.getId() == null) {
+            auditLog.setId(idGenerator.getAndIncrement());
+        }
+        auditLogs.put(auditLog.getId(), auditLog);
+        return auditLog;
+    }
+    
+    public List&lt;AuditLog&gt; findAll() {
+        return new ArrayList&lt;&gt;(auditLogs.values());
+    }
+    
+    public List&lt;AuditLog&gt; findByEntityId(Long entityId) {
+        return auditLogs.values().stream()
+            .filter(log -&gt; log.getEntityId().equals(entityId))
+            .toList();
+    }
+}
+</code></pre>
+            <aside class="special">
+                <p><strong>Listener Patterns:</strong> @JmsListener methods run asynchronously. Multiple listeners can
+                    subscribe to same queue (load balancing) or topic (broadcasting).</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Testing Event-Driven System" duration="5">
+            <p>Test async messaging and event handling.</p>
+            <h2 is-upgraded>Manual Testing</h2>
+            <p><strong>1. Create a task:</strong></p>
+            <pre><code language="language-bash" class="language-bash">curl -X POST http://localhost:8080/api/tasks \
+  -H &#34;Content-Type: application/json&#34; \
+  -H &#34;Authorization: Bearer &lt;token&gt;&#34; \
+  -d &#39;{
+    &#34;title&#34;: &#34;Event-Driven Task&#34;,
+    &#34;description&#34;: &#34;Testing JMS events&#34;
+  }&#39;
+</code></pre>
+            <p><strong>Check logs:</strong></p>
+            <pre><code>Publishing TaskCreated event: &lt;uuid&gt;
+Audit: Task created - ID: 1, Title: Event-Driven Task
+Notification: Task created - sending notification to user: 1
+📧 Sending email to: user@example.com
+✅ Email sent successfully
+</code></pre>
+            <p><strong>2. Assign task:</strong></p>
+            <pre><code language="language-bash" class="language-bash">curl -X PUT http://localhost:8080/api/tasks/1/assign/2 \
+  -H &#34;Authorization: Bearer &lt;token&gt;&#34;
+</code></pre>
+            <p><strong>Check logs:</strong></p>
+            <pre><code>Publishing TaskAssigned event: &lt;uuid&gt;
+Audit: Task assigned - ID: 1 to User: 2
+Notification: Task assigned - notifying user: 2
+📧 Sending email to: user2@example.com (URGENT)
+</code></pre>
+            <p><strong>3. View audit logs:</strong></p>
+            <pre><code language="language-bash" class="language-bash">curl http://localhost:8080/api/audit/task/1 \
+  -H &#34;Authorization: Bearer &lt;token&gt;&#34;
+</code></pre>
+            <h2 is-upgraded>Integration Test</h2>
+            <pre><code language="language-java" class="language-java">package com.example.taskmanager.messaging;
+
+import com.example.taskmanager.event.TaskCreatedEvent;
+import com.example.taskmanager.model.TaskStatus;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jms.core.JmsTemplate;
+
+import static org.awaitility.Awaitility.await;
+import static java.util.concurrent.TimeUnit.SECONDS;
+
+@SpringBootTest
+public class EventPublisherIntegrationTest {
+    
+    @Autowired
+    private EventPublisher eventPublisher;
+    
+    @Autowired
+    private JmsTemplate jmsTemplate;
+    
+    @Test
+    public void testPublishTaskCreatedEvent() {
+        TaskCreatedEvent event = new TaskCreatedEvent(
+            1L, &#34;Test Task&#34;, &#34;Description&#34;, TaskStatus.TODO, 1L
+        );
+        
+        eventPublisher.publishTaskCreated(event);
+        
+        // Wait for async processing
+        await().atMost(5, SECONDS).untilAsserted(() -&gt; {
+            // Verify audit log created
+            // Verify notification sent
+        });
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Add Awaitility Dependency</h2>
+            <pre><code language="language-xml" class="language-xml">&lt;dependency&gt;
+    &lt;groupId&gt;org.awaitility&lt;/groupId&gt;
+    &lt;artifactId&gt;awaitility&lt;/artifactId&gt;
+    &lt;version&gt;4.2.0&lt;/version&gt;
+    &lt;scope&gt;test&lt;/scope&gt;
+&lt;/dependency&gt;
+</code></pre>
+            <h2 is-upgraded>Monitor Artemis Console</h2>
+            <p>Access embedded Artemis console:</p>
+            <ul>
+                <li>URL: http://localhost:8161/console</li>
+                <li>Default credentials: admin/admin</li>
+            </ul>
+            <p>View:</p>
+            <ul>
+                <li>Queue depths</li>
+                <li>Message rates</li>
+                <li>Active consumers</li>
+                <li>DLQ messages</li>
+            </ul>
+            <aside class="special">
+                <p><strong>Testing Async:</strong> Use Awaitility to test async operations with timeouts. Never use
+                    Thread.sleep() in tests!</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Conclusion" duration="2">
+            <p>Congratulations! 🎉 You&#39;ve built an event-driven architecture with Spring JMS!</p>
+            <h2 is-upgraded>What You&#39;ve Learned</h2>
+            <ul>
+                <li>✅ <strong>JMS Basics:</strong> Queues, topics, message brokers</li>
+                <li>✅ <strong>ActiveMQ Artemis:</strong> Embedded broker configuration</li>
+                <li>✅ <strong>Event-Driven Design:</strong> Domain events and handlers</li>
+                <li>✅ <strong>Spring JMS:</strong> JmsTemplate and @JmsListener</li>
+                <li>✅ <strong>Async Processing:</strong> Non-blocking event handling</li>
+                <li>✅ <strong>Event Publishing:</strong> Fire-and-forget messaging</li>
+                <li>✅ <strong>Event Listeners:</strong> Decoupled event subscribers</li>
+                <li>✅ <strong>Audit Trail:</strong> Event sourcing for history</li>
+                <li>✅ <strong>Notifications:</strong> Email notifications via events</li>
+                <li>✅ <strong>DLQ:</strong> Dead letter queue for failures</li>
+            </ul>
+            <h2 is-upgraded>Task Management API v1.6</h2>
+            <p>Event-driven features:</p>
+            <ul>
+                <li>✅ Domain events for task lifecycle</li>
+                <li>✅ Async event publishing</li>
+                <li>✅ Audit log via event sourcing</li>
+                <li>✅ Email notifications</li>
+                <li>✅ Decoupled event handlers</li>
+                <li>✅ JMS queues and topics</li>
+                <li>✅ Message priority support</li>
+                <li>✅ Dead letter queue handling</li>
+                <li>✅ Embedded Artemis broker</li>
+                <li>✅ Production-ready messaging</li>
+            </ul>
+            <h2 is-upgraded>Event-Driven Benefits</h2>
+            <p><strong>Before (Synchronous):</strong></p>
+            <ul>
+                <li>🔴 Slow response times</li>
+                <li>🔴 Tight coupling</li>
+                <li>🔴 Single point of failure</li>
+                <li>🔴 Hard to scale</li>
+            </ul>
+            <p><strong>After (Event-Driven):</strong></p>
+            <ul>
+                <li>✅ Fast response times</li>
+                <li>✅ Loose coupling</li>
+                <li>✅ Resilient to failures</li>
+                <li>✅ Easy horizontal scaling</li>
+                <li>✅ Audit trail included</li>
+                <li>✅ Async processing</li>
+            </ul>
+            <h2 is-upgraded>Git Branching</h2>
+            <pre><code language="language-bash" class="language-bash">git add .
+git commit -m &#34;Codelab 3.7: Spring JMS &amp; Event-Driven Architecture complete&#34;
+git tag codelab-3.7
+</code></pre>
+            <h2 is-upgraded>Next Steps</h2>
+            <ul>
+                <li><strong>Codelab 3.8:</strong> Testing &amp; Remote Debugging</li>
+            </ul>
+            <h2 is-upgraded>Additional Resources</h2>
+            <ul>
+                <li><a href="https://docs.spring.io/spring-framework/reference/integration/jms.html"
+                        target="_blank">Spring JMS Documentation</a></li>
+                <li><a href="https://activemq.apache.org/components/artemis/" target="_blank">ActiveMQ Artemis</a></li>
+                <li><a href="https://martinfowler.com/articles/201701-event-driven.html" target="_blank">Event-Driven
+                        Architecture</a></li>
+            </ul>
+            <aside class="special">
+                <p><strong>Microservices Ready!</strong> Your API now uses event-driven architecture - the foundation
+                    for scalable, loosely-coupled microservices!</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+    </google-codelab>
+
+    <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
+    <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
+    <script src="https://storage.googleapis.com/claat-public/prettify.js"></script>
+    <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
+    <script src="//support.google.com/inapp/api.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,27 @@
+{
+  "environment": "web",
+  "format": "html",
+  "prefix": "https://storage.googleapis.com",
+  "mainga": "UA-49880327-14",
+  "updated": "2025-12-27T18:48:58+05:30",
+  "id": "jpa-locking-spring-security",
+  "duration": 59,
+  "title": "JPA Locking Mechanisms \u0026 Spring Security",
+  "summary": "Master JPA locking mechanisms, implement Spring Security with role-based access control, and secure the Task Management API with authentication and authorization",
+  "source": "codelab-3.4-jpa-locking-spring-security.md",
+  "theme": "",
+  "status": [
+    "published"
+  ],
+  "category": [
+    "springboot",
+    "jpa",
+    "springsecurity",
+    "authentication",
+    "authorization"
+  ],
+  "tags": [
+    "web"
+  ],
+  "url": "jpa-locking-spring-security"
+}

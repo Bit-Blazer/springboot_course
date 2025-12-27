@@ -1,0 +1,1467 @@
+<!doctype html>
+
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+    <meta name="theme-color" content="#4F7DC9">
+    <meta charset="UTF-8">
+    <title>Testing &amp; Remote Debugging Spring Boot Apps</title>
+    <link rel="stylesheet"
+        href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
+    <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
+    <style>
+        .success {
+            color: #1e8e3e;
+        }
+
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+    <google-codelab-analytics gaid="UA-49880327-14"></google-codelab-analytics>
+    <google-codelab codelab-gaid="" id="testing-remote-debugging"
+        title="Testing &amp; Remote Debugging Spring Boot Apps" environment="web" feedback-link="">
+
+        <google-codelab-step label="Introduction" duration="3">
+            <p>Build comprehensive test coverage and master remote debugging for production troubleshooting.</p>
+            <h2 class="checklist" is-upgraded>What You&#39;ll Learn</h2>
+            <ul class="checklist">
+                <li><strong>Unit Testing:</strong> JUnit 5 and Mockito</li>
+                <li><strong>Integration Testing:</strong> @SpringBootTest</li>
+                <li><strong>Test Slices:</strong> @WebMvcTest, @DataJpaTest, @JsonTest</li>
+                <li><strong>Testcontainers:</strong> Docker-based integration tests</li>
+                <li><strong>WebTestClient:</strong> Testing reactive endpoints</li>
+                <li><strong>MockMvc:</strong> Testing MVC controllers</li>
+                <li><strong>Test Coverage:</strong> JaCoCo code coverage</li>
+                <li><strong>Remote Debugging:</strong> JDWP and IntelliJ/Eclipse</li>
+                <li><strong>Production Debugging:</strong> Thread dumps, heap dumps</li>
+                <li><strong>Actuator:</strong> Health checks and metrics</li>
+            </ul>
+            <h2 is-upgraded>What You&#39;ll Build</h2>
+            <p>Comprehensive test suite for Task API:</p>
+            <ul>
+                <li><strong>Unit Tests:</strong> Services, repositories, utilities</li>
+                <li><strong>Integration Tests:</strong> Full application context</li>
+                <li><strong>Controller Tests:</strong> REST API endpoints</li>
+                <li><strong>Repository Tests:</strong> Database operations</li>
+                <li><strong>Security Tests:</strong> Authentication and authorization</li>
+                <li><strong>Testcontainers:</strong> PostgreSQL integration tests</li>
+                <li><strong>Code Coverage:</strong> 80%+ coverage with JaCoCo</li>
+                <li><strong>Remote Debugging:</strong> Debug running containers</li>
+            </ul>
+            <h2 is-upgraded>Prerequisites</h2>
+            <ul>
+                <li>Completed Codelab 3.7 (Spring JMS)</li>
+                <li>Understanding of testing concepts</li>
+            </ul>
+            <h2 is-upgraded>Testing Pyramid</h2>
+            <pre><code>        /\
+       /  \  E2E Tests (Few)
+      /____\
+     /      \
+    / Integ. \ Integration Tests (Some)
+   /__________\
+  /            \
+ /  Unit Tests  \ Unit Tests (Many)
+/________________\
+
+Unit: Fast, isolated, many
+Integration: Slower, real components, some
+E2E: Slowest, full system, few
+</code></pre>
+            <h2 is-upgraded>New Dependencies</h2>
+            <p>Add to <code>pom.xml</code>:</p>
+            <pre><code language="language-xml" class="language-xml">&lt;!-- Testing --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-test&lt;/artifactId&gt;
+    &lt;scope&gt;test&lt;/scope&gt;
+&lt;/dependency&gt;
+
+&lt;!-- Reactor Test --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;io.projectreactor&lt;/groupId&gt;
+    &lt;artifactId&gt;reactor-test&lt;/artifactId&gt;
+    &lt;scope&gt;test&lt;/scope&gt;
+&lt;/dependency&gt;
+
+&lt;!-- Testcontainers --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.testcontainers&lt;/groupId&gt;
+    &lt;artifactId&gt;testcontainers&lt;/artifactId&gt;
+    &lt;version&gt;1.19.3&lt;/version&gt;
+    &lt;scope&gt;test&lt;/scope&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.testcontainers&lt;/groupId&gt;
+    &lt;artifactId&gt;postgresql&lt;/artifactId&gt;
+    &lt;version&gt;1.19.3&lt;/version&gt;
+    &lt;scope&gt;test&lt;/scope&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.testcontainers&lt;/groupId&gt;
+    &lt;artifactId&gt;junit-jupiter&lt;/artifactId&gt;
+    &lt;version&gt;1.19.3&lt;/version&gt;
+    &lt;scope&gt;test&lt;/scope&gt;
+&lt;/dependency&gt;
+
+&lt;!-- JaCoCo for code coverage --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.jacoco&lt;/groupId&gt;
+    &lt;artifactId&gt;jacoco-maven-plugin&lt;/artifactId&gt;
+    &lt;version&gt;0.8.11&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre>
+            <aside class="special">
+                <p><strong>Testing is NOT optional!</strong> Tests are your safety net for refactoring, documentation
+                    for new developers, and confidence for deployment.</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Unit Testing with JUnit 5" duration="10">
+            <p>Write unit tests for services and business logic.</p>
+            <h2 is-upgraded>TaskService Unit Test</h2>
+            <pre><code language="language-java" class="language-java">package com.example.taskmanager.service;
+
+import com.example.taskmanager.event.*;
+import com.example.taskmanager.exception.TaskNotFoundException;
+import com.example.taskmanager.messaging.EventPublisher;
+import com.example.taskmanager.model.Task;
+import com.example.taskmanager.model.TaskStatus;
+import com.example.taskmanager.repository.TaskRepository;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+@DisplayName(&#34;TaskService Unit Tests&#34;)
+class TaskServiceTest {
+
+    @Mock
+    private TaskRepository taskRepository;
+
+    @Mock
+    private EventPublisher eventPublisher;
+
+    @InjectMocks
+    private TaskService taskService;
+
+    private Task testTask;
+
+    @BeforeEach
+    void setUp() {
+        testTask = new Task();
+        testTask.setId(1L);
+        testTask.setTitle(&#34;Test Task&#34;);
+        testTask.setDescription(&#34;Test Description&#34;);
+        testTask.setStatus(TaskStatus.TODO);
+        testTask.setUserId(1L);
+    }
+
+    @Test
+    @DisplayName(&#34;Should create task successfully&#34;)
+    void shouldCreateTask() {
+        // Given
+        Task newTask = new Task(&#34;New Task&#34;, &#34;Description&#34;);
+        newTask.setUserId(1L);
+
+        Task savedTask = new Task(&#34;New Task&#34;, &#34;Description&#34;);
+        savedTask.setId(2L);
+        savedTask.setUserId(1L);
+        savedTask.setStatus(TaskStatus.TODO);
+
+        when(taskRepository.save(any(Task.class))).thenReturn(savedTask);
+        doNothing().when(eventPublisher).publishTaskCreated(any(TaskCreatedEvent.class));
+
+        // When
+        Task result = taskService.createTask(newTask);
+
+        // Then
+        assertThat(result).isNotNull();
+        assertThat(result.getId()).isEqualTo(2L);
+        assertThat(result.getTitle()).isEqualTo(&#34;New Task&#34;);
+        assertThat(result.getStatus()).isEqualTo(TaskStatus.TODO);
+
+        verify(taskRepository, times(1)).save(any(Task.class));
+        verify(eventPublisher, times(1)).publishTaskCreated(any(TaskCreatedEvent.class));
+    }
+
+    @Test
+    @DisplayName(&#34;Should get task by ID&#34;)
+    void shouldGetTaskById() {
+        // Given
+        when(taskRepository.findById(1L)).thenReturn(Optional.of(testTask));
+
+        // When
+        Task result = taskService.getTaskById(1L);
+
+        // Then
+        assertThat(result).isNotNull();
+        assertThat(result.getId()).isEqualTo(1L);
+        assertThat(result.getTitle()).isEqualTo(&#34;Test Task&#34;);
+
+        verify(taskRepository, times(1)).findById(1L);
+    }
+
+    @Test
+    @DisplayName(&#34;Should throw exception when task not found&#34;)
+    void shouldThrowExceptionWhenTaskNotFound() {
+        // Given
+        when(taskRepository.findById(999L)).thenReturn(Optional.empty());
+
+        // When &amp; Then
+        assertThatThrownBy(() -&gt; taskService.getTaskById(999L))
+            .isInstanceOf(TaskNotFoundException.class)
+            .hasMessageContaining(&#34;999&#34;);
+
+        verify(taskRepository, times(1)).findById(999L);
+    }
+
+    @Test
+    @DisplayName(&#34;Should get all tasks&#34;)
+    void shouldGetAllTasks() {
+        // Given
+        Task task2 = new Task(&#34;Task 2&#34;, &#34;Description 2&#34;);
+        task2.setId(2L);
+
+        when(taskRepository.findAll()).thenReturn(Arrays.asList(testTask, task2));
+
+        // When
+        List&lt;Task&gt; results = taskService.getAllTasks();
+
+        // Then
+        assertThat(results).hasSize(2);
+        assertThat(results).extracting(Task::getTitle)
+            .containsExactly(&#34;Test Task&#34;, &#34;Task 2&#34;);
+
+        verify(taskRepository, times(1)).findAll();
+    }
+
+    @Test
+    @DisplayName(&#34;Should update task&#34;)
+    void shouldUpdateTask() {
+        // Given
+        Task updateData = new Task();
+        updateData.setTitle(&#34;Updated Title&#34;);
+        updateData.setDescription(&#34;Updated Description&#34;);
+        updateData.setStatus(TaskStatus.IN_PROGRESS);
+
+        when(taskRepository.findById(1L)).thenReturn(Optional.of(testTask));
+        when(taskRepository.save(any(Task.class))).thenReturn(testTask);
+        doNothing().when(eventPublisher).publishTaskUpdated(any(TaskUpdatedEvent.class));
+
+        // When
+        Task result = taskService.updateTask(1L, updateData);
+
+        // Then
+        assertThat(result.getTitle()).isEqualTo(&#34;Updated Title&#34;);
+        assertThat(result.getDescription()).isEqualTo(&#34;Updated Description&#34;);
+        assertThat(result.getStatus()).isEqualTo(TaskStatus.IN_PROGRESS);
+
+        verify(taskRepository, times(1)).findById(1L);
+        verify(taskRepository, times(1)).save(any(Task.class));
+        verify(eventPublisher, times(1)).publishTaskUpdated(any(TaskUpdatedEvent.class));
+    }
+
+    @Test
+    @DisplayName(&#34;Should delete task&#34;)
+    void shouldDeleteTask() {
+        // Given
+        when(taskRepository.findById(1L)).thenReturn(Optional.of(testTask));
+        doNothing().when(taskRepository).delete(any(Task.class));
+        doNothing().when(eventPublisher).publishTaskDeleted(any(TaskDeletedEvent.class));
+
+        // When
+        taskService.deleteTask(1L);
+
+        // Then
+        verify(taskRepository, times(1)).findById(1L);
+        verify(taskRepository, times(1)).delete(testTask);
+        verify(eventPublisher, times(1)).publishTaskDeleted(any(TaskDeletedEvent.class));
+    }
+
+    @Test
+    @DisplayName(&#34;Should publish correct event when creating task&#34;)
+    void shouldPublishCorrectEventWhenCreatingTask() {
+        // Given
+        Task newTask = new Task(&#34;Event Task&#34;, &#34;Description&#34;);
+        newTask.setUserId(1L);
+
+        Task savedTask = new Task(&#34;Event Task&#34;, &#34;Description&#34;);
+        savedTask.setId(3L);
+        savedTask.setUserId(1L);
+        savedTask.setStatus(TaskStatus.TODO);
+
+        when(taskRepository.save(any(Task.class))).thenReturn(savedTask);
+
+        ArgumentCaptor&lt;TaskCreatedEvent&gt; eventCaptor =
+            ArgumentCaptor.forClass(TaskCreatedEvent.class);
+
+        // When
+        taskService.createTask(newTask);
+
+        // Then
+        verify(eventPublisher).publishTaskCreated(eventCaptor.capture());
+
+        TaskCreatedEvent capturedEvent = eventCaptor.getValue();
+        assertThat(capturedEvent.getTaskId()).isEqualTo(3L);
+        assertThat(capturedEvent.getTitle()).isEqualTo(&#34;Event Task&#34;);
+        assertThat(capturedEvent.getStatus()).isEqualTo(TaskStatus.TODO);
+    }
+
+    @Test
+    @DisplayName(&#34;Should assign task to user&#34;)
+    void shouldAssignTaskToUser() {
+        // Given
+        when(taskRepository.findById(1L)).thenReturn(Optional.of(testTask));
+        when(taskRepository.save(any(Task.class))).thenReturn(testTask);
+        doNothing().when(eventPublisher).publishTaskAssigned(any(TaskAssignedEvent.class));
+
+        // When
+        Task result = taskService.assignTaskToUser(1L, 2L);
+
+        // Then
+        assertThat(result.getUserId()).isEqualTo(2L);
+        verify(eventPublisher, times(1)).publishTaskAssigned(any(TaskAssignedEvent.class));
+    }
+}
+</code></pre>
+            <h2 is-upgraded>JUnit 5 Assertions</h2>
+            <pre><code language="language-java" class="language-java">// AssertJ assertions (recommended)
+assertThat(actual).isEqualTo(expected);
+assertThat(list).hasSize(3);
+assertThat(string).contains(&#34;substring&#34;);
+assertThat(object).isNotNull();
+assertThat(list).extracting(&#34;name&#34;).containsExactly(&#34;A&#34;, &#34;B&#34;);
+
+// Exception assertions
+assertThatThrownBy(() -&gt; service.method())
+    .isInstanceOf(RuntimeException.class)
+    .hasMessageContaining(&#34;error&#34;);
+
+assertThatCode(() -&gt; service.method()).doesNotThrowAnyException();
+
+// JUnit assertions
+assertEquals(expected, actual);
+assertNotNull(object);
+assertTrue(condition);
+assertThrows(Exception.class, () -&gt; method());
+</code></pre>
+            <h2 is-upgraded>Mockito Mocking</h2>
+            <pre><code language="language-java" class="language-java">// Create mock
+@Mock
+private Repository repository;
+
+// Stub method
+when(repository.findById(1L)).thenReturn(Optional.of(entity));
+when(repository.save(any())).thenReturn(savedEntity);
+doNothing().when(publisher).publish(any());
+doThrow(new RuntimeException()).when(service).delete(1L);
+
+// Verify interactions
+verify(repository, times(1)).findById(1L);
+verify(repository, never()).delete(any());
+verify(publisher, atLeastOnce()).publish(any());
+
+// Argument captors
+ArgumentCaptor&lt;Task&gt; captor = ArgumentCaptor.forClass(Task.class);
+verify(repository).save(captor.capture());
+Task captured = captor.getValue();
+assertThat(captured.getTitle()).isEqualTo(&#34;Expected&#34;);
+</code></pre>
+            <aside class="special">
+                <p><strong>Best Practice:</strong> Use AssertJ for fluent, readable assertions. Use Mockito for mocking
+                    dependencies in unit tests.</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Integration Testing" duration="10">
+            <p>Test with full Spring context and real components.</p>
+            <h2 is-upgraded>Integration Test with @SpringBootTest</h2>
+            <pre><code language="language-java" class="language-java">package com.example.taskmanager;
+
+import com.example.taskmanager.dto.CreateTaskRequest;
+import com.example.taskmanager.dto.TaskResponse;
+import com.example.taskmanager.model.TaskStatus;
+import com.example.taskmanager.repository.TaskRepository;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.ActiveProfiles;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles(&#34;test&#34;)
+@DisplayName(&#34;Task API Integration Tests&#34;)
+class TaskApiIntegrationTest {
+
+    @LocalServerPort
+    private int port;
+
+    @Autowired
+    private TestRestTemplate restTemplate;
+
+    @Autowired
+    private TaskRepository taskRepository;
+
+    private String baseUrl;
+
+    @BeforeEach
+    void setUp() {
+        baseUrl = &#34;http://localhost:&#34; + port + &#34;/api/tasks&#34;;
+        taskRepository.deleteAll();
+    }
+
+    @Test
+    @DisplayName(&#34;Should create task via API&#34;)
+    void shouldCreateTaskViaApi() {
+        // Given
+        CreateTaskRequest request = new CreateTaskRequest(
+            &#34;Integration Test Task&#34;,
+            &#34;Testing full stack&#34;,
+            TaskStatus.TODO
+        );
+
+        // When
+        ResponseEntity&lt;TaskResponse&gt; response = restTemplate.postForEntity(
+            baseUrl,
+            request,
+            TaskResponse.class
+        );
+
+        // Then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getTitle()).isEqualTo(&#34;Integration Test Task&#34;);
+        assertThat(response.getHeaders().getLocation()).isNotNull();
+    }
+
+    @Test
+    @DisplayName(&#34;Should get all tasks via API&#34;)
+    void shouldGetAllTasksViaApi() {
+        // Given - create some tasks first
+        taskRepository.save(createTestTask(&#34;Task 1&#34;));
+        taskRepository.save(createTestTask(&#34;Task 2&#34;));
+
+        // When
+        ResponseEntity&lt;TaskResponse[]&gt; response = restTemplate.getForEntity(
+            baseUrl,
+            TaskResponse[].class
+        );
+
+        // Then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).hasSize(2);
+    }
+
+    @Test
+    @DisplayName(&#34;Should return 404 for non-existent task&#34;)
+    void shouldReturn404ForNonExistentTask() {
+        // When
+        ResponseEntity&lt;TaskResponse&gt; response = restTemplate.getForEntity(
+            baseUrl + &#34;/999&#34;,
+            TaskResponse.class
+        );
+
+        // Then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    @DisplayName(&#34;Should update task via API&#34;)
+    void shouldUpdateTaskViaApi() {
+        // Given
+        Task existing = taskRepository.save(createTestTask(&#34;Original&#34;));
+
+        UpdateTaskRequest update = new UpdateTaskRequest(
+            &#34;Updated Title&#34;,
+            &#34;Updated Description&#34;,
+            TaskStatus.IN_PROGRESS
+        );
+
+        // When
+        restTemplate.put(baseUrl + &#34;/&#34; + existing.getId(), update);
+
+        // Then
+        Task updated = taskRepository.findById(existing.getId()).orElseThrow();
+        assertThat(updated.getTitle()).isEqualTo(&#34;Updated Title&#34;);
+        assertThat(updated.getStatus()).isEqualTo(TaskStatus.IN_PROGRESS);
+    }
+
+    @Test
+    @DisplayName(&#34;Should delete task via API&#34;)
+    void shouldDeleteTaskViaApi() {
+        // Given
+        Task existing = taskRepository.save(createTestTask(&#34;To Delete&#34;));
+
+        // When
+        restTemplate.delete(baseUrl + &#34;/&#34; + existing.getId());
+
+        // Then
+        assertThat(taskRepository.findById(existing.getId())).isEmpty();
+    }
+
+    private Task createTestTask(String title) {
+        Task task = new Task(title, &#34;Description&#34;);
+        task.setStatus(TaskStatus.TODO);
+        return task;
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Test Configuration</h2>
+            <p><strong>src/test/resources/application-test.yml:</strong></p>
+            <pre><code language="language-yaml" class="language-yaml">spring:
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+
+  jms:
+    template:
+      default-destination: test.queue
+
+  artemis:
+    mode: embedded
+    embedded:
+      enabled: true
+      persistent: false
+
+logging:
+  level:
+    com.example.taskmanager: DEBUG
+    org.hibernate.SQL: DEBUG
+</code></pre>
+            <h2 is-upgraded>WebMvc Test Slice</h2>
+            <pre><code language="language-java" class="language-java">package com.example.taskmanager.controller;
+
+import com.example.taskmanager.dto.TaskResponse;
+import com.example.taskmanager.model.Task;
+import com.example.taskmanager.model.TaskStatus;
+import com.example.taskmanager.service.TaskService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.Arrays;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.hamcrest.Matchers.*;
+
+@WebMvcTest(TaskController.class)
+@DisplayName(&#34;TaskController MVC Tests&#34;)
+class TaskControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @MockBean
+    private TaskService taskService;
+
+    @Test
+    @DisplayName(&#34;Should return all tasks&#34;)
+    void shouldReturnAllTasks() throws Exception {
+        // Given
+        Task task1 = createTask(1L, &#34;Task 1&#34;);
+        Task task2 = createTask(2L, &#34;Task 2&#34;);
+
+        when(taskService.getAllTasks()).thenReturn(Arrays.asList(task1, task2));
+
+        // When &amp; Then
+        mockMvc.perform(get(&#34;/api/tasks&#34;))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath(&#34;$&#34;, hasSize(2)))
+            .andExpect(jsonPath(&#34;$[0].title&#34;, is(&#34;Task 1&#34;)))
+            .andExpect(jsonPath(&#34;$[1].title&#34;, is(&#34;Task 2&#34;)));
+    }
+
+    @Test
+    @DisplayName(&#34;Should create task&#34;)
+    void shouldCreateTask() throws Exception {
+        // Given
+        CreateTaskRequest request = new CreateTaskRequest(
+            &#34;New Task&#34;,
+            &#34;Description&#34;,
+            TaskStatus.TODO
+        );
+
+        Task savedTask = createTask(1L, &#34;New Task&#34;);
+        when(taskService.createTask(any())).thenReturn(savedTask);
+
+        // When &amp; Then
+        mockMvc.perform(post(&#34;/api/tasks&#34;)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+            .andExpect(status().isCreated())
+            .andExpect(header().exists(&#34;Location&#34;))
+            .andExpect(jsonPath(&#34;$.id&#34;, is(1)))
+            .andExpect(jsonPath(&#34;$.title&#34;, is(&#34;New Task&#34;)));
+    }
+
+    @Test
+    @DisplayName(&#34;Should return 404 for non-existent task&#34;)
+    void shouldReturn404() throws Exception {
+        // Given
+        when(taskService.getTaskById(999L))
+            .thenThrow(new TaskNotFoundException(999L));
+
+        // When &amp; Then
+        mockMvc.perform(get(&#34;/api/tasks/999&#34;))
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName(&#34;Should validate request body&#34;)
+    void shouldValidateRequestBody() throws Exception {
+        // Given - invalid request (empty title)
+        CreateTaskRequest invalid = new CreateTaskRequest(&#34;&#34;, &#34;Description&#34;, null);
+
+        // When &amp; Then
+        mockMvc.perform(post(&#34;/api/tasks&#34;)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(invalid)))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath(&#34;$.validationErrors&#34;).exists());
+    }
+
+    private Task createTask(Long id, String title) {
+        Task task = new Task(title, &#34;Description&#34;);
+        task.setId(id);
+        task.setStatus(TaskStatus.TODO);
+        return task;
+    }
+}
+</code></pre>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Testcontainers for Integration Tests" duration="10">
+            <p>Use Docker containers for realistic integration tests.</p>
+            <h2 is-upgraded>PostgreSQL Testcontainer</h2>
+            <pre><code language="language-java" class="language-java">package com.example.taskmanager;
+
+import com.example.taskmanager.model.Task;
+import com.example.taskmanager.model.TaskStatus;
+import com.example.taskmanager.repository.TaskRepository;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+@SpringBootTest
+@Testcontainers
+@DisplayName(&#34;Task Repository Integration Tests with Testcontainers&#34;)
+class TaskRepositoryIntegrationTest {
+
+    @Container
+    static PostgreSQLContainer&lt;?&gt; postgres = new PostgreSQLContainer&lt;&gt;(&#34;postgres:15-alpine&#34;)
+        .withDatabaseName(&#34;testdb&#34;)
+        .withUsername(&#34;test&#34;)
+        .withPassword(&#34;test&#34;);
+
+    @DynamicPropertySource
+    static void configureProperties(DynamicPropertyRegistry registry) {
+        registry.add(&#34;spring.datasource.url&#34;, postgres::getJdbcUrl);
+        registry.add(&#34;spring.datasource.username&#34;, postgres::getUsername);
+        registry.add(&#34;spring.datasource.password&#34;, postgres::getPassword);
+    }
+
+    @Autowired
+    private TaskRepository taskRepository;
+
+    @Test
+    @DisplayName(&#34;Should save and retrieve task from PostgreSQL&#34;)
+    void shouldSaveAndRetrieveTask() {
+        // Given
+        Task task = new Task(&#34;Testcontainer Task&#34;, &#34;Testing with real PostgreSQL&#34;);
+        task.setStatus(TaskStatus.TODO);
+        task.setUserId(1L);
+
+        // When
+        Task saved = taskRepository.save(task);
+        Task retrieved = taskRepository.findById(saved.getId()).orElseThrow();
+
+        // Then
+        assertThat(retrieved.getTitle()).isEqualTo(&#34;Testcontainer Task&#34;);
+        assertThat(retrieved.getStatus()).isEqualTo(TaskStatus.TODO);
+    }
+
+    @Test
+    @DisplayName(&#34;Should find tasks by status&#34;)
+    void shouldFindTasksByStatus() {
+        // Given
+        taskRepository.deleteAll();
+        taskRepository.save(createTask(&#34;Task 1&#34;, TaskStatus.TODO));
+        taskRepository.save(createTask(&#34;Task 2&#34;, TaskStatus.TODO));
+        taskRepository.save(createTask(&#34;Task 3&#34;, TaskStatus.DONE));
+
+        // When
+        List&lt;Task&gt; todoTasks = taskRepository.findByStatus(TaskStatus.TODO);
+
+        // Then
+        assertThat(todoTasks).hasSize(2);
+        assertThat(todoTasks).extracting(Task::getStatus)
+            .containsOnly(TaskStatus.TODO);
+    }
+
+    @Test
+    @DisplayName(&#34;Should find tasks by user ID&#34;)
+    void shouldFindTasksByUserId() {
+        // Given
+        taskRepository.deleteAll();
+        Task task1 = createTask(&#34;User 1 Task&#34;, TaskStatus.TODO);
+        task1.setUserId(1L);
+        taskRepository.save(task1);
+
+        Task task2 = createTask(&#34;User 2 Task&#34;, TaskStatus.TODO);
+        task2.setUserId(2L);
+        taskRepository.save(task2);
+
+        // When
+        List&lt;Task&gt; user1Tasks = taskRepository.findByUserId(1L);
+
+        // Then
+        assertThat(user1Tasks).hasSize(1);
+        assertThat(user1Tasks.get(0).getTitle()).isEqualTo(&#34;User 1 Task&#34;);
+    }
+
+    @Test
+    @DisplayName(&#34;Should search tasks by title&#34;)
+    void shouldSearchTasksByTitle() {
+        // Given
+        taskRepository.deleteAll();
+        taskRepository.save(createTask(&#34;Important Meeting&#34;, TaskStatus.TODO));
+        taskRepository.save(createTask(&#34;Code Review&#34;, TaskStatus.TODO));
+        taskRepository.save(createTask(&#34;Important Call&#34;, TaskStatus.TODO));
+
+        // When
+        List&lt;Task&gt; importantTasks = taskRepository.findByTitleContainingIgnoreCase(&#34;important&#34;);
+
+        // Then
+        assertThat(importantTasks).hasSize(2);
+    }
+
+    private Task createTask(String title, TaskStatus status) {
+        Task task = new Task(title, &#34;Description&#34;);
+        task.setStatus(status);
+        task.setUserId(1L);
+        return task;
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Base Testcontainer Configuration</h2>
+            <pre><code language="language-java" class="language-java">package com.example.taskmanager.config;
+
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+
+@Testcontainers
+public abstract class AbstractIntegrationTest {
+
+    @Container
+    static PostgreSQLContainer&lt;?&gt; postgres = new PostgreSQLContainer&lt;&gt;(&#34;postgres:15-alpine&#34;)
+        .withDatabaseName(&#34;testdb&#34;)
+        .withUsername(&#34;test&#34;)
+        .withPassword(&#34;test&#34;)
+        .withReuse(true);  // Reuse container across tests
+
+    @DynamicPropertySource
+    static void configureProperties(DynamicPropertyRegistry registry) {
+        registry.add(&#34;spring.datasource.url&#34;, postgres::getJdbcUrl);
+        registry.add(&#34;spring.datasource.username&#34;, postgres::getUsername);
+        registry.add(&#34;spring.datasource.password&#34;, postgres::getPassword);
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Use Base Class</h2>
+            <pre><code language="language-java" class="language-java">@SpringBootTest
+class MyIntegrationTest extends AbstractIntegrationTest {
+    // Inherits Testcontainer configuration
+
+    @Test
+    void myTest() {
+        // Uses real PostgreSQL from container
+    }
+}
+</code></pre>
+            <aside class="special">
+                <p><strong>Testcontainers Benefits:</strong> Test against real databases, message brokers, etc.
+                    Containers start automatically and are cleaned up after tests.</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Security Testing" duration="6">
+            <p>Test authentication and authorization.</p>
+            <h2 is-upgraded>Security Integration Test</h2>
+            <pre><code language="language-java" class="language-java">package com.example.taskmanager.security;
+
+import com.example.taskmanager.dto.LoginRequest;
+import com.example.taskmanager.dto.SignupRequest;
+import com.example.taskmanager.model.User;
+import com.example.taskmanager.repository.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@DisplayName(&#34;Security Integration Tests&#34;)
+class SecurityIntegrationTest {
+
+    @Autowired
+    private TestRestTemplate restTemplate;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @BeforeEach
+    void setUp() {
+        userRepository.deleteAll();
+    }
+
+    @Test
+    @DisplayName(&#34;Should signup new user&#34;)
+    void shouldSignupNewUser() {
+        // Given
+        SignupRequest request = new SignupRequest(
+            &#34;testuser&#34;,
+            &#34;test@example.com&#34;,
+            &#34;Test User&#34;,
+            &#34;password123&#34;
+        );
+
+        // When
+        ResponseEntity&lt;AuthResponse&gt; response = restTemplate.postForEntity(
+            &#34;/api/auth/signup&#34;,
+            request,
+            AuthResponse.class
+        );
+
+        // Then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getToken()).isNotBlank();
+        assertThat(response.getBody().getUsername()).isEqualTo(&#34;testuser&#34;);
+    }
+
+    @Test
+    @DisplayName(&#34;Should login with valid credentials&#34;)
+    void shouldLoginWithValidCredentials() {
+        // Given - create user
+        User user = new User(&#34;loginuser&#34;, &#34;login@example.com&#34;, &#34;Login User&#34;,
+            passwordEncoder.encode(&#34;password123&#34;));
+        user.getRoles().add(&#34;ROLE_USER&#34;);
+        userRepository.save(user);
+
+        LoginRequest request = new LoginRequest(&#34;loginuser&#34;, &#34;password123&#34;);
+
+        // When
+        ResponseEntity&lt;AuthResponse&gt; response = restTemplate.postForEntity(
+            &#34;/api/auth/login&#34;,
+            request,
+            AuthResponse.class
+        );
+
+        // Then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getToken()).isNotBlank();
+    }
+
+    @Test
+    @DisplayName(&#34;Should reject login with invalid credentials&#34;)
+    void shouldRejectInvalidCredentials() {
+        // Given
+        LoginRequest request = new LoginRequest(&#34;invalid&#34;, &#34;wrongpassword&#34;);
+
+        // When
+        ResponseEntity&lt;AuthResponse&gt; response = restTemplate.postForEntity(
+            &#34;/api/auth/login&#34;,
+            request,
+            AuthResponse.class
+        );
+
+        // Then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+    }
+
+    @Test
+    @DisplayName(&#34;Should access protected endpoint with valid token&#34;)
+    void shouldAccessProtectedEndpointWithToken() {
+        // Given - create user and get token
+        SignupRequest signup = new SignupRequest(
+            &#34;authuser&#34;,
+            &#34;auth@example.com&#34;,
+            &#34;Auth User&#34;,
+            &#34;password123&#34;
+        );
+
+        ResponseEntity&lt;AuthResponse&gt; authResponse = restTemplate.postForEntity(
+            &#34;/api/auth/signup&#34;,
+            signup,
+            AuthResponse.class
+        );
+
+        String token = authResponse.getBody().getToken();
+
+        // When - access protected endpoint
+        ResponseEntity&lt;TaskResponse[]&gt; tasksResponse = restTemplate
+            .withBasicAuth(&#34;Bearer&#34;, token)
+            .getForEntity(&#34;/api/tasks&#34;, TaskResponse[].class);
+
+        // Then
+        assertThat(tasksResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Test with Security Context</h2>
+            <pre><code language="language-java" class="language-java">@Test
+@WithMockUser(username = &#34;testuser&#34;, roles = {&#34;USER&#34;})
+void shouldAccessEndpointWithMockUser() {
+    // Test runs with authenticated user context
+}
+
+@Test
+@WithMockUser(roles = {&#34;ADMIN&#34;})
+void shouldAccessAdminEndpoint() {
+    // Test runs with admin role
+}
+</code></pre>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Code Coverage with JaCoCo" duration="5">
+            <p>Measure and enforce code coverage.</p>
+            <h2 is-upgraded>JaCoCo Maven Plugin</h2>
+            <p>Add to <code>pom.xml</code>:</p>
+            <pre><code language="language-xml" class="language-xml">&lt;build&gt;
+    &lt;plugins&gt;
+        &lt;plugin&gt;
+            &lt;groupId&gt;org.jacoco&lt;/groupId&gt;
+            &lt;artifactId&gt;jacoco-maven-plugin&lt;/artifactId&gt;
+            &lt;version&gt;0.8.11&lt;/version&gt;
+            &lt;executions&gt;
+                &lt;execution&gt;
+                    &lt;id&gt;prepare-agent&lt;/id&gt;
+                    &lt;goals&gt;
+                        &lt;goal&gt;prepare-agent&lt;/goal&gt;
+                    &lt;/goals&gt;
+                &lt;/execution&gt;
+                &lt;execution&gt;
+                    &lt;id&gt;report&lt;/id&gt;
+                    &lt;phase&gt;test&lt;/phase&gt;
+                    &lt;goals&gt;
+                        &lt;goal&gt;report&lt;/goal&gt;
+                    &lt;/goals&gt;
+                &lt;/execution&gt;
+                &lt;execution&gt;
+                    &lt;id&gt;check&lt;/id&gt;
+                    &lt;goals&gt;
+                        &lt;goal&gt;check&lt;/goal&gt;
+                    &lt;/goals&gt;
+                    &lt;configuration&gt;
+                        &lt;rules&gt;
+                            &lt;rule&gt;
+                                &lt;element&gt;PACKAGE&lt;/element&gt;
+                                &lt;limits&gt;
+                                    &lt;limit&gt;
+                                        &lt;counter&gt;LINE&lt;/counter&gt;
+                                        &lt;value&gt;COVEREDRATIO&lt;/value&gt;
+                                        &lt;minimum&gt;0.80&lt;/minimum&gt;
+                                    &lt;/limit&gt;
+                                &lt;/limits&gt;
+                            &lt;/rule&gt;
+                        &lt;/rules&gt;
+                    &lt;/configuration&gt;
+                &lt;/execution&gt;
+            &lt;/executions&gt;
+        &lt;/plugin&gt;
+    &lt;/plugins&gt;
+&lt;/build&gt;
+</code></pre>
+            <h2 is-upgraded>Generate Coverage Report</h2>
+            <pre><code language="language-bash" class="language-bash">mvn clean test
+mvn jacoco:report
+</code></pre>
+            <p><strong>View report:</strong> Open <code>target/site/jacoco/index.html</code> in browser</p>
+            <h2 is-upgraded>Coverage Metrics</h2>
+            <ul>
+                <li><strong>Line Coverage:</strong> % of lines executed</li>
+                <li><strong>Branch Coverage:</strong> % of if/else branches taken</li>
+                <li><strong>Method Coverage:</strong> % of methods called</li>
+                <li><strong>Class Coverage:</strong> % of classes loaded</li>
+            </ul>
+            <p><strong>Target:</strong> 80% line coverage minimum</p>
+            <h2 is-upgraded>Exclude from Coverage</h2>
+            <pre><code language="language-java" class="language-java">@Generated  // Exclude generated code
+public class AutoGeneratedClass {
+}
+
+// Or configure in pom.xml:
+&lt;configuration&gt;
+    &lt;excludes&gt;
+        &lt;exclude&gt;**/config/**&lt;/exclude&gt;
+        &lt;exclude&gt;**/dto/**&lt;/exclude&gt;
+        &lt;exclude&gt;**/*Application.class&lt;/exclude&gt;
+    &lt;/excludes&gt;
+&lt;/configuration&gt;
+</code></pre>
+            <aside class="special">
+                <p><strong>Coverage Goal:</strong> Aim for 80%+ coverage, but focus on testing critical business logic
+                    over hitting arbitrary numbers.</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Remote Debugging" duration="8">
+            <p>Debug running applications in development and production.</p>
+            <h2 is-upgraded>Enable Remote Debugging</h2>
+            <p><strong>application.yml (development):</strong></p>
+            <pre><code language="language-yaml" class="language-yaml">spring:
+  devtools:
+    remote:
+      secret: mysecret
+</code></pre>
+            <p><strong>Run with Debug Mode:</strong></p>
+            <pre><code language="language-bash" class="language-bash">java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 \
+  -jar target/task-manager.jar
+</code></pre>
+            <p><strong>Parameters:</strong></p>
+            <ul>
+                <li><code>transport=dt_socket</code>: Use socket transport</li>
+                <li><code>server=y</code>: Act as debug server</li>
+                <li><code>suspend=n</code>: Don&#39;t wait for debugger (use <code>y</code> to wait)</li>
+                <li><code>address=*:5005</code>: Listen on all interfaces, port 5005</li>
+            </ul>
+            <h2 is-upgraded>IntelliJ IDEA Remote Debug</h2>
+            <ol type="1">
+                <li><strong>Run → Edit Configurations</strong></li>
+                <li><strong>Add New Configuration → Remote JVM Debug</strong></li>
+                <li><strong>Configure:</strong>
+                    <ul>
+                        <li>Name: <code>Remote Debug</code></li>
+                        <li>Host: <code>localhost</code></li>
+                        <li>Port: <code>5005</code></li>
+                        <li>Use module classpath: <code>task-manager</code></li>
+                    </ul>
+                </li>
+                <li><strong>Click Debug</strong> (ensure app is running with debug agent)</li>
+            </ol>
+            <h2 is-upgraded>Eclipse Remote Debug</h2>
+            <ol type="1">
+                <li><strong>Run → Debug Configurations</strong></li>
+                <li><strong>Remote Java Application → New</strong></li>
+                <li><strong>Configure:</strong>
+                    <ul>
+                        <li>Project: <code>task-manager</code></li>
+                        <li>Host: <code>localhost</code></li>
+                        <li>Port: <code>5005</code></li>
+                    </ul>
+                </li>
+                <li><strong>Click Debug</strong></li>
+            </ol>
+            <h2 is-upgraded>Debug Docker Container</h2>
+            <p><strong>Dockerfile:</strong></p>
+            <pre><code language="language-dockerfile" class="language-dockerfile">FROM openjdk:17-slim
+COPY target/task-manager.jar app.jar
+EXPOSE 8080 5005
+ENTRYPOINT [&#34;java&#34;, \
+    &#34;-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005&#34;, \
+    &#34;-jar&#34;, &#34;/app.jar&#34;]
+</code></pre>
+            <p><strong>docker-compose.yml:</strong></p>
+            <pre><code language="language-yaml" class="language-yaml">version: &#34;3.8&#34;
+services:
+  app:
+    build: .
+    ports:
+      - &#34;8080:8080&#34;
+      - &#34;5005:5005&#34; # Debug port
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+</code></pre>
+            <p><strong>Run and attach debugger:</strong></p>
+            <pre><code language="language-bash" class="language-bash">docker-compose up
+# Attach IDE debugger to localhost:5005
+</code></pre>
+            <h2 is-upgraded>Kubernetes Debug</h2>
+            <p><strong>deployment.yaml:</strong></p>
+            <pre><code language="language-yaml" class="language-yaml">apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: task-manager
+spec:
+  template:
+    spec:
+      containers:
+        - name: app
+          image: task-manager:latest
+          ports:
+            - containerPort: 8080
+            - containerPort: 5005 # Debug port
+          env:
+            - name: JAVA_TOOL_OPTIONS
+              value: &#34;-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005&#34;
+</code></pre>
+            <p><strong>Port forward:</strong></p>
+            <pre><code language="language-bash" class="language-bash">kubectl port-forward pod/task-manager-xxx 5005:5005
+# Attach IDE debugger to localhost:5005
+</code></pre>
+            <h2 is-upgraded>Debug Tips</h2>
+            <p><strong>Conditional Breakpoints:</strong></p>
+            <pre><code language="language-java" class="language-java">// Right-click breakpoint → Condition
+// Break only when: taskId == 42L
+</code></pre>
+            <p><strong>Logpoints (no code change):</strong></p>
+            <pre><code language="language-java" class="language-java">// Right-click line → Add Logpoint
+// Message: Task {taskId} status changed to {status}
+</code></pre>
+            <p><strong>Evaluate Expression:</strong></p>
+            <pre><code>Alt+F8 (IntelliJ) or Ctrl+Shift+I (Eclipse)
+Evaluate any expression in current context
+</code></pre>
+            <p><strong>Watch Variables:</strong></p>
+            <pre><code>Add variables to watch list
+See values update in real-time
+</code></pre>
+            <aside class="warning">
+                <p><strong>Production Warning:</strong> Never enable debug ports in production without proper network
+                    security. Use VPN or SSH tunnels for remote debugging production systems.</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Production Debugging Tools" duration="6">
+            <p>Diagnose issues in running production systems.</p>
+            <h2 is-upgraded>Spring Boot Actuator</h2>
+            <p><strong>Enable Actuator:</strong></p>
+            <pre><code language="language-xml" class="language-xml">&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-actuator&lt;/artifactId&gt;
+&lt;/dependency&gt;
+</code></pre>
+            <p><strong>application.yml:</strong></p>
+            <pre><code language="language-yaml" class="language-yaml">management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,threaddump,heapdump,loggers
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: always
+</code></pre>
+            <p><strong>Endpoints:</strong></p>
+            <pre><code language="language-bash" class="language-bash"># Health check
+curl http://localhost:8080/actuator/health
+
+# Metrics
+curl http://localhost:8080/actuator/metrics
+curl http://localhost:8080/actuator/metrics/jvm.memory.used
+
+# Thread dump
+curl http://localhost:8080/actuator/threaddump
+
+# Heap dump (downloads .hprof file)
+curl http://localhost:8080/actuator/heapdump -o heapdump.hprof
+
+# Change log level at runtime
+curl -X POST http://localhost:8080/actuator/loggers/com.example.taskmanager \
+  -H &#34;Content-Type: application/json&#34; \
+  -d &#39;{&#34;configuredLevel&#34;: &#34;DEBUG&#34;}&#39;
+</code></pre>
+            <h2 is-upgraded>Thread Dump Analysis</h2>
+            <p><strong>Get thread dump:</strong></p>
+            <pre><code language="language-bash" class="language-bash">jstack &lt;pid&gt; &gt; threaddump.txt
+# Or via Actuator
+curl http://localhost:8080/actuator/threaddump &gt; threaddump.json
+</code></pre>
+            <p><strong>Analyze for:</strong></p>
+            <ul>
+                <li>Deadlocks</li>
+                <li>Thread pool exhaustion</li>
+                <li>Blocked threads</li>
+                <li>CPU-intensive threads</li>
+            </ul>
+            <p><strong>Example deadlock:</strong></p>
+            <pre><code>Found one Java-level deadlock:
+=============================
+&#34;Thread-1&#34;:
+  waiting to lock monitor 0x00007f8f8c004e00 (object 0x000000076ab80000, a java.lang.Object),
+  which is held by &#34;Thread-2&#34;
+&#34;Thread-2&#34;:
+  waiting to lock monitor 0x00007f8f8c006b00 (object 0x000000076ab80010, a java.lang.Object),
+  which is held by &#34;Thread-1&#34;
+</code></pre>
+            <h2 is-upgraded>Heap Dump Analysis</h2>
+            <p><strong>Generate heap dump:</strong></p>
+            <pre><code language="language-bash" class="language-bash">jmap -dump:live,format=b,file=heapdump.hprof &lt;pid&gt;
+# Or via Actuator
+curl http://localhost:8080/actuator/heapdump -o heapdump.hprof
+</code></pre>
+            <p><strong>Analyze with tools:</strong></p>
+            <ul>
+                <li><strong>Eclipse MAT</strong> (Memory Analyzer Tool)</li>
+                <li><strong>VisualVM</strong></li>
+                <li><strong>JProfiler</strong></li>
+            </ul>
+            <p><strong>Look for:</strong></p>
+            <ul>
+                <li>Memory leaks</li>
+                <li>Large object retentions</li>
+                <li>Unexpected object counts</li>
+            </ul>
+            <h2 is-upgraded>JVM Metrics</h2>
+            <p><strong>Key metrics to monitor:</strong></p>
+            <pre><code language="language-bash" class="language-bash"># Memory usage
+jcmd &lt;pid&gt; GC.heap_info
+
+# CPU usage
+top -H -p &lt;pid&gt;
+
+# GC logs
+java -Xlog:gc*:file=gc.log -jar app.jar
+</code></pre>
+            <h2 is-upgraded>Logging Best Practices</h2>
+            <pre><code language="language-java" class="language-java">// Use parameterized logging (no string concatenation)
+log.debug(&#34;Processing task: {} for user: {}&#34;, taskId, userId);
+
+// Include correlation IDs
+log.info(&#34;Request {} - Creating task&#34;, requestId);
+
+// Log exceptions with context
+log.error(&#34;Failed to create task for user: {}&#34;, userId, exception);
+
+// Use appropriate levels
+log.trace(&#34;Detailed trace&#34;);  // Very verbose
+log.debug(&#34;Debug info&#34;);      // Development
+log.info(&#34;Important event&#34;);  // Production info
+log.warn(&#34;Warning&#34;);          // Potential issue
+log.error(&#34;Error&#34;);           // Actual error
+</code></pre>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Performance Testing" duration="4">
+            <p>Test application performance and load handling.</p>
+            <h2 is-upgraded>Load Test with JMeter</h2>
+            <p><strong>Test Plan:</strong></p>
+            <pre><code language="language-xml" class="language-xml">&lt;!-- task-api-load-test.jmx --&gt;
+&lt;jmeterTestPlan&gt;
+  &lt;ThreadGroup&gt;
+    &lt;stringProp name=&#34;ThreadGroup.num_threads&#34;&gt;100&lt;/stringProp&gt;
+    &lt;stringProp name=&#34;ThreadGroup.ramp_time&#34;&gt;10&lt;/stringProp&gt;
+    &lt;stringProp name=&#34;ThreadGroup.duration&#34;&gt;60&lt;/stringProp&gt;
+  &lt;/ThreadGroup&gt;
+
+  &lt;HTTPSamplerProxy&gt;
+    &lt;stringProp name=&#34;HTTPSampler.domain&#34;&gt;localhost&lt;/stringProp&gt;
+    &lt;stringProp name=&#34;HTTPSampler.port&#34;&gt;8080&lt;/stringProp&gt;
+    &lt;stringProp name=&#34;HTTPSampler.path&#34;&gt;/api/tasks&lt;/stringProp&gt;
+    &lt;stringProp name=&#34;HTTPSampler.method&#34;&gt;GET&lt;/stringProp&gt;
+  &lt;/HTTPSamplerProxy&gt;
+&lt;/jmeterTestPlan&gt;
+</code></pre>
+            <p><strong>Run:</strong></p>
+            <pre><code language="language-bash" class="language-bash">jmeter -n -t task-api-load-test.jmx -l results.jtl -e -o report/
+</code></pre>
+            <h2 is-upgraded>Performance Assertions</h2>
+            <pre><code language="language-java" class="language-java">@Test
+@DisplayName(&#34;Should handle 1000 tasks in under 1 second&#34;)
+void shouldHandleHighLoad() {
+    StopWatch stopWatch = new StopWatch();
+    stopWatch.start();
+
+    for (int i = 0; i &lt; 1000; i++) {
+        taskService.createTask(createTestTask(&#34;Task &#34; + i));
+    }
+
+    stopWatch.stop();
+    assertThat(stopWatch.getTotalTimeMillis()).isLessThan(1000);
+}
+</code></pre>
+            <h2 is-upgraded>Database Performance</h2>
+            <pre><code language="language-java" class="language-java">@Test
+@DisplayName(&#34;Should avoid N+1 query problem&#34;)
+void shouldAvoidNPlusOne() {
+    // Given
+    createTasksWithUsers(100);
+
+    // When
+    Statistics statistics = sessionFactory.getStatistics();
+    statistics.clear();
+    statistics.setStatisticsEnabled(true);
+
+    List&lt;Task&gt; tasks = taskRepository.findAllWithUser();
+
+    // Then - should be 2 queries (1 for tasks, 1 for users)
+    // Not 101 (1 for tasks + 100 for each user)
+    assertThat(statistics.getPrepareStatementCount()).isLessThan(5);
+}
+</code></pre>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Conclusion" duration="2">
+            <p>Congratulations! 🎉 You&#39;ve mastered testing and debugging Spring Boot applications!</p>
+            <h2 is-upgraded>What You&#39;ve Learned</h2>
+            <ul>
+                <li>✅ <strong>Unit Testing:</strong> JUnit 5 and Mockito</li>
+                <li>✅ <strong>Integration Testing:</strong> @SpringBootTest</li>
+                <li>✅ <strong>Test Slices:</strong> @WebMvcTest, @DataJpaTest</li>
+                <li>✅ <strong>Testcontainers:</strong> Docker-based tests</li>
+                <li>✅ <strong>Security Testing:</strong> Authentication tests</li>
+                <li>✅ <strong>Code Coverage:</strong> JaCoCo reports</li>
+                <li>✅ <strong>Remote Debugging:</strong> JDWP protocol</li>
+                <li>✅ <strong>Container Debugging:</strong> Docker and K8s</li>
+                <li>✅ <strong>Production Tools:</strong> Actuator, thread/heap dumps</li>
+                <li>✅ <strong>Performance Testing:</strong> Load testing basics</li>
+            </ul>
+            <h2 is-upgraded>Testing Best Practices</h2>
+            <ol type="1">
+                <li><strong>Test Pyramid:</strong> Many unit, some integration, few E2E</li>
+                <li><strong>Fast Tests:</strong> Unit tests &lt; 100ms, integration &lt; 1s</li>
+                <li><strong>Isolated Tests:</strong> No dependencies between tests</li>
+                <li><strong>Readable Tests:</strong> Given-When-Then structure</li>
+                <li><strong>Meaningful Assertions:</strong> Test behavior, not implementation</li>
+                <li><strong>Test Data:</strong> Use builders or factories</li>
+                <li><strong>Coverage:</strong> 80%+ for critical code</li>
+                <li><strong>CI/CD:</strong> Run tests on every commit</li>
+            </ol>
+            <h2 is-upgraded>Debugging Best Practices</h2>
+            <ol type="1">
+                <li><strong>Logging First:</strong> Good logs prevent most debugging</li>
+                <li><strong>Correlation IDs:</strong> Track requests across services</li>
+                <li><strong>Structured Logging:</strong> Use JSON for production</li>
+                <li><strong>Metrics:</strong> Monitor key indicators</li>
+                <li><strong>Alerting:</strong> Proactive error detection</li>
+                <li><strong>Production Access:</strong> Secure debug ports</li>
+                <li><strong>Reproduce Locally:</strong> Test with production data patterns</li>
+            </ol>
+            <h2 is-upgraded>Git Branching</h2>
+            <pre><code language="language-bash" class="language-bash">git add .
+git commit -m &#34;Codelab 3.8: Testing &amp; Remote Debugging complete&#34;
+git tag codelab-3.8
+</code></pre>
+            <h2 is-upgraded>Section 3 Complete!</h2>
+            <p>All 8 Spring Boot codelabs finished:</p>
+            <ul>
+                <li>✅ 3.1: Spring Core &amp; Boot basics</li>
+                <li>✅ 3.2: REST APIs &amp; Swagger</li>
+                <li>✅ 3.3: ORM &amp; Spring Data JPA</li>
+                <li>✅ 3.4: JPA Locking &amp; Spring Security</li>
+                <li>✅ 3.5: JWT &amp; Spring Cloud Config</li>
+                <li>✅ 3.6: Reactive Programming &amp; R2DBC</li>
+                <li>✅ 3.7: Spring JMS &amp; Event-Driven</li>
+                <li>✅ 3.8: Testing &amp; Remote Debugging</li>
+            </ul>
+            <h2 is-upgraded>Next Steps</h2>
+            <ul>
+                <li><strong>Section 4:</strong> Microservices Architecture</li>
+            </ul>
+            <h2 is-upgraded>Additional Resources</h2>
+            <ul>
+                <li><a href="https://junit.org/junit5/docs/current/user-guide/" target="_blank">JUnit 5 User Guide</a>
+                </li>
+                <li><a href="https://javadoc.io/doc/org.mockito/mockito-core/latest/org/mockito/Mockito.html"
+                        target="_blank">Mockito Documentation</a></li>
+                <li><a href="https://www.testcontainers.org/" target="_blank">Testcontainers</a></li>
+                <li><a href="https://docs.spring.io/spring-boot/docs/current/reference/html/features.html#features.testing"
+                        target="_blank">Spring Boot Testing</a></li>
+                <li><a href="https://www.jacoco.org/jacoco/" target="_blank">JaCoCo</a></li>
+            </ul>
+            <aside class="special">
+                <p><strong>Production Ready!</strong> You now have comprehensive testing, debugging skills, and
+                    confidence to deploy quality Spring Boot applications to production!</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+    </google-codelab>
+
+    <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
+    <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
+    <script src="https://storage.googleapis.com/claat-public/prettify.js"></script>
+    <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
+    <script src="//support.google.com/inapp/api.js"></script>
+
+</body>
+
+</html>

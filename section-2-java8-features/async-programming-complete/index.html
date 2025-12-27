@@ -1,0 +1,1247 @@
+<!doctype html>
+
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+    <meta name="theme-color" content="#4F7DC9">
+    <meta charset="UTF-8">
+    <title>Asynchronous Programming Complete</title>
+    <link rel="stylesheet"
+        href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
+    <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
+    <style>
+        .success {
+            color: #1e8e3e;
+        }
+
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+    <google-codelab-analytics gaid="UA-49880327-14"></google-codelab-analytics>
+    <google-codelab codelab-gaid="" id="async-programming-complete" title="Asynchronous Programming Complete"
+        environment="web" feedback-link="">
+
+        <google-codelab-step label="Introduction" duration="5">
+            <p>Asynchronous programming enables efficient use of system resources by allowing tasks to run concurrently
+                without blocking. Modern Java provides powerful tools for writing non-blocking, reactive code.</p>
+            <h2 class="checklist" is-upgraded>What You&#39;ll Learn</h2>
+            <ul class="checklist">
+                <li><strong>Threading Basics:</strong> Runnable vs Callable</li>
+                <li><strong>Future Interface:</strong> get(), isDone(), cancel()</li>
+                <li><strong>ExecutorService:</strong> Thread pools and management</li>
+                <li><strong>CompletableFuture:</strong> Modern async programming</li>
+                <li><strong>Chaining Operations:</strong> thenApply, thenAccept, thenCompose</li>
+                <li><strong>Combining Futures:</strong> thenCombine, allOf, anyOf</li>
+                <li><strong>Error Handling:</strong> exceptionally, handle, whenComplete</li>
+                <li><strong>Timeouts:</strong> orTimeout, completeOnTimeout</li>
+                <li><strong>Best Practices:</strong> Thread safety and performance</li>
+            </ul>
+            <h2 is-upgraded>What You&#39;ll Build</h2>
+            <p>A comprehensive <strong>Multi-threaded Data Processing System</strong> featuring:</p>
+            <ul>
+                <li>Parallel data fetching from multiple sources</li>
+                <li>Async API calls with CompletableFuture</li>
+                <li>Chained transformations and aggregations</li>
+                <li>Error handling and fallback strategies</li>
+                <li>Performance comparison: blocking vs async</li>
+                <li>Real-world microservice orchestration example</li>
+            </ul>
+            <h2 is-upgraded>Prerequisites</h2>
+            <ul>
+                <li>Completed Codelab 2.1 (Functional Programming &amp; Streams)</li>
+                <li>Understanding of lambdas and functional interfaces</li>
+                <li>Basic knowledge of threads</li>
+            </ul>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Threading Basics" duration="10">
+            <p>Before diving into async programming, let&#39;s understand the foundation: threads and executors.</p>
+            <h2 is-upgraded>Runnable vs Callable</h2>
+            <p><strong>Runnable - No Return Value:</strong></p>
+            <pre><code language="language-java" class="language-java">// Old way: Anonymous class
+Runnable task1 = new Runnable() {
+    @Override
+    public void run() {
+        System.out.println(&#34;Running in thread: &#34; + 
+            Thread.currentThread().getName());
+    }
+};
+
+// Modern way: Lambda
+Runnable task2 = () -&gt; {
+    System.out.println(&#34;Running in thread: &#34; + 
+        Thread.currentThread().getName());
+};
+
+// Execute
+Thread thread = new Thread(task2);
+thread.start();
+</code></pre>
+            <p><strong>Callable - Returns Value, Can Throw Exception:</strong></p>
+            <pre><code language="language-java" class="language-java">import java.util.concurrent.Callable;
+
+// Callable returns a value
+Callable&lt;Integer&gt; task = () -&gt; {
+    Thread.sleep(1000);
+    return 42;
+};
+
+// Callable can throw checked exceptions
+Callable&lt;String&gt; fetchData = () -&gt; {
+    if (Math.random() &gt; 0.5) {
+        throw new IOException(&#34;Network error&#34;);
+    }
+    return &#34;Data fetched&#34;;
+};
+</code></pre>
+            <aside class="special">
+                <p><strong>Key Difference:</strong> Use Runnable for fire-and-forget tasks. Use Callable when you need a
+                    result or might throw exceptions.</p>
+            </aside>
+            <h2 is-upgraded>Creating and Managing Threads</h2>
+            <pre><code language="language-java" class="language-java">public class ThreadBasics {
+    public static void main(String[] args) throws InterruptedException {
+        // Method 1: Extend Thread
+        Thread t1 = new Thread() {
+            @Override
+            public void run() {
+                System.out.println(&#34;Thread 1&#34;);
+            }
+        };
+        
+        // Method 2: Implement Runnable
+        Runnable task = () -&gt; System.out.println(&#34;Thread 2&#34;);
+        Thread t2 = new Thread(task);
+        
+        // Start threads
+        t1.start();
+        t2.start();
+        
+        // Wait for completion
+        t1.join();
+        t2.join();
+        
+        System.out.println(&#34;All threads completed&#34;);
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Thread States</h2>
+            <pre><code language="language-java" class="language-java">public class ThreadStates {
+    public static void main(String[] args) throws InterruptedException {
+        Thread thread = new Thread(() -&gt; {
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
+        
+        System.out.println(&#34;State: &#34; + thread.getState());  // NEW
+        
+        thread.start();
+        System.out.println(&#34;State: &#34; + thread.getState());  // RUNNABLE
+        
+        Thread.sleep(100);
+        System.out.println(&#34;State: &#34; + thread.getState());  // TIMED_WAITING
+        
+        thread.join();
+        System.out.println(&#34;State: &#34; + thread.getState());  // TERMINATED
+    }
+}
+</code></pre>
+            <aside class="warning">
+                <p><strong>Warning:</strong> Creating threads directly is expensive and doesn&#39;t scale. Use thread
+                    pools (ExecutorService) for production code.</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="ExecutorService and Thread Pools" duration="12">
+            <p>ExecutorService manages a pool of threads, reusing them efficiently.</p>
+            <h2 is-upgraded>Creating Executors</h2>
+            <pre><code language="language-java" class="language-java">import java.util.concurrent.*;
+
+// Fixed thread pool (n threads)
+ExecutorService executor1 = Executors.newFixedThreadPool(4);
+
+// Cached thread pool (creates threads as needed)
+ExecutorService executor2 = Executors.newCachedThreadPool();
+
+// Single thread executor (sequential execution)
+ExecutorService executor3 = Executors.newSingleThreadExecutor();
+
+// Scheduled executor (for periodic tasks)
+ScheduledExecutorService executor4 = Executors.newScheduledThreadPool(2);
+
+// Always shutdown when done!
+executor1.shutdown();
+</code></pre>
+            <h2 is-upgraded>Submitting Tasks</h2>
+            <pre><code language="language-java" class="language-java">import java.util.concurrent.*;
+
+public class ExecutorDemo {
+    public static void main(String[] args) throws Exception {
+        ExecutorService executor = Executors.newFixedThreadPool(3);
+        
+        // Submit Runnable (no return value)
+        executor.submit(() -&gt; {
+            System.out.println(&#34;Task 1 in &#34; + Thread.currentThread().getName());
+        });
+        
+        // Submit Callable (returns Future)
+        Future&lt;Integer&gt; future = executor.submit(() -&gt; {
+            Thread.sleep(1000);
+            return 42;
+        });
+        
+        // Get result (blocks until complete)
+        Integer result = future.get();
+        System.out.println(&#34;Result: &#34; + result);
+        
+        // Submit multiple tasks
+        for (int i = 0; i &lt; 5; i++) {
+            final int taskId = i;
+            executor.submit(() -&gt; {
+                System.out.println(&#34;Task &#34; + taskId + &#34; executed&#34;);
+            });
+        }
+        
+        // Shutdown executor
+        executor.shutdown();
+        executor.awaitTermination(5, TimeUnit.SECONDS);
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Future Interface</h2>
+            <pre><code language="language-java" class="language-java">import java.util.concurrent.*;
+
+public class FutureExample {
+    public static void main(String[] args) throws Exception {
+        ExecutorService executor = Executors.newFixedThreadPool(2);
+        
+        // Submit long-running task
+        Future&lt;String&gt; future = executor.submit(() -&gt; {
+            Thread.sleep(3000);
+            return &#34;Task completed&#34;;
+        });
+        
+        // Check if done (non-blocking)
+        System.out.println(&#34;Is done? &#34; + future.isDone());  // false
+        
+        // Do other work while task runs
+        System.out.println(&#34;Doing other work...&#34;);
+        Thread.sleep(1000);
+        
+        // Check again
+        System.out.println(&#34;Is done? &#34; + future.isDone());  // false
+        
+        // Get result (blocks until complete)
+        System.out.println(&#34;Waiting for result...&#34;);
+        String result = future.get();  // Blocks here
+        System.out.println(&#34;Result: &#34; + result);
+        
+        // Get with timeout
+        Future&lt;String&gt; future2 = executor.submit(() -&gt; {
+            Thread.sleep(5000);
+            return &#34;Slow task&#34;;
+        });
+        
+        try {
+            String result2 = future2.get(2, TimeUnit.SECONDS);
+        } catch (TimeoutException e) {
+            System.out.println(&#34;Task timed out!&#34;);
+            future2.cancel(true);  // Cancel the task
+        }
+        
+        executor.shutdown();
+    }
+}
+</code></pre>
+            <h2 is-upgraded>InvokeAll and InvokeAny</h2>
+            <pre><code language="language-java" class="language-java">import java.util.*;
+import java.util.concurrent.*;
+
+public class BulkOperations {
+    public static void main(String[] args) throws Exception {
+        ExecutorService executor = Executors.newFixedThreadPool(4);
+        
+        // Create multiple tasks
+        List&lt;Callable&lt;Integer&gt;&gt; tasks = Arrays.asList(
+            () -&gt; { Thread.sleep(1000); return 1; },
+            () -&gt; { Thread.sleep(2000); return 2; },
+            () -&gt; { Thread.sleep(1500); return 3; }
+        );
+        
+        // invokeAll: Execute all, wait for all
+        List&lt;Future&lt;Integer&gt;&gt; futures = executor.invokeAll(tasks);
+        for (Future&lt;Integer&gt; future : futures) {
+            System.out.println(&#34;Result: &#34; + future.get());
+        }
+        
+        // invokeAny: Execute all, return first completed
+        Integer firstResult = executor.invokeAny(tasks);
+        System.out.println(&#34;First result: &#34; + firstResult);
+        
+        executor.shutdown();
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Practical Example: Parallel Processing</h2>
+            <pre><code language="language-java" class="language-java">import java.util.*;
+import java.util.concurrent.*;
+import java.util.stream.*;
+
+public class ParallelProcessor {
+    public static void main(String[] args) throws Exception {
+        ExecutorService executor = Executors.newFixedThreadPool(4);
+        
+        // Process 100 items in parallel
+        List&lt;Integer&gt; items = IntStream.rangeClosed(1, 100)
+            .boxed()
+            .collect(Collectors.toList());
+        
+        long start = System.currentTimeMillis();
+        
+        List&lt;Future&lt;Integer&gt;&gt; futures = new ArrayList&lt;&gt;();
+        for (Integer item : items) {
+            Future&lt;Integer&gt; future = executor.submit(() -&gt; processItem(item));
+            futures.add(future);
+        }
+        
+        // Collect results
+        List&lt;Integer&gt; results = new ArrayList&lt;&gt;();
+        for (Future&lt;Integer&gt; future : futures) {
+            results.add(future.get());
+        }
+        
+        long end = System.currentTimeMillis();
+        
+        System.out.println(&#34;Processed &#34; + results.size() + &#34; items&#34;);
+        System.out.println(&#34;Time taken: &#34; + (end - start) + &#34;ms&#34;);
+        
+        executor.shutdown();
+    }
+    
+    private static Integer processItem(Integer item) throws InterruptedException {
+        Thread.sleep(100);  // Simulate work
+        return item * 2;
+    }
+}
+</code></pre>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="CompletableFuture Basics" duration="15">
+            <p>CompletableFuture is a powerful async programming tool introduced in Java 8, enhanced in later versions.
+            </p>
+            <h2 is-upgraded>Creating CompletableFuture</h2>
+            <pre><code language="language-java" class="language-java">import java.util.concurrent.CompletableFuture;
+
+// 1. Already completed future
+CompletableFuture&lt;String&gt; completed = CompletableFuture.completedFuture(&#34;Hello&#34;);
+System.out.println(completed.join());  // Hello
+
+// 2. Run async (no return value)
+CompletableFuture&lt;Void&gt; async1 = CompletableFuture.runAsync(() -&gt; {
+    System.out.println(&#34;Running in: &#34; + Thread.currentThread().getName());
+});
+
+// 3. Supply async (returns value)
+CompletableFuture&lt;String&gt; async2 = CompletableFuture.supplyAsync(() -&gt; {
+    return &#34;Result from async task&#34;;
+});
+
+String result = async2.join();  // or .get()
+System.out.println(result);
+
+// 4. With custom executor
+ExecutorService executor = Executors.newFixedThreadPool(4);
+CompletableFuture&lt;String&gt; async3 = CompletableFuture.supplyAsync(() -&gt; {
+    return &#34;Custom executor result&#34;;
+}, executor);
+</code></pre>
+            <h2 is-upgraded>Basic Chaining</h2>
+            <pre><code language="language-java" class="language-java">import java.util.concurrent.CompletableFuture;
+
+public class ChainingDemo {
+    public static void main(String[] args) {
+        // thenApply: Transform result
+        CompletableFuture&lt;Integer&gt; future = CompletableFuture.supplyAsync(() -&gt; 5)
+            .thenApply(n -&gt; n * 2)      // 10
+            .thenApply(n -&gt; n + 3);     // 13
+        
+        System.out.println(future.join());  // 13
+        
+        // thenAccept: Consume result (no return)
+        CompletableFuture.supplyAsync(() -&gt; &#34;Hello&#34;)
+            .thenApply(String::toUpperCase)
+            .thenAccept(s -&gt; System.out.println(&#34;Result: &#34; + s));
+        
+        // thenRun: Execute action (no input, no output)
+        CompletableFuture.supplyAsync(() -&gt; &#34;Done&#34;)
+            .thenRun(() -&gt; System.out.println(&#34;Task completed&#34;));
+        
+        // Async variants
+        CompletableFuture.supplyAsync(() -&gt; &#34;Data&#34;)
+            .thenApplyAsync(String::toUpperCase)  // Runs in separate thread
+            .thenAcceptAsync(System.out::println);
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Combining CompletableFutures</h2>
+            <pre><code language="language-java" class="language-java">import java.util.concurrent.CompletableFuture;
+
+public class CombiningFutures {
+    public static void main(String[] args) {
+        // thenCompose: Flatten nested futures
+        CompletableFuture&lt;String&gt; future1 = CompletableFuture.supplyAsync(() -&gt; &#34;User123&#34;)
+            .thenCompose(userId -&gt; fetchUserDetails(userId));
+        
+        System.out.println(future1.join());
+        
+        // thenCombine: Combine two independent futures
+        CompletableFuture&lt;Integer&gt; age = CompletableFuture.supplyAsync(() -&gt; 25);
+        CompletableFuture&lt;String&gt; name = CompletableFuture.supplyAsync(() -&gt; &#34;Alice&#34;);
+        
+        CompletableFuture&lt;String&gt; combined = age.thenCombine(name, (a, n) -&gt; {
+            return n + &#34; is &#34; + a + &#34; years old&#34;;
+        });
+        
+        System.out.println(combined.join());
+        
+        // allOf: Wait for all futures
+        CompletableFuture&lt;String&gt; f1 = CompletableFuture.supplyAsync(() -&gt; &#34;Task1&#34;);
+        CompletableFuture&lt;String&gt; f2 = CompletableFuture.supplyAsync(() -&gt; &#34;Task2&#34;);
+        CompletableFuture&lt;String&gt; f3 = CompletableFuture.supplyAsync(() -&gt; &#34;Task3&#34;);
+        
+        CompletableFuture&lt;Void&gt; all = CompletableFuture.allOf(f1, f2, f3);
+        all.join();  // Wait for all to complete
+        
+        System.out.println(&#34;All tasks completed!&#34;);
+        System.out.println(f1.join() + &#34;, &#34; + f2.join() + &#34;, &#34; + f3.join());
+        
+        // anyOf: Wait for first completed
+        CompletableFuture&lt;Object&gt; first = CompletableFuture.anyOf(f1, f2, f3);
+        System.out.println(&#34;First completed: &#34; + first.join());
+    }
+    
+    static CompletableFuture&lt;String&gt; fetchUserDetails(String userId) {
+        return CompletableFuture.supplyAsync(() -&gt; {
+            // Simulate API call
+            return &#34;User details for &#34; + userId;
+        });
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Error Handling</h2>
+            <pre><code language="language-java" class="language-java">import java.util.concurrent.CompletableFuture;
+
+public class ErrorHandling {
+    public static void main(String[] args) {
+        // exceptionally: Handle errors
+        CompletableFuture&lt;String&gt; future1 = CompletableFuture.supplyAsync(() -&gt; {
+            if (Math.random() &gt; 0.5) {
+                throw new RuntimeException(&#34;Something went wrong!&#34;);
+            }
+            return &#34;Success&#34;;
+        }).exceptionally(ex -&gt; {
+            System.out.println(&#34;Error: &#34; + ex.getMessage());
+            return &#34;Default value&#34;;
+        });
+        
+        System.out.println(future1.join());
+        
+        // handle: Handle both success and error
+        CompletableFuture&lt;String&gt; future2 = CompletableFuture.supplyAsync(() -&gt; {
+            if (Math.random() &gt; 0.5) {
+                throw new RuntimeException(&#34;Error!&#34;);
+            }
+            return &#34;Success&#34;;
+        }).handle((result, ex) -&gt; {
+            if (ex != null) {
+                return &#34;Error occurred: &#34; + ex.getMessage();
+            }
+            return result;
+        });
+        
+        System.out.println(future2.join());
+        
+        // whenComplete: Side effect (doesn&#39;t transform)
+        CompletableFuture.supplyAsync(() -&gt; &#34;Data&#34;)
+            .whenComplete((result, ex) -&gt; {
+                if (ex != null) {
+                    System.out.println(&#34;Failed: &#34; + ex.getMessage());
+                } else {
+                    System.out.println(&#34;Succeeded: &#34; + result);
+                }
+            });
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Timeouts (Java 9+)</h2>
+            <pre><code language="language-java" class="language-java">import java.util.concurrent.*;
+
+public class TimeoutDemo {
+    public static void main(String[] args) {
+        // orTimeout: Fail if not completed in time
+        CompletableFuture&lt;String&gt; future1 = CompletableFuture.supplyAsync(() -&gt; {
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return &#34;Slow result&#34;;
+        }).orTimeout(2, TimeUnit.SECONDS)
+          .exceptionally(ex -&gt; &#34;Timeout!&#34;);
+        
+        System.out.println(future1.join());
+        
+        // completeOnTimeout: Provide default if timeout
+        CompletableFuture&lt;String&gt; future2 = CompletableFuture.supplyAsync(() -&gt; {
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return &#34;Slow result&#34;;
+        }).completeOnTimeout(&#34;Default value&#34;, 2, TimeUnit.SECONDS);
+        
+        System.out.println(future2.join());
+    }
+}
+</code></pre>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Advanced CompletableFuture Patterns" duration="15">
+            <p>Let&#39;s explore advanced patterns for real-world async programming.</p>
+            <h2 is-upgraded>Async API Calls</h2>
+            <pre><code language="language-java" class="language-java">import java.util.concurrent.CompletableFuture;
+import java.net.http.*;
+import java.net.URI;
+
+public class AsyncApiCalls {
+    private static final HttpClient client = HttpClient.newHttpClient();
+    
+    public static CompletableFuture&lt;String&gt; fetchUser(String userId) {
+        return CompletableFuture.supplyAsync(() -&gt; {
+            simulateDelay(1000);
+            return &#34;{\&#34;id\&#34;: \&#34;&#34; + userId + &#34;\&#34;, \&#34;name\&#34;: \&#34;User&#34; + userId + &#34;\&#34;}&#34;;
+        });
+    }
+    
+    public static CompletableFuture&lt;String&gt; fetchOrders(String userId) {
+        return CompletableFuture.supplyAsync(() -&gt; {
+            simulateDelay(800);
+            return &#34;[{\&#34;id\&#34;: \&#34;O1\&#34;, \&#34;amount\&#34;: 100}]&#34;;
+        });
+    }
+    
+    public static CompletableFuture&lt;String&gt; fetchRecommendations(String userId) {
+        return CompletableFuture.supplyAsync(() -&gt; {
+            simulateDelay(1200);
+            return &#34;[\&#34;Product1\&#34;, \&#34;Product2\&#34;]&#34;;
+        });
+    }
+    
+    public static void main(String[] args) {
+        long start = System.currentTimeMillis();
+        
+        String userId = &#34;123&#34;;
+        
+        // Sequential approach (slow)
+        // Total: 1000 + 800 + 1200 = 3000ms
+        
+        // Parallel approach (fast)
+        CompletableFuture&lt;String&gt; userFuture = fetchUser(userId);
+        CompletableFuture&lt;String&gt; ordersFuture = fetchOrders(userId);
+        CompletableFuture&lt;String&gt; recommendationsFuture = fetchRecommendations(userId);
+        
+        // Combine all results
+        CompletableFuture&lt;String&gt; combined = userFuture.thenCombine(ordersFuture, (user, orders) -&gt; {
+            return user + &#34;, &#34; + orders;
+        }).thenCombine(recommendationsFuture, (combined1, recommendations) -&gt; {
+            return combined1 + &#34;, &#34; + recommendations;
+        });
+        
+        String result = combined.join();
+        long end = System.currentTimeMillis();
+        
+        System.out.println(&#34;Result: &#34; + result);
+        System.out.println(&#34;Time taken: &#34; + (end - start) + &#34;ms&#34;);  // ~1200ms (slowest)
+    }
+    
+    private static void simulateDelay(int ms) {
+        try {
+            Thread.sleep(ms);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Retry Pattern</h2>
+            <pre><code language="language-java" class="language-java">import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
+
+public class RetryPattern {
+    public static &lt;T&gt; CompletableFuture&lt;T&gt; retry(Supplier&lt;CompletableFuture&lt;T&gt;&gt; action, int maxAttempts) {
+        CompletableFuture&lt;T&gt; future = action.get();
+        
+        for (int i = 1; i &lt; maxAttempts; i++) {
+            final int attempt = i;
+            future = future.exceptionally(ex -&gt; {
+                System.out.println(&#34;Attempt &#34; + attempt + &#34; failed: &#34; + ex.getMessage());
+                return null;
+            }).thenCompose(result -&gt; {
+                if (result == null) {
+                    return action.get();
+                }
+                return CompletableFuture.completedFuture(result);
+            });
+        }
+        
+        return future;
+    }
+    
+    public static void main(String[] args) {
+        int[] attempts = {0};
+        
+        Supplier&lt;CompletableFuture&lt;String&gt;&gt; unreliableService = () -&gt; {
+            return CompletableFuture.supplyAsync(() -&gt; {
+                attempts[0]++;
+                System.out.println(&#34;Calling service (attempt &#34; + attempts[0] + &#34;)&#34;);
+                
+                if (attempts[0] &lt; 3) {
+                    throw new RuntimeException(&#34;Service unavailable&#34;);
+                }
+                return &#34;Success!&#34;;
+            });
+        };
+        
+        CompletableFuture&lt;String&gt; result = retry(unreliableService, 5);
+        System.out.println(&#34;Final result: &#34; + result.join());
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Fallback Pattern</h2>
+            <pre><code language="language-java" class="language-java">import java.util.concurrent.CompletableFuture;
+
+public class FallbackPattern {
+    public static CompletableFuture&lt;String&gt; fetchFromPrimary() {
+        return CompletableFuture.supplyAsync(() -&gt; {
+            if (Math.random() &gt; 0.7) {
+                return &#34;Data from primary&#34;;
+            }
+            throw new RuntimeException(&#34;Primary failed&#34;);
+        });
+    }
+    
+    public static CompletableFuture&lt;String&gt; fetchFromSecondary() {
+        return CompletableFuture.supplyAsync(() -&gt; {
+            return &#34;Data from secondary (fallback)&#34;;
+        });
+    }
+    
+    public static CompletableFuture&lt;String&gt; fetchFromCache() {
+        return CompletableFuture.completedFuture(&#34;Data from cache&#34;);
+    }
+    
+    public static void main(String[] args) {
+        // Try primary, fallback to secondary, then cache
+        CompletableFuture&lt;String&gt; result = fetchFromPrimary()
+            .exceptionally(ex -&gt; {
+                System.out.println(&#34;Primary failed, trying secondary...&#34;);
+                return null;
+            })
+            .thenCompose(data -&gt; {
+                if (data != null) {
+                    return CompletableFuture.completedFuture(data);
+                }
+                return fetchFromSecondary();
+            })
+            .exceptionally(ex -&gt; {
+                System.out.println(&#34;Secondary failed, using cache...&#34;);
+                return fetchFromCache().join();
+            });
+        
+        System.out.println(&#34;Result: &#34; + result.join());
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Parallel Aggregation</h2>
+            <pre><code language="language-java" class="language-java">import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
+
+public class ParallelAggregation {
+    public static void main(String[] args) {
+        List&lt;String&gt; userIds = Arrays.asList(&#34;1&#34;, &#34;2&#34;, &#34;3&#34;, &#34;4&#34;, &#34;5&#34;);
+        
+        long start = System.currentTimeMillis();
+        
+        // Fetch all users in parallel
+        List&lt;CompletableFuture&lt;User&gt;&gt; futures = userIds.stream()
+            .map(id -&gt; fetchUserAsync(id))
+            .collect(Collectors.toList());
+        
+        // Wait for all to complete
+        CompletableFuture&lt;Void&gt; allOf = CompletableFuture.allOf(
+            futures.toArray(new CompletableFuture[0])
+        );
+        
+        // Collect results
+        CompletableFuture&lt;List&lt;User&gt;&gt; allUsers = allOf.thenApply(v -&gt; {
+            return futures.stream()
+                .map(CompletableFuture::join)
+                .collect(Collectors.toList());
+        });
+        
+        List&lt;User&gt; users = allUsers.join();
+        long end = System.currentTimeMillis();
+        
+        System.out.println(&#34;Fetched &#34; + users.size() + &#34; users&#34;);
+        users.forEach(System.out::println);
+        System.out.println(&#34;Time taken: &#34; + (end - start) + &#34;ms&#34;);
+    }
+    
+    static class User {
+        String id;
+        String name;
+        
+        User(String id, String name) {
+            this.id = id;
+            this.name = name;
+        }
+        
+        @Override
+        public String toString() {
+            return &#34;User{id=&#39;&#34; + id + &#34;&#39;, name=&#39;&#34; + name + &#34;&#39;}&#34;;
+        }
+    }
+    
+    static CompletableFuture&lt;User&gt; fetchUserAsync(String id) {
+        return CompletableFuture.supplyAsync(() -&gt; {
+            try {
+                Thread.sleep(500);  // Simulate API call
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return new User(id, &#34;User&#34; + id);
+        });
+    }
+}
+</code></pre>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Build Data Processing System" duration="25">
+            <p>Let&#39;s build a comprehensive async data processing system!</p>
+            <p>Create <code>DataProcessingSystem.java</code>:</p>
+            <pre><code language="language-java" class="language-java">import java.util.*;
+import java.util.concurrent.*;
+import java.util.stream.Collectors;
+import java.time.*;
+
+record DataSource(String name, String url, int latencyMs) {
+    CompletableFuture&lt;List&lt;String&gt;&gt; fetch() {
+        return CompletableFuture.supplyAsync(() -&gt; {
+            System.out.println(&#34;[&#34; + name + &#34;] Fetching data...&#34;);
+            simulateLatency(latencyMs);
+            
+            // Simulate data
+            List&lt;String&gt; data = new ArrayList&lt;&gt;();
+            for (int i = 1; i &lt;= 5; i++) {
+                data.add(name + &#34;-Data&#34; + i);
+            }
+            
+            System.out.println(&#34;[&#34; + name + &#34;] Fetched &#34; + data.size() + &#34; items&#34;);
+            return data;
+        });
+    }
+    
+    private void simulateLatency(int ms) {
+        try {
+            Thread.sleep(ms);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+}
+
+record ProcessedData(String source, String value, Instant timestamp) {
+    @Override
+    public String toString() {
+        return String.format(&#34;%s: %s (processed at %s)&#34;, 
+            source, value, timestamp);
+    }
+}
+
+class DataProcessor {
+    private final ExecutorService executor;
+    
+    public DataProcessor(int threadPoolSize) {
+        this.executor = Executors.newFixedThreadPool(threadPoolSize);
+    }
+    
+    public CompletableFuture&lt;ProcessedData&gt; process(String source, String data) {
+        return CompletableFuture.supplyAsync(() -&gt; {
+            // Simulate processing
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            
+            String processed = data.toUpperCase() + &#34;-PROCESSED&#34;;
+            return new ProcessedData(source, processed, Instant.now());
+        }, executor);
+    }
+    
+    public void shutdown() {
+        executor.shutdown();
+    }
+}
+
+class DataAggregator {
+    public CompletableFuture&lt;Map&lt;String, List&lt;ProcessedData&gt;&gt;&gt; aggregate(
+            List&lt;ProcessedData&gt; data) {
+        return CompletableFuture.supplyAsync(() -&gt; {
+            return data.stream()
+                .collect(Collectors.groupingBy(ProcessedData::source));
+        });
+    }
+    
+    public CompletableFuture&lt;Statistics&gt; calculateStatistics(List&lt;ProcessedData&gt; data) {
+        return CompletableFuture.supplyAsync(() -&gt; {
+            Map&lt;String, Long&gt; countBySource = data.stream()
+                .collect(Collectors.groupingBy(
+                    ProcessedData::source,
+                    Collectors.counting()
+                ));
+            
+            return new Statistics(
+                data.size(),
+                countBySource.size(),
+                countBySource
+            );
+        });
+    }
+}
+
+record Statistics(int totalItems, int totalSources, Map&lt;String, Long&gt; countBySource) {
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(&#34;Statistics:\n&#34;);
+        sb.append(&#34;  Total items: &#34;).append(totalItems).append(&#34;\n&#34;);
+        sb.append(&#34;  Total sources: &#34;).append(totalSources).append(&#34;\n&#34;);
+        sb.append(&#34;  Breakdown:\n&#34;);
+        countBySource.forEach((source, count) -&gt; 
+            sb.append(&#34;    &#34;).append(source).append(&#34;: &#34;).append(count).append(&#34;\n&#34;)
+        );
+        return sb.toString();
+    }
+}
+
+public class DataProcessingSystem {
+    private final List&lt;DataSource&gt; dataSources;
+    private final DataProcessor processor;
+    private final DataAggregator aggregator;
+    
+    public DataProcessingSystem() {
+        this.dataSources = List.of(
+            new DataSource(&#34;API-1&#34;, &#34;http://api1.example.com&#34;, 1000),
+            new DataSource(&#34;API-2&#34;, &#34;http://api2.example.com&#34;, 800),
+            new DataSource(&#34;API-3&#34;, &#34;http://api3.example.com&#34;, 1200),
+            new DataSource(&#34;Database&#34;, &#34;jdbc:mysql://localhost/db&#34;, 600),
+            new DataSource(&#34;Cache&#34;, &#34;redis://localhost:6379&#34;, 300)
+        );
+        this.processor = new DataProcessor(10);
+        this.aggregator = new DataAggregator();
+    }
+    
+    // Scenario 1: Sequential processing (slow)
+    public List&lt;ProcessedData&gt; processSequentially() {
+        System.out.println(&#34;\n=== SEQUENTIAL PROCESSING ===&#34;);
+        long start = System.currentTimeMillis();
+        
+        List&lt;ProcessedData&gt; allProcessed = new ArrayList&lt;&gt;();
+        
+        for (DataSource source : dataSources) {
+            List&lt;String&gt; data = source.fetch().join();
+            for (String item : data) {
+                ProcessedData processed = processor.process(source.name(), item).join();
+                allProcessed.add(processed);
+            }
+        }
+        
+        long end = System.currentTimeMillis();
+        System.out.println(&#34;Sequential time: &#34; + (end - start) + &#34;ms&#34;);
+        
+        return allProcessed;
+    }
+    
+    // Scenario 2: Parallel processing (fast)
+    public CompletableFuture&lt;List&lt;ProcessedData&gt;&gt; processParallel() {
+        System.out.println(&#34;\n=== PARALLEL PROCESSING ===&#34;);
+        long start = System.currentTimeMillis();
+        
+        // Fetch from all sources in parallel
+        List&lt;CompletableFuture&lt;List&lt;String&gt;&gt;&gt; fetchFutures = dataSources.stream()
+            .map(DataSource::fetch)
+            .collect(Collectors.toList());
+        
+        // Wait for all fetches to complete
+        CompletableFuture&lt;Void&gt; allFetches = CompletableFuture.allOf(
+            fetchFutures.toArray(new CompletableFuture[0])
+        );
+        
+        // Process all fetched data
+        return allFetches.thenCompose(v -&gt; {
+            List&lt;CompletableFuture&lt;ProcessedData&gt;&gt; processFutures = new ArrayList&lt;&gt;();
+            
+            for (int i = 0; i &lt; dataSources.size(); i++) {
+                DataSource source = dataSources.get(i);
+                List&lt;String&gt; data = fetchFutures.get(i).join();
+                
+                for (String item : data) {
+                    CompletableFuture&lt;ProcessedData&gt; processFuture = 
+                        processor.process(source.name(), item);
+                    processFutures.add(processFuture);
+                }
+            }
+            
+            CompletableFuture&lt;Void&gt; allProcessed = CompletableFuture.allOf(
+                processFutures.toArray(new CompletableFuture[0])
+            );
+            
+            return allProcessed.thenApply(v2 -&gt; {
+                long end = System.currentTimeMillis();
+                System.out.println(&#34;Parallel time: &#34; + (end - start) + &#34;ms&#34;);
+                
+                return processFutures.stream()
+                    .map(CompletableFuture::join)
+                    .collect(Collectors.toList());
+            });
+        });
+    }
+    
+    // Scenario 3: Fastest source wins
+    public CompletableFuture&lt;List&lt;String&gt;&gt; fetchFastest() {
+        System.out.println(&#34;\n=== FETCH FROM FASTEST SOURCE ===&#34;);
+        long start = System.currentTimeMillis();
+        
+        @SuppressWarnings(&#34;unchecked&#34;)
+        CompletableFuture&lt;List&lt;String&gt;&gt;[] futures = dataSources.stream()
+            .map(DataSource::fetch)
+            .toArray(CompletableFuture[]::new);
+        
+        return (CompletableFuture&lt;List&lt;String&gt;&gt;) CompletableFuture.anyOf(futures)
+            .thenApply(result -&gt; {
+                long end = System.currentTimeMillis();
+                System.out.println(&#34;Fastest source responded in: &#34; + (end - start) + &#34;ms&#34;);
+                return (List&lt;String&gt;) result;
+            });
+    }
+    
+    // Scenario 4: Error handling and fallbacks
+    public CompletableFuture&lt;List&lt;String&gt;&gt; fetchWithFallback() {
+        System.out.println(&#34;\n=== FETCH WITH FALLBACK ===&#34;);
+        
+        DataSource primary = new DataSource(&#34;Primary&#34;, &#34;http://primary.com&#34;, 500);
+        DataSource secondary = new DataSource(&#34;Secondary&#34;, &#34;http://secondary.com&#34;, 700);
+        DataSource cache = new DataSource(&#34;Cache&#34;, &#34;cache://local&#34;, 100);
+        
+        return primary.fetch()
+            .exceptionally(ex -&gt; {
+                System.out.println(&#34;Primary failed: &#34; + ex.getMessage());
+                return null;
+            })
+            .thenCompose(data -&gt; {
+                if (data != null &amp;&amp; !data.isEmpty()) {
+                    System.out.println(&#34;✓ Using primary data&#34;);
+                    return CompletableFuture.completedFuture(data);
+                }
+                
+                System.out.println(&#34;Trying secondary...&#34;);
+                return secondary.fetch();
+            })
+            .exceptionally(ex -&gt; {
+                System.out.println(&#34;Secondary failed: &#34; + ex.getMessage());
+                return null;
+            })
+            .thenCompose(data -&gt; {
+                if (data != null &amp;&amp; !data.isEmpty()) {
+                    System.out.println(&#34;✓ Using secondary data&#34;);
+                    return CompletableFuture.completedFuture(data);
+                }
+                
+                System.out.println(&#34;Using cache...&#34;);
+                return cache.fetch();
+            })
+            .thenApply(data -&gt; {
+                System.out.println(&#34;✓ Retrieved data successfully&#34;);
+                return data;
+            });
+    }
+    
+    // Scenario 5: Timeout handling
+    public CompletableFuture&lt;List&lt;String&gt;&gt; fetchWithTimeout(int timeoutSeconds) {
+        System.out.println(&#34;\n=== FETCH WITH TIMEOUT ===&#34;);
+        
+        DataSource slowSource = new DataSource(&#34;SlowAPI&#34;, &#34;http://slow.com&#34;, 3000);
+        
+        return slowSource.fetch()
+            .orTimeout(timeoutSeconds, TimeUnit.SECONDS)
+            .exceptionally(ex -&gt; {
+                if (ex instanceof TimeoutException) {
+                    System.out.println(&#34;✗ Request timed out!&#34;);
+                    return List.of(&#34;TIMEOUT-DATA&#34;);
+                }
+                throw new RuntimeException(ex);
+            });
+    }
+    
+    // Scenario 6: Complete pipeline
+    public void runCompletePipeline() {
+        System.out.println(&#34;\n=== COMPLETE PROCESSING PIPELINE ===&#34;);
+        long start = System.currentTimeMillis();
+        
+        CompletableFuture&lt;Statistics&gt; pipeline = processParallel()
+            .thenCompose(processedData -&gt; {
+                System.out.println(&#34;\n✓ Processing complete, aggregating...&#34;);
+                return aggregator.aggregate(processedData)
+                    .thenCombine(
+                        aggregator.calculateStatistics(processedData),
+                        (aggregated, stats) -&gt; {
+                            System.out.println(&#34;\n--- AGGREGATED DATA ---&#34;);
+                            aggregated.forEach((source, items) -&gt; {
+                                System.out.println(source + &#34;: &#34; + items.size() + &#34; items&#34;);
+                            });
+                            return stats;
+                        }
+                    );
+            })
+            .whenComplete((stats, ex) -&gt; {
+                if (ex != null) {
+                    System.err.println(&#34;Pipeline failed: &#34; + ex.getMessage());
+                } else {
+                    long end = System.currentTimeMillis();
+                    System.out.println(&#34;\n&#34; + stats);
+                    System.out.println(&#34;Total pipeline time: &#34; + (end - start) + &#34;ms&#34;);
+                }
+            });
+        
+        pipeline.join();
+    }
+    
+    public void shutdown() {
+        processor.shutdown();
+    }
+    
+    public static void main(String[] args) {
+        DataProcessingSystem system = new DataProcessingSystem();
+        
+        try {
+            // Demonstrate different scenarios
+            
+            // 1. Sequential vs Parallel comparison
+            system.processSequentially();
+            system.processParallel().join();
+            
+            // 2. Fastest source
+            List&lt;String&gt; fastestData = system.fetchFastest().join();
+            System.out.println(&#34;Got &#34; + fastestData.size() + &#34; items from fastest source&#34;);
+            
+            // 3. Fallback mechanism
+            system.fetchWithFallback().join();
+            
+            // 4. Timeout handling
+            system.fetchWithTimeout(2).join();
+            
+            // 5. Complete pipeline
+            system.runCompletePipeline();
+            
+        } finally {
+            system.shutdown();
+        }
+    }
+}
+</code></pre>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Best Practices" duration="8">
+            <h2 is-upgraded>Thread Safety</h2>
+            <pre><code language="language-java" class="language-java">import java.util.concurrent.*;
+import java.util.concurrent.atomic.*;
+
+// Bad: Not thread-safe
+class UnsafeCounter {
+    private int count = 0;
+    
+    public void increment() {
+        count++;  // Race condition!
+    }
+}
+
+// Good: Thread-safe
+class SafeCounter {
+    private final AtomicInteger count = new AtomicInteger(0);
+    
+    public void increment() {
+        count.incrementAndGet();
+    }
+}
+
+// Good: Using synchronized
+class SynchronizedCounter {
+    private int count = 0;
+    
+    public synchronized void increment() {
+        count++;
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Executor Management</h2>
+            <pre><code language="language-java" class="language-java">// Bad: Not shutting down executor
+ExecutorService bad = Executors.newFixedThreadPool(10);
+bad.submit(() -&gt; System.out.println(&#34;Task&#34;));
+// Executor never shuts down!
+
+// Good: Proper shutdown
+ExecutorService good = Executors.newFixedThreadPool(10);
+try {
+    good.submit(() -&gt; System.out.println(&#34;Task&#34;));
+} finally {
+    good.shutdown();
+    try {
+        if (!good.awaitTermination(60, TimeUnit.SECONDS)) {
+            good.shutdownNow();
+        }
+    } catch (InterruptedException e) {
+        good.shutdownNow();
+    }
+}
+
+// Better: Try-with-resources (Java 19+)
+// ExecutorService will auto-close
+</code></pre>
+            <h2 is-upgraded>Exception Handling</h2>
+            <pre><code language="language-java" class="language-java">// Always handle exceptions in CompletableFuture
+CompletableFuture.supplyAsync(() -&gt; {
+    if (Math.random() &gt; 0.5) {
+        throw new RuntimeException(&#34;Error!&#34;);
+    }
+    return &#34;Success&#34;;
+})
+.exceptionally(ex -&gt; {
+    System.err.println(&#34;Error occurred: &#34; + ex.getMessage());
+    return &#34;Fallback value&#34;;
+})
+.thenAccept(System.out::println);
+</code></pre>
+            <h2 is-upgraded>Performance Tips</h2>
+            <pre><code language="language-java" class="language-java">// 1. Choose appropriate executor size
+int cores = Runtime.getRuntime().availableProcessors();
+
+// CPU-bound tasks: cores or cores + 1
+ExecutorService cpuBound = Executors.newFixedThreadPool(cores);
+
+// I/O-bound tasks: larger pool
+ExecutorService ioBound = Executors.newFixedThreadPool(cores * 2);
+
+// 2. Reuse executors
+// Don&#39;t create new executor for each task!
+ExecutorService shared = Executors.newFixedThreadPool(10);
+
+// 3. Use appropriate methods
+// thenApply vs thenApplyAsync
+CompletableFuture&lt;String&gt; future = CompletableFuture.supplyAsync(() -&gt; &#34;data&#34;)
+    .thenApply(String::toUpperCase)  // Same thread
+    .thenApplyAsync(String::trim);    // Different thread (when needed)
+</code></pre>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Conclusion" duration="2">
+            <p>Congratulations! 🎉 You&#39;ve mastered asynchronous programming in Java!</p>
+            <h2 is-upgraded>What You&#39;ve Learned</h2>
+            <ul>
+                <li>✅ <strong>Threading Basics:</strong> Runnable, Callable, Thread management</li>
+                <li>✅ <strong>ExecutorService:</strong> Thread pools and task submission</li>
+                <li>✅ <strong>Future Interface:</strong> Blocking async operations</li>
+                <li>✅ <strong>CompletableFuture:</strong> Modern non-blocking async</li>
+                <li>✅ <strong>Chaining:</strong> thenApply, thenAccept, thenCompose</li>
+                <li>✅ <strong>Combining:</strong> thenCombine, allOf, anyOf</li>
+                <li>✅ <strong>Error Handling:</strong> exceptionally, handle, whenComplete</li>
+                <li>✅ <strong>Timeouts:</strong> orTimeout, completeOnTimeout</li>
+                <li>✅ <strong>Advanced Patterns:</strong> Retry, fallback, aggregation</li>
+            </ul>
+            <h2 is-upgraded>Key Takeaways</h2>
+            <ol type="1">
+                <li><strong>CompletableFuture</strong> is more powerful and flexible than Future</li>
+                <li><strong>Async operations</strong> improve performance by not blocking threads</li>
+                <li><strong>Always handle exceptions</strong> in async code</li>
+                <li><strong>Use thread pools</strong> instead of creating threads directly</li>
+                <li><strong>Shutdown executors</strong> properly to prevent resource leaks</li>
+                <li><strong>Choose appropriate parallelism</strong> based on task type</li>
+            </ol>
+            <h2 is-upgraded>Best Practices</h2>
+            <ul>
+                <li>Use CompletableFuture for async operations</li>
+                <li>Always provide error handlers (exceptionally, handle)</li>
+                <li>Shutdown executors in finally blocks</li>
+                <li>Use timeouts for external calls</li>
+                <li>Prefer async variants when operations are independent</li>
+                <li>Monitor thread pool sizes and adjust as needed</li>
+            </ul>
+            <h2 is-upgraded>Next Steps</h2>
+            <p>Continue to:</p>
+            <ul>
+                <li><strong>Codelab 2.4:</strong> Logging with Log4j</li>
+                <li><strong>Codelab 2.5:</strong> IDE Debugging Mastery</li>
+                <li><strong>Codelab 3.1:</strong> Spring Boot (which uses async extensively)</li>
+            </ul>
+            <h2 is-upgraded>Practice Exercises</h2>
+            <ol type="1">
+                <li><strong>Async Web Scraper:</strong> Fetch and parse multiple URLs in parallel</li>
+                <li><strong>Order Processing:</strong> Async order validation, payment, and fulfillment</li>
+                <li><strong>Batch Processor:</strong> Process large files using parallel streams</li>
+                <li><strong>API Gateway:</strong> Aggregate data from multiple microservices</li>
+                <li><strong>Cache Warmer:</strong> Pre-load cache asynchronously on startup</li>
+            </ol>
+            <aside class="special">
+                <p><strong>Excellent Work!</strong> Async programming is crucial for building high-performance, scalable
+                    applications. These skills are essential for modern Spring Boot and microservices development!</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+    </google-codelab>
+
+    <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
+    <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
+    <script src="https://storage.googleapis.com/claat-public/prettify.js"></script>
+    <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
+    <script src="//support.google.com/inapp/api.js"></script>
+
+</body>
+
+</html>

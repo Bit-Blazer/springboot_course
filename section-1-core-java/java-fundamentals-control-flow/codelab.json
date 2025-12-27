@@ -1,0 +1,25 @@
+{
+  "environment": "web",
+  "format": "html",
+  "prefix": "https://storage.googleapis.com",
+  "mainga": "UA-49880327-14",
+  "updated": "2025-12-27T18:48:58+05:30",
+  "id": "java-fundamentals-control-flow",
+  "duration": 88,
+  "title": "Java Platform, Data Types \u0026 Control Flow",
+  "summary": "Master Java platform concepts, JVM architecture, data types, and control flow by building a menu-driven calculator with history",
+  "source": "codelab-1.1-java-fundamentals-control-flow.md",
+  "theme": "",
+  "status": [
+    "published"
+  ],
+  "category": [
+    "java",
+    "corejava",
+    "programmingfundamentals"
+  ],
+  "tags": [
+    "web"
+  ],
+  "url": "java-fundamentals-control-flow"
+}

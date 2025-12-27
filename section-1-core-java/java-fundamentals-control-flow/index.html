@@ -1,0 +1,1179 @@
+<!doctype html>
+
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+    <meta name="theme-color" content="#4F7DC9">
+    <meta charset="UTF-8">
+    <title>Java Platform, Data Types &amp; Control Flow</title>
+    <link rel="stylesheet"
+        href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
+    <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
+    <style>
+        .success {
+            color: #1e8e3e;
+        }
+
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+    <google-codelab-analytics gaid="UA-49880327-14"></google-codelab-analytics>
+    <google-codelab codelab-gaid="" id="java-fundamentals-control-flow"
+        title="Java Platform, Data Types &amp; Control Flow" environment="web" feedback-link="">
+
+        <google-codelab-step label="Introduction" duration="3">
+            <p>Welcome to your journey into Java programming! In this codelab, you&#39;ll learn the foundational
+                concepts that power all Java applications - from understanding how the JVM works to writing your first
+                programs using control flow structures.</p>
+            <h2 class="checklist" is-upgraded>What You&#39;ll Learn</h2>
+            <ul class="checklist">
+                <li>Java Platform architecture (JVM, JRE, JDK)</li>
+                <li>JVM internal architecture and how Java code executes</li>
+                <li>Primitive data types, arrays, and operators</li>
+                <li>Control flow with if-else, switch, loops</li>
+                <li>Building interactive console applications</li>
+            </ul>
+            <h2 is-upgraded>What You&#39;ll Build</h2>
+            <p>A feature-rich <strong>Calculator Application</strong> with:</p>
+            <ul>
+                <li>Menu-driven interface</li>
+                <li>Basic arithmetic operations</li>
+                <li>Calculation history using arrays</li>
+                <li>Input validation and error handling</li>
+                <li>Clean, interactive user experience</li>
+            </ul>
+            <h2 is-upgraded>Prerequisites</h2>
+            <ul>
+                <li>Basic understanding of programming concepts</li>
+                <li>A computer with admin access to install software</li>
+                <li>Willingness to learn and experiment!</li>
+            </ul>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Setup Java Development Kit" duration="8">
+            <p>Let&#39;s set up your Java development environment.</p>
+            <h2 is-upgraded>Install JDK</h2>
+            <ol type="1">
+                <li>Visit the <a href="https://www.oracle.com/java/technologies/downloads/" target="_blank">Oracle JDK
+                        Downloads</a> or <a href="https://adoptium.net/" target="_blank">OpenJDK</a></li>
+                <li>Download <strong>JDK 17</strong> or higher for your operating system</li>
+                <li>Run the installer and follow the installation wizard</li>
+                <li>Note the installation path (e.g., <code>C:\Program Files\Java\jdk-17</code> on Windows)</li>
+            </ol>
+            <h2 is-upgraded>Configure Environment Variables</h2>
+            <p><strong>Windows:</strong></p>
+            <ol type="1">
+                <li>Open System Properties → Advanced → Environment Variables</li>
+                <li>Add new System Variable: <ul>
+                        <li>Variable name: <code>JAVA_HOME</code></li>
+                        <li>Variable value: <code>C:\Program Files\Java\jdk-17</code> (your JDK path)</li>
+                    </ul>
+                </li>
+                <li>Edit <code>Path</code> variable, add: <code>%JAVA_HOME%\bin</code></li>
+            </ol>
+            <p><strong>macOS/Linux:</strong></p>
+            <p>Add to <code>~/.bashrc</code> or <code>~/.zshrc</code>:</p>
+            <pre><code language="language-bash" class="language-bash">export JAVA_HOME=/usr/lib/jvm/java-17-openjdk
+export PATH=$JAVA_HOME/bin:$PATH
+</code></pre>
+            <h2 is-upgraded>Verify Installation</h2>
+            <p>Open a new terminal and run:</p>
+            <pre>$ java -version
+java version &#34;17.0.1&#34; 2021-10-19 LTS
+
+$ javac -version
+javac 17.0.1
+</pre>
+            <aside class="special">
+                <p><strong>Success!</strong> You should see version information for both <code>java</code> (JVM) and
+                    <code>javac</code> (compiler).</p>
+            </aside>
+            <h2 is-upgraded>Install an IDE (Recommended)</h2>
+            <p>While you can use any text editor, an IDE makes Java development much easier:</p>
+            <ul>
+                <li><strong>IntelliJ IDEA Community</strong> (Recommended): <a
+                        href="https://www.jetbrains.com/idea/download/" target="_blank">Download</a></li>
+                <li><strong>Eclipse</strong>: <a href="https://www.eclipse.org/downloads/" target="_blank">Download</a>
+                </li>
+                <li><strong>VS Code</strong> with Java Extension Pack: <a href="https://code.visualstudio.com/"
+                        target="_blank">Download</a></li>
+            </ul>
+            <aside class="warning">
+                <p><strong>Important:</strong> If using VS Code, install the &#34;Extension Pack for Java&#34; from
+                    Microsoft.</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Understanding Java Platform" duration="10">
+            <p>Before writing code, let&#39;s understand what makes Java special - its platform architecture.</p>
+            <h2 is-upgraded>The Java Ecosystem: JVM, JRE, JDK</h2>
+            <p>Java&#39;s power comes from its three-tier architecture:</p>
+            <pre><code>┌─────────────────────────────────────┐
+│            JDK                       │
+│  ┌──────────────────────────────┐   │
+│  │         JRE                   │   │
+│  │  ┌───────────────────────┐   │   │
+│  │  │       JVM             │   │   │
+│  │  │  - Class Loader       │   │   │
+│  │  │  - Runtime Data Areas │   │   │
+│  │  │  - Execution Engine   │   │   │
+│  │  └───────────────────────┘   │   │
+│  │  + Standard Libraries        │   │
+│  └──────────────────────────────┘   │
+│  + Development Tools (javac, etc)   │
+└─────────────────────────────────────┘
+</code></pre>
+            <p><strong>JVM (Java Virtual Machine):</strong></p>
+            <ul>
+                <li>The runtime engine that executes Java bytecode</li>
+                <li>Provides platform independence (&#34;Write Once, Run Anywhere&#34;)</li>
+                <li>Manages memory and garbage collection</li>
+                <li>Provides security through bytecode verification</li>
+            </ul>
+            <p><strong>JRE (Java Runtime Environment):</strong></p>
+            <ul>
+                <li>JVM + Standard Java libraries (java.lang, java.util, etc.)</li>
+                <li>Everything needed to <em>run</em> Java applications</li>
+                <li>No development tools included</li>
+            </ul>
+            <p><strong>JDK (Java Development Kit):</strong></p>
+            <ul>
+                <li>JRE + Development tools (compiler, debugger, etc.)</li>
+                <li>Everything needed to <em>develop</em> Java applications</li>
+                <li>Includes <code>javac</code>, <code>jar</code>, <code>javadoc</code>, and more</li>
+            </ul>
+            <h2 is-upgraded>JVM Architecture Deep Dive</h2>
+            <p>Understanding JVM internals helps you write better Java code:</p>
+            <p><strong>1. Class Loader Subsystem:</strong></p>
+            <ul>
+                <li><strong>Loading:</strong> Reads <code>.class</code> files and loads bytecode</li>
+                <li><strong>Linking:</strong> Verifies bytecode, prepares memory for static variables</li>
+                <li><strong>Initialization:</strong> Executes static initializers and static blocks</li>
+            </ul>
+            <p><strong>2. Runtime Data Areas:</strong></p>
+            <ul>
+                <li><strong>Method Area:</strong> Stores class metadata, static variables, method bytecode</li>
+                <li><strong>Heap:</strong> Stores all objects and instance variables (garbage collected)</li>
+                <li><strong>Stack:</strong> Stores method calls, local variables, and partial results (per thread)</li>
+                <li><strong>PC Register:</strong> Current instruction pointer (per thread)</li>
+                <li><strong>Native Method Stack:</strong> For native (non-Java) method calls</li>
+            </ul>
+            <p><strong>3. Execution Engine:</strong></p>
+            <ul>
+                <li><strong>Interpreter:</strong> Executes bytecode line by line</li>
+                <li><strong>JIT Compiler:</strong> Compiles hot code to native machine code for performance</li>
+                <li><strong>Garbage Collector:</strong> Automatically reclaims unused memory</li>
+            </ul>
+            <h2 is-upgraded>How Java Code Executes</h2>
+            <pre><code>Source Code (.java)  →  Compiler (javac)  →  Bytecode (.class)
+                                                    ↓
+                                          JVM loads and executes
+                                                    ↓
+                                          Your program runs!
+</code></pre>
+            <aside class="special">
+                <p><strong>Key Insight:</strong> Java compiles to bytecode, not machine code. This bytecode runs on any
+                    platform with a JVM, making Java truly portable!</p>
+            </aside>
+            <h2 is-upgraded>Explore JDK Tools</h2>
+            <p>Let&#39;s use some JDK tools:</p>
+            <pre>$ javac --help
+Usage: javac &lt;options&gt; &lt;source files&gt;
+
+$ java --help
+Usage: java [options] &lt;mainclass&gt; [args...]
+
+$ jconsole
+(Opens Java monitoring console)
+</pre>
+            <aside class="special">
+                <p><strong>Try It:</strong> Open <code>jconsole</code> - this tool monitors Java applications in
+                    real-time, showing memory usage, threads, and more!</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Data Types and Variables" duration="12">
+            <p>Java is a strongly-typed language - every variable has a specific type. Let&#39;s explore Java&#39;s data
+                types.</p>
+            <h2 is-upgraded>Primitive Data Types</h2>
+            <p>Java has 8 primitive types:</p>
+            <table>
+                <tr>
+                    <td colspan="1" rowspan="1">
+                        <p>Type</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>Size</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>Range</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>Default</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>Example</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="1" rowspan="1">
+                        <p><code>byte</code></p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>8-bit</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>-128 to 127</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>0</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p><code>byte age = 25;</code></p>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="1" rowspan="1">
+                        <p><code>short</code></p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>16-bit</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>-32,768 to 32,767</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>0</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p><code>short year = 2024;</code></p>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="1" rowspan="1">
+                        <p><code>int</code></p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>32-bit</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>-2³¹ to 2³¹-1</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>0</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p><code>int count = 1000;</code></p>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="1" rowspan="1">
+                        <p><code>long</code></p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>64-bit</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>-2⁶³ to 2⁶³-1</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>0L</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p><code>long distance = 999999L;</code></p>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="1" rowspan="1">
+                        <p><code>float</code></p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>32-bit</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>~±3.4E38</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>0.0f</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p><code>float pi = 3.14f;</code></p>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="1" rowspan="1">
+                        <p><code>double</code></p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>64-bit</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>~±1.7E308</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>0.0</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p><code>double price = 99.99;</code></p>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="1" rowspan="1">
+                        <p><code>char</code></p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>16-bit</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>0 to 65,535</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>‘\u0000&#39;</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p><code>char grade = 'A';</code></p>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="1" rowspan="1">
+                        <p><code>boolean</code></p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>1-bit</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>true/false</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>false</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p><code>boolean isActive = true;</code></p>
+                    </td>
+                </tr>
+            </table>
+            <h2 is-upgraded>Variable Declaration and Initialization</h2>
+            <pre><code language="language-java" class="language-java">// Declaration
+int count;
+
+// Initialization
+count = 10;
+
+// Declaration + Initialization
+int age = 25;
+
+// Multiple variables
+int x = 1, y = 2, z = 3;
+
+// Constants (final keyword)
+final double PI = 3.14159;
+final int MAX_USERS = 100;
+</code></pre>
+            <aside class="special">
+                <p><strong>Naming Convention:</strong> Use <code>camelCase</code> for variables
+                    (<code>firstName</code>), <code>UPPER_SNAKE_CASE</code> for constants (<code>MAX_VALUE</code>).</p>
+            </aside>
+            <h2 is-upgraded>Type Casting</h2>
+            <p><strong>Implicit (Widening) Casting:</strong></p>
+            <pre><code language="language-java" class="language-java">int myInt = 9;
+double myDouble = myInt;  // Automatic: int → double
+System.out.println(myDouble);  // 9.0
+</code></pre>
+            <p><strong>Explicit (Narrowing) Casting:</strong></p>
+            <pre><code language="language-java" class="language-java">double myDouble = 9.78;
+int myInt = (int) myDouble;  // Manual: double → int
+System.out.println(myInt);  // 9 (fractional part lost!)
+</code></pre>
+            <h2 is-upgraded>Arrays</h2>
+            <p>Arrays store multiple values of the same type:</p>
+            <pre><code language="language-java" class="language-java">// Declaration and initialization
+int[] numbers = {1, 2, 3, 4, 5};
+
+// Declaration with size
+String[] names = new String[3];
+names[0] = &#34;Alice&#34;;
+names[1] = &#34;Bob&#34;;
+names[2] = &#34;Charlie&#34;;
+
+// Multi-dimensional arrays
+int[][] matrix = {
+    {1, 2, 3},
+    {4, 5, 6},
+    {7, 8, 9}
+};
+
+// Array length
+System.out.println(numbers.length);  // 5
+</code></pre>
+            <aside class="warning">
+                <p><strong>Watch Out:</strong> Array indices start at 0. Accessing <code>numbers[5]</code> throws
+                    <code>ArrayIndexOutOfBoundsException</code>!</p>
+            </aside>
+            <h2 is-upgraded>Operators</h2>
+            <p><strong>Arithmetic Operators:</strong></p>
+            <pre><code language="language-java" class="language-java">int a = 10, b = 3;
+System.out.println(a + b);  // 13 (addition)
+System.out.println(a - b);  // 7  (subtraction)
+System.out.println(a * b);  // 30 (multiplication)
+System.out.println(a / b);  // 3  (division - integer)
+System.out.println(a % b);  // 1  (modulus/remainder)
+</code></pre>
+            <p><strong>Comparison Operators:</strong></p>
+            <pre><code language="language-java" class="language-java">int x = 5, y = 10;
+System.out.println(x == y);  // false (equal to)
+System.out.println(x != y);  // true  (not equal)
+System.out.println(x &gt; y);   // false (greater than)
+System.out.println(x &lt; y);   // true  (less than)
+System.out.println(x &gt;= y);  // false (greater or equal)
+System.out.println(x &lt;= y);  // true  (less or equal)
+</code></pre>
+            <p><strong>Logical Operators:</strong></p>
+            <pre><code language="language-java" class="language-java">boolean sunny = true;
+boolean warm = false;
+
+System.out.println(sunny &amp;&amp; warm);  // false (AND)
+System.out.println(sunny || warm);  // true  (OR)
+System.out.println(!sunny);         // false (NOT)
+</code></pre>
+            <p><strong>Increment/Decrement:</strong></p>
+            <pre><code language="language-java" class="language-java">int count = 5;
+count++;        // Post-increment: count = 6
+++count;        // Pre-increment: count = 7
+count--;        // Post-decrement: count = 6
+--count;        // Pre-decrement: count = 5
+</code></pre>
+            <h2 is-upgraded>Hands-On: Variable Playground</h2>
+            <p>Create a file <code>VariableDemo.java</code>:</p>
+            <pre><code language="language-java" class="language-java">public class VariableDemo {
+    public static void main(String[] args) {
+        // Primitive types
+        int age = 25;
+        double salary = 50000.50;
+        char grade = &#39;A&#39;;
+        boolean isEmployed = true;
+
+        // Arrays
+        String[] skills = {&#34;Java&#34;, &#34;Spring&#34;, &#34;SQL&#34;};
+
+        // Operations
+        int yearsOfExperience = 3;
+        double bonus = salary * 0.10;  // 10% bonus
+
+        // Output
+        System.out.println(&#34;Age: &#34; + age);
+        System.out.println(&#34;Salary: $&#34; + salary);
+        System.out.println(&#34;Bonus: $&#34; + bonus);
+        System.out.println(&#34;Grade: &#34; + grade);
+        System.out.println(&#34;Employed: &#34; + isEmployed);
+        System.out.println(&#34;Skills: &#34; + skills[0] + &#34;, &#34; + skills[1] + &#34;, &#34; + skills[2]);
+    }
+}
+</code></pre>
+            <p>Compile and run:</p>
+            <pre>$ javac VariableDemo.java
+$ java VariableDemo
+Age: 25
+Salary: $50000.5
+Bonus: $5000.05
+Grade: A
+Employed: true
+Skills: Java, Spring, SQL
+</pre>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Control Flow: Branching" duration="12">
+            <p>Control flow determines the order in which code executes. Let&#39;s start with branching statements.</p>
+            <h2 is-upgraded>If-Else Statement</h2>
+            <pre><code language="language-java" class="language-java">int score = 85;
+
+if (score &gt;= 90) {
+    System.out.println(&#34;Grade: A&#34;);
+} else if (score &gt;= 80) {
+    System.out.println(&#34;Grade: B&#34;);
+} else if (score &gt;= 70) {
+    System.out.println(&#34;Grade: C&#34;);
+} else if (score &gt;= 60) {
+    System.out.println(&#34;Grade: D&#34;);
+} else {
+    System.out.println(&#34;Grade: F&#34;);
+}
+</code></pre>
+            <p><strong>Ternary Operator (Shorthand):</strong></p>
+            <pre><code language="language-java" class="language-java">int age = 20;
+String category = (age &gt;= 18) ? &#34;Adult&#34; : &#34;Minor&#34;;
+System.out.println(category);  // Adult
+</code></pre>
+            <h2 is-upgraded>Switch Statement (Traditional)</h2>
+            <pre><code language="language-java" class="language-java">int day = 3;
+String dayName;
+
+switch (day) {
+    case 1:
+        dayName = &#34;Monday&#34;;
+        break;
+    case 2:
+        dayName = &#34;Tuesday&#34;;
+        break;
+    case 3:
+        dayName = &#34;Wednesday&#34;;
+        break;
+    case 4:
+        dayName = &#34;Thursday&#34;;
+        break;
+    case 5:
+        dayName = &#34;Friday&#34;;
+        break;
+    case 6:
+        dayName = &#34;Saturday&#34;;
+        break;
+    case 7:
+        dayName = &#34;Sunday&#34;;
+        break;
+    default:
+        dayName = &#34;Invalid day&#34;;
+}
+
+System.out.println(dayName);  // Wednesday
+</code></pre>
+            <aside class="warning">
+                <p><strong>Important:</strong> Don&#39;t forget <code>break</code> statements! Without them, execution
+                    &#34;falls through&#34; to the next case.</p>
+            </aside>
+            <h2 is-upgraded>Switch Expression (Java 14+)</h2>
+            <p>Modern Java offers cleaner switch syntax:</p>
+            <pre><code language="language-java" class="language-java">int day = 3;
+String dayName = switch (day) {
+    case 1 -&gt; &#34;Monday&#34;;
+    case 2 -&gt; &#34;Tuesday&#34;;
+    case 3 -&gt; &#34;Wednesday&#34;;
+    case 4 -&gt; &#34;Thursday&#34;;
+    case 5 -&gt; &#34;Friday&#34;;
+    case 6 -&gt; &#34;Saturday&#34;;
+    case 7 -&gt; &#34;Sunday&#34;;
+    default -&gt; &#34;Invalid day&#34;;
+};
+
+System.out.println(dayName);  // Wednesday
+</code></pre>
+            <p><strong>Multiple Cases:</strong></p>
+            <pre><code language="language-java" class="language-java">String dayType = switch (day) {
+    case 1, 2, 3, 4, 5 -&gt; &#34;Weekday&#34;;
+    case 6, 7 -&gt; &#34;Weekend&#34;;
+    default -&gt; &#34;Invalid&#34;;
+};
+</code></pre>
+            <h2 is-upgraded>Hands-On: Grade Calculator</h2>
+            <p>Create <code>GradeCalculator.java</code>:</p>
+            <pre><code language="language-java" class="language-java">import java.util.Scanner;
+
+public class GradeCalculator {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print(&#34;Enter your score (0-100): &#34;);
+        int score = scanner.nextInt();
+
+        // Validation
+        if (score &lt; 0 || score &gt; 100) {
+            System.out.println(&#34;Invalid score! Must be between 0 and 100.&#34;);
+            return;
+        }
+
+        // Grade calculation
+        String grade;
+        String message;
+
+        if (score &gt;= 90) {
+            grade = &#34;A&#34;;
+            message = &#34;Excellent!&#34;;
+        } else if (score &gt;= 80) {
+            grade = &#34;B&#34;;
+            message = &#34;Good job!&#34;;
+        } else if (score &gt;= 70) {
+            grade = &#34;C&#34;;
+            message = &#34;Satisfactory&#34;;
+        } else if (score &gt;= 60) {
+            grade = &#34;D&#34;;
+            message = &#34;Needs improvement&#34;;
+        } else {
+            grade = &#34;F&#34;;
+            message = &#34;Please study harder&#34;;
+        }
+
+        System.out.println(&#34;Grade: &#34; + grade);
+        System.out.println(&#34;Comment: &#34; + message);
+
+        // Pass/Fail status using ternary
+        String status = (score &gt;= 60) ? &#34;PASS&#34; : &#34;FAIL&#34;;
+        System.out.println(&#34;Status: &#34; + status);
+
+        scanner.close();
+    }
+}
+</code></pre>
+            <p>Run and test:</p>
+            <pre>$ javac GradeCalculator.java
+$ java GradeCalculator
+Enter your score (0-100): 85
+Grade: B
+Good job!
+Status: PASS
+</pre>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Control Flow: Loops" duration="12">
+            <p>Loops execute code repeatedly. Java provides several types of loops.</p>
+            <h2 is-upgraded>For Loop</h2>
+            <p><strong>Classic For Loop:</strong></p>
+            <pre><code language="language-java" class="language-java">// Syntax: for (initialization; condition; update)
+for (int i = 0; i &lt; 5; i++) {
+    System.out.println(&#34;Count: &#34; + i);
+}
+
+// Output:
+// Count: 0
+// Count: 1
+// Count: 2
+// Count: 3
+// Count: 4
+</code></pre>
+            <p><strong>Enhanced For Loop (For-Each):</strong></p>
+            <pre><code language="language-java" class="language-java">String[] fruits = {&#34;Apple&#34;, &#34;Banana&#34;, &#34;Cherry&#34;};
+
+for (String fruit : fruits) {
+    System.out.println(fruit);
+}
+</code></pre>
+            <p><strong>Nested Loops:</strong></p>
+            <pre><code language="language-java" class="language-java">// Multiplication table
+for (int i = 1; i &lt;= 5; i++) {
+    for (int j = 1; j &lt;= 5; j++) {
+        System.out.print(i * j + &#34;\t&#34;);
+    }
+    System.out.println();  // New line after each row
+}
+</code></pre>
+            <h2 is-upgraded>While Loop</h2>
+            <p>Executes while condition is true:</p>
+            <pre><code language="language-java" class="language-java">int count = 0;
+
+while (count &lt; 5) {
+    System.out.println(&#34;Count: &#34; + count);
+    count++;
+}
+</code></pre>
+            <p><strong>Example: User Input Loop:</strong></p>
+            <pre><code language="language-java" class="language-java">Scanner scanner = new Scanner(System.in);
+String input = &#34;&#34;;
+
+while (!input.equals(&#34;quit&#34;)) {
+    System.out.print(&#34;Enter command (or &#39;quit&#39;): &#34;);
+    input = scanner.nextLine();
+    System.out.println(&#34;You entered: &#34; + input);
+}
+</code></pre>
+            <h2 is-upgraded>Do-While Loop</h2>
+            <p>Executes at least once, then checks condition:</p>
+            <pre><code language="language-java" class="language-java">int count = 0;
+
+do {
+    System.out.println(&#34;Count: &#34; + count);
+    count++;
+} while (count &lt; 5);
+</code></pre>
+            <aside class="special">
+                <p><strong>Key Difference: </strong><code>while</code> checks condition first, <code>do-while</code>
+                    executes first then checks. Use <code>do-while</code> when you need at least one execution.</p>
+            </aside>
+            <h2 is-upgraded>Loop Control Statements</h2>
+            <p><strong>Break - Exit loop immediately:</strong></p>
+            <pre><code language="language-java" class="language-java">for (int i = 0; i &lt; 10; i++) {
+    if (i == 5) {
+        break;  // Exits loop when i is 5
+    }
+    System.out.println(i);
+}
+// Output: 0 1 2 3 4
+</code></pre>
+            <p><strong>Continue - Skip current iteration:</strong></p>
+            <pre><code language="language-java" class="language-java">for (int i = 0; i &lt; 10; i++) {
+    if (i % 2 == 0) {
+        continue;  // Skip even numbers
+    }
+    System.out.println(i);
+}
+// Output: 1 3 5 7 9
+</code></pre>
+            <h2 is-upgraded>Hands-On: Array Sum Calculator</h2>
+            <p>Create <code>ArraySumCalculator.java</code>:</p>
+            <pre><code language="language-java" class="language-java">public class ArraySumCalculator {
+    public static void main(String[] args) {
+        int[] numbers = {10, 20, 30, 40, 50};
+
+        // Calculate sum using for loop
+        int sum = 0;
+        for (int i = 0; i &lt; numbers.length; i++) {
+            sum += numbers[i];
+        }
+        System.out.println(&#34;Sum (for loop): &#34; + sum);
+
+        // Calculate sum using for-each loop
+        int sum2 = 0;
+        for (int num : numbers) {
+            sum2 += num;
+        }
+        System.out.println(&#34;Sum (for-each): &#34; + sum2);
+
+        // Find maximum value
+        int max = numbers[0];
+        for (int num : numbers) {
+            if (num &gt; max) {
+                max = num;
+            }
+        }
+        System.out.println(&#34;Maximum: &#34; + max);
+
+        // Find minimum value
+        int min = numbers[0];
+        for (int num : numbers) {
+            if (num &lt; min) {
+                min = num;
+            }
+        }
+        System.out.println(&#34;Minimum: &#34; + min);
+
+        // Calculate average
+        double average = (double) sum / numbers.length;
+        System.out.println(&#34;Average: &#34; + average);
+    }
+}
+</code></pre>
+            <p>Run it:</p>
+            <pre>$ javac ArraySumCalculator.java
+$ java ArraySumCalculator
+Sum (for loop): 150
+Sum (for-each): 150
+Maximum: 50
+Minimum: 10
+Average: 30.0
+</pre>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Build the Calculator Application" duration="20">
+            <p>Now let&#39;s combine everything into a complete project! We&#39;ll build a menu-driven calculator with
+                history.</p>
+            <h2 is-upgraded>Project Structure</h2>
+            <p>Create a new file <code>CalculatorApp.java</code>:</p>
+            <pre><code language="language-java" class="language-java">import java.util.Scanner;
+
+public class CalculatorApp {
+    // Constants
+    private static final int MAX_HISTORY = 10;
+
+    // History storage
+    private static String[] history = new String[MAX_HISTORY];
+    private static int historyCount = 0;
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        boolean running = true;
+
+        System.out.println(&#34;=================================&#34;);
+        System.out.println(&#34;   ADVANCED CALCULATOR v1.0&#34;);
+        System.out.println(&#34;=================================&#34;);
+
+        while (running) {
+            printMenu();
+            int choice = getChoice(scanner);
+
+            switch (choice) {
+                case 1 -&gt; performAddition(scanner);
+                case 2 -&gt; performSubtraction(scanner);
+                case 3 -&gt; performMultiplication(scanner);
+                case 4 -&gt; performDivision(scanner);
+                case 5 -&gt; performModulus(scanner);
+                case 6 -&gt; performPower(scanner);
+                case 7 -&gt; displayHistory();
+                case 8 -&gt; clearHistory();
+                case 9 -&gt; {
+                    System.out.println(&#34;Thank you for using Calculator!&#34;);
+                    running = false;
+                }
+                default -&gt; System.out.println(&#34;Invalid choice! Try again.&#34;);
+            }
+
+            System.out.println();  // Blank line for readability
+        }
+
+        scanner.close();
+    }
+
+    private static void printMenu() {
+        System.out.println(&#34;\n--- MENU ---&#34;);
+        System.out.println(&#34;1. Addition (+)&#34;);
+        System.out.println(&#34;2. Subtraction (-)&#34;);
+        System.out.println(&#34;3. Multiplication (*)&#34;);
+        System.out.println(&#34;4. Division (/)&#34;);
+        System.out.println(&#34;5. Modulus (%)&#34;);
+        System.out.println(&#34;6. Power (^)&#34;);
+        System.out.println(&#34;7. Show History&#34;);
+        System.out.println(&#34;8. Clear History&#34;);
+        System.out.println(&#34;9. Exit&#34;);
+        System.out.print(&#34;Enter your choice: &#34;);
+    }
+
+    private static int getChoice(Scanner scanner) {
+        while (!scanner.hasNextInt()) {
+            System.out.print(&#34;Invalid input! Enter a number: &#34;);
+            scanner.next();  // Clear invalid input
+        }
+        return scanner.nextInt();
+    }
+
+    private static double getNumber(Scanner scanner, String prompt) {
+        System.out.print(prompt);
+        while (!scanner.hasNextDouble()) {
+            System.out.print(&#34;Invalid input! Enter a number: &#34;);
+            scanner.next();
+        }
+        return scanner.nextDouble();
+    }
+
+    private static void performAddition(Scanner scanner) {
+        double num1 = getNumber(scanner, &#34;Enter first number: &#34;);
+        double num2 = getNumber(scanner, &#34;Enter second number: &#34;);
+        double result = num1 + num2;
+
+        String calculation = num1 + &#34; + &#34; + num2 + &#34; = &#34; + result;
+        System.out.println(&#34;Result: &#34; + calculation);
+        addToHistory(calculation);
+    }
+
+    private static void performSubtraction(Scanner scanner) {
+        double num1 = getNumber(scanner, &#34;Enter first number: &#34;);
+        double num2 = getNumber(scanner, &#34;Enter second number: &#34;);
+        double result = num1 - num2;
+
+        String calculation = num1 + &#34; - &#34; + num2 + &#34; = &#34; + result;
+        System.out.println(&#34;Result: &#34; + calculation);
+        addToHistory(calculation);
+    }
+
+    private static void performMultiplication(Scanner scanner) {
+        double num1 = getNumber(scanner, &#34;Enter first number: &#34;);
+        double num2 = getNumber(scanner, &#34;Enter second number: &#34;);
+        double result = num1 * num2;
+
+        String calculation = num1 + &#34; * &#34; + num2 + &#34; = &#34; + result;
+        System.out.println(&#34;Result: &#34; + calculation);
+        addToHistory(calculation);
+    }
+
+    private static void performDivision(Scanner scanner) {
+        double num1 = getNumber(scanner, &#34;Enter dividend: &#34;);
+        double num2 = getNumber(scanner, &#34;Enter divisor: &#34;);
+
+        if (num2 == 0) {
+            System.out.println(&#34;Error: Cannot divide by zero!&#34;);
+            addToHistory(num1 + &#34; / &#34; + num2 + &#34; = ERROR (division by zero)&#34;);
+            return;
+        }
+
+        double result = num1 / num2;
+        String calculation = num1 + &#34; / &#34; + num2 + &#34; = &#34; + result;
+        System.out.println(&#34;Result: &#34; + calculation);
+        addToHistory(calculation);
+    }
+
+    private static void performModulus(Scanner scanner) {
+        double num1 = getNumber(scanner, &#34;Enter first number: &#34;);
+        double num2 = getNumber(scanner, &#34;Enter second number: &#34;);
+
+        if (num2 == 0) {
+            System.out.println(&#34;Error: Cannot perform modulus by zero!&#34;);
+            addToHistory(num1 + &#34; % &#34; + num2 + &#34; = ERROR (modulus by zero)&#34;);
+            return;
+        }
+
+        double result = num1 % num2;
+        String calculation = num1 + &#34; % &#34; + num2 + &#34; = &#34; + result;
+        System.out.println(&#34;Result: &#34; + calculation);
+        addToHistory(calculation);
+    }
+
+    private static void performPower(Scanner scanner) {
+        double base = getNumber(scanner, &#34;Enter base: &#34;);
+        double exponent = getNumber(scanner, &#34;Enter exponent: &#34;);
+        double result = Math.pow(base, exponent);
+
+        String calculation = base + &#34; ^ &#34; + exponent + &#34; = &#34; + result;
+        System.out.println(&#34;Result: &#34; + calculation);
+        addToHistory(calculation);
+    }
+
+    private static void addToHistory(String calculation) {
+        if (historyCount &lt; MAX_HISTORY) {
+            history[historyCount] = calculation;
+            historyCount++;
+        } else {
+            // Shift array left to make room for new entry
+            for (int i = 0; i &lt; MAX_HISTORY - 1; i++) {
+                history[i] = history[i + 1];
+            }
+            history[MAX_HISTORY - 1] = calculation;
+        }
+    }
+
+    private static void displayHistory() {
+        System.out.println(&#34;\n--- CALCULATION HISTORY ---&#34;);
+
+        if (historyCount == 0) {
+            System.out.println(&#34;No calculations yet!&#34;);
+            return;
+        }
+
+        for (int i = 0; i &lt; historyCount; i++) {
+            System.out.println((i + 1) + &#34;. &#34; + history[i]);
+        }
+    }
+
+    private static void clearHistory() {
+        historyCount = 0;
+        // Optional: null out array entries for garbage collection
+        for (int i = 0; i &lt; MAX_HISTORY; i++) {
+            history[i] = null;
+        }
+        System.out.println(&#34;History cleared!&#34;);
+    }
+}
+</code></pre>
+            <aside class="special">
+                <p><strong>Code Quality:</strong> Notice how we break the application into small, focused methods. This
+                    is a best practice called &#34;separation of concerns.&#34;</p>
+            </aside>
+            <h2 is-upgraded>Understanding the Code</h2>
+            <p><strong>Key Concepts Applied:</strong></p>
+            <ol type="1">
+                <li><strong>Constants: </strong><code>MAX_HISTORY</code> defines maximum history entries</li>
+                <li><strong>Arrays:</strong> Store calculation history</li>
+                <li><strong>Control Flow:</strong> Menu loop with switch-case</li>
+                <li><strong>Methods:</strong> Organized code into reusable functions</li>
+                <li><strong>Input Validation:</strong> Check for valid numbers and division by zero</li>
+                <li><strong>String Manipulation:</strong> Build calculation strings</li>
+            </ol>
+            <p><strong>Advanced Techniques:</strong></p>
+            <ul>
+                <li><strong>Switch expressions</strong> (Java 14+) for cleaner code</li>
+                <li><strong>Array shifting</strong> to maintain fixed-size history</li>
+                <li><strong>Defensive programming</strong> with input validation</li>
+                <li><strong>User-friendly interface</strong> with clear prompts</li>
+            </ul>
+            <h2 is-upgraded>Compile and Run</h2>
+            <pre>$ javac CalculatorApp.java
+$ java CalculatorApp
+</pre>
+            <h2 is-upgraded>Test Your Calculator</h2>
+            <p>Try these scenarios:</p>
+            <ol type="1">
+                <li><strong>Basic operations:</strong> Test all arithmetic operations</li>
+                <li><strong>Division by zero:</strong> Enter 10 / 0 (should show error)</li>
+                <li><strong>History feature:</strong> Perform several calculations, then view history</li>
+                <li><strong>History overflow:</strong> Perform more than 10 calculations (oldest should be removed)</li>
+                <li><strong>Invalid input:</strong> Try entering text instead of numbers</li>
+                <li><strong>Clear history:</strong> Test the clear function</li>
+            </ol>
+            <p><strong>Sample Session:</strong></p>
+            <pre>=================================
+   ADVANCED CALCULATOR v1.0
+=================================
+
+--- MENU ---
+1. Addition (+)
+2. Subtraction (-)
+3. Multiplication (*)
+4. Division (/)
+5. Modulus (%)
+6. Power (^)
+7. Show History
+8. Clear History
+9. Exit
+Enter your choice: 1
+Enter first number: 25
+Enter second number: 17
+Result: 25.0 + 17.0 = 42.0
+
+--- MENU ---
+Enter your choice: 6
+Enter base: 2
+Enter exponent: 10
+Result: 2.0 ^ 10.0 = 1024.0
+
+--- MENU ---
+Enter your choice: 7
+
+--- CALCULATION HISTORY ---
+1. 25.0 + 17.0 = 42.0
+2. 2.0 ^ 10.0 = 1024.0
+</pre>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Testing and Troubleshooting" duration="8">
+            <p>Let&#39;s ensure your calculator works correctly and fix common issues.</p>
+            <h2 is-upgraded>Comprehensive Testing Checklist</h2>
+            <p><strong>Functional Testing:</strong></p>
+            <ul>
+                <li>[ ] All arithmetic operations work correctly</li>
+                <li>[ ] Menu navigation functions properly</li>
+                <li>[ ] History stores calculations</li>
+                <li>[ ] History clears when requested</li>
+                <li>[ ] Exit option terminates program cleanly</li>
+            </ul>
+            <p><strong>Edge Cases:</strong></p>
+            <ul>
+                <li>[ ] Division by zero shows error (not crash)</li>
+                <li>[ ] Modulus by zero shows error</li>
+                <li>[ ] Negative numbers work correctly</li>
+                <li>[ ] Decimal numbers work correctly</li>
+                <li>[ ] Very large numbers (test with 999999999999)</li>
+                <li>[ ] History overflow (test with 15+ calculations)</li>
+            </ul>
+            <p><strong>Input Validation:</strong></p>
+            <ul>
+                <li>[ ] Invalid menu choices handled gracefully</li>
+                <li>[ ] Text input for numbers rejected</li>
+                <li>[ ] Empty input handled</li>
+            </ul>
+            <h2 is-upgraded>Common Issues and Solutions</h2>
+            <p><strong>Issue 1: &#34;Cannot find symbol&#34; error</strong></p>
+            <pre>CalculatorApp.java:15: error: cannot find symbol
+    Scanner scanner = new Scanner(System.in);
+    ^
+</pre>
+            <p><strong>Solution:</strong> Add import statement at the top:</p>
+            <pre><code language="language-java" class="language-java">import java.util.Scanner;
+</code></pre>
+            <p><strong>Issue 2: Switch expression not working</strong></p>
+            <pre>error: illegal start of expression
+    case 1 -&gt; performAddition(scanner);
+           ^
+</pre>
+            <p><strong>Solution:</strong> You&#39;re using Java version &lt; 14. Either:</p>
+            <ol type="1">
+                <li>Update to JDK 17+ (recommended)</li>
+                <li>Or use traditional switch with <code>break</code> statements</li>
+            </ol>
+            <p><strong>Issue 3: History not showing after MAX_HISTORY entries</strong></p>
+            <p><strong>Solution:</strong> Check that array shifting logic is correct in <code>addToHistory()</code>
+                method.</p>
+            <p><strong>Issue 4: Program crashes on invalid input</strong></p>
+            <p><strong>Solution:</strong> Use <code>scanner.hasNextInt()</code> or <code>scanner.hasNextDouble()</code>
+                before reading input.</p>
+            <aside class="warning">
+                <p><strong>Important:</strong> Always validate user input! Never trust that users will enter correct
+                    data.</p>
+            </aside>
+            <h2 is-upgraded>Performance Considerations</h2>
+            <p>Our calculator is efficient for its size, but note:</p>
+            <ul>
+                <li><strong>Array shifting</strong> in history is O(n) - acceptable for small arrays</li>
+                <li>For larger history, consider using <strong>ArrayList</strong> (covered in Codelab 1.4)</li>
+                <li><strong>String concatenation</strong> in loops is slow - for complex scenarios, use
+                    <strong>StringBuilder</strong></li>
+            </ul>
+            <h2 is-upgraded>Extending the Calculator</h2>
+            <p>Want to add more features? Try:</p>
+            <ul>
+                <li><strong>Scientific functions:</strong> sin, cos, tan, sqrt, log</li>
+                <li><strong>Memory functions:</strong> Store and recall values</li>
+                <li><strong>Multi-operand calculations:</strong> Support expressions like &#34;1 + 2 + 3&#34;</li>
+                <li><strong>Persistent history:</strong> Save/load history to file (see Codelab 1.3)</li>
+                <li><strong>GUI version:</strong> Use Swing or JavaFX</li>
+            </ul>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Conclusion" duration="3">
+            <p>Congratulations! 🎉 You&#39;ve completed the Java Fundamentals &amp; Control Flow codelab!</p>
+            <h2 is-upgraded>What You&#39;ve Learned</h2>
+            <ul>
+                <li>✅ <strong>Java Platform:</strong> Understanding JVM, JRE, and JDK architecture</li>
+                <li>✅ <strong>JVM Internals:</strong> Class loading, memory areas, execution engine</li>
+                <li>✅ <strong>Data Types:</strong> Primitives, arrays, operators, and type casting</li>
+                <li>✅ <strong>Control Flow:</strong> if-else, switch expressions, for/while/do-while loops</li>
+                <li>✅ <strong>Practical Application:</strong> Built a complete calculator with history</li>
+                <li>✅ <strong>Best Practices:</strong> Input validation, error handling, code organization</li>
+            </ul>
+            <h2 is-upgraded>Key Takeaways</h2>
+            <ol type="1">
+                <li><strong>Java&#39;s platform independence</strong> comes from the JVM executing bytecode</li>
+                <li><strong>Strong typing</strong> prevents many errors at compile-time</li>
+                <li><strong>Control flow</strong> structures (branching, loops) enable complex logic</li>
+                <li><strong>Arrays</strong> store multiple values but have fixed size</li>
+                <li><strong>Methods</strong> organize code into reusable, testable units</li>
+                <li><strong>User input</strong> must always be validated for robustness</li>
+            </ol>
+            <h2 is-upgraded>Next Steps</h2>
+            <p>Ready for more? Continue to:</p>
+            <ul>
+                <li><strong>Codelab 1.2:</strong> Object-Oriented Programming - Classes, inheritance, polymorphism</li>
+                <li><strong>Codelab 1.3:</strong> Exception Handling &amp; File I/O - Robust error handling</li>
+                <li><strong>Codelab 1.4:</strong> Collections Framework - Dynamic data structures</li>
+            </ul>
+            <h2 is-upgraded>Practice Exercises</h2>
+            <p>Before moving on, try these challenges:</p>
+            <ol type="1">
+                <li><strong>Enhanced Calculator:</strong> Add square root, factorial, and percentage functions</li>
+                <li><strong>Number Guessing Game:</strong> Computer picks random number, user guesses with hints</li>
+                <li><strong>Prime Number Checker:</strong> Determine if a number is prime</li>
+                <li><strong>Fibonacci Sequence:</strong> Generate first N Fibonacci numbers</li>
+                <li><strong>Array Sorter:</strong> Implement bubble sort or selection sort</li>
+            </ol>
+            <h2 is-upgraded>Additional Resources</h2>
+            <ul>
+                <li><a href="https://docs.oracle.com/en/java/" target="_blank">Java Documentation</a></li>
+                <li><a href="https://docs.oracle.com/javase/tutorial/" target="_blank">Java Tutorials by Oracle</a></li>
+                <li><a href="https://docs.oracle.com/javase/specs/jvms/se17/html/" target="_blank">JVM Specification</a>
+                </li>
+                <li><a href="https://www.oreilly.com/library/view/effective-java/9780134686097/"
+                        target="_blank">Effective Java by Joshua Bloch</a></li>
+            </ul>
+            <aside class="special">
+                <p><strong>Great Job!</strong> You&#39;ve taken your first major step in Java programming. The concepts
+                    you learned here form the foundation for everything else in this course!</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+    </google-codelab>
+
+    <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
+    <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
+    <script src="https://storage.googleapis.com/claat-public/prettify.js"></script>
+    <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
+    <script src="//support.google.com/inapp/api.js"></script>
+
+</body>
+
+</html>

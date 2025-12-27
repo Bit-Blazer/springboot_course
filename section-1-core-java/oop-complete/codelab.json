@@ -1,0 +1,25 @@
+{
+  "environment": "web",
+  "format": "html",
+  "prefix": "https://storage.googleapis.com",
+  "mainga": "UA-49880327-14",
+  "updated": "2025-12-27T18:48:58+05:30",
+  "id": "oop-complete",
+  "duration": 98,
+  "title": "Object-Oriented Programming Complete",
+  "summary": "Master object-oriented programming concepts including classes, inheritance, interfaces, abstract classes, polymorphism, and packages through building a banking system",
+  "source": "codelab-1.2-oop-complete.md",
+  "theme": "",
+  "status": [
+    "published"
+  ],
+  "category": [
+    "java",
+    "object-orientedprogramming",
+    "oop"
+  ],
+  "tags": [
+    "web"
+  ],
+  "url": "oop-complete"
+}

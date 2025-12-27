@@ -1,0 +1,27 @@
+{
+  "environment": "web",
+  "format": "html",
+  "prefix": "https://storage.googleapis.com",
+  "mainga": "UA-49880327-14",
+  "updated": "2025-12-27T18:48:58+05:30",
+  "id": "orm-spring-data-jpa",
+  "duration": 63,
+  "title": "ORM Concepts \u0026 Spring Data JPA",
+  "summary": "Master ORM concepts and Spring Data JPA by adding database persistence with H2, PostgreSQL, entities, relationships, and query methods to the Task Management API",
+  "source": "codelab-3.3-orm-spring-data-jpa.md",
+  "theme": "",
+  "status": [
+    "published"
+  ],
+  "category": [
+    "springboot",
+    "jpa",
+    "hibernate",
+    "database",
+    "orm"
+  ],
+  "tags": [
+    "web"
+  ],
+  "url": "orm-spring-data-jpa"
+}

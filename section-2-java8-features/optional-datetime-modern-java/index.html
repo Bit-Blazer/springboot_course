@@ -1,0 +1,1528 @@
+<!doctype html>
+
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+    <meta name="theme-color" content="#4F7DC9">
+    <meta charset="UTF-8">
+    <title>Optional, Date/Time &amp; Modern Java Features</title>
+    <link rel="stylesheet"
+        href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
+    <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
+    <style>
+        .success {
+            color: #1e8e3e;
+        }
+
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+    <google-codelab-analytics gaid="UA-49880327-14"></google-codelab-analytics>
+    <google-codelab codelab-gaid="" id="optional-datetime-modern-java"
+        title="Optional, Date/Time &amp; Modern Java Features" environment="web" feedback-link="">
+
+        <google-codelab-step label="Introduction" duration="5">
+            <p>Modern Java (8+) introduced powerful features that make code safer, more readable, and more maintainable.
+                This codelab covers essential modern Java features you&#39;ll use daily.</p>
+            <h2 class="checklist" is-upgraded>What You&#39;ll Learn</h2>
+            <ul class="checklist">
+                <li><strong>Optional API:</strong> Null-safe programming patterns</li>
+                <li><strong>Date/Time API:</strong> LocalDate, LocalTime, LocalDateTime, ZonedDateTime</li>
+                <li><strong>Period &amp; Duration:</strong> Time-based calculations</li>
+                <li><strong>Date Formatting:</strong> DateTimeFormatter patterns</li>
+                <li><strong>Immutable Collections:</strong> List.of, Set.of, Map.of (Java 9+)</li>
+                <li><strong>Var Keyword:</strong> Local variable type inference (Java 10+)</li>
+                <li><strong>Switch Expressions:</strong> Modern switch syntax (Java 14+)</li>
+                <li><strong>Text Blocks:</strong> Multi-line strings (Java 15+)</li>
+                <li><strong>Records:</strong> Immutable data carriers (Java 16+)</li>
+            </ul>
+            <h2 is-upgraded>What You&#39;ll Build</h2>
+            <p>A comprehensive <strong>Conference Scheduling System</strong> featuring:</p>
+            <ul>
+                <li>Event management with time zones</li>
+                <li>Speaker profile service with Optional null-safety</li>
+                <li>Configuration manager using Records and text blocks</li>
+                <li>Schedule conflict detection</li>
+                <li>Multi-timezone event coordination</li>
+                <li>Immutable data structures for thread-safety</li>
+            </ul>
+            <h2 is-upgraded>Prerequisites</h2>
+            <ul>
+                <li>Completed Codelab 2.1 (Functional Programming &amp; Streams)</li>
+                <li>JDK 17+ installed</li>
+                <li>Understanding of basic Java syntax</li>
+            </ul>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Understanding Optional" duration="12">
+            <p>Optional is a container object that may or may not contain a non-null value. It helps avoid
+                NullPointerException.</p>
+            <h2 is-upgraded>The Problem with Null</h2>
+            <pre><code language="language-java" class="language-java">// Traditional null-checking (error-prone)
+public String getUserEmail(String userId) {
+    User user = userRepository.findById(userId);
+    if (user != null) {
+        Profile profile = user.getProfile();
+        if (profile != null) {
+            Email email = profile.getEmail();
+            if (email != null) {
+                return email.getAddress();
+            }
+        }
+    }
+    return &#34;N/A&#34;;
+}
+</code></pre>
+            <aside class="warning">
+                <p><strong>The Billion Dollar Mistake:</strong> Tony Hoare, inventor of null references, calls them his
+                    &#34;billion-dollar mistake&#34; due to countless bugs and crashes they&#39;ve caused.</p>
+            </aside>
+            <h2 is-upgraded>Optional to the Rescue</h2>
+            <pre><code language="language-java" class="language-java">// With Optional (clean and safe)
+public String getUserEmail(String userId) {
+    return userRepository.findById(userId)
+        .map(User::getProfile)
+        .map(Profile::getEmail)
+        .map(Email::getAddress)
+        .orElse(&#34;N/A&#34;);
+}
+</code></pre>
+            <h2 is-upgraded>Creating Optional</h2>
+            <pre><code language="language-java" class="language-java">import java.util.Optional;
+
+// Empty Optional
+Optional&lt;String&gt; empty = Optional.empty();
+System.out.println(empty.isPresent());  // false
+
+// Optional with non-null value
+Optional&lt;String&gt; name = Optional.of(&#34;Alice&#34;);
+System.out.println(name.isPresent());  // true
+
+// Optional.of with null throws exception
+// Optional&lt;String&gt; invalid = Optional.of(null);  // NullPointerException!
+
+// Optional with possibly null value
+String nullableValue = null;
+Optional&lt;String&gt; maybe = Optional.ofNullable(nullableValue);
+System.out.println(maybe.isPresent());  // false
+
+String nonNullValue = &#34;Bob&#34;;
+Optional&lt;String&gt; present = Optional.ofNullable(nonNullValue);
+System.out.println(present.isPresent());  // true
+</code></pre>
+            <h2 is-upgraded>Checking for Values</h2>
+            <pre><code language="language-java" class="language-java">Optional&lt;String&gt; name = Optional.of(&#34;Alice&#34;);
+
+// Old way (not recommended)
+if (name.isPresent()) {
+    System.out.println(name.get());
+}
+
+// Modern way
+name.ifPresent(n -&gt; System.out.println(n));
+name.ifPresent(System.out::println);
+
+// If present/else (Java 9+)
+name.ifPresentOrElse(
+    n -&gt; System.out.println(&#34;Found: &#34; + n),
+    () -&gt; System.out.println(&#34;Not found&#34;)
+);
+</code></pre>
+            <h2 is-upgraded>Retrieving Values</h2>
+            <pre><code language="language-java" class="language-java">Optional&lt;String&gt; name = Optional.of(&#34;Alice&#34;);
+Optional&lt;String&gt; empty = Optional.empty();
+
+// get() - throws if empty (avoid!)
+String value1 = name.get();  // &#34;Alice&#34;
+// String value2 = empty.get();  // NoSuchElementException!
+
+// orElse() - provide default
+String value3 = name.orElse(&#34;Unknown&#34;);   // &#34;Alice&#34;
+String value4 = empty.orElse(&#34;Unknown&#34;);  // &#34;Unknown&#34;
+
+// orElseGet() - lazy default (better for expensive operations)
+String value5 = empty.orElseGet(() -&gt; fetchDefaultName());
+
+// orElseThrow() - custom exception
+String value6 = empty.orElseThrow(() -&gt; 
+    new IllegalStateException(&#34;Name not found&#34;)
+);
+
+// or() - provide alternative Optional (Java 9+)
+Optional&lt;String&gt; alternative = empty.or(() -&gt; Optional.of(&#34;Default&#34;));
+</code></pre>
+            <aside class="special">
+                <p><strong>Best Practice:</strong> Prefer <code>orElse()</code>, <code>orElseGet()</code>, or
+                    <code>orElseThrow()</code> over <code>get()</code>. Never call <code>get()</code> without checking
+                    <code>isPresent()</code>.</p>
+            </aside>
+            <h2 is-upgraded>Transforming Optional</h2>
+            <pre><code language="language-java" class="language-java">// map() - transform value
+Optional&lt;String&gt; name = Optional.of(&#34;alice&#34;);
+Optional&lt;String&gt; upper = name.map(String::toUpperCase);
+System.out.println(upper.get());  // &#34;ALICE&#34;
+
+Optional&lt;Integer&gt; length = name.map(String::length);
+System.out.println(length.get());  // 5
+
+// flatMap() - avoid nested Optionals
+class User {
+    private String name;
+    private Optional&lt;Address&gt; address;
+    
+    public Optional&lt;Address&gt; getAddress() {
+        return address;
+    }
+}
+
+class Address {
+    private String city;
+    
+    public String getCity() {
+        return city;
+    }
+}
+
+Optional&lt;User&gt; user = Optional.of(new User());
+
+// Wrong: returns Optional&lt;Optional&lt;Address&gt;&gt;
+// Optional&lt;Optional&lt;Address&gt;&gt; nested = user.map(User::getAddress);
+
+// Right: returns Optional&lt;Address&gt;
+Optional&lt;Address&gt; address = user.flatMap(User::getAddress);
+
+// Chain flatMap
+Optional&lt;String&gt; city = user
+    .flatMap(User::getAddress)
+    .map(Address::getCity);
+</code></pre>
+            <h2 is-upgraded>Filtering Optional</h2>
+            <pre><code language="language-java" class="language-java">Optional&lt;Integer&gt; age = Optional.of(25);
+
+// filter() - keep if predicate matches
+Optional&lt;Integer&gt; adult = age.filter(a -&gt; a &gt;= 18);
+System.out.println(adult.isPresent());  // true
+
+Optional&lt;Integer&gt; senior = age.filter(a -&gt; a &gt;= 65);
+System.out.println(senior.isPresent());  // false
+
+// Practical example
+Optional&lt;String&gt; email = Optional.of(&#34;user@example.com&#34;);
+
+Optional&lt;String&gt; validEmail = email
+    .filter(e -&gt; e.contains(&#34;@&#34;))
+    .filter(e -&gt; e.length() &gt; 5);
+
+validEmail.ifPresent(e -&gt; sendEmail(e));
+</code></pre>
+            <h2 is-upgraded>Practical Optional Examples</h2>
+            <pre><code language="language-java" class="language-java">import java.util.*;
+
+public class OptionalDemo {
+    // Repository simulation
+    static class UserRepository {
+        private Map&lt;String, User&gt; users = new HashMap&lt;&gt;();
+        
+        public UserRepository() {
+            users.put(&#34;1&#34;, new User(&#34;Alice&#34;, &#34;alice@example.com&#34;));
+            users.put(&#34;2&#34;, new User(&#34;Bob&#34;, null));
+        }
+        
+        public Optional&lt;User&gt; findById(String id) {
+            return Optional.ofNullable(users.get(id));
+        }
+    }
+    
+    static class User {
+        private String name;
+        private String email;
+        
+        public User(String name, String email) {
+            this.name = name;
+            this.email = email;
+        }
+        
+        public String getName() { return name; }
+        public Optional&lt;String&gt; getEmail() { 
+            return Optional.ofNullable(email); 
+        }
+    }
+    
+    public static void main(String[] args) {
+        UserRepository repo = new UserRepository();
+        
+        // Example 1: Safe retrieval
+        String email1 = repo.findById(&#34;1&#34;)
+            .flatMap(User::getEmail)
+            .orElse(&#34;no-email@example.com&#34;);
+        System.out.println(&#34;User 1 email: &#34; + email1);
+        
+        // Example 2: Chaining with filter
+        repo.findById(&#34;2&#34;)
+            .flatMap(User::getEmail)
+            .filter(email -&gt; email.contains(&#34;@&#34;))
+            .ifPresentOrElse(
+                email -&gt; System.out.println(&#34;Valid email: &#34; + email),
+                () -&gt; System.out.println(&#34;No valid email found&#34;)
+            );
+        
+        // Example 3: Transformation
+        List&lt;String&gt; userNames = Arrays.asList(&#34;1&#34;, &#34;2&#34;, &#34;3&#34;).stream()
+            .map(repo::findById)
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .map(User::getName)
+            .toList();  // Java 16+
+        
+        System.out.println(&#34;User names: &#34; + userNames);
+    }
+}
+</code></pre>
+            <aside class="special">
+                <p><strong>Key Insight:</strong> Optional is designed for return types, not for fields or parameters.
+                    Use it to express &#34;this method might not return a value.&#34;</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Date and Time API" duration="15">
+            <p>The modern Date/Time API (java.time package) replaces the old Date and Calendar classes with immutable,
+                thread-safe classes.</p>
+            <h2 is-upgraded>Core Classes</h2>
+            <pre><code language="language-java" class="language-java">import java.time.*;
+
+// Current date
+LocalDate today = LocalDate.now();
+System.out.println(&#34;Today: &#34; + today);  // 2024-12-24
+
+// Current time
+LocalTime now = LocalTime.now();
+System.out.println(&#34;Now: &#34; + now);  // 14:30:45.123
+
+// Current date and time
+LocalDateTime dateTime = LocalDateTime.now();
+System.out.println(&#34;DateTime: &#34; + dateTime);  // 2024-12-24T14:30:45.123
+
+// Date with time zone
+ZonedDateTime zonedNow = ZonedDateTime.now();
+System.out.println(&#34;Zoned: &#34; + zonedNow);
+// 2024-12-24T14:30:45.123+05:30[Asia/Kolkata]
+
+// Instant (timestamp)
+Instant instant = Instant.now();
+System.out.println(&#34;Instant: &#34; + instant);
+// 2024-12-24T09:00:45.123Z (UTC)
+</code></pre>
+            <h2 is-upgraded>LocalDate Operations</h2>
+            <pre><code language="language-java" class="language-java">import java.time.LocalDate;
+import java.time.Month;
+
+// Create specific dates
+LocalDate date1 = LocalDate.of(2024, 12, 25);
+LocalDate date2 = LocalDate.of(2024, Month.DECEMBER, 25);
+LocalDate date3 = LocalDate.parse(&#34;2024-12-25&#34;);
+
+System.out.println(date1);  // 2024-12-25
+
+// Get components
+int year = date1.getYear();           // 2024
+Month month = date1.getMonth();       // DECEMBER
+int monthValue = date1.getMonthValue(); // 12
+int day = date1.getDayOfMonth();      // 25
+int dayOfYear = date1.getDayOfYear(); // 360
+
+// Date arithmetic
+LocalDate tomorrow = date1.plusDays(1);
+LocalDate nextWeek = date1.plusWeeks(1);
+LocalDate nextMonth = date1.plusMonths(1);
+LocalDate nextYear = date1.plusYears(1);
+
+LocalDate yesterday = date1.minusDays(1);
+LocalDate lastWeek = date1.minusWeeks(1);
+
+System.out.println(&#34;Tomorrow: &#34; + tomorrow);
+System.out.println(&#34;Next week: &#34; + nextWeek);
+
+// Date comparison
+LocalDate date4 = LocalDate.of(2024, 12, 31);
+boolean isBefore = date1.isBefore(date4);  // true
+boolean isAfter = date1.isAfter(date4);    // false
+boolean isEqual = date1.isEqual(date4);    // false
+
+// Check properties
+boolean isLeapYear = date1.isLeapYear();
+System.out.println(&#34;Is 2024 a leap year? &#34; + isLeapYear);  // true
+</code></pre>
+            <h2 is-upgraded>LocalTime Operations</h2>
+            <pre><code language="language-java" class="language-java">import java.time.LocalTime;
+
+// Create specific times
+LocalTime time1 = LocalTime.of(14, 30);          // 14:30
+LocalTime time2 = LocalTime.of(14, 30, 45);      // 14:30:45
+LocalTime time3 = LocalTime.of(14, 30, 45, 123_000_000); // with nanos
+LocalTime time4 = LocalTime.parse(&#34;14:30:45&#34;);
+
+// Get components
+int hour = time1.getHour();       // 14
+int minute = time1.getMinute();   // 30
+int second = time2.getSecond();   // 45
+
+// Time arithmetic
+LocalTime later = time1.plusHours(2);      // 16:30
+LocalTime much later = time1.plusMinutes(90); // 16:00
+LocalTime earlier = time1.minusHours(1);   // 13:30
+
+// Comparison
+boolean isBefore = time1.isBefore(time2);
+boolean isAfter = time1.isAfter(time2);
+
+// Special times
+LocalTime midnight = LocalTime.MIDNIGHT;  // 00:00
+LocalTime noon = LocalTime.NOON;          // 12:00
+LocalTime max = LocalTime.MAX;            // 23:59:59.999999999
+LocalTime min = LocalTime.MIN;            // 00:00
+</code></pre>
+            <h2 is-upgraded>LocalDateTime Operations</h2>
+            <pre><code language="language-java" class="language-java">import java.time.LocalDateTime;
+
+// Combine date and time
+LocalDate date = LocalDate.of(2024, 12, 25);
+LocalTime time = LocalTime.of(14, 30);
+LocalDateTime dateTime1 = LocalDateTime.of(date, time);
+LocalDateTime dateTime2 = LocalDateTime.of(2024, 12, 25, 14, 30);
+
+// Get components
+LocalDate dateComponent = dateTime1.toLocalDate();
+LocalTime timeComponent = dateTime1.toLocalTime();
+
+// Arithmetic
+LocalDateTime future = dateTime1
+    .plusDays(7)
+    .plusHours(3)
+    .plusMinutes(30);
+
+// Parse and format
+LocalDateTime parsed = LocalDateTime.parse(&#34;2024-12-25T14:30:45&#34;);
+String formatted = dateTime1.toString();  // ISO format
+</code></pre>
+            <h2 is-upgraded>Working with Time Zones</h2>
+            <pre><code language="language-java" class="language-java">import java.time.*;
+
+// Create ZonedDateTime
+ZonedDateTime nyTime = ZonedDateTime.now(ZoneId.of(&#34;America/New_York&#34;));
+ZonedDateTime tokyoTime = ZonedDateTime.now(ZoneId.of(&#34;Asia/Tokyo&#34;));
+ZonedDateTime utcTime = ZonedDateTime.now(ZoneId.of(&#34;UTC&#34;));
+
+System.out.println(&#34;New York: &#34; + nyTime);
+System.out.println(&#34;Tokyo: &#34; + tokyoTime);
+System.out.println(&#34;UTC: &#34; + utcTime);
+
+// Convert between time zones
+ZonedDateTime istTime = ZonedDateTime.of(
+    LocalDateTime.of(2024, 12, 25, 14, 30),
+    ZoneId.of(&#34;Asia/Kolkata&#34;)
+);
+
+ZonedDateTime estTime = istTime.withZoneSameInstant(
+    ZoneId.of(&#34;America/New_York&#34;)
+);
+
+System.out.println(&#34;IST: &#34; + istTime);
+System.out.println(&#34;EST: &#34; + estTime);
+
+// Get all available zones
+Set&lt;String&gt; allZones = ZoneId.getAvailableZoneIds();
+System.out.println(&#34;Total time zones: &#34; + allZones.size());
+
+// ZoneOffset
+ZoneOffset offset = ZoneOffset.of(&#34;+05:30&#34;);
+OffsetDateTime offsetDateTime = OffsetDateTime.now(offset);
+</code></pre>
+            <h2 is-upgraded>Period and Duration</h2>
+            <pre><code language="language-java" class="language-java">import java.time.*;
+
+// Period - date-based (years, months, days)
+LocalDate start = LocalDate.of(2024, 1, 1);
+LocalDate end = LocalDate.of(2024, 12, 31);
+
+Period period = Period.between(start, end);
+System.out.println(&#34;Period: &#34; + period);  // P11M30D
+System.out.println(&#34;Months: &#34; + period.getMonths());  // 11
+System.out.println(&#34;Days: &#34; + period.getDays());      // 30
+
+// Create periods
+Period oneWeek = Period.ofWeeks(1);
+Period twoMonths = Period.ofMonths(2);
+Period threeYears = Period.ofYears(3);
+
+LocalDate future = start.plus(Period.ofMonths(6));
+System.out.println(&#34;6 months later: &#34; + future);
+
+// Duration - time-based (hours, minutes, seconds)
+LocalTime startTime = LocalTime.of(9, 0);
+LocalTime endTime = LocalTime.of(17, 30);
+
+Duration duration = Duration.between(startTime, endTime);
+System.out.println(&#34;Duration: &#34; + duration);  // PT8H30M
+System.out.println(&#34;Hours: &#34; + duration.toHours());      // 8
+System.out.println(&#34;Minutes: &#34; + duration.toMinutes());  // 510
+
+// Create durations
+Duration oneHour = Duration.ofHours(1);
+Duration thirtyMinutes = Duration.ofMinutes(30);
+Duration fiveSeconds = Duration.ofSeconds(5);
+
+LocalTime later = startTime.plus(Duration.ofHours(2));
+
+// Complex calculations
+LocalDateTime meeting = LocalDateTime.of(2024, 12, 25, 14, 0);
+LocalDateTime now = LocalDateTime.now();
+Duration timeUntilMeeting = Duration.between(now, meeting);
+
+long days = timeUntilMeeting.toDays();
+long hours = timeUntilMeeting.toHours();
+System.out.println(&#34;Meeting in &#34; + days + &#34; days or &#34; + hours + &#34; hours&#34;);
+</code></pre>
+            <h2 is-upgraded>Date Formatting</h2>
+            <pre><code language="language-java" class="language-java">import java.time.format.DateTimeFormatter;
+import java.time.*;
+
+LocalDateTime dateTime = LocalDateTime.of(2024, 12, 25, 14, 30, 45);
+
+// Predefined formatters
+String iso = dateTime.format(DateTimeFormatter.ISO_DATE_TIME);
+System.out.println(&#34;ISO: &#34; + iso);  // 2024-12-25T14:30:45
+
+// Custom patterns
+DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern(&#34;dd/MM/yyyy&#34;);
+String formatted1 = dateTime.format(formatter1);
+System.out.println(formatted1);  // 25/12/2024
+
+DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern(&#34;MMM dd, yyyy&#34;);
+String formatted2 = dateTime.format(formatter2);
+System.out.println(formatted2);  // Dec 25, 2024
+
+DateTimeFormatter formatter3 = DateTimeFormatter.ofPattern(
+    &#34;EEEE, MMMM dd, yyyy &#39;at&#39; hh:mm a&#34;
+);
+String formatted3 = dateTime.format(formatter3);
+System.out.println(formatted3);  // Wednesday, December 25, 2024 at 02:30 PM
+
+// Parsing
+String dateStr = &#34;25-12-2024&#34;;
+DateTimeFormatter parser = DateTimeFormatter.ofPattern(&#34;dd-MM-yyyy&#34;);
+LocalDate parsed = LocalDate.parse(dateStr, parser);
+System.out.println(&#34;Parsed: &#34; + parsed);
+
+// Common patterns
+// yyyy - year (2024)
+// MM - month (12)
+// dd - day (25)
+// HH - hour 24-format (14)
+// hh - hour 12-format (02)
+// mm - minute (30)
+// ss - second (45)
+// a - AM/PM marker
+// EEEE - day name (Wednesday)
+// MMMM - month name (December)
+</code></pre>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Modern Java Features" duration="15">
+            <p>Java 9+ introduced several features that make code cleaner and more expressive.</p>
+            <h2 is-upgraded>Immutable Collections (Java 9+)</h2>
+            <pre><code language="language-java" class="language-java">import java.util.*;
+
+// Old way (mutable)
+List&lt;String&gt; oldList = new ArrayList&lt;&gt;();
+oldList.add(&#34;Apple&#34;);
+oldList.add(&#34;Banana&#34;);
+List&lt;String&gt; unmodifiable = Collections.unmodifiableList(oldList);
+
+// New way (immutable)
+List&lt;String&gt; fruits = List.of(&#34;Apple&#34;, &#34;Banana&#34;, &#34;Cherry&#34;);
+// fruits.add(&#34;Orange&#34;);  // UnsupportedOperationException!
+
+// Empty immutable lists
+List&lt;String&gt; emptyList = List.of();
+
+// Set
+Set&lt;Integer&gt; numbers = Set.of(1, 2, 3, 4, 5);
+// Set&lt;Integer&gt; duplicates = Set.of(1, 2, 2);  // IllegalArgumentException!
+
+// Map
+Map&lt;String, Integer&gt; ages = Map.of(
+    &#34;Alice&#34;, 25,
+    &#34;Bob&#34;, 30,
+    &#34;Charlie&#34;, 35
+);
+
+// Map with more than 10 entries
+Map&lt;String, String&gt; config = Map.ofEntries(
+    Map.entry(&#34;host&#34;, &#34;localhost&#34;),
+    Map.entry(&#34;port&#34;, &#34;8080&#34;),
+    Map.entry(&#34;timeout&#34;, &#34;30&#34;),
+    Map.entry(&#34;retries&#34;, &#34;3&#34;)
+);
+
+// Benefits
+// 1. Thread-safe (immutable)
+// 2. Memory efficient
+// 3. Null-safe (nulls not allowed)
+
+// Copying collections
+List&lt;String&gt; mutableList = new ArrayList&lt;&gt;(fruits);  // Create mutable copy
+List&lt;String&gt; immutableCopy = List.copyOf(mutableList);
+</code></pre>
+            <aside class="special">
+                <p><strong>Performance:</strong> Immutable collections are more memory-efficient and faster than their
+                    mutable counterparts. Use them whenever you don&#39;t need to modify the collection.</p>
+            </aside>
+            <h2 is-upgraded>Var Keyword (Java 10+)</h2>
+            <pre><code language="language-java" class="language-java">// Type inference for local variables
+var message = &#34;Hello&#34;;  // String
+var count = 42;         // int
+var price = 99.99;      // double
+var active = true;      // boolean
+
+// With collections
+var names = List.of(&#34;Alice&#34;, &#34;Bob&#34;, &#34;Charlie&#34;);  // List&lt;String&gt;
+var ages = Map.of(&#34;Alice&#34;, 25, &#34;Bob&#34;, 30);       // Map&lt;String, Integer&gt;
+
+// With streams
+var filtered = names.stream()
+    .filter(name -&gt; name.startsWith(&#34;A&#34;))
+    .toList();  // List&lt;String&gt;
+
+// Complex types made simple
+var result = someMethodReturningComplexType();  // Let compiler figure it out
+
+// Cannot use var without initializer
+// var x;  // ERROR: Cannot infer type
+
+// Cannot use var with null
+// var y = null;  // ERROR: Cannot infer type
+
+// Good use cases
+for (var name : names) {
+    System.out.println(name);
+}
+
+try (var reader = new BufferedReader(new FileReader(&#34;file.txt&#34;))) {
+    // ...
+}
+
+// When NOT to use var
+// var obscure = calculate();  // What type is this?
+int clear = calculate();     // Much better!
+</code></pre>
+            <aside class="warning">
+                <p><strong>Use Judiciously:</strong> var reduces boilerplate but can harm readability. Use it when the
+                    type is obvious from the right-hand side.</p>
+            </aside>
+            <h2 is-upgraded>Switch Expressions (Java 14+)</h2>
+            <pre><code language="language-java" class="language-java">// Old switch statement
+String dayType;
+int day = 3;
+switch (day) {
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+        dayType = &#34;Weekday&#34;;
+        break;
+    case 6:
+    case 7:
+        dayType = &#34;Weekend&#34;;
+        break;
+    default:
+        dayType = &#34;Invalid&#34;;
+}
+
+// New switch expression
+String dayType = switch (day) {
+    case 1, 2, 3, 4, 5 -&gt; &#34;Weekday&#34;;
+    case 6, 7 -&gt; &#34;Weekend&#34;;
+    default -&gt; &#34;Invalid&#34;;
+};
+
+// With multiple statements
+String result = switch (day) {
+    case 1 -&gt; {
+        System.out.println(&#34;Monday!&#34;);
+        yield &#34;Start of week&#34;;
+    }
+    case 5 -&gt; {
+        System.out.println(&#34;Friday!&#34;);
+        yield &#34;End of week&#34;;
+    }
+    default -&gt; &#34;Regular day&#34;;
+};
+
+// Pattern matching example
+Object obj = &#34;Hello&#34;;
+String formatted = switch (obj) {
+    case Integer i -&gt; String.format(&#34;int: %d&#34;, i);
+    case String s -&gt; String.format(&#34;String: %s&#34;, s);
+    case null -&gt; &#34;null value&#34;;
+    default -&gt; &#34;Unknown type&#34;;
+};
+
+// Practical example: HTTP status
+int statusCode = 404;
+String message = switch (statusCode) {
+    case 200 -&gt; &#34;OK&#34;;
+    case 201 -&gt; &#34;Created&#34;;
+    case 400 -&gt; &#34;Bad Request&#34;;
+    case 401 -&gt; &#34;Unauthorized&#34;;
+    case 404 -&gt; &#34;Not Found&#34;;
+    case 500 -&gt; &#34;Internal Server Error&#34;;
+    default -&gt; &#34;Unknown Status&#34;;
+};
+</code></pre>
+            <h2 is-upgraded>Text Blocks (Java 15+)</h2>
+            <pre><code language="language-java" class="language-java">// Old way (painful!)
+String json = &#34;{\n&#34; +
+              &#34;  \&#34;name\&#34;: \&#34;Alice\&#34;,\n&#34; +
+              &#34;  \&#34;age\&#34;: 25,\n&#34; +
+              &#34;  \&#34;email\&#34;: \&#34;alice@example.com\&#34;\n&#34; +
+              &#34;}&#34;;
+
+// New way (beautiful!)
+String json = &#34;&#34;&#34;
+    {
+      &#34;name&#34;: &#34;Alice&#34;,
+      &#34;age&#34;: 25,
+      &#34;email&#34;: &#34;alice@example.com&#34;
+    }
+    &#34;&#34;&#34;;
+
+// SQL query
+String sql = &#34;&#34;&#34;
+    SELECT u.name, u.email, o.total
+    FROM users u
+    INNER JOIN orders o ON u.id = o.user_id
+    WHERE o.status = &#39;COMPLETED&#39;
+    ORDER BY o.created_at DESC
+    LIMIT 10
+    &#34;&#34;&#34;;
+
+// HTML
+String html = &#34;&#34;&#34;
+    &lt;html&gt;
+        &lt;head&gt;
+            &lt;title&gt;Welcome&lt;/title&gt;
+        &lt;/head&gt;
+        &lt;body&gt;
+            &lt;h1&gt;Hello, World!&lt;/h1&gt;
+        &lt;/body&gt;
+    &lt;/html&gt;
+    &#34;&#34;&#34;;
+
+// String interpolation with formatted()
+String name = &#34;Alice&#34;;
+int age = 25;
+String greeting = &#34;&#34;&#34;
+    Hello, %s!
+    You are %d years old.
+    &#34;&#34;&#34;.formatted(name, age);
+
+// Escaping special characters
+String escaped = &#34;&#34;&#34;
+    Line 1
+    Line 2 with \&#34;&#34;&#34;quotes\&#34;&#34;&#34;
+    Line 3
+    &#34;&#34;&#34;;
+
+// Preserve formatting
+String code = &#34;&#34;&#34;
+    public class Hello {
+        public static void main(String[] args) {
+            System.out.println(&#34;Hello, World!&#34;);
+        }
+    }
+    &#34;&#34;&#34;;
+</code></pre>
+            <aside class="special">
+                <p><strong>Readability Win:</strong> Text blocks make multi-line strings readable and maintainable.
+                    Perfect for JSON, SQL, HTML, and code templates!</p>
+            </aside>
+            <h2 is-upgraded>Records (Java 16+)</h2>
+            <pre><code language="language-java" class="language-java">// Old way: POJO with boilerplate
+class PersonOld {
+    private final String name;
+    private final int age;
+    
+    public PersonOld(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+    
+    public String getName() { return name; }
+    public int getAge() { return age; }
+    
+    @Override
+    public boolean equals(Object o) { /* ... */ }
+    
+    @Override
+    public int hashCode() { /* ... */ }
+    
+    @Override
+    public String toString() { /* ... */ }
+}
+
+// New way: Record (one line!)
+record Person(String name, int age) {}
+
+// Usage
+Person alice = new Person(&#34;Alice&#34;, 25);
+System.out.println(alice.name());  // Accessor methods
+System.out.println(alice.age());
+System.out.println(alice);  // Person[name=Alice, age=25]
+
+Person alice2 = new Person(&#34;Alice&#34;, 25);
+System.out.println(alice.equals(alice2));  // true
+System.out.println(alice.hashCode() == alice2.hashCode());  // true
+
+// Custom methods in records
+record Rectangle(double width, double height) {
+    // Compact constructor (validation)
+    public Rectangle {
+        if (width &lt;= 0 || height &lt;= 0) {
+            throw new IllegalArgumentException(&#34;Dimensions must be positive&#34;);
+        }
+    }
+    
+    // Custom method
+    public double area() {
+        return width * height;
+    }
+    
+    // Static factory method
+    public static Rectangle square(double side) {
+        return new Rectangle(side, side);
+    }
+}
+
+Rectangle rect = new Rectangle(5, 10);
+System.out.println(&#34;Area: &#34; + rect.area());  // 50.0
+
+Rectangle square = Rectangle.square(5);
+System.out.println(&#34;Square: &#34; + square);
+
+// Records with other records
+record Address(String street, String city, String country) {}
+record Employee(String name, int id, Address address) {}
+
+Address addr = new Address(&#34;123 Main St&#34;, &#34;New York&#34;, &#34;USA&#34;);
+Employee emp = new Employee(&#34;Alice&#34;, 101, addr);
+System.out.println(emp.address().city());  // New York
+
+// Records in collections
+List&lt;Person&gt; people = List.of(
+    new Person(&#34;Alice&#34;, 25),
+    new Person(&#34;Bob&#34;, 30),
+    new Person(&#34;Charlie&#34;, 35)
+);
+
+var adults = people.stream()
+    .filter(p -&gt; p.age() &gt;= 18)
+    .toList();
+</code></pre>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Build Conference Scheduling System" duration="35">
+            <p>Let&#39;s build a complete conference scheduling system using all the modern Java features!</p>
+            <h2 is-upgraded>Project Structure</h2>
+            <p>Create <code>ConferenceScheduler.java</code>:</p>
+            <pre><code language="language-java" class="language-java">import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.stream.*;
+
+// Records for data modeling
+record Speaker(String id, String name, Optional&lt;String&gt; email, 
+               Optional&lt;String&gt; bio, String expertise) {
+    
+    public Speaker {
+        if (name == null || name.isBlank()) {
+            throw new IllegalArgumentException(&#34;Speaker name cannot be blank&#34;);
+        }
+    }
+    
+    public String displayInfo() {
+        var emailStr = email.orElse(&#34;No email provided&#34;);
+        var bioStr = bio.orElse(&#34;No bio available&#34;);
+        return &#34;&#34;&#34;
+            Speaker: %s
+            Email: %s
+            Expertise: %s
+            Bio: %s
+            &#34;&#34;&#34;.formatted(name, emailStr, expertise, bioStr);
+    }
+}
+
+record Session(String id, String title, Speaker speaker, 
+               LocalDateTime startTime, Duration duration, 
+               String room, String track) {
+    
+    public Session {
+        if (duration.isNegative() || duration.isZero()) {
+            throw new IllegalArgumentException(&#34;Duration must be positive&#34;);
+        }
+    }
+    
+    public LocalDateTime endTime() {
+        return startTime.plus(duration);
+    }
+    
+    public boolean overlapsWith(Session other) {
+        return !this.endTime().isBefore(other.startTime) &amp;&amp; 
+               !other.endTime().isBefore(this.startTime);
+    }
+    
+    public String formatSchedule() {
+        var formatter = DateTimeFormatter.ofPattern(&#34;MMM dd, yyyy HH:mm&#34;);
+        return &#34;&#34;&#34;
+            %s
+            Speaker: %s
+            Time: %s - %s
+            Duration: %d minutes
+            Room: %s | Track: %s
+            &#34;&#34;&#34;.formatted(
+                title,
+                speaker.name(),
+                startTime.format(formatter),
+                endTime().format(formatter),
+                duration.toMinutes(),
+                room,
+                track
+            );
+    }
+}
+
+record Conference(String name, LocalDate startDate, LocalDate endDate,
+                 ZoneId timeZone, String venue) {
+    
+    public Period duration() {
+        return Period.between(startDate, endDate);
+    }
+    
+    public boolean isActive(LocalDate date) {
+        return !date.isBefore(startDate) &amp;&amp; !date.isAfter(endDate);
+    }
+    
+    public String formatInfo() {
+        var formatter = DateTimeFormatter.ofPattern(&#34;MMM dd, yyyy&#34;);
+        return &#34;&#34;&#34;
+            Conference: %s
+            Dates: %s - %s
+            Duration: %d days
+            Venue: %s
+            Time Zone: %s
+            &#34;&#34;&#34;.formatted(
+                name,
+                startDate.format(formatter),
+                endDate.format(formatter),
+                duration().getDays() + 1,
+                venue,
+                timeZone
+            );
+    }
+}
+
+record Attendee(String id, String name, String email, 
+                Set&lt;String&gt; registeredSessions, String category) {
+    
+    public Attendee {
+        registeredSessions = Set.copyOf(registeredSessions);  // Immutable
+    }
+    
+    public boolean isRegistered(String sessionId) {
+        return registeredSessions.contains(sessionId);
+    }
+}
+
+public class ConferenceScheduler {
+    private final Conference conference;
+    private final List&lt;Speaker&gt; speakers;
+    private final List&lt;Session&gt; sessions;
+    private final List&lt;Attendee&gt; attendees;
+    
+    public ConferenceScheduler() {
+        this.conference = createConference();
+        this.speakers = createSpeakers();
+        this.sessions = createSessions();
+        this.attendees = createAttendees();
+    }
+    
+    private Conference createConference() {
+        return new Conference(
+            &#34;Java Developer Conference 2024&#34;,
+            LocalDate.of(2024, 12, 15),
+            LocalDate.of(2024, 12, 17),
+            ZoneId.of(&#34;America/New_York&#34;),
+            &#34;Convention Center, New York&#34;
+        );
+    }
+    
+    private List&lt;Speaker&gt; createSpeakers() {
+        return List.of(
+            new Speaker(&#34;S1&#34;, &#34;Alice Johnson&#34;, 
+                Optional.of(&#34;alice@example.com&#34;),
+                Optional.of(&#34;10+ years in Java development&#34;),
+                &#34;Spring Boot&#34;),
+            new Speaker(&#34;S2&#34;, &#34;Bob Smith&#34;,
+                Optional.of(&#34;bob@example.com&#34;),
+                Optional.empty(),
+                &#34;Microservices&#34;),
+            new Speaker(&#34;S3&#34;, &#34;Charlie Davis&#34;,
+                Optional.empty(),
+                Optional.of(&#34;Cloud architecture expert&#34;),
+                &#34;Cloud Native&#34;),
+            new Speaker(&#34;S4&#34;, &#34;Diana Miller&#34;,
+                Optional.of(&#34;diana@example.com&#34;),
+                Optional.of(&#34;Performance optimization specialist&#34;),
+                &#34;JVM Internals&#34;),
+            new Speaker(&#34;S5&#34;, &#34;Eve Wilson&#34;,
+                Optional.of(&#34;eve@example.com&#34;),
+                Optional.empty(),
+                &#34;Reactive Programming&#34;)
+        );
+    }
+    
+    private List&lt;Session&gt; createSessions() {
+        var day1 = LocalDate.of(2024, 12, 15);
+        var day2 = LocalDate.of(2024, 12, 16);
+        var day3 = LocalDate.of(2024, 12, 17);
+        
+        return List.of(
+            new Session(&#34;SE1&#34;, &#34;Spring Boot Best Practices&#34;,
+                findSpeaker(&#34;S1&#34;).orElseThrow(),
+                LocalDateTime.of(day1, LocalTime.of(9, 0)),
+                Duration.ofMinutes(90),
+                &#34;Room A&#34;, &#34;Backend&#34;),
+            
+            new Session(&#34;SE2&#34;, &#34;Microservices Architecture&#34;,
+                findSpeaker(&#34;S2&#34;).orElseThrow(),
+                LocalDateTime.of(day1, LocalTime.of(11, 0)),
+                Duration.ofMinutes(90),
+                &#34;Room B&#34;, &#34;Architecture&#34;),
+            
+            new Session(&#34;SE3&#34;, &#34;Cloud Native Java&#34;,
+                findSpeaker(&#34;S3&#34;).orElseThrow(),
+                LocalDateTime.of(day1, LocalTime.of(14, 0)),
+                Duration.ofMinutes(60),
+                &#34;Room A&#34;, &#34;Cloud&#34;),
+            
+            new Session(&#34;SE4&#34;, &#34;JVM Performance Tuning&#34;,
+                findSpeaker(&#34;S4&#34;).orElseThrow(),
+                LocalDateTime.of(day2, LocalTime.of(9, 0)),
+                Duration.ofMinutes(120),
+                &#34;Room A&#34;, &#34;Performance&#34;),
+            
+            new Session(&#34;SE5&#34;, &#34;Reactive Programming with Spring&#34;,
+                findSpeaker(&#34;S5&#34;).orElseThrow(),
+                LocalDateTime.of(day2, LocalTime.of(11, 30)),
+                Duration.ofMinutes(90),
+                &#34;Room B&#34;, &#34;Backend&#34;),
+            
+            new Session(&#34;SE6&#34;, &#34;Advanced Spring Boot&#34;,
+                findSpeaker(&#34;S1&#34;).orElseThrow(),
+                LocalDateTime.of(day2, LocalTime.of(14, 0)),
+                Duration.ofMinutes(90),
+                &#34;Room A&#34;, &#34;Backend&#34;),
+            
+            new Session(&#34;SE7&#34;, &#34;Kubernetes for Java Developers&#34;,
+                findSpeaker(&#34;S3&#34;).orElseThrow(),
+                LocalDateTime.of(day3, LocalTime.of(9, 0)),
+                Duration.ofMinutes(120),
+                &#34;Room B&#34;, &#34;Cloud&#34;),
+            
+            new Session(&#34;SE8&#34;, &#34;Monitoring and Observability&#34;,
+                findSpeaker(&#34;S2&#34;).orElseThrow(),
+                LocalDateTime.of(day3, LocalTime.of(11, 30)),
+                Duration.ofMinutes(60),
+                &#34;Room A&#34;, &#34;DevOps&#34;)
+        );
+    }
+    
+    private List&lt;Attendee&gt; createAttendees() {
+        return List.of(
+            new Attendee(&#34;A1&#34;, &#34;John Doe&#34;, &#34;john@example.com&#34;,
+                Set.of(&#34;SE1&#34;, &#34;SE3&#34;, &#34;SE4&#34;), &#34;Developer&#34;),
+            new Attendee(&#34;A2&#34;, &#34;Jane Smith&#34;, &#34;jane@example.com&#34;,
+                Set.of(&#34;SE2&#34;, &#34;SE5&#34;, &#34;SE7&#34;), &#34;Architect&#34;),
+            new Attendee(&#34;A3&#34;, &#34;Mike Brown&#34;, &#34;mike@example.com&#34;,
+                Set.of(&#34;SE1&#34;, &#34;SE4&#34;, &#34;SE6&#34;, &#34;SE8&#34;), &#34;Senior Developer&#34;)
+        );
+    }
+    
+    // 1. Find speaker by ID
+    public Optional&lt;Speaker&gt; findSpeaker(String speakerId) {
+        return speakers.stream()
+            .filter(s -&gt; s.id().equals(speakerId))
+            .findFirst();
+    }
+    
+    // 2. Find sessions by speaker
+    public List&lt;Session&gt; findSessionsBySpeaker(String speakerName) {
+        return sessions.stream()
+            .filter(s -&gt; s.speaker().name().equalsIgnoreCase(speakerName))
+            .sorted(Comparator.comparing(Session::startTime))
+            .toList();
+    }
+    
+    // 3. Find sessions by track
+    public Map&lt;String, List&lt;Session&gt;&gt; groupByTrack() {
+        return sessions.stream()
+            .collect(Collectors.groupingBy(
+                Session::track,
+                Collectors.collectingAndThen(
+                    Collectors.toList(),
+                    list -&gt; list.stream()
+                        .sorted(Comparator.comparing(Session::startTime))
+                        .toList()
+                )
+            ));
+    }
+    
+    // 4. Find sessions by date
+    public List&lt;Session&gt; findSessionsByDate(LocalDate date) {
+        return sessions.stream()
+            .filter(s -&gt; s.startTime().toLocalDate().equals(date))
+            .sorted(Comparator.comparing(Session::startTime))
+            .toList();
+    }
+    
+    // 5. Check for schedule conflicts
+    public List&lt;Session&gt; findConflictingSessions(Session session) {
+        return sessions.stream()
+            .filter(s -&gt; !s.id().equals(session.id()))
+            .filter(s -&gt; s.room().equals(session.room()))
+            .filter(session::overlapsWith)
+            .toList();
+    }
+    
+    // 6. Get sessions in time range
+    public List&lt;Session&gt; findSessionsInRange(LocalDateTime start, LocalDateTime end) {
+        return sessions.stream()
+            .filter(s -&gt; !s.endTime().isBefore(start) &amp;&amp; !s.startTime().isAfter(end))
+            .sorted(Comparator.comparing(Session::startTime))
+            .toList();
+    }
+    
+    // 7. Calculate total session duration
+    public Duration calculateTotalDuration() {
+        return sessions.stream()
+            .map(Session::duration)
+            .reduce(Duration.ZERO, Duration::plus);
+    }
+    
+    // 8. Find sessions by duration
+    public List&lt;Session&gt; findSessionsByDuration(int minMinutes, int maxMinutes) {
+        return sessions.stream()
+            .filter(s -&gt; s.duration().toMinutes() &gt;= minMinutes)
+            .filter(s -&gt; s.duration().toMinutes() &lt;= maxMinutes)
+            .toList();
+    }
+    
+    // 9. Get speaker statistics
+    public Map&lt;Speaker, Long&gt; getSpeakerSessionCounts() {
+        return sessions.stream()
+            .collect(Collectors.groupingBy(
+                Session::speaker,
+                Collectors.counting()
+            ));
+    }
+    
+    // 10. Find popular sessions (most registered)
+    public List&lt;Map.Entry&lt;Session, Long&gt;&gt; findPopularSessions(int topN) {
+        Map&lt;String, Long&gt; registrationCounts = attendees.stream()
+            .flatMap(a -&gt; a.registeredSessions().stream())
+            .collect(Collectors.groupingBy(
+                sessionId -&gt; sessionId,
+                Collectors.counting()
+            ));
+        
+        return sessions.stream()
+            .map(session -&gt; Map.entry(
+                session,
+                registrationCounts.getOrDefault(session.id(), 0L)
+            ))
+            .sorted(Map.Entry.&lt;Session, Long&gt;comparingByValue().reversed())
+            .limit(topN)
+            .toList();
+    }
+    
+    // 11. Convert to different time zone
+    public ZonedDateTime convertToTimeZone(LocalDateTime localTime, ZoneId targetZone) {
+        return ZonedDateTime.of(localTime, conference.timeZone())
+            .withZoneSameInstant(targetZone);
+    }
+    
+    // 12. Generate daily schedule
+    public String generateDailySchedule(LocalDate date) {
+        var sessionsForDay = findSessionsByDate(date);
+        
+        if (sessionsForDay.isEmpty()) {
+            return &#34;No sessions scheduled for &#34; + date;
+        }
+        
+        var schedule = new StringBuilder();
+        schedule.append(&#34;&#34;&#34;
+            
+            =====================================
+            SCHEDULE FOR %s
+            =====================================
+            
+            &#34;&#34;&#34;.formatted(date.format(DateTimeFormatter.ofPattern(&#34;EEEE, MMMM dd, yyyy&#34;))));
+        
+        sessionsForDay.forEach(session -&gt; 
+            schedule.append(session.formatSchedule()).append(&#34;\n&#34;)
+        );
+        
+        return schedule.toString();
+    }
+    
+    // 13. Find attendee&#39;s personalized schedule
+    public String generateAttendeeSchedule(String attendeeId) {
+        var attendee = attendees.stream()
+            .filter(a -&gt; a.id().equals(attendeeId))
+            .findFirst()
+            .orElseThrow(() -&gt; new IllegalArgumentException(&#34;Attendee not found&#34;));
+        
+        var registeredSessions = sessions.stream()
+            .filter(s -&gt; attendee.isRegistered(s.id()))
+            .sorted(Comparator.comparing(Session::startTime))
+            .toList();
+        
+        var schedule = new StringBuilder();
+        schedule.append(&#34;&#34;&#34;
+            
+            =====================================
+            PERSONAL SCHEDULE FOR %s
+            =====================================
+            Email: %s
+            Category: %s
+            Registered Sessions: %d
+            
+            &#34;&#34;&#34;.formatted(
+                attendee.name(),
+                attendee.email(),
+                attendee.category(),
+                registeredSessions.size()
+            ));
+        
+        registeredSessions.forEach(session -&gt;
+            schedule.append(session.formatSchedule()).append(&#34;\n&#34;)
+        );
+        
+        return schedule.toString();
+    }
+    
+    // 14. Validate schedule (find conflicts)
+    public List&lt;String&gt; validateSchedule() {
+        var conflicts = new ArrayList&lt;String&gt;();
+        
+        for (var session : sessions) {
+            var conflicting = findConflictingSessions(session);
+            if (!conflicting.isEmpty()) {
+                conflicts.add(&#34;Conflict: %s overlaps with %d other session(s) in %s&#34;
+                    .formatted(session.title(), conflicting.size(), session.room()));
+            }
+        }
+        
+        return conflicts;
+    }
+    
+    public void runScheduler() {
+        System.out.println(&#34;\n&#34; + &#34;=&#34;.repeat(60));
+        System.out.println(&#34;CONFERENCE SCHEDULING SYSTEM&#34;);
+        System.out.println(&#34;=&#34;.repeat(60));
+        
+        // Conference info
+        System.out.println(conference.formatInfo());
+        
+        // Speaker statistics
+        System.out.println(&#34;\n--- SPEAKER STATISTICS ---&#34;);
+        getSpeakerSessionCounts().forEach((speaker, count) -&gt;
+            System.out.printf(&#34;%s: %d session(s)%n&#34;, speaker.name(), count)
+        );
+        
+        // Sessions by track
+        System.out.println(&#34;\n--- SESSIONS BY TRACK ---&#34;);
+        groupByTrack().forEach((track, trackSessions) -&gt; {
+            System.out.printf(&#34;\n%s Track (%d sessions):%n&#34;, track, trackSessions.size());
+            trackSessions.forEach(s -&gt; 
+                System.out.printf(&#34;  - %s (%d min)%n&#34;, s.title(), s.duration().toMinutes())
+            );
+        });
+        
+        // Daily schedules
+        var confDates = conference.startDate().datesUntil(
+            conference.endDate().plusDays(1)
+        ).toList();
+        
+        confDates.forEach(date -&gt; 
+            System.out.println(generateDailySchedule(date))
+        );
+        
+        // Popular sessions
+        System.out.println(&#34;\n--- TOP 3 POPULAR SESSIONS ---&#34;);
+        findPopularSessions(3).forEach(entry -&gt;
+            System.out.printf(&#34;%s - %d registrations%n&#34;,
+                entry.getKey().title(), entry.getValue())
+        );
+        
+        // Total duration
+        var totalDuration = calculateTotalDuration();
+        System.out.printf(&#34;%nTotal content duration: %d hours %d minutes%n&#34;,
+            totalDuration.toHours(), totalDuration.toMinutesPart());
+        
+        // Time zone conversion example
+        var firstSession = sessions.get(0);
+        var istTime = convertToTimeZone(firstSession.startTime(), ZoneId.of(&#34;Asia/Kolkata&#34;));
+        System.out.printf(&#34;%nFirst session in IST: %s%n&#34;, istTime);
+        
+        // Attendee schedule
+        System.out.println(generateAttendeeSchedule(&#34;A1&#34;));
+        
+        // Validate schedule
+        var conflicts = validateSchedule();
+        if (conflicts.isEmpty()) {
+            System.out.println(&#34;\n✓ No scheduling conflicts found!&#34;);
+        } else {
+            System.out.println(&#34;\n✗ Scheduling conflicts detected:&#34;);
+            conflicts.forEach(System.out::println);
+        }
+    }
+    
+    public static void main(String[] args) {
+        var scheduler = new ConferenceScheduler();
+        scheduler.runScheduler();
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Run the Application</h2>
+            <pre>$ javac ConferenceScheduler.java
+$ java ConferenceScheduler
+</pre>
+            <aside class="special">
+                <p><strong>Production Ready:</strong> This scheduler demonstrates real-world use of modern Java features
+                    with proper null-safety, immutability, and time zone handling!</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Testing Modern Features" duration="5">
+            <p>Let&#39;s create test cases for our modern Java code:</p>
+            <pre><code language="language-java" class="language-java">import java.util.*;
+import java.time.*;
+
+public class ModernJavaTests {
+    public static void main(String[] args) {
+        testOptional();
+        testDateTime();
+        testRecords();
+        testSwitchExpressions();
+        System.out.println(&#34;\n✓ All tests passed!&#34;);
+    }
+    
+    static void testOptional() {
+        // Test 1: Optional creation
+        var present = Optional.of(&#34;Hello&#34;);
+        var empty = Optional.empty();
+        var nullable = Optional.ofNullable(null);
+        
+        assert present.isPresent();
+        assert !empty.isPresent();
+        assert nullable.isEmpty();
+        
+        // Test 2: Optional transformation
+        var result = present
+            .map(String::toUpperCase)
+            .filter(s -&gt; s.length() &gt; 3)
+            .orElse(&#34;DEFAULT&#34;);
+        assert result.equals(&#34;HELLO&#34;);
+        
+        // Test 3: Optional chaining
+        var length = present
+            .map(String::length)
+            .orElse(0);
+        assert length == 5;
+        
+        System.out.println(&#34;✓ Optional tests passed&#34;);
+    }
+    
+    static void testDateTime() {
+        // Test 1: Date creation
+        var date = LocalDate.of(2024, 12, 25);
+        assert date.getYear() == 2024;
+        assert date.getMonthValue() == 12;
+        assert date.getDayOfMonth() == 25;
+        
+        // Test 2: Date arithmetic
+        var tomorrow = date.plusDays(1);
+        assert tomorrow.getDayOfMonth() == 26;
+        
+        // Test 3: Period calculation
+        var start = LocalDate.of(2024, 1, 1);
+        var end = LocalDate.of(2024, 12, 31);
+        var period = Period.between(start, end);
+        assert period.getMonths() == 11;
+        
+        // Test 4: Time zones
+        var nyTime = ZonedDateTime.of(
+            LocalDateTime.of(2024, 12, 25, 12, 0),
+            ZoneId.of(&#34;America/New_York&#34;)
+        );
+        var tokyoTime = nyTime.withZoneSameInstant(ZoneId.of(&#34;Asia/Tokyo&#34;));
+        assert tokyoTime.getHour() != nyTime.getHour();
+        
+        System.out.println(&#34;✓ DateTime tests passed&#34;);
+    }
+    
+    static void testRecords() {
+        // Test 1: Record creation
+        record Point(int x, int y) {}
+        var p1 = new Point(1, 2);
+        var p2 = new Point(1, 2);
+        var p3 = new Point(2, 3);
+        
+        // Test 2: Auto-generated equals
+        assert p1.equals(p2);
+        assert !p1.equals(p3);
+        
+        // Test 3: Auto-generated hashCode
+        assert p1.hashCode() == p2.hashCode();
+        
+        // Test 4: Auto-generated toString
+        assert p1.toString().contains(&#34;Point&#34;);
+        
+        // Test 5: Immutability
+        var list = List.of(p1, p2, p3);
+        assert list.size() == 3;
+        
+        System.out.println(&#34;✓ Record tests passed&#34;);
+    }
+    
+    static void testSwitchExpressions() {
+        // Test 1: Basic switch expression
+        var day = 3;
+        var type = switch (day) {
+            case 1, 2, 3, 4, 5 -&gt; &#34;Weekday&#34;;
+            case 6, 7 -&gt; &#34;Weekend&#34;;
+            default -&gt; &#34;Invalid&#34;;
+        };
+        assert type.equals(&#34;Weekday&#34;);
+        
+        // Test 2: Switch with yield
+        var result = switch (day) {
+            case 1 -&gt; &#34;Monday&#34;;
+            case 3 -&gt; {
+                var msg = &#34;Wednesday&#34;;
+                yield msg;
+            }
+            default -&gt; &#34;Other&#34;;
+        };
+        assert result.equals(&#34;Wednesday&#34;);
+        
+        System.out.println(&#34;✓ Switch expression tests passed&#34;);
+    }
+}
+</code></pre>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Conclusion" duration="3">
+            <p>Congratulations! 🎉 You&#39;ve mastered modern Java features!</p>
+            <h2 is-upgraded>What You&#39;ve Learned</h2>
+            <ul>
+                <li>✅ <strong>Optional API:</strong> Null-safe programming with proper error handling</li>
+                <li>✅ <strong>Date/Time API:</strong> Modern temporal handling with time zones</li>
+                <li>✅ <strong>Period &amp; Duration:</strong> Time-based calculations</li>
+                <li>✅ <strong>Immutable Collections:</strong> Thread-safe, efficient collections</li>
+                <li>✅ <strong>Var Keyword:</strong> Type inference for cleaner code</li>
+                <li>✅ <strong>Switch Expressions:</strong> Pattern matching and cleaner syntax</li>
+                <li>✅ <strong>Text Blocks:</strong> Multi-line strings made readable</li>
+                <li>✅ <strong>Records:</strong> Concise immutable data classes</li>
+            </ul>
+            <h2 is-upgraded>Key Takeaways</h2>
+            <ol type="1">
+                <li><strong>Optional</strong> prevents NullPointerException and makes APIs clearer</li>
+                <li><strong>java.time</strong> is immutable and thread-safe (unlike old Date/Calendar)</li>
+                <li><strong>Records</strong> eliminate boilerplate for data classes</li>
+                <li><strong>Text blocks</strong> improve readability for multi-line strings</li>
+                <li><strong>Switch expressions</strong> reduce boilerplate and errors</li>
+                <li><strong>Immutable collections</strong> are safer and more efficient</li>
+            </ol>
+            <h2 is-upgraded>Best Practices</h2>
+            <ul>
+                <li>Use Optional for return types, not for fields or parameters</li>
+                <li>Always specify time zones when dealing with timestamps</li>
+                <li>Prefer immutable collections when data doesn&#39;t change</li>
+                <li>Use var when the type is obvious from the right-hand side</li>
+                <li>Use records for simple data carriers</li>
+                <li>Use text blocks for SQL, JSON, HTML, and multi-line text</li>
+            </ul>
+            <h2 is-upgraded>Next Steps</h2>
+            <p>Ready for more? Continue to:</p>
+            <ul>
+                <li><strong>Codelab 2.3:</strong> Asynchronous Programming with CompletableFuture</li>
+                <li><strong>Codelab 2.4:</strong> Logging with Log4j</li>
+                <li><strong>Codelab 2.5:</strong> IDE Debugging Mastery</li>
+            </ul>
+            <h2 is-upgraded>Practice Exercises</h2>
+            <ol type="1">
+                <li><strong>Event Management:</strong> Build an event booking system with time zones</li>
+                <li><strong>User Profile Service:</strong> Implement profile management with Optional</li>
+                <li><strong>Configuration Manager:</strong> Parse JSON/YAML using records and text blocks</li>
+                <li><strong>Time Tracker:</strong> Build time tracking with different time zones</li>
+                <li><strong>Data Transfer Objects:</strong> Convert legacy POJOs to records</li>
+            </ol>
+            <h2 is-upgraded>Additional Resources</h2>
+            <ul>
+                <li><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Optional.html"
+                        target="_blank">Optional JavaDoc</a></li>
+                <li><a href="https://docs.oracle.com/javase/tutorial/datetime/" target="_blank">Date/Time API Guide</a>
+                </li>
+                <li><a href="https://openjdk.org/jeps/395" target="_blank">Records Tutorial</a></li>
+                <li><a href="https://openjdk.org/jeps/378" target="_blank">Text Blocks</a></li>
+                <li><a href="https://openjdk.org/projects/amber/" target="_blank">Pattern Matching</a></li>
+            </ul>
+            <aside class="special">
+                <p><strong>Excellent Progress!</strong> You&#39;re now equipped with modern Java features used in
+                    production applications worldwide. These skills are essential for Spring Boot development!</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+    </google-codelab>
+
+    <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
+    <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
+    <script src="https://storage.googleapis.com/claat-public/prettify.js"></script>
+    <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
+    <script src="//support.google.com/inapp/api.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,27 @@
+{
+  "environment": "web",
+  "format": "html",
+  "prefix": "https://storage.googleapis.com",
+  "mainga": "UA-49880327-14",
+  "updated": "2025-12-27T18:48:58+05:30",
+  "id": "servlets-blocking-reactive",
+  "duration": 78,
+  "title": "Servlets \u0026 Blocking vs Reactive Stacks",
+  "summary": "Compare blocking and reactive web stacks by building the same API with raw Servlets, Spring MVC, and Spring WebFlux, then analyze performance differences",
+  "source": "codelab-4.2-servlets-blocking-reactive.md",
+  "theme": "",
+  "status": [
+    "published"
+  ],
+  "category": [
+    "java",
+    "servlets",
+    "springmvc",
+    "springwebflux",
+    "reactiveprogramming"
+  ],
+  "tags": [
+    "web"
+  ],
+  "url": "servlets-blocking-reactive"
+}

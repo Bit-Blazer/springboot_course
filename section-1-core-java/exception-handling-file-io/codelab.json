@@ -1,0 +1,25 @@
+{
+  "environment": "web",
+  "format": "html",
+  "prefix": "https://storage.googleapis.com",
+  "mainga": "UA-49880327-14",
+  "updated": "2025-12-27T18:48:58+05:30",
+  "id": "exception-handling-file-io",
+  "duration": 109,
+  "title": "Exception Handling \u0026 File I/O",
+  "summary": "Master exception handling, custom exceptions, and file I/O operations by building a contact management system with file persistence",
+  "source": "codelab-1.3-exception-handling-file-io.md",
+  "theme": "",
+  "status": [
+    "published"
+  ],
+  "category": [
+    "java",
+    "exceptionhandling",
+    "filei/o"
+  ],
+  "tags": [
+    "web"
+  ],
+  "url": "exception-handling-file-io"
+}

@@ -1,0 +1,27 @@
+{
+  "environment": "web",
+  "format": "html",
+  "prefix": "https://storage.googleapis.com",
+  "mainga": "UA-49880327-14",
+  "updated": "2025-12-27T18:48:58+05:30",
+  "id": "microservices-architecture",
+  "duration": 82,
+  "title": "Microservices Architecture \u0026 Implementation",
+  "summary": "Build a microservices ecosystem with service registry, API gateway, and inter-service communication using Spring Cloud",
+  "source": "codelab-4.1-microservices-architecture.md",
+  "theme": "",
+  "status": [
+    "published"
+  ],
+  "category": [
+    "springboot",
+    "microservices",
+    "springcloud",
+    "eureka",
+    "apigateway"
+  ],
+  "tags": [
+    "web"
+  ],
+  "url": "microservices-architecture"
+}

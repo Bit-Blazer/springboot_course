@@ -1,0 +1,27 @@
+{
+  "environment": "web",
+  "format": "html",
+  "prefix": "https://storage.googleapis.com",
+  "mainga": "UA-49880327-14",
+  "updated": "2025-12-27T19:06:50+05:30",
+  "id": "jwt-spring-cloud",
+  "duration": 62,
+  "title": "JWT Authentication \u0026 Spring Cloud Config",
+  "summary": "Implement JWT-based authentication for stateless API security and introduce Spring Cloud Config for centralized configuration management",
+  "source": "codelab-3.5-jwt-spring-cloud.md",
+  "theme": "",
+  "status": [
+    "published"
+  ],
+  "category": [
+    "springboot",
+    "jwt",
+    "springcloud",
+    "security",
+    "microservices"
+  ],
+  "tags": [
+    "web"
+  ],
+  "url": "jwt-spring-cloud"
+}

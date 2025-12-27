@@ -1,0 +1,27 @@
+{
+  "environment": "web",
+  "format": "html",
+  "prefix": "https://storage.googleapis.com",
+  "mainga": "UA-49880327-14",
+  "updated": "2025-12-27T18:48:58+05:30",
+  "id": "reactive-webflux-r2dbc",
+  "duration": 59,
+  "title": "Reactive Programming with WebFlux \u0026 R2DBC",
+  "summary": "Transform the Task Management API to reactive programming with Spring WebFlux and R2DBC for non-blocking, scalable, event-driven architecture",
+  "source": "codelab-3.6-reactive-webflux-r2dbc.md",
+  "theme": "",
+  "status": [
+    "published"
+  ],
+  "category": [
+    "springboot",
+    "reactiveprogramming",
+    "webflux",
+    "r2dbc",
+    "projectreactor"
+  ],
+  "tags": [
+    "web"
+  ],
+  "url": "reactive-webflux-r2dbc"
+}

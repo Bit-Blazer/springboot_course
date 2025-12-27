@@ -1,0 +1,1214 @@
+<!doctype html>
+
+<html>
+
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <title>Microservices Architecture &amp; Implementation</title>
+  <link rel="stylesheet"
+    href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
+  <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
+  <style>
+    .success {
+      color: #1e8e3e;
+    }
+
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+
+<body>
+  <google-codelab-analytics gaid="UA-49880327-14"></google-codelab-analytics>
+  <google-codelab codelab-gaid="" id="microservices-architecture"
+    title="Microservices Architecture &amp; Implementation" environment="web" feedback-link="">
+
+    <google-codelab-step label="Introduction" duration="3">
+      <p>Build a complete microservices ecosystem with service discovery, API gateway, and inter-service communication.
+      </p>
+      <h2 class="checklist" is-upgraded>What You&#39;ll Learn</h2>
+      <ul class="checklist">
+        <li><strong>Architecture Evolution:</strong> Monolith to microservices</li>
+        <li><strong>Service Registry:</strong> Eureka Server for service discovery</li>
+        <li><strong>API Gateway:</strong> Spring Cloud Gateway for routing</li>
+        <li><strong>Load Balancing:</strong> Client-side load balancing</li>
+        <li><strong>Service Communication:</strong> OpenFeign for REST calls</li>
+        <li><strong>Configuration:</strong> Externalized config patterns</li>
+        <li><strong>Health Checks:</strong> Actuator endpoints</li>
+        <li><strong>Docker Compose:</strong> Multi-service orchestration</li>
+      </ul>
+      <h2 is-upgraded>What You&#39;ll Build</h2>
+      <p>Complete E-Commerce Microservices System:</p>
+      <ul>
+        <li><strong>Eureka Server:</strong> Service registry (port 8761)</li>
+        <li><strong>API Gateway:</strong> Single entry point (port 8080)</li>
+        <li><strong>Product Service:</strong> Manage products (port 8081, 8082 for load balancing)</li>
+        <li><strong>Order Service:</strong> Manage orders, calls Product Service (port 8083)</li>
+      </ul>
+      <p><strong>Architecture:</strong></p>
+      <pre><code>Client → API Gateway → Product Service
+              ↓            ↓
+         Eureka Server ← Order Service
+</code></pre>
+      <h2 is-upgraded>Prerequisites</h2>
+      <ul>
+        <li>Completed previous Spring Boot codelabs</li>
+        <li>Understanding of REST APIs</li>
+        <li>Docker Desktop installed</li>
+        <li>Maven 3.6+</li>
+        <li>JDK 17+</li>
+      </ul>
+      <h2 is-upgraded>Microservices Benefits</h2>
+      <p><strong>Advantages:</strong></p>
+      <ul>
+        <li>Independent deployment</li>
+        <li>Technology diversity</li>
+        <li>Team autonomy</li>
+        <li>Scalability (scale services independently)</li>
+        <li>Fault isolation</li>
+      </ul>
+      <p><strong>Challenges:</strong></p>
+      <ul>
+        <li>Distributed system complexity</li>
+        <li>Network latency</li>
+        <li>Data consistency</li>
+        <li>Testing complexity</li>
+        <li>Operational overhead</li>
+      </ul>
+      <aside class="special">
+        <p><strong>When to Use:</strong> Microservices work best for large, complex applications with multiple teams.
+          Start with a monolith, migrate when needed.</p>
+      </aside>
+
+
+    </google-codelab-step>
+
+    <google-codelab-step label="Create Parent Project" duration="5">
+      <p>Set up Maven multi-module project structure.</p>
+      <h2 is-upgraded>Project Structure</h2>
+      <pre><code>ecommerce-microservices/
+├── pom.xml (parent)
+├── eureka-server/
+├── api-gateway/
+├── product-service/
+├── order-service/
+└── docker-compose.yml
+</code></pre>
+      <h2 is-upgraded>Parent POM</h2>
+      <p><strong>pom.xml:</strong></p>
+      <pre><code language="language-xml" class="language-xml">&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
+&lt;project xmlns=&#34;http://maven.apache.org/POM/4.0.0&#34;
+         xmlns:xsi=&#34;http://www.w3.org/2001/XMLSchema-instance&#34;
+         xsi:schemaLocation=&#34;http://maven.apache.org/POM/4.0.0
+         http://maven.apache.org/xsd/maven-4.0.0.xsd&#34;&gt;
+    &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+
+    &lt;parent&gt;
+        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+        &lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;
+        &lt;version&gt;3.2.1&lt;/version&gt;
+        &lt;relativePath/&gt;
+    &lt;/parent&gt;
+
+    &lt;groupId&gt;com.example&lt;/groupId&gt;
+    &lt;artifactId&gt;ecommerce-microservices&lt;/artifactId&gt;
+    &lt;version&gt;1.0.0&lt;/version&gt;
+    &lt;packaging&gt;pom&lt;/packaging&gt;
+
+    &lt;properties&gt;
+        &lt;java.version&gt;17&lt;/java.version&gt;
+        &lt;spring-cloud.version&gt;2023.0.0&lt;/spring-cloud.version&gt;
+    &lt;/properties&gt;
+
+    &lt;modules&gt;
+        &lt;module&gt;eureka-server&lt;/module&gt;
+        &lt;module&gt;api-gateway&lt;/module&gt;
+        &lt;module&gt;product-service&lt;/module&gt;
+        &lt;module&gt;order-service&lt;/module&gt;
+    &lt;/modules&gt;
+
+    &lt;dependencyManagement&gt;
+        &lt;dependencies&gt;
+            &lt;dependency&gt;
+                &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+                &lt;artifactId&gt;spring-cloud-dependencies&lt;/artifactId&gt;
+                &lt;version&gt;${spring-cloud.version}&lt;/version&gt;
+                &lt;type&gt;pom&lt;/type&gt;
+                &lt;scope&gt;import&lt;/scope&gt;
+            &lt;/dependency&gt;
+        &lt;/dependencies&gt;
+    &lt;/dependencyManagement&gt;
+&lt;/project&gt;
+</code></pre>
+      <h2 is-upgraded>Create Modules</h2>
+      <pre><code language="language-bash" class="language-bash">mkdir ecommerce-microservices
+cd ecommerce-microservices
+
+# Create parent POM (as shown above)
+
+# Create module directories
+mkdir eureka-server api-gateway product-service order-service
+</code></pre>
+
+
+    </google-codelab-step>
+
+    <google-codelab-step label="Eureka Server - Service Registry" duration="10">
+      <p>Build service registry for service discovery.</p>
+      <h2 is-upgraded>Eureka Server POM</h2>
+      <p><strong>eureka-server/pom.xml:</strong></p>
+      <pre><code language="language-xml" class="language-xml">&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
+&lt;project xmlns=&#34;http://maven.apache.org/POM/4.0.0&#34;
+         xmlns:xsi=&#34;http://www.w3.org/2001/XMLSchema-instance&#34;
+         xsi:schemaLocation=&#34;http://maven.apache.org/POM/4.0.0
+         http://maven.apache.org/xsd/maven-4.0.0.xsd&#34;&gt;
+    &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+
+    &lt;parent&gt;
+        &lt;groupId&gt;com.example&lt;/groupId&gt;
+        &lt;artifactId&gt;ecommerce-microservices&lt;/artifactId&gt;
+        &lt;version&gt;1.0.0&lt;/version&gt;
+    &lt;/parent&gt;
+
+    &lt;artifactId&gt;eureka-server&lt;/artifactId&gt;
+
+    &lt;dependencies&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-cloud-starter-netflix-eureka-server&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+&lt;/project&gt;
+</code></pre>
+      <h2 is-upgraded>Eureka Application</h2>
+      <p><strong>src/main/java/com/example/eureka/EurekaServerApplication.java:</strong></p>
+      <pre><code language="language-java" class="language-java">package com.example.eureka;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
+
+@SpringBootApplication
+@EnableEurekaServer
+public class EurekaServerApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(EurekaServerApplication.class, args);
+    }
+}
+</code></pre>
+      <h2 is-upgraded>Eureka Configuration</h2>
+      <p><strong>src/main/resources/application.yml:</strong></p>
+      <pre><code language="language-yaml" class="language-yaml">spring:
+  application:
+    name: eureka-server
+
+server:
+  port: 8761
+
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    register-with-eureka: false # Don&#39;t register self
+    fetch-registry: false # Don&#39;t fetch registry
+    service-url:
+      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
+  server:
+    wait-time-in-ms-when-sync-empty: 0
+</code></pre>
+      <h2 is-upgraded>Test Eureka Server</h2>
+      <pre><code language="language-bash" class="language-bash">cd eureka-server
+mvn spring-boot:run
+</code></pre>
+      <p>Open http://localhost:8761 - Eureka Dashboard should show no registered services yet.</p>
+      <aside class="special">
+        <p><strong>Eureka Dashboard:</strong> Web UI showing all registered services, instances, and health status.</p>
+      </aside>
+
+
+    </google-codelab-step>
+
+    <google-codelab-step label="Product Service" duration="12">
+      <p>Build Product Service with Eureka client.</p>
+      <h2 is-upgraded>Product Service POM</h2>
+      <p><strong>product-service/pom.xml:</strong></p>
+      <pre><code language="language-xml" class="language-xml">&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
+&lt;project xmlns=&#34;http://maven.apache.org/POM/4.0.0&#34;
+         xmlns:xsi=&#34;http://www.w3.org/2001/XMLSchema-instance&#34;
+         xsi:schemaLocation=&#34;http://maven.apache.org/POM/4.0.0
+         http://maven.apache.org/xsd/maven-4.0.0.xsd&#34;&gt;
+    &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+
+    &lt;parent&gt;
+        &lt;groupId&gt;com.example&lt;/groupId&gt;
+        &lt;artifactId&gt;ecommerce-microservices&lt;/artifactId&gt;
+        &lt;version&gt;1.0.0&lt;/version&gt;
+    &lt;/parent&gt;
+
+    &lt;artifactId&gt;product-service&lt;/artifactId&gt;
+
+    &lt;dependencies&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-cloud-starter-netflix-eureka-client&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-actuator&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.projectlombok&lt;/groupId&gt;
+            &lt;artifactId&gt;lombok&lt;/artifactId&gt;
+            &lt;optional&gt;true&lt;/optional&gt;
+        &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+&lt;/project&gt;
+</code></pre>
+      <h2 is-upgraded>Product Model</h2>
+      <p><strong>src/main/java/com/example/product/model/Product.java:</strong></p>
+      <pre><code language="language-java" class="language-java">package com.example.product.model;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Product {
+    private Long id;
+    private String name;
+    private String description;
+    private BigDecimal price;
+    private Integer stock;
+}
+</code></pre>
+      <h2 is-upgraded>Product Service</h2>
+      <p><strong>src/main/java/com/example/product/service/ProductService.java:</strong></p>
+      <pre><code language="language-java" class="language-java">package com.example.product.service;
+
+import com.example.product.model.Product;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
+
+@Service
+public class ProductService {
+
+    private final Map&lt;Long, Product&gt; products = new ConcurrentHashMap&lt;&gt;();
+    private final AtomicLong idGenerator = new AtomicLong(1);
+
+    public ProductService() {
+        // Initialize with sample data
+        createProduct(new Product(null, &#34;Laptop&#34;, &#34;High-performance laptop&#34;,
+            new BigDecimal(&#34;1299.99&#34;), 50));
+        createProduct(new Product(null, &#34;Mouse&#34;, &#34;Wireless mouse&#34;,
+            new BigDecimal(&#34;29.99&#34;), 200));
+        createProduct(new Product(null, &#34;Keyboard&#34;, &#34;Mechanical keyboard&#34;,
+            new BigDecimal(&#34;89.99&#34;), 100));
+    }
+
+    public List&lt;Product&gt; getAllProducts() {
+        return new ArrayList&lt;&gt;(products.values());
+    }
+
+    public Optional&lt;Product&gt; getProductById(Long id) {
+        return Optional.ofNullable(products.get(id));
+    }
+
+    public Product createProduct(Product product) {
+        product.setId(idGenerator.getAndIncrement());
+        products.put(product.getId(), product);
+        return product;
+    }
+
+    public boolean checkStock(Long productId, Integer quantity) {
+        Product product = products.get(productId);
+        return product != null &amp;&amp; product.getStock() &gt;= quantity;
+    }
+
+    public boolean reduceStock(Long productId, Integer quantity) {
+        Product product = products.get(productId);
+        if (product != null &amp;&amp; product.getStock() &gt;= quantity) {
+            product.setStock(product.getStock() - quantity);
+            return true;
+        }
+        return false;
+    }
+}
+</code></pre>
+      <h2 is-upgraded>Product Controller</h2>
+      <p><strong>src/main/java/com/example/product/controller/ProductController.java:</strong></p>
+      <pre><code language="language-java" class="language-java">package com.example.product.controller;
+
+import com.example.product.model.Product;
+import com.example.product.service.ProductService;
+import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping(&#34;/api/products&#34;)
+@RequiredArgsConstructor
+public class ProductController {
+
+    private static final Logger log = LoggerFactory.getLogger(ProductController.class);
+
+    private final ProductService productService;
+
+    @Value(&#34;${server.port}&#34;)
+    private String serverPort;
+
+    @GetMapping
+    public ResponseEntity&lt;List&lt;Product&gt;&gt; getAllProducts() {
+        log.info(&#34;Getting all products from instance on port: {}&#34;, serverPort);
+        return ResponseEntity.ok(productService.getAllProducts());
+    }
+
+    @GetMapping(&#34;/{id}&#34;)
+    public ResponseEntity&lt;Product&gt; getProductById(@PathVariable Long id) {
+        log.info(&#34;Getting product {} from instance on port: {}&#34;, id, serverPort);
+        return productService.getProductById(id)
+            .map(ResponseEntity::ok)
+            .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping
+    public ResponseEntity&lt;Product&gt; createProduct(@RequestBody Product product) {
+        Product created = productService.createProduct(product);
+        return ResponseEntity.ok(created);
+    }
+
+    @PostMapping(&#34;/{id}/check-stock&#34;)
+    public ResponseEntity&lt;Boolean&gt; checkStock(
+            @PathVariable Long id,
+            @RequestParam Integer quantity) {
+        boolean available = productService.checkStock(id, quantity);
+        return ResponseEntity.ok(available);
+    }
+
+    @PostMapping(&#34;/{id}/reduce-stock&#34;)
+    public ResponseEntity&lt;Boolean&gt; reduceStock(
+            @PathVariable Long id,
+            @RequestParam Integer quantity) {
+        boolean success = productService.reduceStock(id, quantity);
+        return ResponseEntity.ok(success);
+    }
+}
+</code></pre>
+      <h2 is-upgraded>Product Application</h2>
+      <p><strong>src/main/java/com/example/product/ProductServiceApplication.java:</strong></p>
+      <pre><code language="language-java" class="language-java">package com.example.product;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+
+@SpringBootApplication
+@EnableDiscoveryClient
+public class ProductServiceApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(ProductServiceApplication.class, args);
+    }
+}
+</code></pre>
+      <h2 is-upgraded>Product Configuration</h2>
+      <p><strong>src/main/resources/application.yml:</strong></p>
+      <pre><code language="language-yaml" class="language-yaml">spring:
+  application:
+    name: product-service
+
+server:
+  port: 8081
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+</code></pre>
+      <h2 is-upgraded>Test Product Service</h2>
+      <pre><code language="language-bash" class="language-bash">cd product-service
+mvn spring-boot:run
+</code></pre>
+      <p>Check Eureka Dashboard - <code>PRODUCT-SERVICE</code> should be registered.</p>
+      <p>Test API:</p>
+      <pre><code language="language-bash" class="language-bash">curl http://localhost:8081/api/products
+</code></pre>
+
+
+    </google-codelab-step>
+
+    <google-codelab-step label="Order Service with Feign" duration="15">
+      <p>Build Order Service that communicates with Product Service via Feign.</p>
+      <h2 is-upgraded>Order Service POM</h2>
+      <p><strong>order-service/pom.xml:</strong></p>
+      <pre><code language="language-xml" class="language-xml">&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
+&lt;project xmlns=&#34;http://maven.apache.org/POM/4.0.0&#34;
+         xmlns:xsi=&#34;http://www.w3.org/2001/XMLSchema-instance&#34;
+         xsi:schemaLocation=&#34;http://maven.apache.org/POM/4.0.0
+         http://maven.apache.org/xsd/maven-4.0.0.xsd&#34;&gt;
+    &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+
+    &lt;parent&gt;
+        &lt;groupId&gt;com.example&lt;/groupId&gt;
+        &lt;artifactId&gt;ecommerce-microservices&lt;/artifactId&gt;
+        &lt;version&gt;1.0.0&lt;/version&gt;
+    &lt;/parent&gt;
+
+    &lt;artifactId&gt;order-service&lt;/artifactId&gt;
+
+    &lt;dependencies&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-cloud-starter-netflix-eureka-client&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-cloud-starter-openfeign&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-actuator&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.projectlombok&lt;/groupId&gt;
+            &lt;artifactId&gt;lombok&lt;/artifactId&gt;
+            &lt;optional&gt;true&lt;/optional&gt;
+        &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+&lt;/project&gt;
+</code></pre>
+      <h2 is-upgraded>Order Models</h2>
+      <p><strong>src/main/java/com/example/order/model/Order.java:</strong></p>
+      <pre><code language="language-java" class="language-java">package com.example.order.model;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Order {
+    private Long id;
+    private String customerName;
+    private List&lt;OrderItem&gt; items;
+    private BigDecimal totalAmount;
+    private OrderStatus status;
+    private LocalDateTime createdAt;
+}
+</code></pre>
+      <p><strong>src/main/java/com/example/order/model/OrderItem.java:</strong></p>
+      <pre><code language="language-java" class="language-java">package com.example.order.model;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class OrderItem {
+    private Long productId;
+    private String productName;
+    private Integer quantity;
+}
+</code></pre>
+      <p><strong>src/main/java/com/example/order/model/OrderStatus.java:</strong></p>
+      <pre><code language="language-java" class="language-java">package com.example.order.model;
+
+public enum OrderStatus {
+    PENDING, CONFIRMED, CANCELLED
+}
+</code></pre>
+      <h2 is-upgraded>Feign Client</h2>
+      <p><strong>src/main/java/com/example/order/client/ProductClient.java:</strong></p>
+      <pre><code language="language-java" class="language-java">package com.example.order.client;
+
+import com.example.order.dto.ProductDto;
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.*;
+
+@FeignClient(name = &#34;product-service&#34;)
+public interface ProductClient {
+
+    @GetMapping(&#34;/api/products/{id}&#34;)
+    ProductDto getProduct(@PathVariable Long id);
+
+    @PostMapping(&#34;/api/products/{id}/check-stock&#34;)
+    Boolean checkStock(@PathVariable Long id, @RequestParam Integer quantity);
+
+    @PostMapping(&#34;/api/products/{id}/reduce-stock&#34;)
+    Boolean reduceStock(@PathVariable Long id, @RequestParam Integer quantity);
+}
+</code></pre>
+      <p><strong>src/main/java/com/example/order/dto/ProductDto.java:</strong></p>
+      <pre><code language="language-java" class="language-java">package com.example.order.dto;
+
+import lombok.Data;
+import java.math.BigDecimal;
+
+@Data
+public class ProductDto {
+    private Long id;
+    private String name;
+    private BigDecimal price;
+    private Integer stock;
+}
+</code></pre>
+      <h2 is-upgraded>Order Service</h2>
+      <p><strong>src/main/java/com/example/order/service/OrderService.java:</strong></p>
+      <pre><code language="language-java" class="language-java">package com.example.order.service;
+
+import com.example.order.client.ProductClient;
+import com.example.order.dto.ProductDto;
+import com.example.order.model.Order;
+import com.example.order.model.OrderItem;
+import com.example.order.model.OrderStatus;
+import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
+
+@Service
+@RequiredArgsConstructor
+public class OrderService {
+
+    private static final Logger log = LoggerFactory.getLogger(OrderService.class);
+
+    private final ProductClient productClient;
+    private final Map&lt;Long, Order&gt; orders = new ConcurrentHashMap&lt;&gt;();
+    private final AtomicLong idGenerator = new AtomicLong(1);
+
+    public List&lt;Order&gt; getAllOrders() {
+        return new ArrayList&lt;&gt;(orders.values());
+    }
+
+    public Optional&lt;Order&gt; getOrderById(Long id) {
+        return Optional.ofNullable(orders.get(id));
+    }
+
+    public Order createOrder(String customerName, List&lt;OrderItem&gt; items) {
+        log.info(&#34;Creating order for customer: {}&#34;, customerName);
+
+        // Check stock for all items
+        for (OrderItem item : items) {
+            log.info(&#34;Checking stock for product: {}&#34;, item.getProductId());
+            Boolean stockAvailable = productClient.checkStock(
+                item.getProductId(),
+                item.getQuantity()
+            );
+
+            if (!stockAvailable) {
+                throw new RuntimeException(
+                    &#34;Insufficient stock for product: &#34; + item.getProductId()
+                );
+            }
+        }
+
+        // Calculate total and get product names
+        BigDecimal total = BigDecimal.ZERO;
+        for (OrderItem item : items) {
+            ProductDto product = productClient.getProduct(item.getProductId());
+            item.setProductName(product.getName());
+
+            BigDecimal itemTotal = product.getPrice()
+                .multiply(BigDecimal.valueOf(item.getQuantity()));
+            total = total.add(itemTotal);
+        }
+
+        // Reduce stock for all items
+        for (OrderItem item : items) {
+            log.info(&#34;Reducing stock for product: {}&#34;, item.getProductId());
+            productClient.reduceStock(item.getProductId(), item.getQuantity());
+        }
+
+        // Create order
+        Order order = new Order(
+            idGenerator.getAndIncrement(),
+            customerName,
+            items,
+            total,
+            OrderStatus.CONFIRMED,
+            LocalDateTime.now()
+        );
+
+        orders.put(order.getId(), order);
+        log.info(&#34;Order created: {}&#34;, order.getId());
+
+        return order;
+    }
+}
+</code></pre>
+      <h2 is-upgraded>Order Controller</h2>
+      <p><strong>src/main/java/com/example/order/controller/OrderController.java:</strong></p>
+      <pre><code language="language-java" class="language-java">package com.example.order.controller;
+
+import com.example.order.dto.CreateOrderRequest;
+import com.example.order.model.Order;
+import com.example.order.service.OrderService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping(&#34;/api/orders&#34;)
+@RequiredArgsConstructor
+public class OrderController {
+
+    private final OrderService orderService;
+
+    @GetMapping
+    public ResponseEntity&lt;List&lt;Order&gt;&gt; getAllOrders() {
+        return ResponseEntity.ok(orderService.getAllOrders());
+    }
+
+    @GetMapping(&#34;/{id}&#34;)
+    public ResponseEntity&lt;Order&gt; getOrderById(@PathVariable Long id) {
+        return orderService.getOrderById(id)
+            .map(ResponseEntity::ok)
+            .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping
+    public ResponseEntity&lt;Order&gt; createOrder(@RequestBody CreateOrderRequest request) {
+        Order order = orderService.createOrder(
+            request.getCustomerName(),
+            request.getItems()
+        );
+        return ResponseEntity.ok(order);
+    }
+}
+</code></pre>
+      <p><strong>src/main/java/com/example/order/dto/CreateOrderRequest.java:</strong></p>
+      <pre><code language="language-java" class="language-java">package com.example.order.dto;
+
+import com.example.order.model.OrderItem;
+import lombok.Data;
+import java.util.List;
+
+@Data
+public class CreateOrderRequest {
+    private String customerName;
+    private List&lt;OrderItem&gt; items;
+}
+</code></pre>
+      <h2 is-upgraded>Order Application</h2>
+      <p><strong>src/main/java/com/example/order/OrderServiceApplication.java:</strong></p>
+      <pre><code language="language-java" class="language-java">package com.example.order;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.openfeign.EnableFeignClients;
+
+@SpringBootApplication
+@EnableDiscoveryClient
+@EnableFeignClients
+public class OrderServiceApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(OrderServiceApplication.class, args);
+    }
+}
+</code></pre>
+      <h2 is-upgraded>Order Configuration</h2>
+      <p><strong>src/main/resources/application.yml:</strong></p>
+      <pre><code language="language-yaml" class="language-yaml">spring:
+  application:
+    name: order-service
+
+server:
+  port: 8083
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+</code></pre>
+      <h2 is-upgraded>Test Order Service</h2>
+      <pre><code language="language-bash" class="language-bash">cd order-service
+mvn spring-boot:run
+</code></pre>
+      <p>Check Eureka - both services registered.</p>
+      <p>Create order:</p>
+      <pre><code language="language-bash" class="language-bash">curl -X POST http://localhost:8083/api/orders \
+  -H &#34;Content-Type: application/json&#34; \
+  -d &#39;{
+    &#34;customerName&#34;: &#34;John Doe&#34;,
+    &#34;items&#34;: [
+      {&#34;productId&#34;: 1, &#34;quantity&#34;: 1},
+      {&#34;productId&#34;: 2, &#34;quantity&#34;: 2}
+    ]
+  }&#39;
+</code></pre>
+      <aside class="special">
+        <p><strong>Feign Magic:</strong> Feign automatically discovers Product Service via Eureka and handles load
+          balancing!</p>
+      </aside>
+
+
+    </google-codelab-step>
+
+    <google-codelab-step label="API Gateway" duration="12">
+      <p>Build API Gateway as single entry point.</p>
+      <h2 is-upgraded>Gateway POM</h2>
+      <p><strong>api-gateway/pom.xml:</strong></p>
+      <pre><code language="language-xml" class="language-xml">&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
+&lt;project xmlns=&#34;http://maven.apache.org/POM/4.0.0&#34;
+         xmlns:xsi=&#34;http://www.w3.org/2001/XMLSchema-instance&#34;
+         xsi:schemaLocation=&#34;http://maven.apache.org/POM/4.0.0
+         http://maven.apache.org/xsd/maven-4.0.0.xsd&#34;&gt;
+    &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+
+    &lt;parent&gt;
+        &lt;groupId&gt;com.example&lt;/groupId&gt;
+        &lt;artifactId&gt;ecommerce-microservices&lt;/artifactId&gt;
+        &lt;version&gt;1.0.0&lt;/version&gt;
+    &lt;/parent&gt;
+
+    &lt;artifactId&gt;api-gateway&lt;/artifactId&gt;
+
+    &lt;dependencies&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-cloud-starter-gateway&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-cloud-starter-netflix-eureka-client&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-actuator&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+&lt;/project&gt;
+</code></pre>
+      <h2 is-upgraded>Gateway Application</h2>
+      <p><strong>src/main/java/com/example/gateway/ApiGatewayApplication.java:</strong></p>
+      <pre><code language="language-java" class="language-java">package com.example.gateway;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+
+@SpringBootApplication
+@EnableDiscoveryClient
+public class ApiGatewayApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(ApiGatewayApplication.class, args);
+    }
+}
+</code></pre>
+      <h2 is-upgraded>Gateway Configuration</h2>
+      <p><strong>src/main/resources/application.yml:</strong></p>
+      <pre><code language="language-yaml" class="language-yaml">spring:
+  application:
+    name: api-gateway
+
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+
+      routes:
+        - id: product-service
+          uri: lb://product-service
+          predicates:
+            - Path=/api/products/**
+
+        - id: order-service
+          uri: lb://order-service
+          predicates:
+            - Path=/api/orders/**
+
+server:
+  port: 8080
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+</code></pre>
+      <h2 is-upgraded>Test Gateway</h2>
+      <pre><code language="language-bash" class="language-bash">cd api-gateway
+mvn spring-boot:run
+</code></pre>
+      <p><strong>Access via Gateway:</strong></p>
+      <pre><code language="language-bash" class="language-bash"># Products via Gateway
+curl http://localhost:8080/api/products
+
+# Orders via Gateway
+curl http://localhost:8080/api/orders
+
+# Create order via Gateway
+curl -X POST http://localhost:8080/api/orders \
+  -H &#34;Content-Type: application/json&#34; \
+  -d &#39;{
+    &#34;customerName&#34;: &#34;Jane Smith&#34;,
+    &#34;items&#34;: [{&#34;productId&#34;: 3, &#34;quantity&#34;: 1}]
+  }&#39;
+</code></pre>
+      <p>Gateway routes to appropriate service!</p>
+
+
+    </google-codelab-step>
+
+    <google-codelab-step label="Load Balancing" duration="8">
+      <p>Test client-side load balancing with multiple instances.</p>
+      <h2 is-upgraded>Run Multiple Product Instances</h2>
+      <p><strong>Terminal 1:</strong></p>
+      <pre><code language="language-bash" class="language-bash">cd product-service
+mvn spring-boot:run -Dspring-boot.run.arguments=--server.port=8081
+</code></pre>
+      <p><strong>Terminal 2:</strong></p>
+      <pre><code language="language-bash" class="language-bash">cd product-service
+mvn spring-boot:run -Dspring-boot.run.arguments=--server.port=8082
+</code></pre>
+      <p>Check Eureka Dashboard - 2 instances of Product Service.</p>
+      <h2 is-upgraded>Test Load Balancing</h2>
+      <pre><code language="language-bash" class="language-bash"># Call multiple times
+for i in {1..10}; do
+  curl http://localhost:8080/api/products
+  echo &#34;&#34;
+done
+</code></pre>
+      <p>Check logs - requests distributed between ports 8081 and 8082!</p>
+      <h2 is-upgraded>Load Balancing Configuration</h2>
+      <p>Feign uses Spring Cloud LoadBalancer by default.</p>
+      <p><strong>Customize (optional):</strong></p>
+      <pre><code language="language-java" class="language-java">@Configuration
+public class LoadBalancerConfig {
+
+    @Bean
+    public ServiceInstanceListSupplier discoveryClientServiceInstanceListSupplier(
+            ConfigurableApplicationContext context) {
+        return ServiceInstanceListSupplier.builder()
+            .withDiscoveryClient()
+            .withCaching()
+            .build(context);
+    }
+}
+</code></pre>
+      <aside class="special">
+        <p><strong>Client-Side Load Balancing:</strong> Feign + LoadBalancer distribute requests across service
+          instances automatically.</p>
+      </aside>
+
+
+    </google-codelab-step>
+
+    <google-codelab-step label="Docker Compose Deployment" duration="10">
+      <p>Deploy entire ecosystem with Docker Compose.</p>
+      <h2 is-upgraded>Dockerfiles</h2>
+      <p><strong>eureka-server/Dockerfile:</strong></p>
+      <pre><code language="language-dockerfile" class="language-dockerfile">FROM openjdk:17-slim
+COPY target/eureka-server-1.0.0.jar app.jar
+EXPOSE 8761
+ENTRYPOINT [&#34;java&#34;, &#34;-jar&#34;, &#34;/app.jar&#34;]
+</code></pre>
+      <p><strong>Same pattern for other services</strong> (api-gateway/Dockerfile, product-service/Dockerfile,
+        order-service/Dockerfile)</p>
+      <h2 is-upgraded>Docker Compose</h2>
+      <p><strong>docker-compose.yml (root directory):</strong></p>
+      <pre><code language="language-yaml" class="language-yaml">version: &#34;3.8&#34;
+
+services:
+  eureka-server:
+    build: ./eureka-server
+    ports:
+      - &#34;8761:8761&#34;
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    networks:
+      - microservices-net
+    healthcheck:
+      test: [&#34;CMD&#34;, &#34;curl&#34;, &#34;-f&#34;, &#34;http://localhost:8761/actuator/health&#34;]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  product-service-1:
+    build: ./product-service
+    ports:
+      - &#34;8081:8081&#34;
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SERVER_PORT=8081
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - microservices-net
+
+  product-service-2:
+    build: ./product-service
+    ports:
+      - &#34;8082:8082&#34;
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SERVER_PORT=8082
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - microservices-net
+
+  order-service:
+    build: ./order-service
+    ports:
+      - &#34;8083:8083&#34;
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - microservices-net
+
+  api-gateway:
+    build: ./api-gateway
+    ports:
+      - &#34;8080:8080&#34;
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - microservices-net
+
+networks:
+  microservices-net:
+    driver: bridge
+</code></pre>
+      <h2 is-upgraded>Build and Deploy</h2>
+      <pre><code language="language-bash" class="language-bash"># Build all services
+mvn clean package -DskipTests
+
+# Start all services
+docker-compose up --build
+
+# Check logs
+docker-compose logs -f
+
+# Stop all services
+docker-compose down
+</code></pre>
+      <h2 is-upgraded>Test Full System</h2>
+      <pre><code language="language-bash" class="language-bash"># Via Gateway
+curl http://localhost:8080/api/products
+curl http://localhost:8080/api/orders
+
+# Eureka UI
+open http://localhost:8761
+</code></pre>
+
+
+    </google-codelab-step>
+
+    <google-codelab-step label="Monitoring &amp; Resilience" duration="5">
+      <p>Add health checks and monitoring.</p>
+      <h2 is-upgraded>Health Endpoints</h2>
+      <p>All services have Actuator:</p>
+      <pre><code language="language-bash" class="language-bash">curl http://localhost:8080/actuator/health
+curl http://localhost:8081/actuator/health
+curl http://localhost:8083/actuator/health
+</code></pre>
+      <h2 is-upgraded>Circuit Breaker (Optional)</h2>
+      <p>Add Resilience4j for fault tolerance:</p>
+      <p><strong>pom.xml:</strong></p>
+      <pre><code language="language-xml" class="language-xml">&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-cloud-starter-circuitbreaker-resilience4j&lt;/artifactId&gt;
+&lt;/dependency&gt;
+</code></pre>
+      <p><strong>Feign with Circuit Breaker:</strong></p>
+      <pre><code language="language-java" class="language-java">@FeignClient(
+    name = &#34;product-service&#34;,
+    fallback = ProductClientFallback.class
+)
+public interface ProductClient {
+    @GetMapping(&#34;/api/products/{id}&#34;)
+    ProductDto getProduct(@PathVariable Long id);
+}
+
+@Component
+class ProductClientFallback implements ProductClient {
+    @Override
+    public ProductDto getProduct(Long id) {
+        // Return default or cached product
+        ProductDto fallback = new ProductDto();
+        fallback.setId(id);
+        fallback.setName(&#34;Product Unavailable&#34;);
+        return fallback;
+    }
+}
+</code></pre>
+      <aside class="warning">
+        <p><strong>Production Readiness:</strong> Add circuit breakers, distributed tracing (Zipkin), centralized
+          logging (ELK), and metrics (Prometheus) for production systems.</p>
+      </aside>
+
+
+    </google-codelab-step>
+
+    <google-codelab-step label="Conclusion" duration="2">
+      <p>Congratulations! 🎉 You&#39;ve built a complete microservices ecosystem!</p>
+      <h2 is-upgraded>What You&#39;ve Learned</h2>
+      <ul>
+        <li>✅ <strong>Architecture Evolution:</strong> Monolith vs Microservices</li>
+        <li>✅ <strong>Service Registry:</strong> Eureka for service discovery</li>
+        <li>✅ <strong>API Gateway:</strong> Single entry point with routing</li>
+        <li>✅ <strong>Service Communication:</strong> Feign for inter-service calls</li>
+        <li>✅ <strong>Load Balancing:</strong> Client-side load balancing</li>
+        <li>✅ <strong>Deployment:</strong> Docker Compose orchestration</li>
+        <li>✅ <strong>Health Checks:</strong> Actuator endpoints</li>
+        <li>✅ <strong>Distributed Systems:</strong> Challenges and solutions</li>
+      </ul>
+      <h2 is-upgraded>Architecture Patterns</h2>
+      <p><strong>Service Registry:</strong></p>
+      <ul>
+        <li>Services register on startup</li>
+        <li>Clients discover services dynamically</li>
+        <li>Health checks and heartbeats</li>
+      </ul>
+      <p><strong>API Gateway:</strong></p>
+      <ul>
+        <li>Single entry point for clients</li>
+        <li>Routing to microservices</li>
+        <li>Cross-cutting concerns (auth, logging)</li>
+      </ul>
+      <p><strong>Service Communication:</strong></p>
+      <ul>
+        <li>Synchronous: REST with Feign</li>
+        <li>Asynchronous: Messaging (JMS, Kafka)</li>
+        <li>Service mesh: Istio, Linkerd</li>
+      </ul>
+      <h2 is-upgraded>Best Practices</h2>
+      <ol type="1">
+        <li><strong>Database per Service:</strong> Each service owns its data</li>
+        <li><strong>API Versioning:</strong> /v1/products, /v2/products</li>
+        <li><strong>Centralized Config:</strong> Spring Cloud Config</li>
+        <li><strong>Distributed Tracing:</strong> Track requests across services</li>
+        <li><strong>Circuit Breakers:</strong> Handle service failures gracefully</li>
+        <li><strong>API Gateway:</strong> Authentication, rate limiting, caching</li>
+        <li><strong>Health Checks:</strong> Monitor service availability</li>
+        <li><strong>Logging:</strong> Centralized log aggregation</li>
+      </ol>
+      <h2 is-upgraded>Trade-offs</h2>
+      <p><strong>Use Microservices When:</strong></p>
+      <ul>
+        <li>Large, complex applications</li>
+        <li>Multiple development teams</li>
+        <li>Independent deployment needs</li>
+        <li>Technology diversity required</li>
+      </ul>
+      <p><strong>Avoid Microservices When:</strong></p>
+      <ul>
+        <li>Small applications</li>
+        <li>Single team</li>
+        <li>Simple domain</li>
+        <li>High network latency concerns</li>
+      </ul>
+      <h2 is-upgraded>Next Steps</h2>
+      <ul>
+        <li><strong>Add Database:</strong> PostgreSQL per service</li>
+        <li><strong>Add Security:</strong> OAuth2, JWT gateway</li>
+        <li><strong>Add Tracing:</strong> Sleuth + Zipkin</li>
+        <li><strong>Add Config Server:</strong> Externalize configuration</li>
+        <li><strong>Add Messaging:</strong> Async communication with Kafka</li>
+        <li><strong>Add Monitoring:</strong> Prometheus + Grafana</li>
+      </ul>
+      <h2 is-upgraded>Resources</h2>
+      <ul>
+        <li><a href="https://spring.io/projects/spring-cloud" target="_blank">Spring Cloud Documentation</a></li>
+        <li><a href="https://microservices.io/patterns/" target="_blank">Microservices Patterns</a></li>
+        <li><a href="https://spring.io/projects/spring-cloud-netflix" target="_blank">Spring Cloud Netflix</a></li>
+        <li><a href="https://spring.io/projects/spring-cloud-gateway" target="_blank">Spring Cloud Gateway</a></li>
+      </ul>
+      <aside class="special">
+        <p><strong>Production Journey:</strong> You&#39;ve built the foundation. Add security, monitoring, logging, and
+          resilience patterns for production-ready microservices!</p>
+      </aside>
+
+
+    </google-codelab-step>
+
+  </google-codelab>
+
+  <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/prettify.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
+  <script src="//support.google.com/inapp/api.js"></script>
+
+</body>
+
+</html>

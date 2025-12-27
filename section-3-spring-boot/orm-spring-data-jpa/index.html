@@ -1,0 +1,1298 @@
+<!doctype html>
+
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+    <meta name="theme-color" content="#4F7DC9">
+    <meta charset="UTF-8">
+    <title>ORM Concepts &amp; Spring Data JPA</title>
+    <link rel="stylesheet"
+        href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
+    <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
+    <style>
+        .success {
+            color: #1e8e3e;
+        }
+
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+    <google-codelab-analytics gaid="UA-49880327-14"></google-codelab-analytics>
+    <google-codelab codelab-gaid="" id="orm-spring-data-jpa" title="ORM Concepts &amp; Spring Data JPA"
+        environment="web" feedback-link="">
+
+        <google-codelab-step label="Introduction" duration="3">
+            <p>Replace the in-memory repository with real database persistence using Spring Data JPA and Hibernate ORM.
+            </p>
+            <h2 class="checklist" is-upgraded>What You&#39;ll Learn</h2>
+            <ul class="checklist">
+                <li><strong>ORM Fundamentals:</strong> Object-Relational Mapping concepts</li>
+                <li><strong>JPA Basics:</strong> Java Persistence API overview</li>
+                <li><strong>Entity Mapping:</strong> @Entity, @Table, @Id, @Column annotations</li>
+                <li><strong>Relationships:</strong> @OneToMany, @ManyToOne, @ManyToMany</li>
+                <li><strong>Spring Data JPA:</strong> Repository pattern and query methods</li>
+                <li><strong>Query Methods:</strong> Derived queries from method names</li>
+                <li><strong>@Query Annotation:</strong> Custom JPQL and native SQL</li>
+                <li><strong>Pagination &amp; Sorting:</strong> Pageable interface</li>
+                <li><strong>Database Configuration:</strong> H2 in-memory, PostgreSQL production</li>
+                <li><strong>Transactions:</strong> @Transactional annotation</li>
+            </ul>
+            <h2 is-upgraded>What You&#39;ll Build</h2>
+            <p>Database-backed Task Management API with:</p>
+            <ul>
+                <li><strong>Task Entity</strong> with JPA annotations</li>
+                <li><strong>User Entity</strong> for task ownership</li>
+                <li><strong>Category Entity</strong> with many-to-many relationship</li>
+                <li><strong>JPA Repositories</strong> replacing in-memory storage</li>
+                <li><strong>Custom Queries</strong> for filtering and searching</li>
+                <li><strong>Pagination</strong> for large result sets</li>
+                <li><strong>H2 Console</strong> for development</li>
+                <li><strong>PostgreSQL</strong> configuration for production</li>
+            </ul>
+            <h2 is-upgraded>Prerequisites</h2>
+            <ul>
+                <li>Completed Codelab 3.2 (REST APIs &amp; Swagger)</li>
+                <li>PostgreSQL installed (optional, we&#39;ll use H2 first)</li>
+            </ul>
+            <h2 is-upgraded>New Dependencies</h2>
+            <p>Add to <code>pom.xml</code>:</p>
+            <pre><code language="language-xml" class="language-xml">&lt;!-- Spring Data JPA --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-data-jpa&lt;/artifactId&gt;
+&lt;/dependency&gt;
+
+&lt;!-- H2 Database (in-memory for development) --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;com.h2database&lt;/groupId&gt;
+    &lt;artifactId&gt;h2&lt;/artifactId&gt;
+    &lt;scope&gt;runtime&lt;/scope&gt;
+&lt;/dependency&gt;
+
+&lt;!-- PostgreSQL Driver (for production) --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.postgresql&lt;/groupId&gt;
+    &lt;artifactId&gt;postgresql&lt;/artifactId&gt;
+    &lt;scope&gt;runtime&lt;/scope&gt;
+&lt;/dependency&gt;
+</code></pre>
+            <aside class="special">
+                <p><strong>Git Branch:</strong> Start from <code>codelab-3.2</code> or continue from your current work.
+                    This codelab transforms our in-memory API into a real database-backed system.</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Understanding ORM" duration="8">
+            <p>Before diving into code, let&#39;s understand Object-Relational Mapping.</p>
+            <h2 is-upgraded>The Impedance Mismatch</h2>
+            <p><strong>Objects (Java)</strong> vs <strong>Relations (SQL)</strong> have fundamental differences:</p>
+            <p><strong>Java Objects:</strong></p>
+            <pre><code language="language-java" class="language-java">public class Task {
+    private Long id;
+    private String title;
+    private TaskStatus status;
+    private User assignedTo;  // Object reference
+    private List&lt;Category&gt; categories;  // Collection
+}
+</code></pre>
+            <p><strong>SQL Tables:</strong></p>
+            <pre><code language="language-sql" class="language-sql">CREATE TABLE tasks (
+    id BIGINT PRIMARY KEY,
+    title VARCHAR(255),
+    status VARCHAR(20),
+    user_id BIGINT,  -- Foreign key, not object
+    -- Can&#39;t store List directly!
+);
+</code></pre>
+            <p><strong>Problems without ORM:</strong></p>
+            <ul>
+                <li>Manual SQL for every operation</li>
+                <li>Type conversions (Java ↔ SQL)</li>
+                <li>Relationship management</li>
+                <li>Boilerplate code</li>
+            </ul>
+            <h2 is-upgraded>ORM to the Rescue</h2>
+            <p><strong>ORM</strong> automates the mapping between objects and database tables:</p>
+            <pre><code language="language-java" class="language-java">// Without ORM - Manual SQL
+public Task findById(Long id) {
+    String sql = &#34;SELECT * FROM tasks WHERE id = ?&#34;;
+    PreparedStatement stmt = connection.prepareStatement(sql);
+    stmt.setLong(1, id);
+    ResultSet rs = stmt.executeQuery();
+    
+    Task task = new Task();
+    if (rs.next()) {
+        task.setId(rs.getLong(&#34;id&#34;));
+        task.setTitle(rs.getString(&#34;title&#34;));
+        task.setStatus(TaskStatus.valueOf(rs.getString(&#34;status&#34;)));
+        // ... more mapping code
+    }
+    return task;
+}
+
+// With ORM - Automatic
+public Task findById(Long id) {
+    return taskRepository.findById(id).orElse(null);
+}
+</code></pre>
+            <h2 is-upgraded>JPA Overview</h2>
+            <p><strong>JPA (Java Persistence API)</strong> is the standard ORM specification for Java.</p>
+            <p><strong>Key Players:</strong></p>
+            <ul>
+                <li><strong>JPA:</strong> The specification (interface)</li>
+                <li><strong>Hibernate:</strong> Most popular implementation</li>
+                <li><strong>Spring Data JPA:</strong> Simplifies JPA usage</li>
+            </ul>
+            <pre><code>Spring Data JPA
+    ↓ (uses)
+JPA Specification
+    ↓ (implemented by)
+Hibernate ORM
+    ↓ (talks to)
+JDBC
+    ↓ (connects to)
+Database (H2, PostgreSQL, MySQL)
+</code></pre>
+            <h2 is-upgraded>Entity Lifecycle</h2>
+            <pre><code>[Transient]  → new Task()
+    ↓ persist()
+[Managed]    → entityManager tracks changes
+    ↓ commit()
+[Detached]   → no longer tracked
+    ↓ merge()
+[Managed]    → back in context
+    ↓ remove()
+[Removed]    → scheduled for deletion
+</code></pre>
+            <h2 is-upgraded>JPA Benefits</h2>
+            <p>✅ <strong>Less Boilerplate:</strong> No manual SQL for CRUD ✅ <strong>Database Independence:</strong>
+                Switch DB with config change ✅ <strong>Type Safety:</strong> Compile-time checking ✅
+                <strong>Relationships:</strong> Automatic join handling ✅ <strong>Caching:</strong> First-level cache
+                (EntityManager) ✅ <strong>Lazy Loading:</strong> Load data only when needed ✅ <strong>Query
+                    Methods:</strong> Derive queries from method names
+            </p>
+            <aside class="special">
+                <p><strong>Best Practice:</strong> Use JPA for most operations, but don&#39;t be afraid to use native
+                    SQL for complex queries or performance-critical operations.</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Configure Database" duration="5">
+            <p>Set up H2 for development and PostgreSQL for production.</p>
+            <h2 is-upgraded>H2 Configuration (Development)</h2>
+            <p><strong>application.yml:</strong></p>
+            <pre><code language="language-yaml" class="language-yaml">spring:
+  application:
+    name: task-manager
+  
+  # H2 Database
+  datasource:
+    url: jdbc:h2:mem:taskdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  
+  # H2 Console
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  
+  # JPA/Hibernate
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+
+# Logging
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+</code></pre>
+            <h2 is-upgraded>PostgreSQL Configuration (Production)</h2>
+            <p><strong>application-prod.yml:</strong></p>
+            <pre><code language="language-yaml" class="language-yaml">spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/taskdb
+    driver-class-name: org.postgresql.Driver
+    username: postgres
+    password: your_password
+  
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+</code></pre>
+            <h2 is-upgraded>Hibernate ddl-auto Options</h2>
+            <pre><code language="language-yaml" class="language-yaml">hibernate:
+  ddl-auto: create-drop
+  # create-drop: Drop and recreate tables on startup (development)
+  # create: Create tables on startup (development)
+  # update: Update existing schema (development)
+  # validate: Validate schema matches entities (production)
+  # none: Do nothing (production with Flyway/Liquibase)
+</code></pre>
+            <h2 is-upgraded>Access H2 Console</h2>
+            <p>Start application and visit: http://localhost:8080/h2-console</p>
+            <p><strong>Connection settings:</strong></p>
+            <ul>
+                <li>JDBC URL: <code>jdbc:h2:mem:taskdb</code></li>
+                <li>Username: <code>sa</code></li>
+                <li>Password: (empty)</li>
+            </ul>
+            <aside class="warning">
+                <p><strong>Production Warning:</strong> Never use <code>create-drop</code> or <code>create</code> in
+                    production! Use <code>validate</code> or <code>none</code> with migration tools like Flyway.</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Create JPA Entities" duration="12">
+            <p>Transform our model classes into JPA entities.</p>
+            <h2 is-upgraded>Task Entity</h2>
+            <pre><code language="language-java" class="language-java">package com.example.taskmanager.model;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
+
+@Entity
+@Table(name = &#34;tasks&#34;)
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Task {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @Column(nullable = false, length = 100)
+    private String title;
+    
+    @Column(length = 500)
+    private String description;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private TaskStatus status;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = &#34;user_id&#34;)
+    private User assignedTo;
+    
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = &#34;task_categories&#34;,
+        joinColumns = @JoinColumn(name = &#34;task_id&#34;),
+        inverseJoinColumns = @JoinColumn(name = &#34;category_id&#34;)
+    )
+    private Set&lt;Category&gt; categories = new HashSet&lt;&gt;();
+    
+    @CreationTimestamp
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+    
+    @UpdateTimestamp
+    @Column(nullable = false)
+    private LocalDateTime updatedAt;
+    
+    // Constructor for basic task creation
+    public Task(String title, String description) {
+        this.title = title;
+        this.description = description;
+        this.status = TaskStatus.TODO;
+    }
+}
+</code></pre>
+            <h2 is-upgraded>User Entity</h2>
+            <pre><code language="language-java" class="language-java">package com.example.taskmanager.model;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+@Entity
+@Table(name = &#34;users&#34;)
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class User {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @Column(nullable = false, unique = true, length = 50)
+    private String username;
+    
+    @Column(nullable = false, unique = true, length = 100)
+    private String email;
+    
+    @Column(nullable = false, length = 100)
+    private String fullName;
+    
+    @OneToMany(mappedBy = &#34;assignedTo&#34;, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List&lt;Task&gt; tasks = new ArrayList&lt;&gt;();
+    
+    @CreationTimestamp
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+    
+    public User(String username, String email, String fullName) {
+        this.username = username;
+        this.email = email;
+        this.fullName = fullName;
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Category Entity</h2>
+            <pre><code language="language-java" class="language-java">package com.example.taskmanager.model;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.HashSet;
+import java.util.Set;
+
+@Entity
+@Table(name = &#34;categories&#34;)
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Category {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @Column(nullable = false, unique = true, length = 50)
+    private String name;
+    
+    @Column(length = 255)
+    private String description;
+    
+    @ManyToMany(mappedBy = &#34;categories&#34;)
+    private Set&lt;Task&gt; tasks = new HashSet&lt;&gt;();
+    
+    public Category(String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Understanding JPA Annotations</h2>
+            <pre><code language="language-java" class="language-java">@Entity
+// Marks class as JPA entity (table)
+
+@Table(name = &#34;tasks&#34;)
+// Specifies table name (optional, defaults to class name)
+
+@Id
+// Primary key field
+
+@GeneratedValue(strategy = GenerationType.IDENTITY)
+// Auto-increment primary key
+// IDENTITY: Database auto-increment
+// SEQUENCE: Database sequence
+// TABLE: Separate table for ID generation
+// AUTO: JPA chooses strategy
+
+@Column(nullable = false, length = 100, unique = true)
+// Column constraints
+// nullable: NOT NULL constraint
+// length: VARCHAR length
+// unique: UNIQUE constraint
+// name: Column name (defaults to field name)
+
+@Enumerated(EnumType.STRING)
+// Store enum as string (vs ordinal number)
+
+@CreationTimestamp
+// Automatically set on creation (Hibernate-specific)
+
+@UpdateTimestamp
+// Automatically update on modification (Hibernate-specific)
+</code></pre>
+            <h2 is-upgraded>Relationship Annotations</h2>
+            <pre><code language="language-java" class="language-java">// One-to-Many: One user has many tasks
+@OneToMany(mappedBy = &#34;assignedTo&#34;, cascade = CascadeType.ALL)
+private List&lt;Task&gt; tasks;
+
+// Many-to-One: Many tasks belong to one user
+@ManyToOne(fetch = FetchType.LAZY)
+@JoinColumn(name = &#34;user_id&#34;)
+private User assignedTo;
+
+// Many-to-Many: Tasks have many categories, categories have many tasks
+@ManyToMany
+@JoinTable(
+    name = &#34;task_categories&#34;,
+    joinColumns = @JoinColumn(name = &#34;task_id&#34;),
+    inverseJoinColumns = @JoinColumn(name = &#34;category_id&#34;)
+)
+private Set&lt;Category&gt; categories;
+</code></pre>
+            <h2 is-upgraded>Fetch Types</h2>
+            <pre><code language="language-java" class="language-java">FetchType.LAZY   // Load on demand (default for collections)
+FetchType.EAGER  // Load immediately (default for single entities)
+
+// Example
+@ManyToOne(fetch = FetchType.LAZY)  // Don&#39;t load user until accessed
+private User assignedTo;
+
+@OneToMany(fetch = FetchType.LAZY)  // Don&#39;t load all tasks immediately
+private List&lt;Task&gt; tasks;
+</code></pre>
+            <h2 is-upgraded>Cascade Types</h2>
+            <pre><code language="language-java" class="language-java">CascadeType.ALL        // Cascade all operations
+CascadeType.PERSIST    // Cascade save
+CascadeType.MERGE      // Cascade update
+CascadeType.REMOVE     // Cascade delete
+CascadeType.REFRESH    // Cascade refresh
+CascadeType.DETACH     // Cascade detach
+
+// Example: Delete user → delete all their tasks
+@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+private List&lt;Task&gt; tasks;
+</code></pre>
+            <aside class="special">
+                <p><strong>Best Practice:</strong> Use <code>FetchType.LAZY</code> for collections and relationships to
+                    avoid N+1 query problems. Load data only when needed.</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Spring Data JPA Repositories" duration="10">
+            <p>Replace in-memory repositories with Spring Data JPA repositories.</p>
+            <h2 is-upgraded>TaskRepository</h2>
+            <pre><code language="language-java" class="language-java">package com.example.taskmanager.repository;
+
+import com.example.taskmanager.model.Task;
+import com.example.taskmanager.model.TaskStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Repository
+public interface TaskRepository extends JpaRepository&lt;Task, Long&gt; {
+    
+    // Derived query methods (Spring Data generates SQL automatically)
+    
+    List&lt;Task&gt; findByStatus(TaskStatus status);
+    
+    List&lt;Task&gt; findByAssignedToId(Long userId);
+    
+    List&lt;Task&gt; findByTitleContainingIgnoreCase(String title);
+    
+    List&lt;Task&gt; findByStatusAndAssignedToId(TaskStatus status, Long userId);
+    
+    List&lt;Task&gt; findByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
+    
+    Page&lt;Task&gt; findByStatus(TaskStatus status, Pageable pageable);
+    
+    long countByStatus(TaskStatus status);
+    
+    boolean existsByTitleAndAssignedToId(String title, Long userId);
+    
+    // Custom JPQL queries
+    
+    @Query(&#34;SELECT t FROM Task t WHERE t.status = :status AND t.assignedTo.id = :userId&#34;)
+    List&lt;Task&gt; findTasksByStatusAndUser(
+        @Param(&#34;status&#34;) TaskStatus status,
+        @Param(&#34;userId&#34;) Long userId
+    );
+    
+    @Query(&#34;SELECT t FROM Task t LEFT JOIN FETCH t.categories WHERE t.id = :id&#34;)
+    Task findByIdWithCategories(@Param(&#34;id&#34;) Long id);
+    
+    @Query(&#34;SELECT t FROM Task t LEFT JOIN FETCH t.assignedTo WHERE t.status = :status&#34;)
+    List&lt;Task&gt; findByStatusWithUser(@Param(&#34;status&#34;) TaskStatus status);
+    
+    // Native SQL query
+    
+    @Query(value = &#34;SELECT * FROM tasks t WHERE t.created_at &gt; :date&#34;, nativeQuery = true)
+    List&lt;Task&gt; findRecentTasks(@Param(&#34;date&#34;) LocalDateTime date);
+    
+    // Aggregation query
+    
+    @Query(&#34;SELECT t.status, COUNT(t) FROM Task t GROUP BY t.status&#34;)
+    List&lt;Object[]&gt; countTasksByStatus();
+}
+</code></pre>
+            <h2 is-upgraded>UserRepository</h2>
+            <pre><code language="language-java" class="language-java">package com.example.taskmanager.repository;
+
+import com.example.taskmanager.model.User;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
+
+@Repository
+public interface UserRepository extends JpaRepository&lt;User, Long&gt; {
+    
+    Optional&lt;User&gt; findByUsername(String username);
+    
+    Optional&lt;User&gt; findByEmail(String email);
+    
+    boolean existsByUsername(String username);
+    
+    boolean existsByEmail(String email);
+    
+    @Query(&#34;SELECT u FROM User u LEFT JOIN FETCH u.tasks WHERE u.id = :id&#34;)
+    Optional&lt;User&gt; findByIdWithTasks(Long id);
+}
+</code></pre>
+            <h2 is-upgraded>CategoryRepository</h2>
+            <pre><code language="language-java" class="language-java">package com.example.taskmanager.repository;
+
+import com.example.taskmanager.model.Category;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
+
+@Repository
+public interface CategoryRepository extends JpaRepository&lt;Category, Long&gt; {
+    
+    Optional&lt;Category&gt; findByName(String name);
+    
+    boolean existsByName(String name);
+}
+</code></pre>
+            <h2 is-upgraded>Query Method Keywords</h2>
+            <p>Spring Data JPA generates SQL from method names:</p>
+            <pre><code language="language-java" class="language-java">// Keywords and examples:
+findBy...          // SELECT
+countBy...         // COUNT
+deleteBy...        // DELETE
+existsBy...        // EXISTS
+
+// Conditions:
+And                // WHERE ... AND ...
+Or                 // WHERE ... OR ...
+Is, Equals         // =
+Between            // BETWEEN
+LessThan           // &lt;
+GreaterThan        // &gt;
+After, Before      // &gt; or &lt;
+IsNull, IsNotNull  // IS NULL
+Like, NotLike      // LIKE
+StartingWith       // LIKE &#39;value%&#39;
+EndingWith         // LIKE &#39;%value&#39;
+Containing         // LIKE &#39;%value%&#39;
+IgnoreCase         // UPPER(field) = UPPER(value)
+OrderBy...Asc      // ORDER BY ... ASC
+OrderBy...Desc     // ORDER BY ... DESC
+
+// Examples:
+findByTitle(String title)
+// SELECT * FROM tasks WHERE title = ?
+
+findByTitleAndStatus(String title, TaskStatus status)
+// SELECT * FROM tasks WHERE title = ? AND status = ?
+
+findByCreatedAtAfter(LocalDateTime date)
+// SELECT * FROM tasks WHERE created_at &gt; ?
+
+findByTitleContainingIgnoreCaseOrderByCreatedAtDesc(String title)
+// SELECT * FROM tasks WHERE UPPER(title) LIKE UPPER(?) ORDER BY created_at DESC
+</code></pre>
+            <h2 is-upgraded>JpaRepository Methods</h2>
+            <pre><code language="language-java" class="language-java">// Provided by JpaRepository:
+save(T entity)              // INSERT or UPDATE
+saveAll(Iterable&lt;T&gt;)        // Batch save
+findById(ID id)             // SELECT by ID
+findAll()                   // SELECT all
+findAllById(Iterable&lt;ID&gt;)   // SELECT by IDs
+count()                     // COUNT
+existsById(ID id)           // EXISTS
+deleteById(ID id)           // DELETE by ID
+delete(T entity)            // DELETE
+deleteAll()                 // DELETE all
+flush()                     // Force sync with DB
+getOne(ID id)               // Get reference (lazy)
+</code></pre>
+            <aside class="special">
+                <p><strong>Magic Methods:</strong> Spring Data JPA automatically implements repository methods based on
+                    naming conventions. You write the interface, Spring provides the implementation!</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Update Service Layer" duration="10">
+            <p>Update services to use JPA repositories and handle relationships.</p>
+            <h2 is-upgraded>Enhanced TaskService</h2>
+            <pre><code language="language-java" class="language-java">package com.example.taskmanager.service;
+
+import com.example.taskmanager.exception.InvalidTaskException;
+import com.example.taskmanager.exception.TaskNotFoundException;
+import com.example.taskmanager.model.Category;
+import com.example.taskmanager.model.Task;
+import com.example.taskmanager.model.TaskStatus;
+import com.example.taskmanager.model.User;
+import com.example.taskmanager.repository.CategoryRepository;
+import com.example.taskmanager.repository.TaskRepository;
+import com.example.taskmanager.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
+
+@Service
+@Slf4j
+@Transactional(readOnly = true)
+public class TaskService {
+    
+    private final TaskRepository taskRepository;
+    private final UserRepository userRepository;
+    private final CategoryRepository categoryRepository;
+    
+    public TaskService(TaskRepository taskRepository,
+                       UserRepository userRepository,
+                       CategoryRepository categoryRepository) {
+        this.taskRepository = taskRepository;
+        this.userRepository = userRepository;
+        this.categoryRepository = categoryRepository;
+        log.info(&#34;TaskService initialized with JPA repositories&#34;);
+    }
+    
+    @Transactional
+    public Task createTask(Task task) {
+        log.debug(&#34;Creating new task: {}&#34;, task.getTitle());
+        
+        if (task.getTitle() == null || task.getTitle().isBlank()) {
+            throw new InvalidTaskException(&#34;Task title cannot be empty&#34;);
+        }
+        
+        if (task.getStatus() == null) {
+            task.setStatus(TaskStatus.TODO);
+        }
+        
+        Task savedTask = taskRepository.save(task);
+        log.info(&#34;Task created with ID: {}&#34;, savedTask.getId());
+        return savedTask;
+    }
+    
+    public Task getTaskById(Long id) {
+        log.debug(&#34;Fetching task with ID: {}&#34;, id);
+        return taskRepository.findById(id)
+            .orElseThrow(() -&gt; new TaskNotFoundException(id));
+    }
+    
+    public List&lt;Task&gt; getAllTasks() {
+        log.debug(&#34;Fetching all tasks&#34;);
+        List&lt;Task&gt; tasks = taskRepository.findAll();
+        log.info(&#34;Found {} tasks&#34;, tasks.size());
+        return tasks;
+    }
+    
+    public Page&lt;Task&gt; getAllTasks(Pageable pageable) {
+        log.debug(&#34;Fetching tasks page: {}, size: {}&#34;, 
+            pageable.getPageNumber(), pageable.getPageSize());
+        return taskRepository.findAll(pageable);
+    }
+    
+    @Transactional
+    public Task updateTask(Long id, Task taskDetails) {
+        log.debug(&#34;Updating task with ID: {}&#34;, id);
+        
+        Task task = taskRepository.findById(id)
+            .orElseThrow(() -&gt; new TaskNotFoundException(id));
+        
+        task.setTitle(taskDetails.getTitle());
+        task.setDescription(taskDetails.getDescription());
+        task.setStatus(taskDetails.getStatus());
+        
+        Task updatedTask = taskRepository.save(task);
+        log.info(&#34;Task updated: {}&#34;, id);
+        return updatedTask;
+    }
+    
+    @Transactional
+    public void deleteTask(Long id) {
+        log.debug(&#34;Deleting task with ID: {}&#34;, id);
+        
+        if (!taskRepository.existsById(id)) {
+            throw new TaskNotFoundException(id);
+        }
+        
+        taskRepository.deleteById(id);
+        log.info(&#34;Task deleted: {}&#34;, id);
+    }
+    
+    @Transactional
+    public Task updateTaskStatus(Long id, TaskStatus status) {
+        log.debug(&#34;Updating task {} status to {}&#34;, id, status);
+        
+        Task task = taskRepository.findById(id)
+            .orElseThrow(() -&gt; new TaskNotFoundException(id));
+        
+        task.setStatus(status);
+        return taskRepository.save(task);
+    }
+    
+    public List&lt;Task&gt; getTasksByStatus(TaskStatus status) {
+        log.debug(&#34;Fetching tasks with status: {}&#34;, status);
+        return taskRepository.findByStatus(status);
+    }
+    
+    public Page&lt;Task&gt; getTasksByStatus(TaskStatus status, Pageable pageable) {
+        log.debug(&#34;Fetching tasks with status: {} (paginated)&#34;, status);
+        return taskRepository.findByStatus(status, pageable);
+    }
+    
+    public List&lt;Task&gt; getTasksByUser(Long userId) {
+        log.debug(&#34;Fetching tasks for user: {}&#34;, userId);
+        return taskRepository.findByAssignedToId(userId);
+    }
+    
+    public List&lt;Task&gt; searchTasks(String keyword) {
+        log.debug(&#34;Searching tasks with keyword: {}&#34;, keyword);
+        return taskRepository.findByTitleContainingIgnoreCase(keyword);
+    }
+    
+    @Transactional
+    public Task assignTaskToUser(Long taskId, Long userId) {
+        log.debug(&#34;Assigning task {} to user {}&#34;, taskId, userId);
+        
+        Task task = taskRepository.findById(taskId)
+            .orElseThrow(() -&gt; new TaskNotFoundException(taskId));
+        
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -&gt; new RuntimeException(&#34;User not found with id: &#34; + userId));
+        
+        task.setAssignedTo(user);
+        return taskRepository.save(task);
+    }
+    
+    @Transactional
+    public Task addCategoriesToTask(Long taskId, Set&lt;Long&gt; categoryIds) {
+        log.debug(&#34;Adding {} categories to task {}&#34;, categoryIds.size(), taskId);
+        
+        Task task = taskRepository.findById(taskId)
+            .orElseThrow(() -&gt; new TaskNotFoundException(taskId));
+        
+        Set&lt;Category&gt; categories = Set.copyOf(categoryRepository.findAllById(categoryIds));
+        task.getCategories().addAll(categories);
+        
+        return taskRepository.save(task);
+    }
+    
+    public long countTasksByStatus(TaskStatus status) {
+        return taskRepository.countByStatus(status);
+    }
+    
+    public List&lt;Task&gt; getRecentTasks(int days) {
+        LocalDateTime since = LocalDateTime.now().minusDays(days);
+        return taskRepository.findByCreatedAtBetween(since, LocalDateTime.now());
+    }
+}
+</code></pre>
+            <h2 is-upgraded>UserService</h2>
+            <pre><code language="language-java" class="language-java">package com.example.taskmanager.service;
+
+import com.example.taskmanager.model.User;
+import com.example.taskmanager.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+@Service
+@Slf4j
+@Transactional(readOnly = true)
+public class UserService {
+    
+    private final UserRepository userRepository;
+    
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+    
+    @Transactional
+    public User createUser(User user) {
+        log.debug(&#34;Creating user: {}&#34;, user.getUsername());
+        
+        if (userRepository.existsByUsername(user.getUsername())) {
+            throw new RuntimeException(&#34;Username already exists: &#34; + user.getUsername());
+        }
+        
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new RuntimeException(&#34;Email already exists: &#34; + user.getEmail());
+        }
+        
+        return userRepository.save(user);
+    }
+    
+    public User getUserById(Long id) {
+        return userRepository.findById(id)
+            .orElseThrow(() -&gt; new RuntimeException(&#34;User not found with id: &#34; + id));
+    }
+    
+    public User getUserByUsername(String username) {
+        return userRepository.findByUsername(username)
+            .orElseThrow(() -&gt; new RuntimeException(&#34;User not found with username: &#34; + username));
+    }
+    
+    public List&lt;User&gt; getAllUsers() {
+        return userRepository.findAll();
+    }
+    
+    @Transactional
+    public void deleteUser(Long id) {
+        if (!userRepository.existsById(id)) {
+            throw new RuntimeException(&#34;User not found with id: &#34; + id);
+        }
+        userRepository.deleteById(id);
+    }
+}
+</code></pre>
+            <h2 is-upgraded>CategoryService</h2>
+            <pre><code language="language-java" class="language-java">package com.example.taskmanager.service;
+
+import com.example.taskmanager.model.Category;
+import com.example.taskmanager.repository.CategoryRepository;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+@Service
+@Slf4j
+@Transactional(readOnly = true)
+public class CategoryService {
+    
+    private final CategoryRepository categoryRepository;
+    
+    public CategoryService(CategoryRepository categoryRepository) {
+        this.categoryRepository = categoryRepository;
+    }
+    
+    @Transactional
+    public Category createCategory(Category category) {
+        log.debug(&#34;Creating category: {}&#34;, category.getName());
+        
+        if (categoryRepository.existsByName(category.getName())) {
+            throw new RuntimeException(&#34;Category already exists: &#34; + category.getName());
+        }
+        
+        return categoryRepository.save(category);
+    }
+    
+    public Category getCategoryById(Long id) {
+        return categoryRepository.findById(id)
+            .orElseThrow(() -&gt; new RuntimeException(&#34;Category not found with id: &#34; + id));
+    }
+    
+    public Category getCategoryByName(String name) {
+        return categoryRepository.findByName(name)
+            .orElseThrow(() -&gt; new RuntimeException(&#34;Category not found: &#34; + name));
+    }
+    
+    public List&lt;Category&gt; getAllCategories() {
+        return categoryRepository.findAll();
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Understanding @Transactional</h2>
+            <pre><code language="language-java" class="language-java">@Transactional(readOnly = true)  // Class level: all methods read-only
+public class TaskService {
+    
+    @Transactional  // Override: this method needs write access
+    public Task createTask(Task task) {
+        // Will commit changes to database
+        return taskRepository.save(task);
+    }
+    
+    // Inherits readOnly = true from class
+    public List&lt;Task&gt; getAllTasks() {
+        return taskRepository.findAll();
+    }
+}
+</code></pre>
+            <p><strong>Benefits:</strong></p>
+            <ul>
+                <li>Automatic transaction management</li>
+                <li>Rollback on exceptions</li>
+                <li>Flush changes to database</li>
+                <li>Connection management</li>
+            </ul>
+            <aside class="special">
+                <p><strong>Performance Tip:</strong> Use <code>@Transactional(readOnly = true)</code> for read
+                    operations. It optimizes performance and prevents accidental writes.</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Add Controllers" duration="8">
+            <p>Add controllers for users and categories, update task controller.</p>
+            <h2 is-upgraded>UserController</h2>
+            <pre><code language="language-java" class="language-java">package com.example.taskmanager.controller;
+
+import com.example.taskmanager.model.User;
+import com.example.taskmanager.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.net.URI;
+import java.util.List;
+
+@RestController
+@RequestMapping(&#34;/api/users&#34;)
+@Tag(name = &#34;User Management&#34;)
+@Slf4j
+public class UserController {
+    
+    private final UserService userService;
+    
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
+    
+    @Operation(summary = &#34;Create a new user&#34;)
+    @PostMapping
+    public ResponseEntity&lt;User&gt; createUser(@RequestBody User user) {
+        log.info(&#34;POST /api/users - Creating user: {}&#34;, user.getUsername());
+        User createdUser = userService.createUser(user);
+        URI location = URI.create(&#34;/api/users/&#34; + createdUser.getId());
+        return ResponseEntity.created(location).body(createdUser);
+    }
+    
+    @Operation(summary = &#34;Get all users&#34;)
+    @GetMapping
+    public ResponseEntity&lt;List&lt;User&gt;&gt; getAllUsers() {
+        log.info(&#34;GET /api/users&#34;);
+        return ResponseEntity.ok(userService.getAllUsers());
+    }
+    
+    @Operation(summary = &#34;Get user by ID&#34;)
+    @GetMapping(&#34;/{id}&#34;)
+    public ResponseEntity&lt;User&gt; getUserById(@PathVariable Long id) {
+        log.info(&#34;GET /api/users/{}&#34;, id);
+        return ResponseEntity.ok(userService.getUserById(id));
+    }
+    
+    @Operation(summary = &#34;Get user by username&#34;)
+    @GetMapping(&#34;/username/{username}&#34;)
+    public ResponseEntity&lt;User&gt; getUserByUsername(@PathVariable String username) {
+        log.info(&#34;GET /api/users/username/{}&#34;, username);
+        return ResponseEntity.ok(userService.getUserByUsername(username));
+    }
+    
+    @Operation(summary = &#34;Delete user&#34;)
+    @DeleteMapping(&#34;/{id}&#34;)
+    public ResponseEntity&lt;Void&gt; deleteUser(@PathVariable Long id) {
+        log.info(&#34;DELETE /api/users/{}&#34;, id);
+        userService.deleteUser(id);
+        return ResponseEntity.noContent().build();
+    }
+}
+</code></pre>
+            <h2 is-upgraded>CategoryController</h2>
+            <pre><code language="language-java" class="language-java">package com.example.taskmanager.controller;
+
+import com.example.taskmanager.model.Category;
+import com.example.taskmanager.service.CategoryService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.net.URI;
+import java.util.List;
+
+@RestController
+@RequestMapping(&#34;/api/categories&#34;)
+@Tag(name = &#34;Category Management&#34;)
+@Slf4j
+public class CategoryController {
+    
+    private final CategoryService categoryService;
+    
+    public CategoryController(CategoryService categoryService) {
+        this.categoryService = categoryService;
+    }
+    
+    @Operation(summary = &#34;Create a new category&#34;)
+    @PostMapping
+    public ResponseEntity&lt;Category&gt; createCategory(@RequestBody Category category) {
+        log.info(&#34;POST /api/categories - Creating: {}&#34;, category.getName());
+        Category created = categoryService.createCategory(category);
+        URI location = URI.create(&#34;/api/categories/&#34; + created.getId());
+        return ResponseEntity.created(location).body(created);
+    }
+    
+    @Operation(summary = &#34;Get all categories&#34;)
+    @GetMapping
+    public ResponseEntity&lt;List&lt;Category&gt;&gt; getAllCategories() {
+        log.info(&#34;GET /api/categories&#34;);
+        return ResponseEntity.ok(categoryService.getAllCategories());
+    }
+    
+    @Operation(summary = &#34;Get category by ID&#34;)
+    @GetMapping(&#34;/{id}&#34;)
+    public ResponseEntity&lt;Category&gt; getCategoryById(@PathVariable Long id) {
+        log.info(&#34;GET /api/categories/{}&#34;, id);
+        return ResponseEntity.ok(categoryService.getCategoryById(id));
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Enhanced TaskController</h2>
+            <p>Add new endpoints to TaskController:</p>
+            <pre><code language="language-java" class="language-java">@Operation(summary = &#34;Assign task to user&#34;)
+@PutMapping(&#34;/{taskId}/assign/{userId}&#34;)
+public ResponseEntity&lt;TaskResponse&gt; assignTask(
+        @PathVariable Long taskId,
+        @PathVariable Long userId) {
+    log.info(&#34;PUT /api/tasks/{}/assign/{}&#34;, taskId, userId);
+    Task task = taskService.assignTaskToUser(taskId, userId);
+    return ResponseEntity.ok(new TaskResponse(task));
+}
+
+@Operation(summary = &#34;Add categories to task&#34;)
+@PostMapping(&#34;/{taskId}/categories&#34;)
+public ResponseEntity&lt;TaskResponse&gt; addCategories(
+        @PathVariable Long taskId,
+        @RequestBody Set&lt;Long&gt; categoryIds) {
+    log.info(&#34;POST /api/tasks/{}/categories&#34;, taskId);
+    Task task = taskService.addCategoriesToTask(taskId, categoryIds);
+    return ResponseEntity.ok(new TaskResponse(task));
+}
+
+@Operation(summary = &#34;Get tasks by user&#34;)
+@GetMapping(&#34;/user/{userId}&#34;)
+public ResponseEntity&lt;List&lt;TaskResponse&gt;&gt; getTasksByUser(@PathVariable Long userId) {
+    log.info(&#34;GET /api/tasks/user/{}&#34;, userId);
+    List&lt;TaskResponse&gt; tasks = taskService.getTasksByUser(userId).stream()
+        .map(TaskResponse::new)
+        .toList();
+    return ResponseEntity.ok(tasks);
+}
+
+@Operation(summary = &#34;Search tasks&#34;)
+@GetMapping(&#34;/search&#34;)
+public ResponseEntity&lt;List&lt;TaskResponse&gt;&gt; searchTasks(@RequestParam String keyword) {
+    log.info(&#34;GET /api/tasks/search?keyword={}&#34;, keyword);
+    List&lt;TaskResponse&gt; tasks = taskService.searchTasks(keyword).stream()
+        .map(TaskResponse::new)
+        .toList();
+    return ResponseEntity.ok(tasks);
+}
+
+@Operation(summary = &#34;Get task statistics&#34;)
+@GetMapping(&#34;/stats&#34;)
+public ResponseEntity&lt;Map&lt;TaskStatus, Long&gt;&gt; getTaskStats() {
+    log.info(&#34;GET /api/tasks/stats&#34;);
+    Map&lt;TaskStatus, Long&gt; stats = new HashMap&lt;&gt;();
+    for (TaskStatus status : TaskStatus.values()) {
+        stats.put(status, taskService.countTasksByStatus(status));
+    }
+    return ResponseEntity.ok(stats);
+}
+</code></pre>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Testing the Database API" duration="5">
+            <p>Test the database-backed API.</p>
+            <h2 is-upgraded>Start Application</h2>
+            <pre><code language="language-bash" class="language-bash">mvn spring-boot:run
+</code></pre>
+            <p>Check logs for Hibernate SQL:</p>
+            <pre><code>Hibernate: create table tasks (...)
+Hibernate: create table users (...)
+Hibernate: create table categories (...)
+Hibernate: create table task_categories (...)
+</code></pre>
+            <h2 is-upgraded>Test Scenarios</h2>
+            <p><strong>1. Create User</strong></p>
+            <pre><code language="language-bash" class="language-bash">curl -X POST http://localhost:8080/api/users \
+  -H &#34;Content-Type: application/json&#34; \
+  -d &#39;{
+    &#34;username&#34;: &#34;john_doe&#34;,
+    &#34;email&#34;: &#34;john@example.com&#34;,
+    &#34;fullName&#34;: &#34;John Doe&#34;
+  }&#39;
+</code></pre>
+            <p><strong>2. Create Categories</strong></p>
+            <pre><code language="language-bash" class="language-bash">curl -X POST http://localhost:8080/api/categories \
+  -H &#34;Content-Type: application/json&#34; \
+  -d &#39;{&#34;name&#34;: &#34;Work&#34;, &#34;description&#34;: &#34;Work-related tasks&#34;}&#39;
+
+curl -X POST http://localhost:8080/api/categories \
+  -H &#34;Content-Type: application/json&#34; \
+  -d &#39;{&#34;name&#34;: &#34;Personal&#34;, &#34;description&#34;: &#34;Personal tasks&#34;}&#39;
+</code></pre>
+            <p><strong>3. Create Task</strong></p>
+            <pre><code language="language-bash" class="language-bash">curl -X POST http://localhost:8080/api/tasks \
+  -H &#34;Content-Type: application/json&#34; \
+  -d &#39;{
+    &#34;title&#34;: &#34;Complete JPA Codelab&#34;,
+    &#34;description&#34;: &#34;Learn Spring Data JPA&#34;,
+    &#34;status&#34;: &#34;TODO&#34;
+  }&#39;
+</code></pre>
+            <p><strong>4. Assign Task to User</strong></p>
+            <pre><code language="language-bash" class="language-bash">curl -X PUT http://localhost:8080/api/tasks/1/assign/1
+</code></pre>
+            <p><strong>5. Add Categories to Task</strong></p>
+            <pre><code language="language-bash" class="language-bash">curl -X POST http://localhost:8080/api/tasks/1/categories \
+  -H &#34;Content-Type: application/json&#34; \
+  -d &#39;[1, 2]&#39;
+</code></pre>
+            <p><strong>6. Search Tasks</strong></p>
+            <pre><code language="language-bash" class="language-bash">curl &#34;http://localhost:8080/api/tasks/search?keyword=JPA&#34;
+</code></pre>
+            <p><strong>7. Get Task Stats</strong></p>
+            <pre><code language="language-bash" class="language-bash">curl http://localhost:8080/api/tasks/stats
+</code></pre>
+            <h2 is-upgraded>Verify in H2 Console</h2>
+            <ol type="1">
+                <li>Visit: http://localhost:8080/h2-console</li>
+                <li>Connect with <code>jdbc:h2:mem:taskdb</code></li>
+                <li>Run queries:</li>
+            </ol>
+            <pre><code language="language-sql" class="language-sql">SELECT * FROM tasks;
+SELECT * FROM users;
+SELECT * FROM categories;
+SELECT * FROM task_categories;
+
+-- Join query
+SELECT t.title, u.username, c.name
+FROM tasks t
+LEFT JOIN users u ON t.user_id = u.id
+LEFT JOIN task_categories tc ON t.id = tc.task_id
+LEFT JOIN categories c ON tc.category_id = c.id;
+</code></pre>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Conclusion" duration="2">
+            <p>Congratulations! 🎉 You&#39;ve added database persistence with Spring Data JPA!</p>
+            <h2 is-upgraded>What You&#39;ve Learned</h2>
+            <ul>
+                <li>✅ <strong>ORM Concepts:</strong> Object-Relational Mapping fundamentals</li>
+                <li>✅ <strong>JPA Entities:</strong> @Entity, @Table, @Column annotations</li>
+                <li>✅ <strong>Relationships:</strong> @OneToMany, @ManyToOne, @ManyToMany</li>
+                <li>✅ <strong>Spring Data JPA:</strong> Magic repository methods</li>
+                <li>✅ <strong>Query Methods:</strong> Derived queries and @Query</li>
+                <li>✅ <strong>Transactions:</strong> @Transactional management</li>
+                <li>✅ <strong>Database Config:</strong> H2 for dev, PostgreSQL for prod</li>
+                <li>✅ <strong>Cascade &amp; Fetch:</strong> Managing relationships</li>
+            </ul>
+            <h2 is-upgraded>Task Management API v1.2</h2>
+            <p>Database-backed features:</p>
+            <ul>
+                <li>✅ JPA entities with relationships</li>
+                <li>✅ User and Category entities</li>
+                <li>✅ Task assignment to users</li>
+                <li>✅ Many-to-many task categories</li>
+                <li>✅ Derived query methods</li>
+                <li>✅ Custom JPQL queries</li>
+                <li>✅ H2 console for development</li>
+                <li>✅ PostgreSQL ready for production</li>
+            </ul>
+            <h2 is-upgraded>Key Takeaways</h2>
+            <ol type="1">
+                <li><strong>Spring Data JPA</strong> eliminates boilerplate CRUD code</li>
+                <li><strong>Lazy loading</strong> prevents N+1 query problems</li>
+                <li><strong>@Transactional</strong> manages database transactions</li>
+                <li><strong>Query methods</strong> are generated from names</li>
+                <li><strong>@Query</strong> for complex queries</li>
+                <li><strong>H2</strong> perfect for development</li>
+                <li><strong>Relationships</strong> handled automatically</li>
+            </ol>
+            <h2 is-upgraded>Git Branching</h2>
+            <pre><code language="language-bash" class="language-bash">git add .
+git commit -m &#34;Codelab 3.3: ORM &amp; Spring Data JPA complete&#34;
+git tag codelab-3.3
+</code></pre>
+            <h2 is-upgraded>Next Steps</h2>
+            <ul>
+                <li><strong>Codelab 3.4:</strong> JPA Locking &amp; Spring Security</li>
+            </ul>
+            <h2 is-upgraded>Additional Resources</h2>
+            <ul>
+                <li><a href="https://docs.spring.io/spring-data/jpa/docs/current/reference/html/" target="_blank">Spring
+                        Data JPA Reference</a></li>
+                <li><a href="https://jakarta.ee/specifications/persistence/" target="_blank">JPA Specifications</a></li>
+                <li><a href="https://hibernate.org/orm/documentation/" target="_blank">Hibernate Documentation</a></li>
+            </ul>
+            <aside class="special">
+                <p><strong>Database Powered!</strong> Your Task API now has real database persistence with relationships
+                    and query capabilities. Ready for enterprise!</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+    </google-codelab>
+
+    <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
+    <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
+    <script src="https://storage.googleapis.com/claat-public/prettify.js"></script>
+    <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
+    <script src="//support.google.com/inapp/api.js"></script>
+
+</body>
+
+</html>

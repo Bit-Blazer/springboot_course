@@ -1,0 +1,1077 @@
+<!doctype html>
+
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+    <meta name="theme-color" content="#4F7DC9">
+    <meta charset="UTF-8">
+    <title>Logging with Log4j 2</title>
+    <link rel="stylesheet"
+        href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
+    <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
+    <style>
+        .success {
+            color: #1e8e3e;
+        }
+
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+    <google-codelab-analytics gaid="UA-49880327-14"></google-codelab-analytics>
+    <google-codelab codelab-gaid="" id="logging-log4j" title="Logging with Log4j 2" environment="web" feedback-link="">
+
+        <google-codelab-step label="Introduction" duration="3">
+            <p>Logging is essential for monitoring, debugging, and maintaining applications in production. Log4j 2 is
+                the most popular logging framework for Java, offering high performance and extensive configuration
+                options.</p>
+            <h2 class="checklist" is-upgraded>What You&#39;ll Learn</h2>
+            <ul class="checklist">
+                <li><strong>Logging Fundamentals:</strong> Why logging matters</li>
+                <li><strong>Logging Levels:</strong> TRACE, DEBUG, INFO, WARN, ERROR, FATAL</li>
+                <li><strong>Log4j 2 Architecture:</strong> Loggers, Appenders, Layouts</li>
+                <li><strong>Configuration:</strong> XML and properties formats</li>
+                <li><strong>Appenders:</strong> Console, File, RollingFile</li>
+                <li><strong>Patterns:</strong> Custom log formatting</li>
+                <li><strong>Best Practices:</strong> Performance, security, structured logging</li>
+                <li><strong>Integration:</strong> Using with existing applications</li>
+            </ul>
+            <h2 is-upgraded>What You&#39;ll Build</h2>
+            <p>Transform an existing application with:</p>
+            <ul>
+                <li>Multi-level logging strategy</li>
+                <li>Console and file appenders</li>
+                <li>Rolling file policies for production</li>
+                <li>Custom log patterns with timestamps</li>
+                <li>Async logging for performance</li>
+                <li>MDC (Mapped Diagnostic Context) for request tracking</li>
+            </ul>
+            <h2 is-upgraded>Prerequisites</h2>
+            <ul>
+                <li>Completed Codelab 1.3 (Exception Handling)</li>
+                <li>Understanding of Maven or Gradle</li>
+                <li>Basic Java application knowledge</li>
+            </ul>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Why Logging Matters" duration="5">
+            <p>Logging is your window into application behavior, especially in production where debugging isn&#39;t
+                possible.</p>
+            <h2 is-upgraded>The Problem with System.out.println</h2>
+            <pre><code language="language-java" class="language-java">// Bad: Using System.out for logging
+public class UserService {
+    public User findUser(String id) {
+        System.out.println(&#34;Finding user: &#34; + id);
+        User user = database.findById(id);
+        System.out.println(&#34;Found user: &#34; + user.getName());
+        return user;
+    }
+}
+</code></pre>
+            <p><strong>Problems:</strong></p>
+            <ul>
+                <li>❌ No log levels (can&#39;t filter by severity)</li>
+                <li>❌ No timestamps</li>
+                <li>❌ Can&#39;t redirect to files</li>
+                <li>❌ No structured format</li>
+                <li>❌ Performance issues (synchronous)</li>
+                <li>❌ Hard to disable in production</li>
+            </ul>
+            <h2 is-upgraded>Proper Logging with Log4j</h2>
+            <pre><code language="language-java" class="language-java">import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+public class UserService {
+    private static final Logger logger = LogManager.getLogger(UserService.class);
+    
+    public User findUser(String id) {
+        logger.debug(&#34;Finding user with id: {}&#34;, id);
+        
+        try {
+            User user = database.findById(id);
+            logger.info(&#34;User found: id={}, name={}&#34;, user.getId(), user.getName());
+            return user;
+        } catch (Exception e) {
+            logger.error(&#34;Failed to find user with id: {}&#34;, id, e);
+            throw e;
+        }
+    }
+}
+</code></pre>
+            <p><strong>Benefits:</strong></p>
+            <ul>
+                <li>✅ Log levels for filtering</li>
+                <li>✅ Automatic timestamps</li>
+                <li>✅ Multiple output destinations</li>
+                <li>✅ Structured, parseable format</li>
+                <li>✅ High performance</li>
+                <li>✅ Easy to configure</li>
+            </ul>
+            <aside class="special">
+                <p><strong>Production Ready:</strong> Proper logging is non-negotiable for production applications.
+                    It&#39;s your primary tool for diagnosing issues after deployment.</p>
+            </aside>
+            <h2 is-upgraded>Common Use Cases</h2>
+            <pre><code language="language-java" class="language-java">// 1. Debugging during development
+logger.debug(&#34;Request payload: {}&#34;, requestJson);
+
+// 2. Tracking user actions
+logger.info(&#34;User {} logged in successfully&#34;, username);
+
+// 3. Warning about potential issues
+logger.warn(&#34;API response time exceeded threshold: {}ms&#34;, responseTime);
+
+// 4. Recording errors
+logger.error(&#34;Payment processing failed for order {}&#34;, orderId, exception);
+
+// 5. Security auditing
+logger.info(&#34;Failed login attempt for user: {}&#34;, username);
+
+// 6. Performance monitoring
+long startTime = System.currentTimeMillis();
+// ... operation ...
+logger.info(&#34;Operation completed in {}ms&#34;, System.currentTimeMillis() - startTime);
+</code></pre>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Logging Levels" duration="8">
+            <p>Log4j 2 provides six logging levels, ordered from most verbose to most severe.</p>
+            <h2 is-upgraded>Level Hierarchy</h2>
+            <pre><code>ALL &lt; TRACE &lt; DEBUG &lt; INFO &lt; WARN &lt; ERROR &lt; FATAL &lt; OFF
+</code></pre>
+            <h2 is-upgraded>TRACE - Finest Detail</h2>
+            <pre><code language="language-java" class="language-java">logger.trace(&#34;Entering method processOrder()&#34;);
+logger.trace(&#34;Processing item: {}&#34;, item);
+logger.trace(&#34;Loop iteration: {}&#34;, i);
+</code></pre>
+            <p><strong>When to use:</strong> Very detailed information, typically only enabled during development or
+                deep troubleshooting.</p>
+            <h2 is-upgraded>DEBUG - Diagnostic Information</h2>
+            <pre><code language="language-java" class="language-java">logger.debug(&#34;Database query: {}&#34;, sql);
+logger.debug(&#34;Cache hit rate: {}&#34;, hitRate);
+logger.debug(&#34;Request parameters: {}&#34;, params);
+</code></pre>
+            <p><strong>When to use:</strong> Information useful for debugging, typically disabled in production.</p>
+            <h2 is-upgraded>INFO - General Information</h2>
+            <pre><code language="language-java" class="language-java">logger.info(&#34;Application started successfully&#34;);
+logger.info(&#34;User {} created account&#34;, username);
+logger.info(&#34;Processing batch of {} records&#34;, count);
+</code></pre>
+            <p><strong>When to use:</strong> Important events that happen during normal operation. Default production
+                level.</p>
+            <h2 is-upgraded>WARN - Warning Messages</h2>
+            <pre><code language="language-java" class="language-java">logger.warn(&#34;Database connection pool is 80% utilized&#34;);
+logger.warn(&#34;API response time exceeded 2 seconds: {}ms&#34;, responseTime);
+logger.warn(&#34;Deprecated method called: {}&#34;, methodName);
+</code></pre>
+            <p><strong>When to use:</strong> Potentially harmful situations that don&#39;t prevent operation but need
+                attention.</p>
+            <h2 is-upgraded>ERROR - Error Events</h2>
+            <pre><code language="language-java" class="language-java">logger.error(&#34;Failed to connect to database&#34;, exception);
+logger.error(&#34;Payment processing failed for order {}&#34;, orderId, e);
+logger.error(&#34;Invalid configuration: {}&#34;, configKey);
+</code></pre>
+            <p><strong>When to use:</strong> Error events that might still allow the application to continue running.
+            </p>
+            <h2 is-upgraded>FATAL - Critical Errors</h2>
+            <pre><code language="language-java" class="language-java">logger.fatal(&#34;Database is unreachable, shutting down&#34;, exception);
+logger.fatal(&#34;Critical configuration missing: {}&#34;, requiredConfig);
+</code></pre>
+            <p><strong>When to use:</strong> Severe errors that will presumably lead the application to abort.</p>
+            <h2 is-upgraded>Practical Example</h2>
+            <pre><code language="language-java" class="language-java">import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+public class OrderProcessor {
+    private static final Logger logger = LogManager.getLogger(OrderProcessor.class);
+    
+    public void processOrder(Order order) {
+        logger.trace(&#34;processOrder() called with orderId: {}&#34;, order.getId());
+        logger.debug(&#34;Order details: {}&#34;, order);
+        
+        try {
+            validateOrder(order);
+            logger.info(&#34;Processing order {} for customer {}&#34;, 
+                order.getId(), order.getCustomerId());
+            
+            if (order.getAmount() &gt; 10000) {
+                logger.warn(&#34;High-value order detected: ${}&#34;, order.getAmount());
+            }
+            
+            // Process order
+            logger.info(&#34;Order {} processed successfully&#34;, order.getId());
+            
+        } catch (ValidationException e) {
+            logger.error(&#34;Order validation failed: {}&#34;, order.getId(), e);
+            throw e;
+        } catch (Exception e) {
+            logger.fatal(&#34;Critical error processing order {}&#34;, order.getId(), e);
+            notifyAdministrators(e);
+            throw e;
+        }
+        
+        logger.trace(&#34;processOrder() completed&#34;);
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Log Level Configuration</h2>
+            <pre><code language="language-xml" class="language-xml">&lt;!-- log4j2.xml --&gt;
+&lt;Configuration&gt;
+    &lt;Loggers&gt;
+        &lt;!-- Root logger: INFO level --&gt;
+        &lt;Root level=&#34;INFO&#34;&gt;
+            &lt;AppenderRef ref=&#34;Console&#34;/&gt;
+        &lt;/Root&gt;
+        
+        &lt;!-- Package-specific levels --&gt;
+        &lt;Logger name=&#34;com.myapp.service&#34; level=&#34;DEBUG&#34;/&gt;
+        &lt;Logger name=&#34;com.myapp.database&#34; level=&#34;TRACE&#34;/&gt;
+        &lt;Logger name=&#34;org.springframework&#34; level=&#34;WARN&#34;/&gt;
+    &lt;/Loggers&gt;
+&lt;/Configuration&gt;
+</code></pre>
+            <aside class="special">
+                <p><strong>Best Practice:</strong> Use INFO as the default production level. Enable DEBUG or TRACE only
+                    for specific packages when troubleshooting.</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Log4j 2 Setup" duration="10">
+            <p>Let&#39;s set up Log4j 2 in a Java project.</p>
+            <h2 is-upgraded>Maven Dependencies</h2>
+            <pre><code language="language-xml" class="language-xml">&lt;!-- pom.xml --&gt;
+&lt;dependencies&gt;
+    &lt;!-- Log4j 2 Core --&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.apache.logging.log4j&lt;/groupId&gt;
+        &lt;artifactId&gt;log4j-core&lt;/artifactId&gt;
+        &lt;version&gt;2.21.1&lt;/version&gt;
+    &lt;/dependency&gt;
+    
+    &lt;!-- Log4j 2 API --&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.apache.logging.log4j&lt;/groupId&gt;
+        &lt;artifactId&gt;log4j-api&lt;/artifactId&gt;
+        &lt;version&gt;2.21.1&lt;/version&gt;
+    &lt;/dependency&gt;
+    
+    &lt;!-- Optional: SLF4J Bridge (if using SLF4J) --&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.apache.logging.log4j&lt;/groupId&gt;
+        &lt;artifactId&gt;log4j-slf4j-impl&lt;/artifactId&gt;
+        &lt;version&gt;2.21.1&lt;/version&gt;
+    &lt;/dependency&gt;
+&lt;/dependencies&gt;
+</code></pre>
+            <h2 is-upgraded>Gradle Dependencies</h2>
+            <pre><code language="language-gradle" class="language-gradle">// build.gradle
+dependencies {
+    implementation &#39;org.apache.logging.log4j:log4j-core:2.21.1&#39;
+    implementation &#39;org.apache.logging.log4j:log4j-api:2.21.1&#39;
+    
+    // Optional: SLF4J Bridge
+    implementation &#39;org.apache.logging.log4j:log4j-slf4j-impl:2.21.1&#39;
+}
+</code></pre>
+            <h2 is-upgraded>Basic Configuration - log4j2.xml</h2>
+            <p>Create <code>src/main/resources/log4j2.xml</code>:</p>
+            <pre><code language="language-xml" class="language-xml">&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
+&lt;Configuration status=&#34;WARN&#34;&gt;
+    &lt;Appenders&gt;
+        &lt;!-- Console Appender --&gt;
+        &lt;Console name=&#34;Console&#34; target=&#34;SYSTEM_OUT&#34;&gt;
+            &lt;PatternLayout pattern=&#34;%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n&#34;/&gt;
+        &lt;/Console&gt;
+    &lt;/Appenders&gt;
+    
+    &lt;Loggers&gt;
+        &lt;Root level=&#34;INFO&#34;&gt;
+            &lt;AppenderRef ref=&#34;Console&#34;/&gt;
+        &lt;/Root&gt;
+    &lt;/Loggers&gt;
+&lt;/Configuration&gt;
+</code></pre>
+            <h2 is-upgraded>Alternative - log4j2.properties</h2>
+            <p>Create <code>src/main/resources/log4j2.properties</code>:</p>
+            <pre><code language="language-properties" class="language-properties"># Root logger
+rootLogger.level = INFO
+rootLogger.appenderRef.console.ref = Console
+
+# Console appender
+appender.console.type = Console
+appender.console.name = Console
+appender.console.layout.type = PatternLayout
+appender.console.layout.pattern = %d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n
+</code></pre>
+            <h2 is-upgraded>Basic Usage</h2>
+            <pre><code language="language-java" class="language-java">import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+public class Application {
+    // Logger instance (one per class)
+    private static final Logger logger = LogManager.getLogger(Application.class);
+    
+    public static void main(String[] args) {
+        logger.info(&#34;Application starting...&#34;);
+        
+        try {
+            // Application logic
+            logger.debug(&#34;Debug information&#34;);
+            logger.info(&#34;Processing complete&#34;);
+        } catch (Exception e) {
+            logger.error(&#34;Application error&#34;, e);
+        }
+        
+        logger.info(&#34;Application shutting down&#34;);
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Verify Setup</h2>
+            <pre>$ mvn compile
+$ mvn exec:java -Dexec.mainClass=&#34;Application&#34;
+
+14:30:45.123 [main] INFO  Application - Application starting...
+14:30:45.456 [main] INFO  Application - Processing complete
+14:30:45.789 [main] INFO  Application - Application shutting down
+</pre>
+            <aside class="warning">
+                <p><strong>Important:</strong> Place log4j2.xml (or log4j2.properties) in
+                    <code>src/main/resources</code> so it&#39;s included in the classpath.</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Appenders and Layouts" duration="12">
+            <p>Appenders control where logs go. Layouts control how they look.</p>
+            <h2 is-upgraded>Console Appender</h2>
+            <pre><code language="language-xml" class="language-xml">&lt;Console name=&#34;Console&#34; target=&#34;SYSTEM_OUT&#34;&gt;
+    &lt;PatternLayout pattern=&#34;%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n&#34;/&gt;
+&lt;/Console&gt;
+</code></pre>
+            <h2 is-upgraded>File Appender</h2>
+            <pre><code language="language-xml" class="language-xml">&lt;File name=&#34;FileLogger&#34; fileName=&#34;logs/application.log&#34;&gt;
+    &lt;PatternLayout pattern=&#34;%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level %logger{36} - %msg%n&#34;/&gt;
+&lt;/File&gt;
+</code></pre>
+            <h2 is-upgraded>RollingFile Appender (Production)</h2>
+            <pre><code language="language-xml" class="language-xml">&lt;RollingFile name=&#34;RollingFile&#34; 
+             fileName=&#34;logs/app.log&#34;
+             filePattern=&#34;logs/app-%d{yyyy-MM-dd}-%i.log.gz&#34;&gt;
+    
+    &lt;PatternLayout&gt;
+        &lt;Pattern&gt;%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n&lt;/Pattern&gt;
+    &lt;/PatternLayout&gt;
+    
+    &lt;Policies&gt;
+        &lt;!-- Roll over daily --&gt;
+        &lt;TimeBasedTriggeringPolicy /&gt;
+        
+        &lt;!-- Roll over when file reaches 10 MB --&gt;
+        &lt;SizeBasedTriggeringPolicy size=&#34;10 MB&#34;/&gt;
+    &lt;/Policies&gt;
+    
+    &lt;!-- Keep 30 days of logs --&gt;
+    &lt;DefaultRolloverStrategy max=&#34;30&#34;/&gt;
+&lt;/RollingFile&gt;
+</code></pre>
+            <h2 is-upgraded>Async Appender (High Performance)</h2>
+            <pre><code language="language-xml" class="language-xml">&lt;Async name=&#34;AsyncConsole&#34;&gt;
+    &lt;AppenderRef ref=&#34;Console&#34;/&gt;
+&lt;/Async&gt;
+
+&lt;Async name=&#34;AsyncFile&#34;&gt;
+    &lt;AppenderRef ref=&#34;RollingFile&#34;/&gt;
+&lt;/Async&gt;
+</code></pre>
+            <h2 is-upgraded>Pattern Layout Syntax</h2>
+            <pre><code>%d{yyyy-MM-dd HH:mm:ss.SSS} - Date/time
+%t or %thread - Thread name
+%-5level - Log level (left-justified, 5 chars)
+%logger{36} - Logger name (max 36 chars)
+%C or %class - Class name
+%M or %method - Method name
+%L or %line - Line number
+%msg or %m - Log message
+%n - New line
+%ex or %throwable - Exception stack trace
+%highlight{...} - Colored output
+%X{key} - MDC value
+</code></pre>
+            <h2 is-upgraded>Custom Patterns</h2>
+            <pre><code language="language-xml" class="language-xml">&lt;!-- Simple pattern --&gt;
+&lt;PatternLayout pattern=&#34;%d %level %msg%n&#34;/&gt;
+
+&lt;!-- Detailed pattern --&gt;
+&lt;PatternLayout pattern=&#34;%d{ISO8601} [%t] %-5level %c{1}:%L - %msg%n&#34;/&gt;
+
+&lt;!-- Colored console output --&gt;
+&lt;PatternLayout&gt;
+    &lt;Pattern&gt;%d{HH:mm:ss.SSS} %highlight{%-5level} %logger{36} - %msg%n&lt;/Pattern&gt;
+&lt;/PatternLayout&gt;
+
+&lt;!-- JSON format --&gt;
+&lt;JsonLayout complete=&#34;false&#34; compact=&#34;true&#34;/&gt;
+</code></pre>
+            <h2 is-upgraded>Complete Configuration Example</h2>
+            <pre><code language="language-xml" class="language-xml">&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
+&lt;Configuration status=&#34;WARN&#34;&gt;
+    &lt;Properties&gt;
+        &lt;Property name=&#34;LOG_PATTERN&#34;&gt;
+            %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n
+        &lt;/Property&gt;
+    &lt;/Properties&gt;
+    
+    &lt;Appenders&gt;
+        &lt;!-- Console: Colored output for development --&gt;
+        &lt;Console name=&#34;Console&#34; target=&#34;SYSTEM_OUT&#34;&gt;
+            &lt;PatternLayout&gt;
+                &lt;Pattern&gt;%d{HH:mm:ss.SSS} %highlight{%-5level} %logger{36} - %msg%n&lt;/Pattern&gt;
+            &lt;/PatternLayout&gt;
+        &lt;/Console&gt;
+        
+        &lt;!-- File: All logs --&gt;
+        &lt;RollingFile name=&#34;AllLogs&#34;
+                     fileName=&#34;logs/application.log&#34;
+                     filePattern=&#34;logs/application-%d{yyyy-MM-dd}-%i.log.gz&#34;&gt;
+            &lt;PatternLayout pattern=&#34;${LOG_PATTERN}&#34;/&gt;
+            &lt;Policies&gt;
+                &lt;TimeBasedTriggeringPolicy /&gt;
+                &lt;SizeBasedTriggeringPolicy size=&#34;10MB&#34;/&gt;
+            &lt;/Policies&gt;
+            &lt;DefaultRolloverStrategy max=&#34;30&#34;/&gt;
+        &lt;/RollingFile&gt;
+        
+        &lt;!-- File: Errors only --&gt;
+        &lt;RollingFile name=&#34;ErrorLogs&#34;
+                     fileName=&#34;logs/error.log&#34;
+                     filePattern=&#34;logs/error-%d{yyyy-MM-dd}-%i.log.gz&#34;&gt;
+            &lt;PatternLayout pattern=&#34;${LOG_PATTERN}&#34;/&gt;
+            &lt;Policies&gt;
+                &lt;TimeBasedTriggeringPolicy /&gt;
+                &lt;SizeBasedTriggeringPolicy size=&#34;10MB&#34;/&gt;
+            &lt;/Policies&gt;
+            &lt;DefaultRolloverStrategy max=&#34;90&#34;/&gt;
+            &lt;!-- Only ERROR and above --&gt;
+            &lt;ThresholdFilter level=&#34;ERROR&#34; onMatch=&#34;ACCEPT&#34; onMismatch=&#34;DENY&#34;/&gt;
+        &lt;/RollingFile&gt;
+        
+        &lt;!-- Async wrappers for performance --&gt;
+        &lt;Async name=&#34;AsyncConsole&#34;&gt;
+            &lt;AppenderRef ref=&#34;Console&#34;/&gt;
+        &lt;/Async&gt;
+        
+        &lt;Async name=&#34;AsyncAllLogs&#34;&gt;
+            &lt;AppenderRef ref=&#34;AllLogs&#34;/&gt;
+        &lt;/Async&gt;
+        
+        &lt;Async name=&#34;AsyncErrorLogs&#34;&gt;
+            &lt;AppenderRef ref=&#34;ErrorLogs&#34;/&gt;
+        &lt;/Async&gt;
+    &lt;/Appenders&gt;
+    
+    &lt;Loggers&gt;
+        &lt;!-- Application loggers --&gt;
+        &lt;Logger name=&#34;com.myapp&#34; level=&#34;DEBUG&#34; additivity=&#34;false&#34;&gt;
+            &lt;AppenderRef ref=&#34;AsyncConsole&#34;/&gt;
+            &lt;AppenderRef ref=&#34;AsyncAllLogs&#34;/&gt;
+            &lt;AppenderRef ref=&#34;AsyncErrorLogs&#34;/&gt;
+        &lt;/Logger&gt;
+        
+        &lt;!-- Third-party libraries --&gt;
+        &lt;Logger name=&#34;org.springframework&#34; level=&#34;INFO&#34;/&gt;
+        &lt;Logger name=&#34;org.hibernate&#34; level=&#34;WARN&#34;/&gt;
+        
+        &lt;!-- Root logger --&gt;
+        &lt;Root level=&#34;INFO&#34;&gt;
+            &lt;AppenderRef ref=&#34;AsyncConsole&#34;/&gt;
+            &lt;AppenderRef ref=&#34;AsyncAllLogs&#34;/&gt;
+        &lt;/Root&gt;
+    &lt;/Loggers&gt;
+&lt;/Configuration&gt;
+</code></pre>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Logging Best Practices" duration="10">
+            <h2 is-upgraded>1. Parameterized Logging</h2>
+            <pre><code language="language-java" class="language-java">// Bad: String concatenation (always evaluated)
+logger.debug(&#34;User details: &#34; + user.toString());
+
+// Good: Parameterized (only evaluated if DEBUG enabled)
+logger.debug(&#34;User details: {}&#34;, user);
+
+// Multiple parameters
+logger.info(&#34;User {} logged in from IP {} at {}&#34;, username, ipAddress, timestamp);
+</code></pre>
+            <h2 is-upgraded>2. Guard Expensive Operations</h2>
+            <pre><code language="language-java" class="language-java">// If the operation is expensive
+if (logger.isDebugEnabled()) {
+    String expensiveString = generateDetailedReport();
+    logger.debug(&#34;Report: {}&#34;, expensiveString);
+}
+
+// Modern approach with Supplier (Java 8+)
+logger.debug(&#34;Report: {}&#34;, () -&gt; generateDetailedReport());
+</code></pre>
+            <h2 is-upgraded>3. Log Exceptions Properly</h2>
+            <pre><code language="language-java" class="language-java">// Bad: Loses stack trace
+logger.error(&#34;Error occurred: &#34; + e.getMessage());
+
+// Good: Includes full exception
+logger.error(&#34;Failed to process order {}&#34;, orderId, e);
+
+// With context
+try {
+    processOrder(order);
+} catch (ValidationException e) {
+    logger.error(&#34;Order validation failed: orderId={}, customerId={}&#34;, 
+        order.getId(), order.getCustomerId(), e);
+}
+</code></pre>
+            <h2 is-upgraded>4. Avoid Logging Sensitive Data</h2>
+            <pre><code language="language-java" class="language-java">// Bad: Logs password!
+logger.info(&#34;User login: username={}, password={}&#34;, username, password);
+
+// Good: Mask or omit sensitive data
+logger.info(&#34;User login: username={}&#34;, username);
+
+// Good: Sanitized data
+logger.info(&#34;Credit card payment: cardNumber={}&#34;, maskCardNumber(cardNumber));
+
+private String maskCardNumber(String cardNumber) {
+    return &#34;**** **** **** &#34; + cardNumber.substring(cardNumber.length() - 4);
+}
+</code></pre>
+            <h2 is-upgraded>5. Use Appropriate Log Levels</h2>
+            <pre><code language="language-java" class="language-java">public class OrderService {
+    private static final Logger logger = LogManager.getLogger(OrderService.class);
+    
+    public void processOrder(Order order) {
+        // DEBUG: Detailed information for troubleshooting
+        logger.debug(&#34;Processing order: {}&#34;, order);
+        
+        // INFO: Important business events
+        logger.info(&#34;Order {} submitted by customer {}&#34;, 
+            order.getId(), order.getCustomerId());
+        
+        // WARN: Potential issues
+        if (order.getAmount() &gt; 10000) {
+            logger.warn(&#34;High-value order: orderId={}, amount={}&#34;, 
+                order.getId(), order.getAmount());
+        }
+        
+        try {
+            chargeCustomer(order);
+        } catch (PaymentException e) {
+            // ERROR: Recoverable errors
+            logger.error(&#34;Payment failed for order {}&#34;, order.getId(), e);
+            throw e;
+        } catch (Exception e) {
+            // FATAL: Critical errors
+            logger.fatal(&#34;Unexpected error processing order {}&#34;, order.getId(), e);
+            throw e;
+        }
+    }
+}
+</code></pre>
+            <h2 is-upgraded>6. Structured Logging with MDC</h2>
+            <pre><code language="language-java" class="language-java">import org.apache.logging.log4j.ThreadContext;
+
+public class RequestFilter {
+    public void doFilter(HttpServletRequest request) {
+        // Add context to all logs in this thread
+        ThreadContext.put(&#34;requestId&#34;, UUID.randomUUID().toString());
+        ThreadContext.put(&#34;userId&#34;, request.getUserId());
+        ThreadContext.put(&#34;ipAddress&#34;, request.getRemoteAddr());
+        
+        try {
+            // All logs will include this context
+            processRequest(request);
+        } finally {
+            // Clean up
+            ThreadContext.clearAll();
+        }
+    }
+}
+
+// Access MDC in pattern
+// Pattern: %d [%X{requestId}] [%X{userId}] %-5level %logger - %msg%n
+</code></pre>
+            <h2 is-upgraded>7. Performance Considerations</h2>
+            <pre><code language="language-java" class="language-java">// Use async appenders for high-throughput applications
+&lt;Async name=&#34;AsyncFile&#34;&gt;
+    &lt;AppenderRef ref=&#34;RollingFile&#34;/&gt;
+&lt;/Async&gt;
+
+// Avoid logging in tight loops
+for (int i = 0; i &lt; 1000000; i++) {
+    // Bad: Creates 1 million log entries
+    logger.debug(&#34;Processing item {}&#34;, i);
+}
+
+// Better: Log summary
+logger.debug(&#34;Processing {} items&#34;, items.size());
+// Log first/last or sampling
+if (i % 1000 == 0) {
+    logger.debug(&#34;Processed {} items so far&#34;, i);
+}
+</code></pre>
+            <h2 is-upgraded>8. Don&#39;t Log and Throw</h2>
+            <pre><code language="language-java" class="language-java">// Bad: Double logging
+try {
+    processData();
+} catch (Exception e) {
+    logger.error(&#34;Error processing data&#34;, e);
+    throw e;  // Caller will log again!
+}
+
+// Good: Log OR throw, not both
+try {
+    processData();
+} catch (Exception e) {
+    // Either log and handle
+    logger.error(&#34;Error processing data, using fallback&#34;, e);
+    return fallbackValue;
+    
+    // OR just throw (let caller decide what to log)
+    throw new ProcessingException(&#34;Failed to process data&#34;, e);
+}
+</code></pre>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Build Logged Application" duration="10">
+            <p>Let&#39;s add comprehensive logging to a complete application!</p>
+            <p>Create <code>BankingApplication.java</code>:</p>
+            <pre><code language="language-java" class="language-java">import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.ThreadContext;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.concurrent.*;
+
+class Transaction {
+    private String id;
+    private String accountId;
+    private BigDecimal amount;
+    private String type;
+    private LocalDateTime timestamp;
+    
+    public Transaction(String id, String accountId, BigDecimal amount, String type) {
+        this.id = id;
+        this.accountId = accountId;
+        this.amount = amount;
+        this.type = type;
+        this.timestamp = LocalDateTime.now();
+    }
+    
+    // Getters
+    public String getId() { return id; }
+    public String getAccountId() { return accountId; }
+    public BigDecimal getAmount() { return amount; }
+    public String getType() { return type; }
+    public LocalDateTime getTimestamp() { return timestamp; }
+    
+    @Override
+    public String toString() {
+        return String.format(&#34;Transaction{id=&#39;%s&#39;, account=&#39;%s&#39;, amount=%s, type=&#39;%s&#39;}&#34;, 
+            id, accountId, amount, type);
+    }
+}
+
+class Account {
+    private String id;
+    private String customerId;
+    private BigDecimal balance;
+    
+    public Account(String id, String customerId, BigDecimal balance) {
+        this.id = id;
+        this.customerId = customerId;
+        this.balance = balance;
+    }
+    
+    // Getters and setters
+    public String getId() { return id; }
+    public String getCustomerId() { return customerId; }
+    public BigDecimal getBalance() { return balance; }
+    public void setBalance(BigDecimal balance) { this.balance = balance; }
+}
+
+class TransactionService {
+    private static final Logger logger = LogManager.getLogger(TransactionService.class);
+    private final Map&lt;String, Account&gt; accounts = new ConcurrentHashMap&lt;&gt;();
+    
+    public TransactionService() {
+        // Initialize with sample accounts
+        accounts.put(&#34;ACC001&#34;, new Account(&#34;ACC001&#34;, &#34;CUST001&#34;, new BigDecimal(&#34;10000&#34;)));
+        accounts.put(&#34;ACC002&#34;, new Account(&#34;ACC002&#34;, &#34;CUST002&#34;, new BigDecimal(&#34;5000&#34;)));
+        logger.info(&#34;TransactionService initialized with {} accounts&#34;, accounts.size());
+    }
+    
+    public Transaction processTransaction(Transaction transaction) {
+        String txnId = transaction.getId();
+        
+        // Add transaction context to all logs
+        ThreadContext.put(&#34;transactionId&#34;, txnId);
+        ThreadContext.put(&#34;accountId&#34;, transaction.getAccountId());
+        
+        logger.info(&#34;Processing transaction: type={}, amount={}&#34;, 
+            transaction.getType(), transaction.getAmount());
+        
+        try {
+            // Validate transaction
+            validateTransaction(transaction);
+            
+            // Process based on type
+            switch (transaction.getType()) {
+                case &#34;DEPOSIT&#34;:
+                    processDeposit(transaction);
+                    break;
+                case &#34;WITHDRAWAL&#34;:
+                    processWithdrawal(transaction);
+                    break;
+                case &#34;TRANSFER&#34;:
+                    processTransfer(transaction);
+                    break;
+                default:
+                    logger.error(&#34;Unknown transaction type: {}&#34;, transaction.getType());
+                    throw new IllegalArgumentException(&#34;Unknown transaction type&#34;);
+            }
+            
+            logger.info(&#34;Transaction processed successfully: {}&#34;, txnId);
+            return transaction;
+            
+        } catch (InsufficientFundsException e) {
+            logger.warn(&#34;Transaction failed - insufficient funds: txnId={}, required={}, available={}&#34;, 
+                txnId, transaction.getAmount(), e.getAvailableBalance());
+            throw e;
+        } catch (Exception e) {
+            logger.error(&#34;Transaction processing failed: txnId={}&#34;, txnId, e);
+            throw e;
+        } finally {
+            ThreadContext.clearAll();
+        }
+    }
+    
+    private void validateTransaction(Transaction transaction) {
+        logger.debug(&#34;Validating transaction: {}&#34;, transaction.getId());
+        
+        if (transaction.getAmount().compareTo(BigDecimal.ZERO) &lt;= 0) {
+            logger.error(&#34;Invalid transaction amount: {}&#34;, transaction.getAmount());
+            throw new IllegalArgumentException(&#34;Amount must be positive&#34;);
+        }
+        
+        Account account = accounts.get(transaction.getAccountId());
+        if (account == null) {
+            logger.error(&#34;Account not found: {}&#34;, transaction.getAccountId());
+            throw new IllegalArgumentException(&#34;Account not found&#34;);
+        }
+        
+        logger.debug(&#34;Transaction validation passed&#34;);
+    }
+    
+    private void processDeposit(Transaction transaction) {
+        logger.debug(&#34;Processing deposit&#34;);
+        
+        Account account = accounts.get(transaction.getAccountId());
+        BigDecimal oldBalance = account.getBalance();
+        BigDecimal newBalance = oldBalance.add(transaction.getAmount());
+        
+        account.setBalance(newBalance);
+        
+        logger.info(&#34;Deposit completed: account={}, oldBalance={}, newBalance={}, amount={}&#34;, 
+            account.getId(), oldBalance, newBalance, transaction.getAmount());
+        
+        if (transaction.getAmount().compareTo(new BigDecimal(&#34;10000&#34;)) &gt; 0) {
+            logger.warn(&#34;Large deposit detected: amount={}, account={}&#34;, 
+                transaction.getAmount(), account.getId());
+        }
+    }
+    
+    private void processWithdrawal(Transaction transaction) {
+        logger.debug(&#34;Processing withdrawal&#34;);
+        
+        Account account = accounts.get(transaction.getAccountId());
+        BigDecimal oldBalance = account.getBalance();
+        
+        if (oldBalance.compareTo(transaction.getAmount()) &lt; 0) {
+            logger.warn(&#34;Insufficient funds: requested={}, available={}&#34;, 
+                transaction.getAmount(), oldBalance);
+            throw new InsufficientFundsException(&#34;Insufficient funds&#34;, oldBalance);
+        }
+        
+        BigDecimal newBalance = oldBalance.subtract(transaction.getAmount());
+        account.setBalance(newBalance);
+        
+        logger.info(&#34;Withdrawal completed: account={}, oldBalance={}, newBalance={}, amount={}&#34;, 
+            account.getId(), oldBalance, newBalance, transaction.getAmount());
+        
+        if (newBalance.compareTo(new BigDecimal(&#34;1000&#34;)) &lt; 0) {
+            logger.warn(&#34;Low balance alert: account={}, balance={}&#34;, 
+                account.getId(), newBalance);
+        }
+    }
+    
+    private void processTransfer(Transaction transaction) {
+        logger.debug(&#34;Processing transfer&#34;);
+        logger.info(&#34;Transfer not yet implemented&#34;);
+        throw new UnsupportedOperationException(&#34;Transfer not implemented&#34;);
+    }
+    
+    public Account getAccount(String accountId) {
+        logger.debug(&#34;Retrieving account: {}&#34;, accountId);
+        return accounts.get(accountId);
+    }
+}
+
+class InsufficientFundsException extends RuntimeException {
+    private final BigDecimal availableBalance;
+    
+    public InsufficientFundsException(String message, BigDecimal availableBalance) {
+        super(message);
+        this.availableBalance = availableBalance;
+    }
+    
+    public BigDecimal getAvailableBalance() {
+        return availableBalance;
+    }
+}
+
+public class BankingApplication {
+    private static final Logger logger = LogManager.getLogger(BankingApplication.class);
+    
+    public static void main(String[] args) {
+        logger.info(&#34;=&#34;.repeat(60));
+        logger.info(&#34;Banking Application Starting&#34;);
+        logger.info(&#34;=&#34;.repeat(60));
+        
+        TransactionService transactionService = new TransactionService();
+        
+        // Test scenarios
+        try {
+            // Scenario 1: Successful deposit
+            logger.info(&#34;\n--- Scenario 1: Successful Deposit ---&#34;);
+            Transaction deposit = new Transaction(&#34;TXN001&#34;, &#34;ACC001&#34;, 
+                new BigDecimal(&#34;1000&#34;), &#34;DEPOSIT&#34;);
+            transactionService.processTransaction(deposit);
+            
+            // Scenario 2: Successful withdrawal
+            logger.info(&#34;\n--- Scenario 2: Successful Withdrawal ---&#34;);
+            Transaction withdrawal = new Transaction(&#34;TXN002&#34;, &#34;ACC001&#34;, 
+                new BigDecimal(&#34;500&#34;), &#34;WITHDRAWAL&#34;);
+            transactionService.processTransaction(withdrawal);
+            
+            // Scenario 3: Large deposit (warning)
+            logger.info(&#34;\n--- Scenario 3: Large Deposit ---&#34;);
+            Transaction largeDeposit = new Transaction(&#34;TXN003&#34;, &#34;ACC002&#34;, 
+                new BigDecimal(&#34;15000&#34;), &#34;DEPOSIT&#34;);
+            transactionService.processTransaction(largeDeposit);
+            
+            // Scenario 4: Insufficient funds
+            logger.info(&#34;\n--- Scenario 4: Insufficient Funds ---&#34;);
+            Transaction overdraft = new Transaction(&#34;TXN004&#34;, &#34;ACC002&#34;, 
+                new BigDecimal(&#34;50000&#34;), &#34;WITHDRAWAL&#34;);
+            try {
+                transactionService.processTransaction(overdraft);
+            } catch (InsufficientFundsException e) {
+                logger.info(&#34;Transaction rejected as expected&#34;);
+            }
+            
+            // Scenario 5: Invalid transaction
+            logger.info(&#34;\n--- Scenario 5: Invalid Transaction ---&#34;);
+            Transaction invalid = new Transaction(&#34;TXN005&#34;, &#34;ACC999&#34;, 
+                new BigDecimal(&#34;100&#34;), &#34;DEPOSIT&#34;);
+            try {
+                transactionService.processTransaction(invalid);
+            } catch (IllegalArgumentException e) {
+                logger.info(&#34;Invalid transaction rejected as expected&#34;);
+            }
+            
+            // Display final balances
+            logger.info(&#34;\n--- Final Account Balances ---&#34;);
+            Account acc1 = transactionService.getAccount(&#34;ACC001&#34;);
+            Account acc2 = transactionService.getAccount(&#34;ACC002&#34;);
+            logger.info(&#34;Account {}: Balance = {}&#34;, acc1.getId(), acc1.getBalance());
+            logger.info(&#34;Account {}: Balance = {}&#34;, acc2.getId(), acc2.getBalance());
+            
+        } catch (Exception e) {
+            logger.fatal(&#34;Application encountered a fatal error&#34;, e);
+            System.exit(1);
+        }
+        
+        logger.info(&#34;\n&#34; + &#34;=&#34;.repeat(60));
+        logger.info(&#34;Banking Application Completed Successfully&#34;);
+        logger.info(&#34;=&#34;.repeat(60));
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Create log4j2.xml Configuration</h2>
+            <pre><code language="language-xml" class="language-xml">&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
+&lt;Configuration status=&#34;WARN&#34;&gt;
+    &lt;Properties&gt;
+        &lt;Property name=&#34;LOG_PATTERN&#34;&gt;
+            %d{yyyy-MM-dd HH:mm:ss.SSS} [%X{transactionId}] [%t] %-5level %logger{36} - %msg%n
+        &lt;/Property&gt;
+    &lt;/Properties&gt;
+    
+    &lt;Appenders&gt;
+        &lt;Console name=&#34;Console&#34; target=&#34;SYSTEM_OUT&#34;&gt;
+            &lt;PatternLayout&gt;
+                &lt;Pattern&gt;%d{HH:mm:ss.SSS} %highlight{%-5level} [%X{transactionId}] %logger{36} - %msg%n&lt;/Pattern&gt;
+            &lt;/PatternLayout&gt;
+        &lt;/Console&gt;
+        
+        &lt;RollingFile name=&#34;AppLog&#34;
+                     fileName=&#34;logs/banking-app.log&#34;
+                     filePattern=&#34;logs/banking-app-%d{yyyy-MM-dd}-%i.log.gz&#34;&gt;
+            &lt;PatternLayout pattern=&#34;${LOG_PATTERN}&#34;/&gt;
+            &lt;Policies&gt;
+                &lt;TimeBasedTriggeringPolicy /&gt;
+                &lt;SizeBasedTriggeringPolicy size=&#34;10MB&#34;/&gt;
+            &lt;/Policies&gt;
+            &lt;DefaultRolloverStrategy max=&#34;30&#34;/&gt;
+        &lt;/RollingFile&gt;
+        
+        &lt;RollingFile name=&#34;ErrorLog&#34;
+                     fileName=&#34;logs/banking-error.log&#34;
+                     filePattern=&#34;logs/banking-error-%d{yyyy-MM-dd}-%i.log.gz&#34;&gt;
+            &lt;PatternLayout pattern=&#34;${LOG_PATTERN}&#34;/&gt;
+            &lt;Policies&gt;
+                &lt;TimeBasedTriggeringPolicy /&gt;
+                &lt;SizeBasedTriggeringPolicy size=&#34;10MB&#34;/&gt;
+            &lt;/Policies&gt;
+            &lt;DefaultRolloverStrategy max=&#34;90&#34;/&gt;
+            &lt;ThresholdFilter level=&#34;WARN&#34; onMatch=&#34;ACCEPT&#34; onMismatch=&#34;DENY&#34;/&gt;
+        &lt;/RollingFile&gt;
+        
+        &lt;RollingFile name=&#34;TransactionLog&#34;
+                     fileName=&#34;logs/transactions.log&#34;
+                     filePattern=&#34;logs/transactions-%d{yyyy-MM-dd}-%i.log.gz&#34;&gt;
+            &lt;PatternLayout pattern=&#34;${LOG_PATTERN}&#34;/&gt;
+            &lt;Policies&gt;
+                &lt;TimeBasedTriggeringPolicy /&gt;
+                &lt;SizeBasedTriggeringPolicy size=&#34;10MB&#34;/&gt;
+            &lt;/Policies&gt;
+            &lt;DefaultRolloverStrategy max=&#34;365&#34;/&gt;
+        &lt;/RollingFile&gt;
+    &lt;/Appenders&gt;
+    
+    &lt;Loggers&gt;
+        &lt;Logger name=&#34;TransactionService&#34; level=&#34;DEBUG&#34; additivity=&#34;false&#34;&gt;
+            &lt;AppenderRef ref=&#34;Console&#34;/&gt;
+            &lt;AppenderRef ref=&#34;AppLog&#34;/&gt;
+            &lt;AppenderRef ref=&#34;ErrorLog&#34;/&gt;
+            &lt;AppenderRef ref=&#34;TransactionLog&#34;/&gt;
+        &lt;/Logger&gt;
+        
+        &lt;Root level=&#34;INFO&#34;&gt;
+            &lt;AppenderRef ref=&#34;Console&#34;/&gt;
+            &lt;AppenderRef ref=&#34;AppLog&#34;/&gt;
+            &lt;AppenderRef ref=&#34;ErrorLog&#34;/&gt;
+        &lt;/Root&gt;
+    &lt;/Loggers&gt;
+&lt;/Configuration&gt;
+</code></pre>
+            <h2 is-upgraded>Run and Observe</h2>
+            <pre>$ mvn compile
+$ mvn exec:java -Dexec.mainClass=&#34;BankingApplication&#34;
+
+14:30:45.123 INFO  [main] BankingApplication - ============================================================
+14:30:45.124 INFO  [main] BankingApplication - Banking Application Starting
+14:30:45.125 INFO  [main] BankingApplication - ============================================================
+14:30:45.126 INFO  [main] TransactionService - TransactionService initialized with 2 accounts
+14:30:45.127 INFO  [main] BankingApplication - 
+--- Scenario 1: Successful Deposit ---
+14:30:45.128 INFO  [TXN001] [main] TransactionService - Processing transaction: type=DEPOSIT, amount=1000
+...
+</pre>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Conclusion" duration="2">
+            <p>Congratulations! 🎉 You&#39;ve mastered logging with Log4j 2!</p>
+            <h2 is-upgraded>What You&#39;ve Learned</h2>
+            <ul>
+                <li>✅ <strong>Logging Levels:</strong> TRACE, DEBUG, INFO, WARN, ERROR, FATAL</li>
+                <li>✅ <strong>Log4j 2 Architecture:</strong> Loggers, Appenders, Layouts</li>
+                <li>✅ <strong>Configuration:</strong> XML and properties formats</li>
+                <li>✅ <strong>Appenders:</strong> Console, File, RollingFile, Async</li>
+                <li>✅ <strong>Patterns:</strong> Custom formatting with timestamps and context</li>
+                <li>✅ <strong>MDC:</strong> Mapped Diagnostic Context for request tracking</li>
+                <li>✅ <strong>Best Practices:</strong> Performance, security, structured logging</li>
+                <li>✅ <strong>Production Setup:</strong> Rolling files, log retention, async logging</li>
+            </ul>
+            <h2 is-upgraded>Key Takeaways</h2>
+            <ol type="1">
+                <li><strong>Never use System.out</strong> for production logging</li>
+                <li><strong>Use appropriate log levels</strong> - INFO for production default</li>
+                <li><strong>Parameterized logging</strong> prevents unnecessary string operations</li>
+                <li><strong>Always log exceptions</strong> with full stack traces</li>
+                <li><strong>Never log sensitive data</strong> (passwords, credit cards, etc.)</li>
+                <li><strong>Use MDC</strong> for request/transaction tracking</li>
+                <li><strong>Async appenders</strong> improve performance</li>
+                <li><strong>Rolling files</strong> prevent disk space issues</li>
+            </ol>
+            <h2 is-upgraded>Production Checklist</h2>
+            <ul>
+                <li>✅ Use RollingFile appenders with size/time policies</li>
+                <li>✅ Configure log retention (30-90 days typical)</li>
+                <li>✅ Separate error logs for monitoring</li>
+                <li>✅ Use async appenders for high-throughput</li>
+                <li>✅ Set appropriate log levels per package</li>
+                <li>✅ Include MDC context for tracing</li>
+                <li>✅ Implement log rotation and archiving</li>
+                <li>✅ Monitor log file sizes and disk usage</li>
+            </ul>
+            <h2 is-upgraded>Next Steps</h2>
+            <p>Continue to:</p>
+            <ul>
+                <li><strong>Codelab 2.5:</strong> IDE Debugging Mastery</li>
+                <li><strong>Codelab 3.1:</strong> Spring Boot (which integrates with Log4j 2)</li>
+                <li><strong>Codelab 4.1:</strong> Microservices with distributed tracing</li>
+            </ul>
+            <h2 is-upgraded>Additional Resources</h2>
+            <ul>
+                <li><a href="https://logging.apache.org/log4j/2.x/" target="_blank">Log4j 2 Documentation</a></li>
+                <li><a href="https://logging.apache.org/log4j/2.x/manual/configuration.html" target="_blank">Log4j 2
+                        Configuration</a></li>
+                <li><a href="https://logging.apache.org/log4j/2.x/performance.html" target="_blank">Log4j 2
+                        Performance</a></li>
+                <li><a href="https://12factor.net/logs" target="_blank">12-Factor App: Logs</a></li>
+            </ul>
+            <aside class="special">
+                <p><strong>Production Ready!</strong> Proper logging is essential for production systems. You now have
+                    the skills to implement enterprise-grade logging in any Java application!</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+    </google-codelab>
+
+    <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
+    <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
+    <script src="https://storage.googleapis.com/claat-public/prettify.js"></script>
+    <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
+    <script src="//support.google.com/inapp/api.js"></script>
+
+</body>
+
+</html>

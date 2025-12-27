@@ -1,0 +1,27 @@
+{
+  "environment": "web",
+  "format": "html",
+  "prefix": "https://storage.googleapis.com",
+  "mainga": "UA-49880327-14",
+  "updated": "2025-12-27T18:48:58+05:30",
+  "id": "spring-jms-event-driven",
+  "duration": 49,
+  "title": "Spring JMS \u0026 Event-Driven Architecture",
+  "summary": "Build event-driven architecture with Spring JMS, ActiveMQ Artemis, message queues, async task notifications, and event processing for scalable microservices",
+  "source": "codelab-3.7-spring-jms-event-driven.md",
+  "theme": "",
+  "status": [
+    "published"
+  ],
+  "category": [
+    "springboot",
+    "jms",
+    "messaging",
+    "event-driven",
+    "activemq"
+  ],
+  "tags": [
+    "web"
+  ],
+  "url": "spring-jms-event-driven"
+}

@@ -1,0 +1,26 @@
+{
+  "environment": "web",
+  "format": "html",
+  "prefix": "https://storage.googleapis.com",
+  "mainga": "UA-49880327-14",
+  "updated": "2025-12-27T18:48:58+05:30",
+  "id": "spring-core-boot-basics",
+  "duration": 82,
+  "title": "Spring Core \u0026 Spring Boot Basics",
+  "summary": "Master Spring Core concepts including Dependency Injection, IoC, and Spring Boot basics by building the foundation of a Task Management API",
+  "source": "codelab-3.1-spring-core-boot-basics.md",
+  "theme": "",
+  "status": [
+    "published"
+  ],
+  "category": [
+    "springboot",
+    "springcore",
+    "dependencyinjection",
+    "restapi"
+  ],
+  "tags": [
+    "web"
+  ],
+  "url": "spring-core-boot-basics"
+}

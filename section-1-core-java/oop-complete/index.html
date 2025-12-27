@@ -1,0 +1,1534 @@
+<!doctype html>
+
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+    <meta name="theme-color" content="#4F7DC9">
+    <meta charset="UTF-8">
+    <title>Object-Oriented Programming Complete</title>
+    <link rel="stylesheet"
+        href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
+    <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
+    <style>
+        .success {
+            color: #1e8e3e;
+        }
+
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+    <google-codelab-analytics gaid="UA-49880327-14"></google-codelab-analytics>
+    <google-codelab codelab-gaid="" id="oop-complete" title="Object-Oriented Programming Complete" environment="web"
+        feedback-link="">
+
+        <google-codelab-step label="Introduction" duration="3">
+            <p>Object-Oriented Programming (OOP) is the cornerstone of Java development. In this codelab, you&#39;ll
+                master all essential OOP concepts by building real-world applications that demonstrate the power of
+                objects, inheritance, and polymorphism.</p>
+            <h2 class="checklist" is-upgraded>What You&#39;ll Learn</h2>
+            <ul class="checklist">
+                <li>Classes, objects, fields, and methods</li>
+                <li>Constructors and the <code>this</code> keyword</li>
+                <li>Inheritance with <code>extends</code> and the <code>super</code> keyword</li>
+                <li>Interfaces and <code>implements</code> keyword</li>
+                <li>Abstract classes and methods</li>
+                <li>Method overloading and overriding</li>
+                <li>Polymorphism in action</li>
+                <li>Packages and access modifiers</li>
+                <li>Encapsulation and data hiding</li>
+            </ul>
+            <h2 is-upgraded>What You&#39;ll Build</h2>
+            <ol type="1">
+                <li><strong>Banking System</strong> - Complete account hierarchy with savings, checking accounts</li>
+                <li><strong>Animal Simulation</strong> - Abstract classes with multiple interfaces (Flyable, Swimmable)
+                </li>
+                <li><strong>Multi-package Structure</strong> - Professional project organization</li>
+            </ol>
+            <h2 is-upgraded>Prerequisites</h2>
+            <ul>
+                <li>Completed Codelab 1.1 (Java Fundamentals &amp; Control Flow)</li>
+                <li>Understanding of variables, methods, and control flow</li>
+                <li>Java JDK 17+ installed</li>
+                <li>IDE or text editor ready</li>
+            </ul>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Understanding Classes and Objects" duration="12">
+            <p>Everything in Java is an object (except primitives). Let&#39;s understand the building blocks.</p>
+            <h2 is-upgraded>What are Classes and Objects?</h2>
+            <p><strong>Class:</strong> A blueprint/template for creating objects <strong>Object:</strong> An instance of
+                a class with actual data</p>
+            <p>Think of it like:</p>
+            <ul>
+                <li><strong>Class = Cookie Cutter</strong> (the template)</li>
+                <li><strong>Object = Cookie</strong> (the actual thing you create)</li>
+            </ul>
+            <h2 is-upgraded>Creating Your First Class</h2>
+            <p>Create a file <code>Person.java</code>:</p>
+            <pre><code language="language-java" class="language-java">public class Person {
+    // Fields (instance variables)
+    String name;
+    int age;
+    String email;
+
+    // Method
+    void displayInfo() {
+        System.out.println(&#34;Name: &#34; + name);
+        System.out.println(&#34;Age: &#34; + age);
+        System.out.println(&#34;Email: &#34; + email);
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Creating and Using Objects</h2>
+            <p>Create <code>PersonDemo.java</code>:</p>
+            <pre><code language="language-java" class="language-java">public class PersonDemo {
+    public static void main(String[] args) {
+        // Creating objects
+        Person person1 = new Person();
+        person1.name = &#34;Alice&#34;;
+        person1.age = 25;
+        person1.email = &#34;alice@example.com&#34;;
+
+        Person person2 = new Person();
+        person2.name = &#34;Bob&#34;;
+        person2.age = 30;
+        person2.email = &#34;bob@example.com&#34;;
+
+        // Using objects
+        person1.displayInfo();
+        System.out.println();
+        person2.displayInfo();
+    }
+}
+</code></pre>
+            <p>Run it:</p>
+            <pre>$ javac Person.java PersonDemo.java
+$ java PersonDemo
+Name: Alice
+Age: 25
+Email: alice@example.com
+
+Name: Bob
+Age: 30
+Email: bob@example.com
+</pre>
+            <aside class="special">
+                <p><strong>Key Insight:</strong> Each object has its own copy of instance variables.
+                    <code>person1</code> and <code>person2</code> have independent <code>name</code>, <code>age</code>,
+                    and <code>email</code> values!</p>
+            </aside>
+            <h2 is-upgraded>Constructors</h2>
+            <p>Constructors initialize objects. They have the same name as the class and no return type.</p>
+            <p><strong>Update Person.java:</strong></p>
+            <pre><code language="language-java" class="language-java">public class Person {
+    String name;
+    int age;
+    String email;
+
+    // Default constructor
+    public Person() {
+        this.name = &#34;Unknown&#34;;
+        this.age = 0;
+        this.email = &#34;not.provided@example.com&#34;;
+    }
+
+    // Parameterized constructor
+    public Person(String name, int age, String email) {
+        this.name = name;
+        this.age = age;
+        this.email = email;
+    }
+
+    // Constructor with partial parameters
+    public Person(String name, int age) {
+        this.name = name;
+        this.age = age;
+        this.email = &#34;not.provided@example.com&#34;;
+    }
+
+    void displayInfo() {
+        System.out.println(&#34;Name: &#34; + name);
+        System.out.println(&#34;Age: &#34; + age);
+        System.out.println(&#34;Email: &#34; + email);
+    }
+}
+</code></pre>
+            <p><strong>Using constructors:</strong></p>
+            <pre><code language="language-java" class="language-java">public class PersonDemo {
+    public static void main(String[] args) {
+        Person p1 = new Person();  // Default constructor
+        Person p2 = new Person(&#34;Charlie&#34;, 28, &#34;charlie@example.com&#34;);
+        Person p3 = new Person(&#34;Diana&#34;, 32);
+
+        p1.displayInfo();
+        System.out.println();
+        p2.displayInfo();
+        System.out.println();
+        p3.displayInfo();
+    }
+}
+</code></pre>
+            <h2 is-upgraded>The <code>this</code> Keyword</h2>
+            <p><code>this</code> refers to the current object instance:</p>
+            <pre><code language="language-java" class="language-java">public Person(String name, int age, String email) {
+    this.name = name;      // this.name = instance variable
+    this.age = age;        // age = parameter
+    this.email = email;
+}
+</code></pre>
+            <p><strong>Constructor chaining with </strong></p>
+            <p><strong><code>this()</code></strong></p>
+            <p><strong>:</strong></p>
+            <pre><code language="language-java" class="language-java">public Person(String name, int age) {
+    this(name, age, &#34;not.provided@example.com&#34;);  // Calls 3-param constructor
+}
+</code></pre>
+            <aside class="special">
+                <p><strong>Best Practice:</strong> Use <code>this</code> to distinguish between instance variables and
+                    parameters with the same name.</p>
+            </aside>
+            <h2 is-upgraded>Access Modifiers</h2>
+            <p>Control who can access your class members:</p>
+            <table>
+                <tr>
+                    <td colspan="1" rowspan="1">
+                        <p>Modifier</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>Class</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>Package</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>Subclass</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>World</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="1" rowspan="1">
+                        <p><code>public</code></p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>✅</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>✅</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>✅</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>✅</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="1" rowspan="1">
+                        <p><code>protected</code></p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>✅</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>✅</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>✅</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>❌</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="1" rowspan="1">
+                        <p>default (no modifier)</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>✅</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>✅</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>❌</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>❌</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="1" rowspan="1">
+                        <p><code>private</code></p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>✅</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>❌</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>❌</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>❌</p>
+                    </td>
+                </tr>
+            </table>
+            <p><strong>Encapsulation with private fields:</strong></p>
+            <pre><code language="language-java" class="language-java">public class Person {
+    private String name;
+    private int age;
+    private String email;
+
+    public Person(String name, int age, String email) {
+        this.name = name;
+        setAge(age);  // Use setter for validation
+        this.email = email;
+    }
+
+    // Getters
+    public String getName() {
+        return name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    // Setters with validation
+    public void setName(String name) {
+        if (name != null &amp;&amp; !name.trim().isEmpty()) {
+            this.name = name;
+        }
+    }
+
+    public void setAge(int age) {
+        if (age &gt;= 0 &amp;&amp; age &lt;= 150) {
+            this.age = age;
+        }
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+}
+</code></pre>
+            <aside class="warning">
+                <p><strong>Important:</strong> Always make fields <code>private</code> and provide <code>public</code>
+                    getters/setters. This is encapsulation - hiding internal state and controlling access.</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Method Overloading" duration="8">
+            <p>Method overloading allows multiple methods with the same name but different parameters.</p>
+            <h2 is-upgraded>Overloading Rules</h2>
+            <p>Methods can be overloaded by:</p>
+            <ol type="1">
+                <li><strong>Number of parameters</strong></li>
+                <li><strong>Type of parameters</strong></li>
+                <li><strong>Order of parameters</strong></li>
+            </ol>
+            <p><strong>NOT by return type alone!</strong></p>
+            <h2 is-upgraded>Practical Example</h2>
+            <p>Create <code>Calculator.java</code>:</p>
+            <pre><code language="language-java" class="language-java">public class Calculator {
+
+    // Add two integers
+    public int add(int a, int b) {
+        return a + b;
+    }
+
+    // Add three integers
+    public int add(int a, int b, int c) {
+        return a + b + c;
+    }
+
+    // Add two doubles
+    public double add(double a, double b) {
+        return a + b;
+    }
+
+    // Add array of integers
+    public int add(int[] numbers) {
+        int sum = 0;
+        for (int num : numbers) {
+            sum += num;
+        }
+        return sum;
+    }
+
+    // Concatenate strings (still called &#34;add&#34;)
+    public String add(String a, String b) {
+        return a + b;
+    }
+}
+</code></pre>
+            <p><strong>Using overloaded methods:</strong></p>
+            <pre><code language="language-java" class="language-java">public class CalculatorDemo {
+    public static void main(String[] args) {
+        Calculator calc = new Calculator();
+
+        System.out.println(calc.add(5, 3));              // 8
+        System.out.println(calc.add(5, 3, 2));           // 10
+        System.out.println(calc.add(5.5, 3.2));          // 8.7
+        System.out.println(calc.add(new int[]{1, 2, 3, 4})); // 10
+        System.out.println(calc.add(&#34;Hello&#34;, &#34; World&#34;)); // Hello World
+    }
+}
+</code></pre>
+            <aside class="special">
+                <p><strong>Compiler Magic:</strong> Java automatically selects the right method based on the arguments
+                    you pass. This is called <strong>compile-time polymorphism</strong> or <strong>static
+                        binding</strong>.</p>
+            </aside>
+            <h2 is-upgraded>Constructor Overloading</h2>
+            <p>You&#39;ve already seen this with Person class constructors!</p>
+            <pre><code language="language-java" class="language-java">public Person() { ... }
+public Person(String name, int age) { ... }
+public Person(String name, int age, String email) { ... }
+</code></pre>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Inheritance" duration="15">
+            <p>Inheritance allows a class to inherit properties and methods from another class, promoting code reuse.
+            </p>
+            <h2 is-upgraded>Basic Inheritance with <code>extends</code></h2>
+            <p>Create the banking system foundation:</p>
+            <p><strong>Account.java (Parent/Superclass):</strong></p>
+            <pre><code language="language-java" class="language-java">public class Account {
+    protected String accountNumber;
+    protected String accountHolder;
+    protected double balance;
+
+    public Account(String accountNumber, String accountHolder, double initialBalance) {
+        this.accountNumber = accountNumber;
+        this.accountHolder = accountHolder;
+        this.balance = initialBalance;
+    }
+
+    public void deposit(double amount) {
+        if (amount &gt; 0) {
+            balance += amount;
+            System.out.println(&#34;Deposited: $&#34; + amount);
+            System.out.println(&#34;New balance: $&#34; + balance);
+        }
+    }
+
+    public void withdraw(double amount) {
+        if (amount &gt; 0 &amp;&amp; amount &lt;= balance) {
+            balance -= amount;
+            System.out.println(&#34;Withdrawn: $&#34; + amount);
+            System.out.println(&#34;New balance: $&#34; + balance);
+        } else {
+            System.out.println(&#34;Insufficient funds!&#34;);
+        }
+    }
+
+    public void displayInfo() {
+        System.out.println(&#34;Account Number: &#34; + accountNumber);
+        System.out.println(&#34;Account Holder: &#34; + accountHolder);
+        System.out.println(&#34;Balance: $&#34; + balance);
+    }
+
+    public double getBalance() {
+        return balance;
+    }
+}
+</code></pre>
+            <p><strong>SavingsAccount.java (Child/Subclass):</strong></p>
+            <pre><code language="language-java" class="language-java">public class SavingsAccount extends Account {
+    private double interestRate;
+    private int withdrawalLimit;
+    private int withdrawalCount;
+
+    public SavingsAccount(String accountNumber, String accountHolder,
+                          double initialBalance, double interestRate) {
+        super(accountNumber, accountHolder, initialBalance);  // Call parent constructor
+        this.interestRate = interestRate;
+        this.withdrawalLimit = 3;
+        this.withdrawalCount = 0;
+    }
+
+    // Method overriding
+    @Override
+    public void withdraw(double amount) {
+        if (withdrawalCount &gt;= withdrawalLimit) {
+            System.out.println(&#34;Withdrawal limit reached for this period!&#34;);
+            return;
+        }
+
+        super.withdraw(amount);  // Call parent method
+        withdrawalCount++;
+    }
+
+    // New method specific to SavingsAccount
+    public void applyInterest() {
+        double interest = balance * (interestRate / 100);
+        balance += interest;
+        System.out.println(&#34;Interest applied: $&#34; + interest);
+        System.out.println(&#34;New balance: $&#34; + balance);
+    }
+
+    public void resetWithdrawalCount() {
+        withdrawalCount = 0;
+        System.out.println(&#34;Withdrawal count reset.&#34;);
+    }
+
+    @Override
+    public void displayInfo() {
+        super.displayInfo();  // Call parent method
+        System.out.println(&#34;Interest Rate: &#34; + interestRate + &#34;%&#34;);
+        System.out.println(&#34;Withdrawals: &#34; + withdrawalCount + &#34;/&#34; + withdrawalLimit);
+    }
+}
+</code></pre>
+            <p><strong>CheckingAccount.java:</strong></p>
+            <pre><code language="language-java" class="language-java">public class CheckingAccount extends Account {
+    private double overdraftLimit;
+    private double overdraftFee;
+
+    public CheckingAccount(String accountNumber, String accountHolder,
+                           double initialBalance, double overdraftLimit) {
+        super(accountNumber, accountHolder, initialBalance);
+        this.overdraftLimit = overdraftLimit;
+        this.overdraftFee = 35.0;
+    }
+
+    @Override
+    public void withdraw(double amount) {
+        if (amount &gt; 0 &amp;&amp; amount &lt;= (balance + overdraftLimit)) {
+            balance -= amount;
+            System.out.println(&#34;Withdrawn: $&#34; + amount);
+
+            if (balance &lt; 0) {
+                balance -= overdraftFee;
+                System.out.println(&#34;Overdraft fee charged: $&#34; + overdraftFee);
+                System.out.println(&#34;You are in overdraft!&#34;);
+            }
+
+            System.out.println(&#34;New balance: $&#34; + balance);
+        } else {
+            System.out.println(&#34;Transaction denied - exceeds overdraft limit!&#34;);
+        }
+    }
+
+    public void displayOverdraftInfo() {
+        System.out.println(&#34;Overdraft Limit: $&#34; + overdraftLimit);
+        System.out.println(&#34;Overdraft Fee: $&#34; + overdraftFee);
+    }
+
+    @Override
+    public void displayInfo() {
+        super.displayInfo();
+        displayOverdraftInfo();
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Using the Inheritance Hierarchy</h2>
+            <p><strong>BankDemo.java:</strong></p>
+            <pre><code language="language-java" class="language-java">public class BankDemo {
+    public static void main(String[] args) {
+        // Create accounts
+        SavingsAccount savings = new SavingsAccount(&#34;SAV-001&#34;, &#34;Alice&#34;, 1000.0, 3.5);
+        CheckingAccount checking = new CheckingAccount(&#34;CHK-001&#34;, &#34;Bob&#34;, 500.0, 200.0);
+
+        System.out.println(&#34;=== SAVINGS ACCOUNT ===&#34;);
+        savings.displayInfo();
+        System.out.println();
+
+        savings.deposit(500);
+        System.out.println();
+
+        savings.withdraw(200);
+        savings.withdraw(100);
+        savings.withdraw(50);
+        savings.withdraw(25);  // Should exceed limit
+        System.out.println();
+
+        savings.applyInterest();
+        System.out.println();
+
+        System.out.println(&#34;=== CHECKING ACCOUNT ===&#34;);
+        checking.displayInfo();
+        System.out.println();
+
+        checking.withdraw(600);  // Goes into overdraft
+        System.out.println();
+
+        checking.displayInfo();
+    }
+}
+</code></pre>
+            <h2 is-upgraded>The <code>super</code> Keyword</h2>
+            <p><code>super</code> refers to the parent class:</p>
+            <ol type="1">
+                <li><strong>Call parent constructor:
+                    </strong><code>super(accountNumber, accountHolder, initialBalance);</code></li>
+                <li><strong>Call parent method: </strong><code>super.withdraw(amount);</code></li>
+                <li><strong>Access parent field: </strong><code>super.balance</code> (if not private)</li>
+            </ol>
+            <aside class="warning">
+                <p><strong>Important: </strong><code>super()</code> must be the first statement in a constructor if
+                    used.</p>
+            </aside>
+            <h2 is-upgraded>Method Overriding</h2>
+            <p><strong>Rules for overriding:</strong></p>
+            <ol type="1">
+                <li>Same method signature (name, parameters, return type)</li>
+                <li>Cannot reduce access level (can increase)</li>
+                <li>Use <code>@Override</code> annotation (recommended)</li>
+                <li>Cannot override <code>final</code>, <code>static</code>, or <code>private</code> methods</li>
+            </ol>
+            <pre><code language="language-java" class="language-java">@Override
+public void withdraw(double amount) {
+    // Custom implementation
+}
+</code></pre>
+            <aside class="special">
+                <p><strong>Best Practice:</strong> Always use <code>@Override</code> annotation. It helps catch errors
+                    at compile-time if you accidentally change the signature.</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Abstract Classes and Methods" duration="12">
+            <p>Abstract classes provide a template for subclasses but cannot be instantiated themselves.</p>
+            <h2 is-upgraded>When to Use Abstract Classes</h2>
+            <p>Use abstract classes when:</p>
+            <ul>
+                <li>You want to share code among related classes</li>
+                <li>You expect subclasses to have common methods but different implementations</li>
+                <li>You want to define non-public members (interfaces can&#39;t)</li>
+            </ul>
+            <h2 is-upgraded>Creating an Abstract Animal Hierarchy</h2>
+            <p><strong>Animal.java (Abstract Base Class):</strong></p>
+            <pre><code language="language-java" class="language-java">public abstract class Animal {
+    protected String name;
+    protected int age;
+    protected double weight;
+
+    public Animal(String name, int age, double weight) {
+        this.name = name;
+        this.age = age;
+        this.weight = weight;
+    }
+
+    // Abstract method - no implementation
+    public abstract void makeSound();
+
+    // Abstract method
+    public abstract void move();
+
+    // Concrete method - has implementation
+    public void eat(String food) {
+        System.out.println(name + &#34; is eating &#34; + food);
+        weight += 0.1;
+    }
+
+    public void sleep() {
+        System.out.println(name + &#34; is sleeping... Zzz&#34;);
+    }
+
+    public void displayInfo() {
+        System.out.println(&#34;Name: &#34; + name);
+        System.out.println(&#34;Age: &#34; + age + &#34; years&#34;);
+        System.out.println(&#34;Weight: &#34; + weight + &#34; kg&#34;);
+    }
+
+    // Getters
+    public String getName() { return name; }
+    public int getAge() { return age; }
+    public double getWeight() { return weight; }
+}
+</code></pre>
+            <p><strong>Dog.java:</strong></p>
+            <pre><code language="language-java" class="language-java">public class Dog extends Animal {
+    private String breed;
+
+    public Dog(String name, int age, double weight, String breed) {
+        super(name, age, weight);
+        this.breed = breed;
+    }
+
+    @Override
+    public void makeSound() {
+        System.out.println(name + &#34; says: Woof! Woof!&#34;);
+    }
+
+    @Override
+    public void move() {
+        System.out.println(name + &#34; is running on four legs!&#34;);
+    }
+
+    public void fetch() {
+        System.out.println(name + &#34; is fetching the ball!&#34;);
+    }
+
+    @Override
+    public void displayInfo() {
+        super.displayInfo();
+        System.out.println(&#34;Breed: &#34; + breed);
+    }
+}
+</code></pre>
+            <p><strong>Cat.java:</strong></p>
+            <pre><code language="language-java" class="language-java">public class Cat extends Animal {
+    private boolean isIndoor;
+
+    public Cat(String name, int age, double weight, boolean isIndoor) {
+        super(name, age, weight);
+        this.isIndoor = isIndoor;
+    }
+
+    @Override
+    public void makeSound() {
+        System.out.println(name + &#34; says: Meow! Meow!&#34;);
+    }
+
+    @Override
+    public void move() {
+        System.out.println(name + &#34; is walking gracefully!&#34;);
+    }
+
+    public void scratch() {
+        System.out.println(name + &#34; is scratching the furniture!&#34;);
+    }
+
+    @Override
+    public void displayInfo() {
+        super.displayInfo();
+        System.out.println(&#34;Indoor cat: &#34; + (isIndoor ? &#34;Yes&#34; : &#34;No&#34;));
+    }
+}
+</code></pre>
+            <p><strong>Bird.java:</strong></p>
+            <pre><code language="language-java" class="language-java">public class Bird extends Animal {
+    private double wingSpan;
+
+    public Bird(String name, int age, double weight, double wingSpan) {
+        super(name, age, weight);
+        this.wingSpan = wingSpan;
+    }
+
+    @Override
+    public void makeSound() {
+        System.out.println(name + &#34; says: Tweet! Tweet!&#34;);
+    }
+
+    @Override
+    public void move() {
+        System.out.println(name + &#34; is flying through the sky!&#34;);
+    }
+
+    public void fly() {
+        System.out.println(name + &#34; spreads wings (&#34; + wingSpan + &#34;m) and takes off!&#34;);
+    }
+
+    @Override
+    public void displayInfo() {
+        super.displayInfo();
+        System.out.println(&#34;Wing Span: &#34; + wingSpan + &#34; meters&#34;);
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Using Abstract Classes</h2>
+            <p><strong>AnimalDemo.java:</strong></p>
+            <pre><code language="language-java" class="language-java">public class AnimalDemo {
+    public static void main(String[] args) {
+        // Cannot do: Animal animal = new Animal(...); // ERROR!
+
+        Dog dog = new Dog(&#34;Buddy&#34;, 3, 25.5, &#34;Golden Retriever&#34;);
+        Cat cat = new Cat(&#34;Whiskers&#34;, 2, 4.2, true);
+        Bird bird = new Bird(&#34;Tweety&#34;, 1, 0.05, 0.3);
+
+        System.out.println(&#34;=== DOG ===&#34;);
+        dog.displayInfo();
+        dog.makeSound();
+        dog.move();
+        dog.fetch();
+        dog.eat(&#34;dog food&#34;);
+        dog.sleep();
+        System.out.println();
+
+        System.out.println(&#34;=== CAT ===&#34;);
+        cat.displayInfo();
+        cat.makeSound();
+        cat.move();
+        cat.scratch();
+        cat.eat(&#34;fish&#34;);
+        System.out.println();
+
+        System.out.println(&#34;=== BIRD ===&#34;);
+        bird.displayInfo();
+        bird.makeSound();
+        bird.move();
+        bird.fly();
+        bird.eat(&#34;seeds&#34;);
+    }
+}
+</code></pre>
+            <aside class="special">
+                <p><strong>Key Point:</strong> Abstract classes can&#39;t be instantiated, but you can have references
+                    of abstract type pointing to concrete objects (polymorphism).</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Interfaces" duration="15">
+            <p>Interfaces define a contract - what a class can do, not how it does it.</p>
+            <h2 is-upgraded>Interface Basics</h2>
+            <p><strong>Syntax:</strong></p>
+            <pre><code language="language-java" class="language-java">public interface InterfaceName {
+    // Abstract methods (public abstract by default)
+    void method1();
+    int method2(String param);
+
+    // Default methods (Java 8+)
+    default void defaultMethod() {
+        System.out.println(&#34;Default implementation&#34;);
+    }
+
+    // Static methods (Java 8+)
+    static void staticMethod() {
+        System.out.println(&#34;Static method&#34;);
+    }
+
+    // Constants (public static final by default)
+    int CONSTANT = 100;
+}
+</code></pre>
+            <h2 is-upgraded>Creating Ability Interfaces</h2>
+            <p><strong>Flyable.java:</strong></p>
+            <pre><code language="language-java" class="language-java">public interface Flyable {
+    void fly();
+    void land();
+
+    default void displayFlyingStatus() {
+        System.out.println(&#34;This creature can fly!&#34;);
+    }
+}
+</code></pre>
+            <p><strong>Swimmable.java:</strong></p>
+            <pre><code language="language-java" class="language-java">public interface Swimmable {
+    void swim();
+    void dive();
+
+    default void displaySwimmingStatus() {
+        System.out.println(&#34;This creature can swim!&#34;);
+    }
+}
+</code></pre>
+            <p><strong>Walkable.java:</strong></p>
+            <pre><code language="language-java" class="language-java">public interface Walkable {
+    void walk();
+    void run();
+}
+</code></pre>
+            <h2 is-upgraded>Implementing Multiple Interfaces</h2>
+            <p><strong>Duck.java (implements multiple interfaces):</strong></p>
+            <pre><code language="language-java" class="language-java">public class Duck extends Animal implements Flyable, Swimmable, Walkable {
+
+    public Duck(String name, int age, double weight) {
+        super(name, age, weight);
+    }
+
+    @Override
+    public void makeSound() {
+        System.out.println(name + &#34; says: Quack! Quack!&#34;);
+    }
+
+    @Override
+    public void move() {
+        System.out.println(name + &#34; can walk, swim, and fly!&#34;);
+    }
+
+    // Flyable interface methods
+    @Override
+    public void fly() {
+        System.out.println(name + &#34; is flying!&#34;);
+    }
+
+    @Override
+    public void land() {
+        System.out.println(name + &#34; is landing on water!&#34;);
+    }
+
+    // Swimmable interface methods
+    @Override
+    public void swim() {
+        System.out.println(name + &#34; is swimming gracefully!&#34;);
+    }
+
+    @Override
+    public void dive() {
+        System.out.println(name + &#34; is diving for fish!&#34;);
+    }
+
+    // Walkable interface methods
+    @Override
+    public void walk() {
+        System.out.println(name + &#34; is waddling on land!&#34;);
+    }
+
+    @Override
+    public void run() {
+        System.out.println(name + &#34; is running (waddling quickly)!&#34;);
+    }
+}
+</code></pre>
+            <p><strong>Fish.java:</strong></p>
+            <pre><code language="language-java" class="language-java">public class Fish extends Animal implements Swimmable {
+    private String species;
+
+    public Fish(String name, int age, double weight, String species) {
+        super(name, age, weight);
+        this.species = species;
+    }
+
+    @Override
+    public void makeSound() {
+        System.out.println(name + &#34; makes bubbles... glub glub!&#34;);
+    }
+
+    @Override
+    public void move() {
+        swim();
+    }
+
+    @Override
+    public void swim() {
+        System.out.println(name + &#34; is swimming through water!&#34;);
+    }
+
+    @Override
+    public void dive() {
+        System.out.println(name + &#34; is diving deeper!&#34;);
+    }
+
+    @Override
+    public void displayInfo() {
+        super.displayInfo();
+        System.out.println(&#34;Species: &#34; + species);
+    }
+}
+</code></pre>
+            <p><strong>Penguin.java:</strong></p>
+            <pre><code language="language-java" class="language-java">public class Penguin extends Animal implements Swimmable, Walkable {
+
+    public Penguin(String name, int age, double weight) {
+        super(name, age, weight);
+    }
+
+    @Override
+    public void makeSound() {
+        System.out.println(name + &#34; says: Honk! Honk!&#34;);
+    }
+
+    @Override
+    public void move() {
+        System.out.println(name + &#34; waddles and swims!&#34;);
+    }
+
+    @Override
+    public void swim() {
+        System.out.println(name + &#34; is swimming super fast underwater!&#34;);
+    }
+
+    @Override
+    public void dive() {
+        System.out.println(name + &#34; is diving deep for fish!&#34;);
+    }
+
+    @Override
+    public void walk() {
+        System.out.println(name + &#34; is waddling on ice!&#34;);
+    }
+
+    @Override
+    public void run() {
+        System.out.println(name + &#34; is sliding on its belly!&#34;);
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Interface Demo</h2>
+            <p><strong>InterfaceDemo.java:</strong></p>
+            <pre><code language="language-java" class="language-java">public class InterfaceDemo {
+    public static void main(String[] args) {
+        Duck duck = new Duck(&#34;Donald&#34;, 2, 1.5);
+        Fish fish = new Fish(&#34;Nemo&#34;, 1, 0.2, &#34;Clownfish&#34;);
+        Penguin penguin = new Penguin(&#34;Pingu&#34;, 3, 15.0);
+
+        System.out.println(&#34;=== DUCK (Flies, Swims, Walks) ===&#34;);
+        duck.displayInfo();
+        duck.makeSound();
+        duck.fly();
+        duck.swim();
+        duck.walk();
+        duck.displayFlyingStatus();
+        duck.displaySwimmingStatus();
+        System.out.println();
+
+        System.out.println(&#34;=== FISH (Swims only) ===&#34;);
+        fish.displayInfo();
+        fish.makeSound();
+        fish.swim();
+        fish.dive();
+        fish.displaySwimmingStatus();
+        System.out.println();
+
+        System.out.println(&#34;=== PENGUIN (Swims, Walks, no flying) ===&#34;);
+        penguin.displayInfo();
+        penguin.makeSound();
+        penguin.swim();
+        penguin.walk();
+        penguin.run();
+        System.out.println();
+
+        // Polymorphism with interfaces
+        System.out.println(&#34;=== POLYMORPHISM DEMO ===&#34;);
+        Swimmable[] swimmers = {duck, fish, penguin};
+
+        for (Swimmable swimmer : swimmers) {
+            if (swimmer instanceof Animal) {
+                System.out.println(((Animal) swimmer).getName() + &#34; can swim:&#34;);
+            }
+            swimmer.swim();
+        }
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Abstract Class vs Interface</h2>
+            <table>
+                <tr>
+                    <td colspan="1" rowspan="1">
+                        <p>Feature</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>Abstract Class</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>Interface</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="1" rowspan="1">
+                        <p>Multiple inheritance</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>No (single)</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>Yes (multiple)</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="1" rowspan="1">
+                        <p>Constructor</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>Yes</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>No</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="1" rowspan="1">
+                        <p>Fields</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>All types</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>Only public static final</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="1" rowspan="1">
+                        <p>Method types</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>Abstract + Concrete</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>Abstract + Default + Static</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="1" rowspan="1">
+                        <p>Access modifiers</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>All</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>Public only (methods)</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="1" rowspan="1">
+                        <p>When to use</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>IS-A relationship</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>CAN-DO behavior</p>
+                    </td>
+                </tr>
+            </table>
+            <aside class="special">
+                <p><strong>Rule of Thumb:</strong> Use abstract classes for shared code and common state. Use interfaces
+                    for defining capabilities/contracts.</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Polymorphism in Action" duration="12">
+            <p>Polymorphism means &#34;many forms&#34; - the ability of objects to take multiple forms.</p>
+            <h2 is-upgraded>Types of Polymorphism</h2>
+            <ol type="1">
+                <li><strong>Compile-time (Static):</strong> Method overloading</li>
+                <li><strong>Runtime (Dynamic):</strong> Method overriding</li>
+            </ol>
+            <h2 is-upgraded>Runtime Polymorphism Demo</h2>
+            <p><strong>Create a Zoo Management System:</strong></p>
+            <pre><code language="language-java" class="language-java">public class Zoo {
+    public static void main(String[] args) {
+        // Polymorphism: Parent reference, child objects
+        Animal[] animals = {
+            new Dog(&#34;Max&#34;, 4, 30.0, &#34;Labrador&#34;),
+            new Cat(&#34;Luna&#34;, 3, 5.0, true),
+            new Bird(&#34;Sky&#34;, 1, 0.1, 0.4),
+            new Duck(&#34;Daffy&#34;, 2, 1.8),
+            new Fish(&#34;Bubbles&#34;, 1, 0.3, &#34;Goldfish&#34;),
+            new Penguin(&#34;Skipper&#34;, 5, 18.0)
+        };
+
+        System.out.println(&#34;=== ZOO FEEDING TIME ===\n&#34;);
+
+        for (Animal animal : animals) {
+            System.out.println(&#34;--- &#34; + animal.getName() + &#34; ---&#34;);
+            animal.displayInfo();
+            animal.makeSound();  // Polymorphic call
+            animal.move();       // Polymorphic call
+            animal.eat(&#34;food&#34;);
+
+            // Type checking and casting
+            if (animal instanceof Flyable) {
+                System.out.println(animal.getName() + &#34; is a flyer!&#34;);
+                ((Flyable) animal).fly();
+            }
+
+            if (animal instanceof Swimmable) {
+                System.out.println(animal.getName() + &#34; is a swimmer!&#34;);
+                ((Swimmable) animal).swim();
+            }
+
+            System.out.println();
+        }
+
+        // Demonstrate polymorphic behavior
+        System.out.println(&#34;=== POLYMORPHIC METHOD CALLS ===\n&#34;);
+        feedAnimal(new Dog(&#34;Rover&#34;, 2, 20.0, &#34;Beagle&#34;));
+        feedAnimal(new Cat(&#34;Mittens&#34;, 1, 4.0, false));
+        feedAnimal(new Bird(&#34;Chirpy&#34;, 1, 0.08, 0.25));
+    }
+
+    // Polymorphic method - accepts any Animal
+    public static void feedAnimal(Animal animal) {
+        System.out.println(&#34;Feeding &#34; + animal.getName() + &#34;...&#34;);
+        animal.eat(&#34;nutritious food&#34;);
+        System.out.println();
+    }
+}
+</code></pre>
+            <h2 is-upgraded>The <code>instanceof</code> Operator</h2>
+            <p>Check object type at runtime:</p>
+            <pre><code language="language-java" class="language-java">if (animal instanceof Dog) {
+    Dog dog = (Dog) animal;
+    dog.fetch();
+}
+
+// Java 16+ pattern matching
+if (animal instanceof Dog dog) {
+    dog.fetch();  // Automatically cast!
+}
+</code></pre>
+            <aside class="special">
+                <p><strong>Modern Java:</strong> Use pattern matching with <code>instanceof</code> (Java 16+) to avoid
+                    explicit casting.</p>
+            </aside>
+            <h2 is-upgraded>Polymorphism Benefits</h2>
+            <ol type="1">
+                <li><strong>Flexibility:</strong> Write code that works with parent types</li>
+                <li><strong>Extensibility:</strong> Add new subclasses without changing existing code</li>
+                <li><strong>Maintainability:</strong> Single interface for multiple implementations</li>
+                <li><strong>Code Reuse:</strong> Write once, use with many types</li>
+            </ol>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Packages and Organization" duration="10">
+            <p>Packages organize classes into namespaces and prevent naming conflicts.</p>
+            <h2 is-upgraded>Creating Package Structure</h2>
+            <p><strong>Project structure:</strong></p>
+            <pre><code>banking-system/
+├── com/
+│   └── bank/
+│       ├── accounts/
+│       │   ├── Account.java
+│       │   ├── SavingsAccount.java
+│       │   └── CheckingAccount.java
+│       ├── services/
+│       │   ├── BankingService.java
+│       │   └── TransactionService.java
+│       └── models/
+│           ├── Customer.java
+│           └── Transaction.java
+└── Main.java
+</code></pre>
+            <h2 is-upgraded>Package Declaration and Import</h2>
+            <p><strong>com/bank/accounts/Account.java:</strong></p>
+            <pre><code language="language-java" class="language-java">package com.bank.accounts;
+
+public class Account {
+    protected String accountNumber;
+    protected String accountHolder;
+    protected double balance;
+
+    public Account(String accountNumber, String accountHolder, double initialBalance) {
+        this.accountNumber = accountNumber;
+        this.accountHolder = accountHolder;
+        this.balance = initialBalance;
+    }
+
+    public void deposit(double amount) {
+        if (amount &gt; 0) {
+            balance += amount;
+        }
+    }
+
+    public boolean withdraw(double amount) {
+        if (amount &gt; 0 &amp;&amp; amount &lt;= balance) {
+            balance -= amount;
+            return true;
+        }
+        return false;
+    }
+
+    public double getBalance() {
+        return balance;
+    }
+
+    public String getAccountNumber() {
+        return accountNumber;
+    }
+
+    public String getAccountHolder() {
+        return accountHolder;
+    }
+}
+</code></pre>
+            <p><strong>com/bank/models/Customer.java:</strong></p>
+            <pre><code language="language-java" class="language-java">package com.bank.models;
+
+import com.bank.accounts.Account;
+import java.util.ArrayList;
+import java.util.List;
+
+public class Customer {
+    private String customerId;
+    private String name;
+    private String email;
+    private List&lt;Account&gt; accounts;
+
+    public Customer(String customerId, String name, String email) {
+        this.customerId = customerId;
+        this.name = name;
+        this.email = email;
+        this.accounts = new ArrayList&lt;&gt;();
+    }
+
+    public void addAccount(Account account) {
+        accounts.add(account);
+    }
+
+    public List&lt;Account&gt; getAccounts() {
+        return accounts;
+    }
+
+    public double getTotalBalance() {
+        double total = 0;
+        for (Account account : accounts) {
+            total += account.getBalance();
+        }
+        return total;
+    }
+
+    // Getters
+    public String getCustomerId() { return customerId; }
+    public String getName() { return name; }
+    public String getEmail() { return email; }
+}
+</code></pre>
+            <p><strong>Main.java:</strong></p>
+            <pre><code language="language-java" class="language-java">import com.bank.accounts.*;
+import com.bank.models.Customer;
+
+public class Main {
+    public static void main(String[] args) {
+        Customer customer = new Customer(&#34;CUST-001&#34;, &#34;John Doe&#34;, &#34;john@example.com&#34;);
+
+        SavingsAccount savings = new SavingsAccount(&#34;SAV-001&#34;, &#34;John Doe&#34;, 5000.0, 3.5);
+        CheckingAccount checking = new CheckingAccount(&#34;CHK-001&#34;, &#34;John Doe&#34;, 2000.0, 500.0);
+
+        customer.addAccount(savings);
+        customer.addAccount(checking);
+
+        System.out.println(&#34;Customer: &#34; + customer.getName());
+        System.out.println(&#34;Total Balance: $&#34; + customer.getTotalBalance());
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Compiling with Packages</h2>
+            <pre>javac com/bank/accounts/*.java
+javac com/bank/models/*.java
+javac Main.java
+java Main
+</pre>
+            <aside class="special">
+                <p><strong>Best Practice:</strong> Use reverse domain name convention for packages:
+                    <code>com.company.project.module</code></p>
+            </aside>
+            <h2 is-upgraded>Import Statements</h2>
+            <pre><code language="language-java" class="language-java">// Import specific class
+import com.bank.accounts.Account;
+
+// Import all classes from package
+import com.bank.accounts.*;
+
+// Import static members
+import static java.lang.Math.PI;
+import static java.lang.Math.sqrt;
+</code></pre>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Complete Banking System" duration="8">
+            <p>Let&#39;s integrate everything into a complete, professional banking system.</p>
+            <h2 is-upgraded>Enhanced BankingService</h2>
+            <p><strong>com/bank/services/BankingService.java:</strong></p>
+            <pre><code language="language-java" class="language-java">package com.bank.services;
+
+import com.bank.accounts.*;
+import com.bank.models.Customer;
+import java.util.HashMap;
+import java.util.Map;
+
+public class BankingService {
+    private Map&lt;String, Customer&gt; customers;
+    private Map&lt;String, Account&gt; accounts;
+
+    public BankingService() {
+        this.customers = new HashMap&lt;&gt;();
+        this.accounts = new HashMap&lt;&gt;();
+    }
+
+    public void registerCustomer(Customer customer) {
+        customers.put(customer.getCustomerId(), customer);
+        System.out.println(&#34;Customer registered: &#34; + customer.getName());
+    }
+
+    public void openAccount(String customerId, Account account) {
+        Customer customer = customers.get(customerId);
+        if (customer != null) {
+            customer.addAccount(account);
+            accounts.put(account.getAccountNumber(), account);
+            System.out.println(&#34;Account opened: &#34; + account.getAccountNumber());
+        }
+    }
+
+    public void transfer(String fromAccountNum, String toAccountNum, double amount) {
+        Account fromAccount = accounts.get(fromAccountNum);
+        Account toAccount = accounts.get(toAccountNum);
+
+        if (fromAccount != null &amp;&amp; toAccount != null) {
+            if (fromAccount.withdraw(amount)) {
+                toAccount.deposit(amount);
+                System.out.println(&#34;Transfer successful: $&#34; + amount);
+                System.out.println(&#34;From &#34; + fromAccountNum + &#34; to &#34; + toAccountNum);
+            } else {
+                System.out.println(&#34;Transfer failed: Insufficient funds&#34;);
+            }
+        }
+    }
+
+    public void displayCustomerInfo(String customerId) {
+        Customer customer = customers.get(customerId);
+        if (customer != null) {
+            System.out.println(&#34;\n=== CUSTOMER INFO ===&#34;);
+            System.out.println(&#34;ID: &#34; + customer.getCustomerId());
+            System.out.println(&#34;Name: &#34; + customer.getName());
+            System.out.println(&#34;Email: &#34; + customer.getEmail());
+            System.out.println(&#34;Total Balance: $&#34; + customer.getTotalBalance());
+            System.out.println(&#34;\nAccounts:&#34;);
+            for (Account account : customer.getAccounts()) {
+                System.out.println(&#34;  - &#34; + account.getAccountNumber() +
+                                   &#34;: $&#34; + account.getBalance());
+            }
+        }
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Complete Demo</h2>
+            <p><strong>BankingSystemDemo.java:</strong></p>
+            <pre><code language="language-java" class="language-java">import com.bank.accounts.*;
+import com.bank.models.Customer;
+import com.bank.services.BankingService;
+
+public class BankingSystemDemo {
+    public static void main(String[] args) {
+        BankingService bank = new BankingService();
+
+        // Create customers
+        Customer alice = new Customer(&#34;CUST-001&#34;, &#34;Alice Johnson&#34;, &#34;alice@email.com&#34;);
+        Customer bob = new Customer(&#34;CUST-002&#34;, &#34;Bob Smith&#34;, &#34;bob@email.com&#34;);
+
+        bank.registerCustomer(alice);
+        bank.registerCustomer(bob);
+
+        // Open accounts
+        SavingsAccount aliceSavings = new SavingsAccount(&#34;SAV-001&#34;, &#34;Alice Johnson&#34;, 10000.0, 4.0);
+        CheckingAccount aliceChecking = new CheckingAccount(&#34;CHK-001&#34;, &#34;Alice Johnson&#34;, 3000.0, 1000.0);
+        CheckingAccount bobChecking = new CheckingAccount(&#34;CHK-002&#34;, &#34;Bob Smith&#34;, 5000.0, 500.0);
+
+        bank.openAccount(&#34;CUST-001&#34;, aliceSavings);
+        bank.openAccount(&#34;CUST-001&#34;, aliceChecking);
+        bank.openAccount(&#34;CUST-002&#34;, bobChecking);
+
+        // Perform transactions
+        System.out.println(&#34;\n=== TRANSACTIONS ===&#34;);
+        aliceSavings.deposit(2000);
+        aliceSavings.applyInterest();
+        aliceChecking.withdraw(500);
+
+        // Transfer money
+        System.out.println();
+        bank.transfer(&#34;CHK-001&#34;, &#34;CHK-002&#34;, 1000);
+
+        // Display customer info
+        bank.displayCustomerInfo(&#34;CUST-001&#34;);
+        bank.displayCustomerInfo(&#34;CUST-002&#34;);
+    }
+}
+</code></pre>
+            <p>Compile and run:</p>
+            <pre>javac -d bin com/bank/**/*.java BankingSystemDemo.java
+java -cp bin BankingSystemDemo
+</pre>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Conclusion" duration="3">
+            <p>Congratulations! 🎉 You&#39;ve mastered Object-Oriented Programming in Java!</p>
+            <h2 is-upgraded>What You&#39;ve Learned</h2>
+            <ul>
+                <li>✅ <strong>Classes and Objects:</strong> Creating blueprints and instances</li>
+                <li>✅ <strong>Constructors:</strong> Initializing objects with <code>this</code> keyword</li>
+                <li>✅ <strong>Encapsulation:</strong> Private fields with public getters/setters</li>
+                <li>✅ <strong>Inheritance:</strong> Code reuse with <code>extends</code> and <code>super</code></li>
+                <li>✅ <strong>Abstract Classes:</strong> Templates for related classes</li>
+                <li>✅ <strong>Interfaces:</strong> Contracts and multiple inheritance</li>
+                <li>✅ <strong>Polymorphism:</strong> Writing flexible, extensible code</li>
+                <li>✅ <strong>Packages:</strong> Organizing code professionally</li>
+                <li>✅ <strong>Method Overloading:</strong> Same name, different parameters</li>
+                <li>✅ <strong>Method Overriding:</strong> Customizing inherited behavior</li>
+            </ul>
+            <h2 is-upgraded>Key Takeaways</h2>
+            <ol type="1">
+                <li><strong>Encapsulation:</strong> Hide data, expose behavior</li>
+                <li><strong>Inheritance:</strong> IS-A relationship (Dog IS-A Animal)</li>
+                <li><strong>Interfaces:</strong> CAN-DO relationship (Duck CAN Fly)</li>
+                <li><strong>Polymorphism:</strong> Write once, use with many types</li>
+                <li><strong>Abstraction:</strong> Hide complexity, show essentials</li>
+                <li><strong>Packages:</strong> Organize and namespace your code</li>
+            </ol>
+            <h2 is-upgraded>Design Principles Applied</h2>
+            <ul>
+                <li><strong>Single Responsibility:</strong> Each class has one job</li>
+                <li><strong>Open/Closed:</strong> Open for extension, closed for modification</li>
+                <li><strong>Liskov Substitution:</strong> Subclass objects can replace parent objects</li>
+                <li><strong>Interface Segregation:</strong> Multiple specific interfaces &gt; one general</li>
+                <li><strong>Dependency Inversion:</strong> Depend on abstractions, not concretions</li>
+            </ul>
+            <h2 is-upgraded>Next Steps</h2>
+            <p>Continue your journey:</p>
+            <ul>
+                <li><strong>Codelab 1.3:</strong> Exception Handling &amp; File I/O</li>
+                <li><strong>Codelab 1.4:</strong> Collections Framework &amp; Generics</li>
+                <li><strong>Codelab 1.5:</strong> Memory Management &amp; Garbage Collection</li>
+            </ul>
+            <h2 is-upgraded>Practice Exercises</h2>
+            <p>Strengthen your OOP skills:</p>
+            <ol type="1">
+                <li><strong>Vehicle System:</strong> Create Car, Motorcycle, Truck with Engine, Driveable interface</li>
+                <li><strong>Shape Calculator:</strong> Abstract Shape class with Circle, Rectangle, Triangle</li>
+                <li><strong>University System:</strong> Student, Professor, Course with enrollment</li>
+                <li><strong>E-Commerce:</strong> Product, ElectronicsProduct, ClothingProduct with shopping cart</li>
+                <li><strong>Library System:</strong> Book, Member, Librarian with borrowing functionality</li>
+            </ol>
+            <h2 is-upgraded>Additional Resources</h2>
+            <ul>
+                <li><a href="https://docs.oracle.com/javase/tutorial/java/concepts/" target="_blank">Oracle Java OOP
+                        Tutorial</a></li>
+                <li><a href="https://www.oreilly.com/library/view/effective-java/9780134686097/"
+                        target="_blank">Effective Java by Joshua Bloch</a></li>
+                <li><a href="https://www.oreilly.com/library/view/head-first-design/0596007124/" target="_blank">Head
+                        First Design Patterns</a></li>
+                <li><a href="https://www.oreilly.com/library/view/clean-code-a/9780136083238/" target="_blank">Clean
+                        Code by Robert Martin</a></li>
+            </ul>
+            <aside class="special">
+                <p><strong>Excellent Work!</strong> OOP is the foundation of Java development. Master these concepts,
+                    and you&#39;ll write better, more maintainable code!</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+    </google-codelab>
+
+    <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
+    <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
+    <script src="https://storage.googleapis.com/claat-public/prettify.js"></script>
+    <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
+    <script src="//support.google.com/inapp/api.js"></script>
+
+</body>
+
+</html>

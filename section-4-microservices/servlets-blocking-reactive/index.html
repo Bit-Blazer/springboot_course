@@ -1,0 +1,1315 @@
+<!doctype html>
+
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+    <meta name="theme-color" content="#4F7DC9">
+    <meta charset="UTF-8">
+    <title>Servlets &amp; Blocking vs Reactive Stacks</title>
+    <link rel="stylesheet"
+        href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
+    <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
+    <style>
+        .success {
+            color: #1e8e3e;
+        }
+
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+    <google-codelab-analytics gaid="UA-49880327-14"></google-codelab-analytics>
+    <google-codelab codelab-gaid="" id="servlets-blocking-reactive" title="Servlets &amp; Blocking vs Reactive Stacks"
+        environment="web" feedback-link="">
+
+        <google-codelab-step label="Introduction" duration="3">
+            <p>Understand servlet containers, blocking vs reactive architectures, and when to use each approach.</p>
+            <h2 class="checklist" is-upgraded>What You&#39;ll Learn</h2>
+            <ul class="checklist">
+                <li><strong>Servlet API:</strong> HttpServlet, lifecycle, filters</li>
+                <li><strong>Servlet Containers:</strong> Tomcat architecture</li>
+                <li><strong>Blocking I/O:</strong> Thread-per-request model</li>
+                <li><strong>Reactive I/O:</strong> Event-loop model</li>
+                <li><strong>Spring MVC:</strong> Servlet-based blocking stack</li>
+                <li><strong>Spring WebFlux:</strong> Reactive non-blocking stack</li>
+                <li><strong>Performance:</strong> Load testing and comparison</li>
+                <li><strong>Best Practices:</strong> When to use each approach</li>
+            </ul>
+            <h2 is-upgraded>What You&#39;ll Build</h2>
+            <p>Same Task API three ways:</p>
+            <ol type="1">
+                <li><strong>Raw Servlet API</strong> - No Spring, manual JSON (Tomcat)</li>
+                <li><strong>Blocking Stack</strong> - Spring MVC + JDBC</li>
+                <li><strong>Reactive Stack</strong> - Spring WebFlux + R2DBC</li>
+            </ol>
+            <p>Then load test and compare!</p>
+            <h2 is-upgraded>Prerequisites</h2>
+            <ul>
+                <li>Completed Spring Boot codelabs</li>
+                <li>Understanding of REST APIs</li>
+                <li>Basic multithreading knowledge</li>
+                <li>JDK 17+, Maven 3.6+</li>
+                <li>Apache JMeter (for load testing)</li>
+            </ul>
+            <h2 is-upgraded>Blocking vs Reactive</h2>
+            <p><strong>Blocking (Thread-per-Request):</strong></p>
+            <pre><code>Request 1 → Thread 1 (blocked on I/O)
+Request 2 → Thread 2 (blocked on I/O)
+Request 3 → Thread 3 (blocked on I/O)
+...
+Request 200 → Need 200 threads!
+</code></pre>
+            <p><strong>Reactive (Event Loop):</strong></p>
+            <pre><code>Request 1 ──┐
+Request 2 ──┤
+Request 3 ──┼→ Event Loop (few threads) → Non-blocking I/O
+Request 4 ──┤
+Request 5 ──┘
+</code></pre>
+            <aside class="special">
+                <p><strong>Key Insight:</strong> Blocking uses thread-per-request. Reactive uses event loop with
+                    callbacks. Choose based on I/O characteristics!</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Raw Servlet API" duration="15">
+            <p>Build Task API with raw servlets to understand Spring&#39;s abstraction.</p>
+            <h2 is-upgraded>Project Setup</h2>
+            <p><strong>pom.xml:</strong></p>
+            <pre><code language="language-xml" class="language-xml">&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
+&lt;project xmlns=&#34;http://maven.apache.org/POM/4.0.0&#34;
+         xmlns:xsi=&#34;http://www.w3.org/2001/XMLSchema-instance&#34;
+         xsi:schemaLocation=&#34;http://maven.apache.org/POM/4.0.0 
+         http://maven.apache.org/xsd/maven-4.0.0.xsd&#34;&gt;
+    &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+    
+    &lt;groupId&gt;com.example&lt;/groupId&gt;
+    &lt;artifactId&gt;servlet-task-api&lt;/artifactId&gt;
+    &lt;version&gt;1.0.0&lt;/version&gt;
+    &lt;packaging&gt;war&lt;/packaging&gt;
+    
+    &lt;properties&gt;
+        &lt;maven.compiler.source&gt;17&lt;/maven.compiler.source&gt;
+        &lt;maven.compiler.target&gt;17&lt;/maven.compiler.target&gt;
+    &lt;/properties&gt;
+    
+    &lt;dependencies&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;jakarta.servlet&lt;/groupId&gt;
+            &lt;artifactId&gt;jakarta.servlet-api&lt;/artifactId&gt;
+            &lt;version&gt;6.0.0&lt;/version&gt;
+            &lt;scope&gt;provided&lt;/scope&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;com.google.code.gson&lt;/groupId&gt;
+            &lt;artifactId&gt;gson&lt;/artifactId&gt;
+            &lt;version&gt;2.10.1&lt;/version&gt;
+        &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+    
+    &lt;build&gt;
+        &lt;finalName&gt;servlet-task-api&lt;/finalName&gt;
+        &lt;plugins&gt;
+            &lt;plugin&gt;
+                &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+                &lt;artifactId&gt;maven-war-plugin&lt;/artifactId&gt;
+                &lt;version&gt;3.3.2&lt;/version&gt;
+            &lt;/plugin&gt;
+        &lt;/plugins&gt;
+    &lt;/build&gt;
+&lt;/project&gt;
+</code></pre>
+            <h2 is-upgraded>Task Model</h2>
+            <p><strong>src/main/java/com/example/servlet/model/Task.java:</strong></p>
+            <pre><code language="language-java" class="language-java">package com.example.servlet.model;
+
+public class Task {
+    private Long id;
+    private String title;
+    private String description;
+    private String status;
+    
+    public Task() {}
+    
+    public Task(Long id, String title, String description, String status) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+        this.status = status;
+    }
+    
+    // Getters and setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
+    
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+    
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+}
+</code></pre>
+            <h2 is-upgraded>Task Repository</h2>
+            <p><strong>src/main/java/com/example/servlet/repository/TaskRepository.java:</strong></p>
+            <pre><code language="language-java" class="language-java">package com.example.servlet.repository;
+
+import com.example.servlet.model.Task;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
+
+public class TaskRepository {
+    private static final TaskRepository INSTANCE = new TaskRepository();
+    private final Map&lt;Long, Task&gt; tasks = new ConcurrentHashMap&lt;&gt;();
+    private final AtomicLong idGenerator = new AtomicLong(1);
+    
+    private TaskRepository() {
+        // Initialize with sample data
+        createTask(new Task(null, &#34;Sample Task&#34;, &#34;Description&#34;, &#34;TODO&#34;));
+    }
+    
+    public static TaskRepository getInstance() {
+        return INSTANCE;
+    }
+    
+    public List&lt;Task&gt; findAll() {
+        return new ArrayList&lt;&gt;(tasks.values());
+    }
+    
+    public Optional&lt;Task&gt; findById(Long id) {
+        return Optional.ofNullable(tasks.get(id));
+    }
+    
+    public Task createTask(Task task) {
+        task.setId(idGenerator.getAndIncrement());
+        tasks.put(task.getId(), task);
+        return task;
+    }
+    
+    public boolean deleteTask(Long id) {
+        return tasks.remove(id) != null;
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Task Servlet</h2>
+            <p><strong>src/main/java/com/example/servlet/TaskServlet.java:</strong></p>
+            <pre><code language="language-java" class="language-java">package com.example.servlet;
+
+import com.example.servlet.model.Task;
+import com.example.servlet.repository.TaskRepository;
+import com.google.gson.Gson;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.*;
+import java.io.IOException;
+import java.util.stream.Collectors;
+
+@WebServlet(name = &#34;TaskServlet&#34;, urlPatterns = {&#34;/api/tasks&#34;, &#34;/api/tasks/*&#34;})
+public class TaskServlet extends HttpServlet {
+    
+    private final TaskRepository repository = TaskRepository.getInstance();
+    private final Gson gson = new Gson();
+    
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) 
+            throws ServletException, IOException {
+        
+        String pathInfo = req.getPathInfo();
+        resp.setContentType(&#34;application/json&#34;);
+        resp.setCharacterEncoding(&#34;UTF-8&#34;);
+        
+        if (pathInfo == null || pathInfo.equals(&#34;/&#34;)) {
+            // Get all tasks
+            String json = gson.toJson(repository.findAll());
+            resp.getWriter().write(json);
+        } else {
+            // Get task by ID
+            Long id = Long.parseLong(pathInfo.substring(1));
+            repository.findById(id).ifPresentOrElse(
+                task -&gt; {
+                    try {
+                        resp.getWriter().write(gson.toJson(task));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                },
+                () -&gt; resp.setStatus(HttpServletResponse.SC_NOT_FOUND)
+            );
+        }
+    }
+    
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) 
+            throws ServletException, IOException {
+        
+        // Read request body
+        String body = req.getReader().lines().collect(Collectors.joining());
+        Task task = gson.fromJson(body, Task.class);
+        
+        // Create task
+        Task created = repository.createTask(task);
+        
+        // Send response
+        resp.setContentType(&#34;application/json&#34;);
+        resp.setCharacterEncoding(&#34;UTF-8&#34;);
+        resp.setStatus(HttpServletResponse.SC_CREATED);
+        resp.getWriter().write(gson.toJson(created));
+    }
+    
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) 
+            throws ServletException, IOException {
+        
+        String pathInfo = req.getPathInfo();
+        if (pathInfo != null &amp;&amp; !pathInfo.equals(&#34;/&#34;)) {
+            Long id = Long.parseLong(pathInfo.substring(1));
+            boolean deleted = repository.deleteTask(id);
+            
+            if (deleted) {
+                resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
+            } else {
+                resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            }
+        } else {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        }
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Servlet Filter</h2>
+            <p><strong>src/main/java/com/example/servlet/LoggingFilter.java:</strong></p>
+            <pre><code language="language-java" class="language-java">package com.example.servlet;
+
+import jakarta.servlet.*;
+import jakarta.servlet.annotation.WebFilter;
+import jakarta.servlet.http.HttpServletRequest;
+import java.io.IOException;
+
+@WebFilter(urlPatterns = &#34;/api/*&#34;)
+public class LoggingFilter implements Filter {
+    
+    @Override
+    public void init(FilterConfig filterConfig) throws ServletException {
+        System.out.println(&#34;LoggingFilter initialized&#34;);
+    }
+    
+    @Override
+    public void doFilter(ServletRequest request, ServletResponse response, 
+                         FilterChain chain) throws IOException, ServletException {
+        
+        HttpServletRequest httpRequest = (HttpServletRequest) request;
+        long startTime = System.currentTimeMillis();
+        
+        System.out.println(&#34;Request: &#34; + httpRequest.getMethod() + &#34; &#34; + 
+                          httpRequest.getRequestURI());
+        
+        chain.doFilter(request, response);
+        
+        long duration = System.currentTimeMillis() - startTime;
+        System.out.println(&#34;Response time: &#34; + duration + &#34;ms&#34;);
+    }
+    
+    @Override
+    public void destroy() {
+        System.out.println(&#34;LoggingFilter destroyed&#34;);
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Deploy to Tomcat</h2>
+            <p><strong>Build WAR:</strong></p>
+            <pre><code language="language-bash" class="language-bash">mvn clean package
+</code></pre>
+            <p><strong>Copy to Tomcat:</strong></p>
+            <pre><code language="language-bash" class="language-bash">cp target/servlet-task-api.war $TOMCAT_HOME/webapps/
+</code></pre>
+            <p><strong>Test:</strong></p>
+            <pre><code language="language-bash" class="language-bash">curl http://localhost:8080/servlet-task-api/api/tasks
+</code></pre>
+            <aside class="warning">
+                <p><strong>Raw Servlets:</strong> Manual request/response handling, JSON parsing, routing, error
+                    handling. Spring abstracts all this complexity!</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Blocking Stack - Spring MVC" duration="15">
+            <p>Build same API with Spring MVC and JDBC.</p>
+            <h2 is-upgraded>Project Setup</h2>
+            <p><strong>pom.xml:</strong></p>
+            <pre><code language="language-xml" class="language-xml">&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
+&lt;project xmlns=&#34;http://maven.apache.org/POM/4.0.0&#34;
+         xmlns:xsi=&#34;http://www.w3.org/2001/XMLSchema-instance&#34;
+         xsi:schemaLocation=&#34;http://maven.apache.org/POM/4.0.0 
+         http://maven.apache.org/xsd/maven-4.0.0.xsd&#34;&gt;
+    &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+    
+    &lt;parent&gt;
+        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+        &lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;
+        &lt;version&gt;3.2.1&lt;/version&gt;
+    &lt;/parent&gt;
+    
+    &lt;groupId&gt;com.example&lt;/groupId&gt;
+    &lt;artifactId&gt;blocking-task-api&lt;/artifactId&gt;
+    &lt;version&gt;1.0.0&lt;/version&gt;
+    
+    &lt;properties&gt;
+        &lt;java.version&gt;17&lt;/java.version&gt;
+    &lt;/properties&gt;
+    
+    &lt;dependencies&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-jdbc&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;com.h2database&lt;/groupId&gt;
+            &lt;artifactId&gt;h2&lt;/artifactId&gt;
+            &lt;scope&gt;runtime&lt;/scope&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.projectlombok&lt;/groupId&gt;
+            &lt;artifactId&gt;lombok&lt;/artifactId&gt;
+            &lt;optional&gt;true&lt;/optional&gt;
+        &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+&lt;/project&gt;
+</code></pre>
+            <h2 is-upgraded>Task Entity</h2>
+            <p><strong>src/main/java/com/example/blocking/model/Task.java:</strong></p>
+            <pre><code language="language-java" class="language-java">package com.example.blocking.model;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Task {
+    private Long id;
+    private String title;
+    private String description;
+    private String status;
+}
+</code></pre>
+            <h2 is-upgraded>JDBC Repository</h2>
+            <p><strong>src/main/java/com/example/blocking/repository/TaskRepository.java:</strong></p>
+            <pre><code language="language-java" class="language-java">package com.example.blocking.repository;
+
+import com.example.blocking.model.Task;
+import lombok.RequiredArgsConstructor;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+@RequiredArgsConstructor
+public class TaskRepository {
+    
+    private final JdbcTemplate jdbcTemplate;
+    
+    private final RowMapper&lt;Task&gt; taskRowMapper = (rs, rowNum) -&gt; new Task(
+        rs.getLong(&#34;id&#34;),
+        rs.getString(&#34;title&#34;),
+        rs.getString(&#34;description&#34;),
+        rs.getString(&#34;status&#34;)
+    );
+    
+    public List&lt;Task&gt; findAll() {
+        return jdbcTemplate.query(
+            &#34;SELECT * FROM tasks&#34;, 
+            taskRowMapper
+        );
+    }
+    
+    public Optional&lt;Task&gt; findById(Long id) {
+        List&lt;Task&gt; tasks = jdbcTemplate.query(
+            &#34;SELECT * FROM tasks WHERE id = ?&#34;, 
+            taskRowMapper, 
+            id
+        );
+        return tasks.isEmpty() ? Optional.empty() : Optional.of(tasks.get(0));
+    }
+    
+    public Task save(Task task) {
+        if (task.getId() == null) {
+            jdbcTemplate.update(
+                &#34;INSERT INTO tasks (title, description, status) VALUES (?, ?, ?)&#34;,
+                task.getTitle(), task.getDescription(), task.getStatus()
+            );
+            Long id = jdbcTemplate.queryForObject(
+                &#34;SELECT LAST_INSERT_ID()&#34;, 
+                Long.class
+            );
+            task.setId(id);
+        } else {
+            jdbcTemplate.update(
+                &#34;UPDATE tasks SET title = ?, description = ?, status = ? WHERE id = ?&#34;,
+                task.getTitle(), task.getDescription(), task.getStatus(), task.getId()
+            );
+        }
+        return task;
+    }
+    
+    public void deleteById(Long id) {
+        jdbcTemplate.update(&#34;DELETE FROM tasks WHERE id = ?&#34;, id);
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Task Service with Simulated Delay</h2>
+            <p><strong>src/main/java/com/example/blocking/service/TaskService.java:</strong></p>
+            <pre><code language="language-java" class="language-java">package com.example.blocking.service;
+
+import com.example.blocking.model.Task;
+import com.example.blocking.repository.TaskRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+
+@Service
+@RequiredArgsConstructor
+@Slf4j
+public class TaskService {
+    
+    private final TaskRepository repository;
+    
+    public List&lt;Task&gt; getAllTasks() {
+        log.info(&#34;Getting all tasks - Thread: {}&#34;, Thread.currentThread().getName());
+        simulateSlowOperation(); // Simulate I/O delay
+        return repository.findAll();
+    }
+    
+    public Optional&lt;Task&gt; getTaskById(Long id) {
+        log.info(&#34;Getting task {} - Thread: {}&#34;, id, Thread.currentThread().getName());
+        simulateSlowOperation();
+        return repository.findById(id);
+    }
+    
+    public Task createTask(Task task) {
+        log.info(&#34;Creating task - Thread: {}&#34;, Thread.currentThread().getName());
+        simulateSlowOperation();
+        return repository.save(task);
+    }
+    
+    public void deleteTask(Long id) {
+        log.info(&#34;Deleting task {} - Thread: {}&#34;, id, Thread.currentThread().getName());
+        simulateSlowOperation();
+        repository.deleteById(id);
+    }
+    
+    private void simulateSlowOperation() {
+        try {
+            Thread.sleep(100); // Simulate slow database/external API
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+}
+</code></pre>
+            <h2 is-upgraded>REST Controller</h2>
+            <p><strong>src/main/java/com/example/blocking/controller/TaskController.java:</strong></p>
+            <pre><code language="language-java" class="language-java">package com.example.blocking.controller;
+
+import com.example.blocking.model.Task;
+import com.example.blocking.service.TaskService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping(&#34;/api/tasks&#34;)
+@RequiredArgsConstructor
+public class TaskController {
+    
+    private final TaskService taskService;
+    
+    @GetMapping
+    public ResponseEntity&lt;List&lt;Task&gt;&gt; getAllTasks() {
+        return ResponseEntity.ok(taskService.getAllTasks());
+    }
+    
+    @GetMapping(&#34;/{id}&#34;)
+    public ResponseEntity&lt;Task&gt; getTaskById(@PathVariable Long id) {
+        return taskService.getTaskById(id)
+            .map(ResponseEntity::ok)
+            .orElse(ResponseEntity.notFound().build());
+    }
+    
+    @PostMapping
+    public ResponseEntity&lt;Task&gt; createTask(@RequestBody Task task) {
+        return ResponseEntity.ok(taskService.createTask(task));
+    }
+    
+    @DeleteMapping(&#34;/{id}&#34;)
+    public ResponseEntity&lt;Void&gt; deleteTask(@PathVariable Long id) {
+        taskService.deleteTask(id);
+        return ResponseEntity.noContent().build();
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Configuration</h2>
+            <p><strong>src/main/resources/application.yml:</strong></p>
+            <pre><code language="language-yaml" class="language-yaml">spring:
+  application:
+    name: blocking-task-api
+  
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+  
+  h2:
+    console:
+      enabled: true
+
+server:
+  port: 8081
+  tomcat:
+    threads:
+      max: 200  # Default thread pool size
+
+logging:
+  level:
+    com.example.blocking: INFO
+</code></pre>
+            <p><strong>src/main/resources/schema.sql:</strong></p>
+            <pre><code language="language-sql" class="language-sql">CREATE TABLE tasks (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    status VARCHAR(50) NOT NULL
+);
+
+INSERT INTO tasks (title, description, status) VALUES 
+(&#39;Sample Task 1&#39;, &#39;Description 1&#39;, &#39;TODO&#39;),
+(&#39;Sample Task 2&#39;, &#39;Description 2&#39;, &#39;IN_PROGRESS&#39;);
+</code></pre>
+            <h2 is-upgraded>Run and Test</h2>
+            <pre><code language="language-bash" class="language-bash">mvn spring-boot:run
+curl http://localhost:8081/api/tasks
+</code></pre>
+            <aside class="special">
+                <p><strong>Blocking Model:</strong> Each request gets a thread from pool. Thread blocks on I/O
+                    (database, external API). Thread count limits concurrency.</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Reactive Stack - Spring WebFlux" duration="15">
+            <p>Build same API with Spring WebFlux and R2DBC.</p>
+            <h2 is-upgraded>Project Setup</h2>
+            <p><strong>pom.xml:</strong></p>
+            <pre><code language="language-xml" class="language-xml">&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
+&lt;project xmlns=&#34;http://maven.apache.org/POM/4.0.0&#34;
+         xmlns:xsi=&#34;http://www.w3.org/2001/XMLSchema-instance&#34;
+         xsi:schemaLocation=&#34;http://maven.apache.org/POM/4.0.0 
+         http://maven.apache.org/xsd/maven-4.0.0.xsd&#34;&gt;
+    &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+    
+    &lt;parent&gt;
+        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+        &lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;
+        &lt;version&gt;3.2.1&lt;/version&gt;
+    &lt;/parent&gt;
+    
+    &lt;groupId&gt;com.example&lt;/groupId&gt;
+    &lt;artifactId&gt;reactive-task-api&lt;/artifactId&gt;
+    &lt;version&gt;1.0.0&lt;/version&gt;
+    
+    &lt;properties&gt;
+        &lt;java.version&gt;17&lt;/java.version&gt;
+    &lt;/properties&gt;
+    
+    &lt;dependencies&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-webflux&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-data-r2dbc&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;io.r2dbc&lt;/groupId&gt;
+            &lt;artifactId&gt;r2dbc-h2&lt;/artifactId&gt;
+            &lt;scope&gt;runtime&lt;/scope&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.projectlombok&lt;/groupId&gt;
+            &lt;artifactId&gt;lombok&lt;/artifactId&gt;
+            &lt;optional&gt;true&lt;/optional&gt;
+        &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+&lt;/project&gt;
+</code></pre>
+            <h2 is-upgraded>Task Entity</h2>
+            <p><strong>src/main/java/com/example/reactive/model/Task.java:</strong></p>
+            <pre><code language="language-java" class="language-java">package com.example.reactive.model;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Table;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(&#34;tasks&#34;)
+public class Task {
+    @Id
+    private Long id;
+    private String title;
+    private String description;
+    private String status;
+}
+</code></pre>
+            <h2 is-upgraded>R2DBC Repository</h2>
+            <p><strong>src/main/java/com/example/reactive/repository/TaskRepository.java:</strong></p>
+            <pre><code language="language-java" class="language-java">package com.example.reactive.repository;
+
+import com.example.reactive.model.Task;
+import org.springframework.data.repository.reactive.ReactiveCrudRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface TaskRepository extends ReactiveCrudRepository&lt;Task, Long&gt; {
+    // Reactive CRUD methods inherited
+}
+</code></pre>
+            <h2 is-upgraded>Task Service with Simulated Delay</h2>
+            <p><strong>src/main/java/com/example/reactive/service/TaskService.java:</strong></p>
+            <pre><code language="language-java" class="language-java">package com.example.reactive.service;
+
+import com.example.reactive.model.Task;
+import com.example.reactive.repository.TaskRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+import java.time.Duration;
+
+@Service
+@RequiredArgsConstructor
+@Slf4j
+public class TaskService {
+    
+    private final TaskRepository repository;
+    
+    public Flux&lt;Task&gt; getAllTasks() {
+        log.info(&#34;Getting all tasks - Thread: {}&#34;, Thread.currentThread().getName());
+        return repository.findAll()
+            .delayElements(Duration.ofMillis(100)); // Simulate I/O delay
+    }
+    
+    public Mono&lt;Task&gt; getTaskById(Long id) {
+        log.info(&#34;Getting task {} - Thread: {}&#34;, id, Thread.currentThread().getName());
+        return repository.findById(id)
+            .delayElement(Duration.ofMillis(100));
+    }
+    
+    public Mono&lt;Task&gt; createTask(Task task) {
+        log.info(&#34;Creating task - Thread: {}&#34;, Thread.currentThread().getName());
+        return repository.save(task)
+            .delayElement(Duration.ofMillis(100));
+    }
+    
+    public Mono&lt;Void&gt; deleteTask(Long id) {
+        log.info(&#34;Deleting task {} - Thread: {}&#34;, id, Thread.currentThread().getName());
+        return repository.deleteById(id)
+            .delayElement(Duration.ofMillis(100));
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Reactive Controller</h2>
+            <p><strong>src/main/java/com/example/reactive/controller/TaskController.java:</strong></p>
+            <pre><code language="language-java" class="language-java">package com.example.reactive.controller;
+
+import com.example.reactive.model.Task;
+import com.example.reactive.service.TaskService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+@RestController
+@RequestMapping(&#34;/api/tasks&#34;)
+@RequiredArgsConstructor
+public class TaskController {
+    
+    private final TaskService taskService;
+    
+    @GetMapping
+    public Flux&lt;Task&gt; getAllTasks() {
+        return taskService.getAllTasks();
+    }
+    
+    @GetMapping(&#34;/{id}&#34;)
+    public Mono&lt;ResponseEntity&lt;Task&gt;&gt; getTaskById(@PathVariable Long id) {
+        return taskService.getTaskById(id)
+            .map(ResponseEntity::ok)
+            .defaultIfEmpty(ResponseEntity.notFound().build());
+    }
+    
+    @PostMapping
+    public Mono&lt;Task&gt; createTask(@RequestBody Task task) {
+        return taskService.createTask(task);
+    }
+    
+    @DeleteMapping(&#34;/{id}&#34;)
+    public Mono&lt;ResponseEntity&lt;Void&gt;&gt; deleteTask(@PathVariable Long id) {
+        return taskService.deleteTask(id)
+            .then(Mono.just(ResponseEntity.noContent().&lt;Void&gt;build()));
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Configuration</h2>
+            <p><strong>src/main/resources/application.yml:</strong></p>
+            <pre><code language="language-yaml" class="language-yaml">spring:
+  application:
+    name: reactive-task-api
+  
+  r2dbc:
+    url: r2dbc:h2:mem:///testdb
+
+server:
+  port: 8082
+
+logging:
+  level:
+    com.example.reactive: INFO
+    io.r2dbc: DEBUG
+</code></pre>
+            <p><strong>src/main/resources/schema.sql:</strong></p>
+            <pre><code language="language-sql" class="language-sql">CREATE TABLE IF NOT EXISTS tasks (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    status VARCHAR(50) NOT NULL
+);
+</code></pre>
+            <h2 is-upgraded>Data Initialization</h2>
+            <p><strong>src/main/java/com/example/reactive/config/DataInitializer.java:</strong></p>
+            <pre><code language="language-java" class="language-java">package com.example.reactive.config;
+
+import com.example.reactive.model.Task;
+import com.example.reactive.repository.TaskRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
+
+@Component
+@RequiredArgsConstructor
+public class DataInitializer implements CommandLineRunner {
+    
+    private final TaskRepository repository;
+    
+    @Override
+    public void run(String... args) {
+        repository.deleteAll()
+            .thenMany(Flux.just(
+                new Task(null, &#34;Sample Task 1&#34;, &#34;Description 1&#34;, &#34;TODO&#34;),
+                new Task(null, &#34;Sample Task 2&#34;, &#34;Description 2&#34;, &#34;IN_PROGRESS&#34;)
+            ))
+            .flatMap(repository::save)
+            .subscribe();
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Run and Test</h2>
+            <pre><code language="language-bash" class="language-bash">mvn spring-boot:run
+curl http://localhost:8082/api/tasks
+</code></pre>
+            <aside class="special">
+                <p><strong>Reactive Model:</strong> Small thread pool (event loop). Non-blocking I/O with callbacks.
+                    Handles many concurrent requests with few threads.</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Performance Testing" duration="15">
+            <p>Load test both implementations and compare performance.</p>
+            <h2 is-upgraded>Install JMeter</h2>
+            <p>Download from: https://jmeter.apache.org/download_jmeter.cgi</p>
+            <h2 is-upgraded>JMeter Test Plan - Blocking</h2>
+            <p><strong>blocking-load-test.jmx:</strong></p>
+            <pre><code language="language-xml" class="language-xml">&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
+&lt;jmeterTestPlan version=&#34;1.2&#34; properties=&#34;5.0&#34; jmeter=&#34;5.6&#34;&gt;
+  &lt;hashTree&gt;
+    &lt;TestPlan guiclass=&#34;TestPlanGui&#34; testclass=&#34;TestPlan&#34; testname=&#34;Blocking API Load Test&#34;&gt;
+      &lt;elementProp name=&#34;TestPlan.user_defined_variables&#34; elementType=&#34;Arguments&#34;&gt;
+        &lt;collectionProp name=&#34;Arguments.arguments&#34;/&gt;
+      &lt;/elementProp&gt;
+    &lt;/TestPlan&gt;
+    &lt;hashTree&gt;
+      &lt;ThreadGroup guiclass=&#34;ThreadGroupGui&#34; testclass=&#34;ThreadGroup&#34; testname=&#34;Users&#34;&gt;
+        &lt;stringProp name=&#34;ThreadGroup.num_threads&#34;&gt;500&lt;/stringProp&gt;
+        &lt;stringProp name=&#34;ThreadGroup.ramp_time&#34;&gt;10&lt;/stringProp&gt;
+        &lt;stringProp name=&#34;ThreadGroup.duration&#34;&gt;60&lt;/stringProp&gt;
+        &lt;boolProp name=&#34;ThreadGroup.scheduler&#34;&gt;true&lt;/boolProp&gt;
+      &lt;/ThreadGroup&gt;
+      &lt;hashTree&gt;
+        &lt;HTTPSamplerProxy guiclass=&#34;HttpTestSampleGui&#34; testclass=&#34;HTTPSamplerProxy&#34; testname=&#34;GET Tasks&#34;&gt;
+          &lt;stringProp name=&#34;HTTPSampler.domain&#34;&gt;localhost&lt;/stringProp&gt;
+          &lt;stringProp name=&#34;HTTPSampler.port&#34;&gt;8081&lt;/stringProp&gt;
+          &lt;stringProp name=&#34;HTTPSampler.path&#34;&gt;/api/tasks&lt;/stringProp&gt;
+          &lt;stringProp name=&#34;HTTPSampler.method&#34;&gt;GET&lt;/stringProp&gt;
+        &lt;/HTTPSamplerProxy&gt;
+        
+        &lt;ResultCollector guiclass=&#34;SummaryReport&#34; testclass=&#34;ResultCollector&#34; testname=&#34;Summary Report&#34;&gt;
+          &lt;boolProp name=&#34;ResultCollector.error_logging&#34;&gt;false&lt;/boolProp&gt;
+          &lt;objProp&gt;
+            &lt;name&gt;saveConfig&lt;/name&gt;
+            &lt;value class=&#34;SampleSaveConfiguration&#34;&gt;
+              &lt;time&gt;true&lt;/time&gt;
+              &lt;latency&gt;true&lt;/latency&gt;
+              &lt;timestamp&gt;true&lt;/timestamp&gt;
+              &lt;success&gt;true&lt;/success&gt;
+            &lt;/value&gt;
+          &lt;/objProp&gt;
+        &lt;/ResultCollector&gt;
+      &lt;/hashTree&gt;
+    &lt;/hashTree&gt;
+  &lt;/hashTree&gt;
+&lt;/jmeterTestPlan&gt;
+</code></pre>
+            <h2 is-upgraded>JMeter Test Plan - Reactive</h2>
+            <p>Same structure, change port to 8082.</p>
+            <h2 is-upgraded>Run Load Tests</h2>
+            <p><strong>Terminal 1 - Start Blocking API:</strong></p>
+            <pre><code language="language-bash" class="language-bash">cd blocking-task-api
+mvn spring-boot:run
+</code></pre>
+            <p><strong>Terminal 2 - Run JMeter Test:</strong></p>
+            <pre><code language="language-bash" class="language-bash">jmeter -n -t blocking-load-test.jmx -l blocking-results.jtl -e -o blocking-report/
+</code></pre>
+            <p><strong>Terminal 3 - Start Reactive API:</strong></p>
+            <pre><code language="language-bash" class="language-bash">cd reactive-task-api
+mvn spring-boot:run
+</code></pre>
+            <p><strong>Terminal 4 - Run JMeter Test:</strong></p>
+            <pre><code language="language-bash" class="language-bash">jmeter -n -t reactive-load-test.jmx -l reactive-results.jtl -e -o reactive-report/
+</code></pre>
+            <h2 is-upgraded>Monitor Resources</h2>
+            <p><strong>During tests, monitor:</strong></p>
+            <pre><code language="language-bash" class="language-bash"># CPU and Memory
+top
+
+# Thread count
+jstack &lt;pid&gt; | grep &#34;java.lang.Thread.State&#34; | wc -l
+
+# Heap usage
+jstat -gc &lt;pid&gt; 1000
+</code></pre>
+            <h2 is-upgraded>Expected Results</h2>
+            <p><strong>Blocking API (Spring MVC):</strong></p>
+            <ul>
+                <li>Threads: ~200 (max pool size)</li>
+                <li>Throughput: ~100-200 req/sec</li>
+                <li>Latency: Higher under load</li>
+                <li>Memory: Higher (more threads)</li>
+            </ul>
+            <p><strong>Reactive API (Spring WebFlux):</strong></p>
+            <ul>
+                <li>Threads: ~10-20 (event loop)</li>
+                <li>Throughput: ~300-500 req/sec</li>
+                <li>Latency: Lower under load</li>
+                <li>Memory: Lower (fewer threads)</li>
+            </ul>
+            <h2 is-upgraded>Performance Comparison</h2>
+            <table>
+                <tr>
+                    <td colspan="1" rowspan="1">
+                        <p>Metric</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>Blocking (MVC)</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>Reactive (WebFlux)</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="1" rowspan="1">
+                        <p>Thread Count</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>200+</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>10-20</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="1" rowspan="1">
+                        <p>Requests/sec</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>150</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>400</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="1" rowspan="1">
+                        <p>Avg Latency</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>500ms</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>200ms</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="1" rowspan="1">
+                        <p>95th Percentile</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>1200ms</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>400ms</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="1" rowspan="1">
+                        <p>Memory (Heap)</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>512MB</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>256MB</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="1" rowspan="1">
+                        <p>CPU Usage</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>60%</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>40%</p>
+                    </td>
+                </tr>
+            </table>
+            <aside class="special">
+                <p><strong>Reactive Wins:</strong> When many concurrent requests with I/O waits. Blocking wins for
+                    CPU-intensive operations or simple CRUD.</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Thread Dump Analysis" duration="5">
+            <p>Analyze thread behavior in both models.</p>
+            <h2 is-upgraded>Capture Thread Dumps</h2>
+            <p><strong>Blocking API:</strong></p>
+            <pre><code language="language-bash" class="language-bash">jstack &lt;pid&gt; &gt; blocking-threads.txt
+</code></pre>
+            <p><strong>Example blocking threads:</strong></p>
+            <pre><code>&#34;http-nio-8081-exec-1&#34; #25 daemon prio=5 os_prio=0 
+   java.lang.Thread.State: TIMED_WAITING (sleeping)
+        at java.lang.Thread.sleep(Native Method)
+        at com.example.blocking.service.TaskService.simulateSlowOperation
+
+&#34;http-nio-8081-exec-2&#34; #26 daemon prio=5 os_prio=0
+   java.lang.Thread.State: TIMED_WAITING (sleeping)
+        at java.lang.Thread.sleep(Native Method)
+        
+... (200 threads)
+</code></pre>
+            <p><strong>Reactive API:</strong></p>
+            <pre><code language="language-bash" class="language-bash">jstack &lt;pid&gt; &gt; reactive-threads.txt
+</code></pre>
+            <p><strong>Example reactive threads:</strong></p>
+            <pre><code>&#34;reactor-http-nio-2&#34; #14 daemon prio=5 os_prio=0
+   java.lang.Thread.State: RUNNABLE
+        at sun.nio.ch.EPoll.wait(Native Method)
+        
+&#34;reactor-http-nio-3&#34; #15 daemon prio=5 os_prio=0
+   java.lang.Thread.State: RUNNABLE
+        
+... (10-20 threads total)
+</code></pre>
+            <h2 is-upgraded>Thread Analysis</h2>
+            <p><strong>Blocking:</strong></p>
+            <ul>
+                <li>Many threads (1 per request)</li>
+                <li>TIMED_WAITING state (blocked on I/O)</li>
+                <li>High context switching overhead</li>
+            </ul>
+            <p><strong>Reactive:</strong></p>
+            <ul>
+                <li>Few threads (event loop)</li>
+                <li>RUNNABLE state (event loop waiting for events)</li>
+                <li>Low context switching</li>
+            </ul>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="When to Use Each Approach" duration="5">
+            <p>Decision matrix for choosing the right stack.</p>
+            <h2 is-upgraded>Use Blocking (Spring MVC + JDBC)</h2>
+            <p>✅ <strong>Good for:</strong></p>
+            <ul>
+                <li>CRUD applications</li>
+                <li>Low to moderate concurrency (&lt;100 concurrent users)</li>
+                <li>CPU-intensive operations</li>
+                <li>Simple application logic</li>
+                <li>Team familiar with traditional blocking model</li>
+                <li>Extensive use of blocking libraries</li>
+                <li>Existing JDBC/JPA codebase</li>
+            </ul>
+            <p><strong>Example:</strong></p>
+            <ul>
+                <li>Internal admin dashboards</li>
+                <li>Simple REST APIs</li>
+                <li>Traditional web applications</li>
+                <li>Batch processing</li>
+            </ul>
+            <h2 is-upgraded>Use Reactive (Spring WebFlux + R2DBC)</h2>
+            <p>✅ <strong>Good for:</strong></p>
+            <ul>
+                <li>High concurrency (1000+ concurrent users)</li>
+                <li>I/O-intensive operations</li>
+                <li>Streaming data</li>
+                <li>Microservices with many service calls</li>
+                <li>Event-driven systems</li>
+                <li>Real-time applications</li>
+            </ul>
+            <p><strong>Example:</strong></p>
+            <ul>
+                <li>Real-time dashboards</li>
+                <li>Chat applications</li>
+                <li>Stock trading platforms</li>
+                <li>IoT data ingestion</li>
+                <li>Video streaming services</li>
+            </ul>
+            <h2 is-upgraded>Performance Comparison Summary</h2>
+            <pre><code>Concurrency Level vs Throughput
+
+Blocking:     Reactive:
+    ^             ^
+    |          /  |
+Req |       /     |
+/sec|    /        |       /
+    | /           |    /
+    +-------&gt;     | /
+    Users         +-------&gt;
+                  Users
+
+Blocking degrades with high concurrency
+Reactive scales better with concurrency
+</code></pre>
+            <h2 is-upgraded>Complexity Trade-off</h2>
+            <p><strong>Blocking:</strong></p>
+            <ul>
+                <li>✅ Easier to understand</li>
+                <li>✅ Easier to debug</li>
+                <li>✅ Synchronous, imperative code</li>
+                <li>❌ Limited scalability</li>
+            </ul>
+            <p><strong>Reactive:</strong></p>
+            <ul>
+                <li>❌ Steeper learning curve</li>
+                <li>❌ Harder to debug</li>
+                <li>❌ Asynchronous, functional code</li>
+                <li>✅ Better scalability</li>
+            </ul>
+            <aside class="warning">
+                <p><strong>Don&#39;t Use Reactive Everywhere!</strong> Reactive adds complexity. Use it only when you
+                    need the performance benefits for high-concurrency I/O scenarios.</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Spring Framework Evolution" duration="3">
+            <p>Understanding Spring&#39;s unified stack approach.</p>
+            <h2 is-upgraded>Spring 5+ Architecture</h2>
+            <pre><code>Spring Framework 5+
+├── Spring MVC (Servlet Stack)
+│   ├── Tomcat/Jetty (Servlet Container)
+│   ├── Spring MVC
+│   ├── Spring Data JPA
+│   └── JDBC
+│
+└── Spring WebFlux (Reactive Stack)
+    ├── Netty/Undertow (Reactive Server)
+    ├── Spring WebFlux
+    ├── Spring Data R2DBC
+    └── R2DBC
+
+Both share:
+- Spring Core (IoC, DI)
+- Spring Boot Auto-configuration
+- Spring Security
+- Spring Cloud
+</code></pre>
+            <h2 is-upgraded>Unified Programming Model</h2>
+            <p><strong>Same annotations, different execution:</strong></p>
+            <pre><code language="language-java" class="language-java">// Both work the same from API perspective
+
+// Blocking
+@GetMapping(&#34;/tasks&#34;)
+public List&lt;Task&gt; getTasks() {
+    return service.findAll();
+}
+
+// Reactive
+@GetMapping(&#34;/tasks&#34;)
+public Flux&lt;Task&gt; getTasks() {
+    return service.findAll();
+}
+</code></pre>
+            <h2 is-upgraded>Migration Path</h2>
+            <ol type="1">
+                <li><strong>Start with Blocking</strong> (Spring MVC)</li>
+                <li><strong>Identify bottlenecks</strong> (monitoring, profiling)</li>
+                <li><strong>Migrate specific services</strong> to reactive</li>
+                <li><strong>Use reactive for new microservices</strong></li>
+                <li><strong>Keep blocking for simple CRUD</strong></li>
+            </ol>
+            <h2 is-upgraded>Hybrid Approach</h2>
+            <pre><code language="language-java" class="language-java">// Mix blocking and reactive in same app
+
+@RestController
+public class HybridController {
+    
+    // Blocking endpoint
+    @GetMapping(&#34;/users&#34;)
+    public List&lt;User&gt; getUsers() {
+        return userService.findAll(); // JDBC
+    }
+    
+    // Reactive endpoint
+    @GetMapping(&#34;/notifications&#34;)
+    public Flux&lt;Notification&gt; getNotifications() {
+        return notificationService.findAll(); // R2DBC
+    }
+}
+</code></pre>
+            <aside class="special">
+                <p><strong>Best Practice:</strong> Use the right tool for each service. Blocking for simple CRUD,
+                    reactive for high-concurrency I/O.</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Conclusion" duration="2">
+            <p>Congratulations! 🎉 You&#39;ve mastered servlet containers, blocking, and reactive architectures!</p>
+            <h2 is-upgraded>What You&#39;ve Learned</h2>
+            <ul>
+                <li>✅ <strong>Servlet API:</strong> Raw servlets, filters, lifecycle</li>
+                <li>✅ <strong>Blocking I/O:</strong> Thread-per-request model</li>
+                <li>✅ <strong>Reactive I/O:</strong> Event-loop model</li>
+                <li>✅ <strong>Spring MVC:</strong> Servlet-based blocking stack</li>
+                <li>✅ <strong>Spring WebFlux:</strong> Reactive non-blocking stack</li>
+                <li>✅ <strong>Performance:</strong> Load testing and analysis</li>
+                <li>✅ <strong>Decision Making:</strong> When to use each approach</li>
+            </ul>
+            <h2 is-upgraded>Key Takeaways</h2>
+            <ol type="1">
+                <li><strong>Blocking:</strong> Simple, easy to debug, limited concurrency</li>
+                <li><strong>Reactive:</strong> Complex, harder to debug, high concurrency</li>
+                <li><strong>Choose based on use case:</strong> Not all apps need reactive</li>
+                <li><strong>Spring abstracts complexity:</strong> Raw servlets vs Spring</li>
+                <li><strong>Performance depends on I/O:</strong> Reactive shines with many concurrent I/O operations
+                </li>
+            </ol>
+            <h2 is-upgraded>Performance Summary</h2>
+            <p><strong>Use Blocking When:</strong></p>
+            <ul>
+                <li>Simple CRUD applications</li>
+                <li>CPU-intensive operations</li>
+                <li>Low concurrency (&lt;100 users)</li>
+                <li>Team prefers imperative code</li>
+            </ul>
+            <p><strong>Use Reactive When:</strong></p>
+            <ul>
+                <li>High concurrency (1000+ users)</li>
+                <li>I/O-intensive operations</li>
+                <li>Streaming/real-time data</li>
+                <li>Microservices architecture</li>
+            </ul>
+            <h2 is-upgraded>Course Complete! 🎓</h2>
+            <p>You&#39;ve completed all 20 codelabs:</p>
+            <ul>
+                <li>✅ Section 1: Core Java (5 codelabs)</li>
+                <li>✅ Section 2: Java 8+ Features (5 codelabs)</li>
+                <li>✅ Section 3: Spring Boot (8 codelabs)</li>
+                <li>✅ Section 4: Microservices (2 codelabs)</li>
+            </ul>
+            <h2 is-upgraded>Next Steps</h2>
+            <ul>
+                <li>Build capstone project</li>
+                <li>Contribute to open source</li>
+                <li>Explore Kubernetes deployment</li>
+                <li>Study distributed tracing (Zipkin)</li>
+                <li>Learn API Gateway patterns</li>
+                <li>Master Docker and containers</li>
+            </ul>
+            <h2 is-upgraded>Additional Resources</h2>
+            <ul>
+                <li><a href="https://docs.spring.io/spring-framework/reference/web/webflux.html" target="_blank">Spring
+                        WebFlux Documentation</a></li>
+                <li><a href="https://projectreactor.io/" target="_blank">Project Reactor</a></li>
+                <li><a href="https://r2dbc.io/" target="_blank">R2DBC Documentation</a></li>
+                <li><a href="https://jakarta.ee/specifications/servlet/" target="_blank">Servlet API Specification</a>
+                </li>
+                <li><a href="https://www.reactivemanifesto.org/" target="_blank">Reactive Programming Guide</a></li>
+            </ul>
+            <aside class="special">
+                <p><strong>Congratulations!</strong> You&#39;re now equipped with production-ready Spring Boot skills.
+                    Go build amazing applications! 🚀</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+    </google-codelab>
+
+    <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
+    <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
+    <script src="https://storage.googleapis.com/claat-public/prettify.js"></script>
+    <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
+    <script src="//support.google.com/inapp/api.js"></script>
+
+</body>
+
+</html>

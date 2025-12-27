@@ -1,0 +1,1535 @@
+<!doctype html>
+
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+    <meta name="theme-color" content="#4F7DC9">
+    <meta charset="UTF-8">
+    <title>Reactive Programming with WebFlux &amp; R2DBC</title>
+    <link rel="stylesheet"
+        href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
+    <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
+    <style>
+        .success {
+            color: #1e8e3e;
+        }
+
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+    <google-codelab-analytics gaid="UA-49880327-14"></google-codelab-analytics>
+    <google-codelab codelab-gaid="" id="reactive-webflux-r2dbc" title="Reactive Programming with WebFlux &amp; R2DBC"
+        environment="web" feedback-link="">
+
+        <google-codelab-step label="Introduction" duration="3">
+            <p>Transform the blocking Task Management API into a fully reactive, non-blocking application using Spring
+                WebFlux and R2DBC.</p>
+            <h2 class="checklist" is-upgraded>What You&#39;ll Learn</h2>
+            <ul class="checklist">
+                <li><strong>Reactive Programming:</strong> Event-driven, non-blocking paradigm</li>
+                <li><strong>Project Reactor:</strong> Mono and Flux reactive types</li>
+                <li><strong>Spring WebFlux:</strong> Reactive web framework</li>
+                <li><strong>R2DBC:</strong> Reactive Relational Database Connectivity</li>
+                <li><strong>Reactive Repositories:</strong> Non-blocking database access</li>
+                <li><strong>Reactive Security:</strong> WebFlux security configuration</li>
+                <li><strong>Backpressure:</strong> Flow control in reactive streams</li>
+                <li><strong>Operators:</strong> map, flatMap, filter, zip, merge</li>
+                <li><strong>Error Handling:</strong> onErrorResume, onErrorReturn</li>
+                <li><strong>Testing:</strong> WebTestClient for reactive endpoints</li>
+            </ul>
+            <h2 is-upgraded>What You&#39;ll Build</h2>
+            <p>Reactive Task Management API with:</p>
+            <ul>
+                <li><strong>Reactive Controllers</strong> using Mono and Flux</li>
+                <li><strong>R2DBC Repositories</strong> for non-blocking DB access</li>
+                <li><strong>Reactive Security</strong> with JWT</li>
+                <li><strong>Non-blocking Operations</strong> throughout the stack</li>
+                <li><strong>H2 R2DBC</strong> for development</li>
+                <li><strong>PostgreSQL R2DBC</strong> ready for production</li>
+                <li><strong>Reactive Validation</strong> and error handling</li>
+                <li><strong>WebTestClient</strong> integration tests</li>
+                <li><strong>Server-Sent Events</strong> for real-time updates</li>
+            </ul>
+            <h2 is-upgraded>Prerequisites</h2>
+            <ul>
+                <li>Completed Codelab 3.5 (JWT &amp; Spring Cloud Config)</li>
+                <li>Understanding of functional programming (lambdas, streams)</li>
+            </ul>
+            <h2 is-upgraded>Blocking vs Reactive</h2>
+            <p><strong>Blocking (Traditional):</strong></p>
+            <pre><code>Thread → DB Query → [WAIT] → Response
+(Thread blocked during I/O)
+</code></pre>
+            <p><strong>Reactive (Non-blocking):</strong></p>
+            <pre><code>Thread → DB Query → Release Thread
+         ↓
+      [I/O Happens]
+         ↓
+Thread Pool → Response
+(Thread freed during I/O)
+</code></pre>
+            <h2 is-upgraded>New Dependencies</h2>
+            <p>Replace blocking dependencies with reactive ones in <code>pom.xml</code>:</p>
+            <pre><code language="language-xml" class="language-xml">&lt;!-- REMOVE these blocking dependencies --&gt;
+&lt;!--
+&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-data-jpa&lt;/artifactId&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;com.h2database&lt;/groupId&gt;
+    &lt;artifactId&gt;h2&lt;/artifactId&gt;
+&lt;/dependency&gt;
+--&gt;
+
+&lt;!-- ADD these reactive dependencies --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-webflux&lt;/artifactId&gt;
+&lt;/dependency&gt;
+
+&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-data-r2dbc&lt;/artifactId&gt;
+&lt;/dependency&gt;
+
+&lt;!-- R2DBC H2 (for development) --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;io.r2dbc&lt;/groupId&gt;
+    &lt;artifactId&gt;r2dbc-h2&lt;/artifactId&gt;
+    &lt;scope&gt;runtime&lt;/scope&gt;
+&lt;/dependency&gt;
+
+&lt;!-- R2DBC PostgreSQL (for production) --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.postgresql&lt;/groupId&gt;
+    &lt;artifactId&gt;r2dbc-postgresql&lt;/artifactId&gt;
+    &lt;scope&gt;runtime&lt;/scope&gt;
+&lt;/dependency&gt;
+
+&lt;!-- Reactive Security --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-security&lt;/artifactId&gt;
+&lt;/dependency&gt;
+
+&lt;!-- Validation --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-validation&lt;/artifactId&gt;
+&lt;/dependency&gt;
+
+&lt;!-- Lombok --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.projectlombok&lt;/groupId&gt;
+    &lt;artifactId&gt;lombok&lt;/artifactId&gt;
+    &lt;optional&gt;true&lt;/optional&gt;
+&lt;/dependency&gt;
+
+&lt;!-- JWT (same as before) --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;io.jsonwebtoken&lt;/groupId&gt;
+    &lt;artifactId&gt;jjwt-api&lt;/artifactId&gt;
+    &lt;version&gt;0.12.3&lt;/version&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;io.jsonwebtoken&lt;/groupId&gt;
+    &lt;artifactId&gt;jjwt-impl&lt;/artifactId&gt;
+    &lt;version&gt;0.12.3&lt;/version&gt;
+    &lt;scope&gt;runtime&lt;/scope&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;io.jsonwebtoken&lt;/groupId&gt;
+    &lt;artifactId&gt;jjwt-jackson&lt;/artifactId&gt;
+    &lt;version&gt;0.12.3&lt;/version&gt;
+    &lt;scope&gt;runtime&lt;/scope&gt;
+&lt;/dependency&gt;
+
+&lt;!-- Reactor Test --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;io.projectreactor&lt;/groupId&gt;
+    &lt;artifactId&gt;reactor-test&lt;/artifactId&gt;
+    &lt;scope&gt;test&lt;/scope&gt;
+&lt;/dependency&gt;
+</code></pre>
+            <aside class="special">
+                <p><strong>Paradigm Shift:</strong> We&#39;re moving from imperative blocking code to declarative
+                    reactive streams. This enables better scalability with fewer threads!</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Understanding Reactive Programming" duration="8">
+            <p>Learn the reactive programming paradigm and Project Reactor.</p>
+            <h2 is-upgraded>Reactive Manifesto</h2>
+            <p>Reactive systems are:</p>
+            <ol type="1">
+                <li><strong>Responsive:</strong> Quick and consistent response times</li>
+                <li><strong>Resilient:</strong> Responsive despite failures</li>
+                <li><strong>Elastic:</strong> Responsive under varying load</li>
+                <li><strong>Message-Driven:</strong> Async message passing with backpressure</li>
+            </ol>
+            <h2 is-upgraded>Reactive Streams</h2>
+            <pre><code>Publisher → Subscriber
+     ↓
+  [Data Flow]
+     ↓
+[Backpressure]
+</code></pre>
+            <p><strong>Key Interfaces:</strong></p>
+            <ul>
+                <li><code>Publisher<T></code>: Produces data</li>
+                <li><code>Subscriber<T></code>: Consumes data</li>
+                <li><code>Subscription</code>: Connection between them</li>
+                <li><code>Processor<T,R></code>: Both publisher and subscriber</li>
+            </ul>
+            <h2 is-upgraded>Project Reactor Types</h2>
+            <p><strong>Mono</strong>: 0 or 1 element</p>
+            <pre><code language="language-java" class="language-java">Mono&lt;Task&gt; mono = taskRepository.findById(1L);
+// Emits: Task or empty
+</code></pre>
+            <p><strong>Flux</strong>: 0 to N elements</p>
+            <pre><code language="language-java" class="language-java">Flux&lt;Task&gt; flux = taskRepository.findAll();
+// Emits: Task, Task, Task, ..., complete
+</code></pre>
+            <h2 is-upgraded>Marble Diagrams</h2>
+            <p><strong>Mono:</strong></p>
+            <pre><code>Time →
+---(Task)---|→
+   emit    complete
+</code></pre>
+            <p><strong>Flux:</strong></p>
+            <pre><code>Time →
+---(T1)---(T2)---(T3)---|→
+   emit  emit  emit   complete
+</code></pre>
+            <p><strong>Error:</strong></p>
+            <pre><code>Time →
+---(T1)---(T2)---X
+   emit  emit  error
+</code></pre>
+            <h2 is-upgraded>Common Operators</h2>
+            <pre><code language="language-java" class="language-java">// map: Transform each element
+Flux&lt;String&gt; titles = flux.map(Task::getTitle);
+
+// flatMap: Transform to Publisher and flatten
+Flux&lt;User&gt; users = flux.flatMap(task -&gt; 
+    userRepository.findById(task.getUserId())
+);
+
+// filter: Keep elements matching predicate
+Flux&lt;Task&gt; todoTasks = flux.filter(task -&gt; 
+    task.getStatus() == TaskStatus.TODO
+);
+
+// take: Limit elements
+Flux&lt;Task&gt; first10 = flux.take(10);
+
+// zip: Combine multiple streams
+Flux&lt;Tuple2&lt;Task, User&gt;&gt; combined = Flux.zip(tasks, users);
+
+// merge: Interleave multiple streams
+Flux&lt;Task&gt; all = Flux.merge(flux1, flux2);
+
+// collectList: Flux → Mono&lt;List&gt;
+Mono&lt;List&lt;Task&gt;&gt; list = flux.collectList();
+
+// flatMapMany: Mono → Flux
+Flux&lt;Task&gt; tasks = userMono.flatMapMany(user -&gt; 
+    taskRepository.findByUserId(user.getId())
+);
+</code></pre>
+            <h2 is-upgraded>Error Handling</h2>
+            <pre><code language="language-java" class="language-java">// onErrorResume: Fallback to another publisher
+Mono&lt;Task&gt; result = taskRepository.findById(id)
+    .onErrorResume(error -&gt; Mono.empty());
+
+// onErrorReturn: Return default value
+Mono&lt;Task&gt; result = taskRepository.findById(id)
+    .onErrorReturn(new Task());
+
+// onErrorMap: Transform error
+Mono&lt;Task&gt; result = taskRepository.findById(id)
+    .onErrorMap(e -&gt; new TaskNotFoundException(id));
+
+// doOnError: Side effect on error
+Mono&lt;Task&gt; result = taskRepository.findById(id)
+    .doOnError(e -&gt; log.error(&#34;Error: {}&#34;, e.getMessage()));
+</code></pre>
+            <h2 is-upgraded>Subscription</h2>
+            <pre><code language="language-java" class="language-java">// Nothing happens until you subscribe!
+Mono&lt;Task&gt; mono = taskRepository.findById(1L);
+// ↑ No database query yet
+
+mono.subscribe(
+    task -&gt; System.out.println(&#34;Success: &#34; + task),
+    error -&gt; System.err.println(&#34;Error: &#34; + error),
+    () -&gt; System.out.println(&#34;Complete&#34;)
+);
+// ↑ Now the query executes
+</code></pre>
+            <h2 is-upgraded>Blocking vs Reactive Example</h2>
+            <p><strong>Blocking:</strong></p>
+            <pre><code language="language-java" class="language-java">@GetMapping(&#34;/tasks&#34;)
+public List&lt;Task&gt; getTasks() {
+    // Thread blocked until DB query completes
+    return taskRepository.findAll();
+}
+
+// 1000 concurrent requests = 1000 threads needed
+</code></pre>
+            <p><strong>Reactive:</strong></p>
+            <pre><code language="language-java" class="language-java">@GetMapping(&#34;/tasks&#34;)
+public Flux&lt;Task&gt; getTasks() {
+    // Thread released immediately
+    return taskRepository.findAll();
+}
+
+// 1000 concurrent requests = Few threads (event loop)
+</code></pre>
+            <h2 is-upgraded>Backpressure</h2>
+            <p>Publisher produces faster than Subscriber can consume:</p>
+            <pre><code>Publisher: ████████████████ (fast)
+Subscriber: ██ (slow)
+
+Problem: Memory overflow
+
+Solution: Backpressure
+- BUFFER: Store excess
+- DROP: Discard excess
+- LATEST: Keep only latest
+- ERROR: Fail fast
+</code></pre>
+            <pre><code language="language-java" class="language-java">Flux&lt;Task&gt; flux = taskRepository.findAll()
+    .onBackpressureBuffer(100)  // Buffer up to 100
+    .onBackpressureDrop()       // Or drop excess
+    .onBackpressureLatest();    // Or keep latest only
+</code></pre>
+            <aside class="special">
+                <p><strong>Key Insight:</strong> Reactive programming is about composing asynchronous, non-blocking
+                    operations using declarative code. Think &#34;what to do&#34; not &#34;how to do it&#34;!</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Configure R2DBC Database" duration="5">
+            <p>Set up R2DBC for reactive database access.</p>
+            <h2 is-upgraded>Update application.yml</h2>
+            <pre><code language="language-yaml" class="language-yaml">spring:
+  application:
+    name: task-manager-reactive
+  
+  # R2DBC Configuration (H2)
+  r2dbc:
+    url: r2dbc:h2:mem:///taskdb?options=DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password:
+  
+  # H2 Console (optional, for debugging)
+  h2:
+    console:
+      enabled: true
+
+# Logging
+logging:
+  level:
+    org.springframework.r2dbc: DEBUG
+    io.r2dbc: DEBUG
+    com.example.taskmanager: DEBUG
+</code></pre>
+            <h2 is-upgraded>PostgreSQL Configuration (Production)</h2>
+            <p><strong>application-prod.yml:</strong></p>
+            <pre><code language="language-yaml" class="language-yaml">spring:
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/taskdb
+    username: postgres
+    password: ${DB_PASSWORD}
+    pool:
+      initial-size: 10
+      max-size: 20
+      max-idle-time: 30m
+</code></pre>
+            <h2 is-upgraded>R2DBC URL Format</h2>
+            <pre><code>r2dbc:&lt;driver&gt;://&lt;host&gt;:&lt;port&gt;/&lt;database&gt;[?options]
+
+Examples:
+r2dbc:h2:mem:///testdb
+r2dbc:h2:file:///./data/taskdb
+r2dbc:postgresql://localhost:5432/taskdb
+r2dbc:mysql://localhost:3306/taskdb
+</code></pre>
+            <h2 is-upgraded>Initialize Database Schema</h2>
+            <p>R2DBC doesn&#39;t auto-create tables like JPA. Create schema initialization:</p>
+            <p><strong>resources/schema.sql:</strong></p>
+            <pre><code language="language-sql" class="language-sql">-- Drop tables if exist
+DROP TABLE IF EXISTS task_categories;
+DROP TABLE IF EXISTS user_roles;
+DROP TABLE IF EXISTS categories;
+DROP TABLE IF EXISTS tasks;
+DROP TABLE IF EXISTS users;
+
+-- Users table
+CREATE TABLE users (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    full_name VARCHAR(100) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    enabled BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- User roles table
+CREATE TABLE user_roles (
+    user_id BIGINT NOT NULL,
+    role VARCHAR(50) NOT NULL,
+    PRIMARY KEY (user_id, role),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- Tasks table
+CREATE TABLE tasks (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(100) NOT NULL,
+    description VARCHAR(500),
+    status VARCHAR(20) NOT NULL,
+    user_id BIGINT,
+    version BIGINT NOT NULL DEFAULT 0,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+);
+
+-- Categories table
+CREATE TABLE categories (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50) NOT NULL UNIQUE,
+    description VARCHAR(255)
+);
+
+-- Task-Category junction table
+CREATE TABLE task_categories (
+    task_id BIGINT NOT NULL,
+    category_id BIGINT NOT NULL,
+    PRIMARY KEY (task_id, category_id),
+    FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE,
+    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
+);
+</code></pre>
+            <h2 is-upgraded>Schema Initialization Configuration</h2>
+            <pre><code language="language-java" class="language-java">package com.example.taskmanager.config;
+
+import io.r2dbc.spi.ConnectionFactory;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.r2dbc.connection.init.ConnectionFactoryInitializer;
+import org.springframework.r2dbc.connection.init.ResourceDatabasePopulator;
+
+@Configuration
+public class R2dbcConfig {
+    
+    @Bean
+    public ConnectionFactoryInitializer initializer(ConnectionFactory connectionFactory) {
+        ConnectionFactoryInitializer initializer = new ConnectionFactoryInitializer();
+        initializer.setConnectionFactory(connectionFactory);
+        
+        ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
+        populator.addScript(new ClassPathResource(&#34;schema.sql&#34;));
+        
+        initializer.setDatabasePopulator(populator);
+        return initializer;
+    }
+}
+</code></pre>
+            <aside class="warning">
+                <p><strong>Important:</strong> R2DBC doesn&#39;t support JPA annotations like @Entity, @OneToMany. Use
+                    plain POJOs with @Table and @Id from Spring Data R2DBC.</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Create Reactive Entities" duration="8">
+            <p>Transform entities for R2DBC (no JPA annotations).</p>
+            <h2 is-upgraded>Task Entity</h2>
+            <pre><code language="language-java" class="language-java">package com.example.taskmanager.model;
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Version;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+
+@Table(&#34;tasks&#34;)
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Task {
+    
+    @Id
+    private Long id;
+    
+    @Column(&#34;title&#34;)
+    private String title;
+    
+    @Column(&#34;description&#34;)
+    private String description;
+    
+    @Column(&#34;status&#34;)
+    private TaskStatus status;
+    
+    @Column(&#34;user_id&#34;)
+    private Long userId;
+    
+    @Version
+    private Long version;
+    
+    @Column(&#34;created_at&#34;)
+    private LocalDateTime createdAt;
+    
+    @Column(&#34;updated_at&#34;)
+    private LocalDateTime updatedAt;
+    
+    public Task(String title, String description) {
+        this.title = title;
+        this.description = description;
+        this.status = TaskStatus.TODO;
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
+}
+</code></pre>
+            <h2 is-upgraded>TaskStatus Enum</h2>
+            <pre><code language="language-java" class="language-java">package com.example.taskmanager.model;
+
+public enum TaskStatus {
+    TODO,
+    IN_PROGRESS,
+    DONE,
+    CANCELLED
+}
+</code></pre>
+            <h2 is-upgraded>User Entity</h2>
+            <pre><code language="language-java" class="language-java">package com.example.taskmanager.model;
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
+
+@Table(&#34;users&#34;)
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class User {
+    
+    @Id
+    private Long id;
+    
+    @Column(&#34;username&#34;)
+    private String username;
+    
+    @Column(&#34;email&#34;)
+    private String email;
+    
+    @Column(&#34;full_name&#34;)
+    private String fullName;
+    
+    @Column(&#34;password&#34;)
+    private String password;
+    
+    @Column(&#34;enabled&#34;)
+    private Boolean enabled = true;
+    
+    @Column(&#34;created_at&#34;)
+    private LocalDateTime createdAt;
+    
+    // Roles loaded separately (no direct mapping in R2DBC)
+    @Transient
+    private Set&lt;String&gt; roles = new HashSet&lt;&gt;();
+    
+    public User(String username, String email, String fullName, String password) {
+        this.username = username;
+        this.email = email;
+        this.fullName = fullName;
+        this.password = password;
+        this.enabled = true;
+        this.createdAt = LocalDateTime.now();
+        this.roles.add(&#34;ROLE_USER&#34;);
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Category Entity</h2>
+            <pre><code language="language-java" class="language-java">package com.example.taskmanager.model;
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Table(&#34;categories&#34;)
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Category {
+    
+    @Id
+    private Long id;
+    
+    @Column(&#34;name&#34;)
+    private String name;
+    
+    @Column(&#34;description&#34;)
+    private String description;
+    
+    public Category(String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Key Differences from JPA</h2>
+            <table>
+                <tr>
+                    <td colspan="1" rowspan="1">
+                        <p>JPA</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>R2DBC</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="1" rowspan="1">
+                        <p><code>@Entity</code></p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p><code>@Table</code></p>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="1" rowspan="1">
+                        <p><code>@GeneratedValue</code></p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>Auto by DB</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="1" rowspan="1">
+                        <p><code>@OneToMany</code>, <code>@ManyToOne</code></p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>Manual join queries</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="1" rowspan="1">
+                        <p><code>@ManyToMany</code></p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>Junction table, manual</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="1" rowspan="1">
+                        <p><code>@Column(name)</code></p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p><code>@Column("name")</code></p>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="1" rowspan="1">
+                        <p>Lazy/Eager loading</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>Manual with <code>flatMap</code></p>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="1" rowspan="1">
+                        <p>Cascade operations</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>Manual</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="1" rowspan="1">
+                        <p>Relationships loaded automatically</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>Load explicitly</p>
+                    </td>
+                </tr>
+            </table>
+            <aside class="special">
+                <p><strong>R2DBC Philosophy:</strong> Simple, lightweight mapping. Complex relationships handled in
+                    application code using reactive operators.</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Reactive Repositories" duration="10">
+            <p>Create reactive repositories using R2dbcRepository.</p>
+            <h2 is-upgraded>TaskRepository</h2>
+            <pre><code language="language-java" class="language-java">package com.example.taskmanager.repository;
+
+import com.example.taskmanager.model.Task;
+import com.example.taskmanager.model.TaskStatus;
+import org.springframework.data.r2dbc.repository.Query;
+import org.springframework.data.r2dbc.repository.R2dbcRepository;
+import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+@Repository
+public interface TaskRepository extends R2dbcRepository&lt;Task, Long&gt; {
+    
+    // Derived query methods
+    Flux&lt;Task&gt; findByStatus(TaskStatus status);
+    
+    Flux&lt;Task&gt; findByUserId(Long userId);
+    
+    Flux&lt;Task&gt; findByTitleContainingIgnoreCase(String title);
+    
+    Mono&lt;Long&gt; countByStatus(TaskStatus status);
+    
+    Mono&lt;Boolean&gt; existsByTitleAndUserId(String title, Long userId);
+    
+    // Custom queries
+    @Query(&#34;SELECT * FROM tasks WHERE status = :status AND user_id = :userId&#34;)
+    Flux&lt;Task&gt; findByStatusAndUserId(TaskStatus status, Long userId);
+    
+    @Query(&#34;SELECT * FROM tasks WHERE created_at &gt; :since ORDER BY created_at DESC&#34;)
+    Flux&lt;Task&gt; findRecentTasks(String since);
+    
+    @Query(&#34;DELETE FROM tasks WHERE status = :status&#34;)
+    Mono&lt;Void&gt; deleteByStatus(TaskStatus status);
+}
+</code></pre>
+            <h2 is-upgraded>UserRepository</h2>
+            <pre><code language="language-java" class="language-java">package com.example.taskmanager.repository;
+
+import com.example.taskmanager.model.User;
+import org.springframework.data.r2dbc.repository.Query;
+import org.springframework.data.r2dbc.repository.R2dbcRepository;
+import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+@Repository
+public interface UserRepository extends R2dbcRepository&lt;User, Long&gt; {
+    
+    Mono&lt;User&gt; findByUsername(String username);
+    
+    Mono&lt;User&gt; findByEmail(String email);
+    
+    Mono&lt;Boolean&gt; existsByUsername(String username);
+    
+    Mono&lt;Boolean&gt; existsByEmail(String email);
+    
+    @Query(&#34;SELECT r.role FROM user_roles r WHERE r.user_id = :userId&#34;)
+    Flux&lt;String&gt; findRolesByUserId(Long userId);
+}
+</code></pre>
+            <h2 is-upgraded>UserRoleRepository</h2>
+            <pre><code language="language-java" class="language-java">package com.example.taskmanager.repository;
+
+import org.springframework.data.r2dbc.repository.Query;
+import org.springframework.data.repository.reactive.ReactiveCrudRepository;
+import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+@Repository
+public interface UserRoleRepository extends ReactiveCrudRepository&lt;UserRole, Long&gt; {
+    
+    @Query(&#34;INSERT INTO user_roles (user_id, role) VALUES (:userId, :role)&#34;)
+    Mono&lt;Void&gt; insertRole(Long userId, String role);
+    
+    @Query(&#34;DELETE FROM user_roles WHERE user_id = :userId AND role = :role&#34;)
+    Mono&lt;Void&gt; deleteRole(Long userId, String role);
+    
+    @Query(&#34;SELECT role FROM user_roles WHERE user_id = :userId&#34;)
+    Flux&lt;String&gt; findRolesByUserId(Long userId);
+}
+</code></pre>
+            <h2 is-upgraded>CategoryRepository</h2>
+            <pre><code language="language-java" class="language-java">package com.example.taskmanager.repository;
+
+import com.example.taskmanager.model.Category;
+import org.springframework.data.r2dbc.repository.R2dbcRepository;
+import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Mono;
+
+@Repository
+public interface CategoryRepository extends R2dbcRepository&lt;Category, Long&gt; {
+    
+    Mono&lt;Category&gt; findByName(String name);
+    
+    Mono&lt;Boolean&gt; existsByName(String name);
+}
+</code></pre>
+            <h2 is-upgraded>R2dbcRepository Methods</h2>
+            <pre><code language="language-java" class="language-java">// All methods return Mono or Flux
+Mono&lt;Task&gt; save(Task task);               // Save or update
+Flux&lt;Task&gt; saveAll(Iterable&lt;Task&gt; tasks); // Batch save
+Mono&lt;Task&gt; findById(Long id);             // Find by ID
+Flux&lt;Task&gt; findAll();                     // Find all
+Flux&lt;Task&gt; findAllById(Iterable&lt;Long&gt; ids); // Find multiple
+Mono&lt;Long&gt; count();                       // Count all
+Mono&lt;Boolean&gt; existsById(Long id);        // Check exists
+Mono&lt;Void&gt; deleteById(Long id);           // Delete by ID
+Mono&lt;Void&gt; delete(Task task);             // Delete entity
+Mono&lt;Void&gt; deleteAll();                   // Delete all
+</code></pre>
+            <aside class="special">
+                <p><strong>Reactive Repositories:</strong> All methods return Mono or Flux instead of blocking values.
+                    Queries execute only when subscribed!</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Reactive Service Layer" duration="10">
+            <p>Transform services to use reactive operators.</p>
+            <h2 is-upgraded>TaskService</h2>
+            <pre><code language="language-java" class="language-java">package com.example.taskmanager.service;
+
+import com.example.taskmanager.exception.TaskNotFoundException;
+import com.example.taskmanager.model.Task;
+import com.example.taskmanager.model.TaskStatus;
+import com.example.taskmanager.repository.TaskRepository;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+import java.time.LocalDateTime;
+
+@Service
+@Slf4j
+public class TaskService {
+    
+    private final TaskRepository taskRepository;
+    
+    public TaskService(TaskRepository taskRepository) {
+        this.taskRepository = taskRepository;
+    }
+    
+    public Mono&lt;Task&gt; createTask(Task task) {
+        log.debug(&#34;Creating task: {}&#34;, task.getTitle());
+        
+        task.setCreatedAt(LocalDateTime.now());
+        task.setUpdatedAt(LocalDateTime.now());
+        
+        if (task.getStatus() == null) {
+            task.setStatus(TaskStatus.TODO);
+        }
+        
+        return taskRepository.save(task)
+            .doOnSuccess(saved -&gt; log.info(&#34;Task created with ID: {}&#34;, saved.getId()))
+            .doOnError(error -&gt; log.error(&#34;Error creating task: {}&#34;, error.getMessage()));
+    }
+    
+    public Mono&lt;Task&gt; getTaskById(Long id) {
+        log.debug(&#34;Fetching task: {}&#34;, id);
+        
+        return taskRepository.findById(id)
+            .switchIfEmpty(Mono.error(new TaskNotFoundException(id)))
+            .doOnSuccess(task -&gt; log.debug(&#34;Found task: {}&#34;, task.getTitle()));
+    }
+    
+    public Flux&lt;Task&gt; getAllTasks() {
+        log.debug(&#34;Fetching all tasks&#34;);
+        return taskRepository.findAll()
+            .doOnComplete(() -&gt; log.debug(&#34;Fetched all tasks&#34;));
+    }
+    
+    public Mono&lt;Task&gt; updateTask(Long id, Task taskDetails) {
+        log.debug(&#34;Updating task: {}&#34;, id);
+        
+        return taskRepository.findById(id)
+            .switchIfEmpty(Mono.error(new TaskNotFoundException(id)))
+            .flatMap(task -&gt; {
+                task.setTitle(taskDetails.getTitle());
+                task.setDescription(taskDetails.getDescription());
+                task.setStatus(taskDetails.getStatus());
+                task.setUpdatedAt(LocalDateTime.now());
+                return taskRepository.save(task);
+            })
+            .doOnSuccess(updated -&gt; log.info(&#34;Task updated: {}&#34;, id));
+    }
+    
+    public Mono&lt;Void&gt; deleteTask(Long id) {
+        log.debug(&#34;Deleting task: {}&#34;, id);
+        
+        return taskRepository.existsById(id)
+            .flatMap(exists -&gt; {
+                if (!exists) {
+                    return Mono.error(new TaskNotFoundException(id));
+                }
+                return taskRepository.deleteById(id);
+            })
+            .doOnSuccess(v -&gt; log.info(&#34;Task deleted: {}&#34;, id));
+    }
+    
+    public Mono&lt;Task&gt; updateTaskStatus(Long id, TaskStatus status) {
+        log.debug(&#34;Updating task {} status to {}&#34;, id, status);
+        
+        return taskRepository.findById(id)
+            .switchIfEmpty(Mono.error(new TaskNotFoundException(id)))
+            .flatMap(task -&gt; {
+                task.setStatus(status);
+                task.setUpdatedAt(LocalDateTime.now());
+                return taskRepository.save(task);
+            });
+    }
+    
+    public Flux&lt;Task&gt; getTasksByStatus(TaskStatus status) {
+        log.debug(&#34;Fetching tasks with status: {}&#34;, status);
+        return taskRepository.findByStatus(status);
+    }
+    
+    public Flux&lt;Task&gt; getTasksByUser(Long userId) {
+        log.debug(&#34;Fetching tasks for user: {}&#34;, userId);
+        return taskRepository.findByUserId(userId);
+    }
+    
+    public Flux&lt;Task&gt; searchTasks(String keyword) {
+        log.debug(&#34;Searching tasks with keyword: {}&#34;, keyword);
+        return taskRepository.findByTitleContainingIgnoreCase(keyword);
+    }
+    
+    public Mono&lt;Task&gt; assignTaskToUser(Long taskId, Long userId) {
+        log.debug(&#34;Assigning task {} to user {}&#34;, taskId, userId);
+        
+        return taskRepository.findById(taskId)
+            .switchIfEmpty(Mono.error(new TaskNotFoundException(taskId)))
+            .flatMap(task -&gt; {
+                task.setUserId(userId);
+                task.setUpdatedAt(LocalDateTime.now());
+                return taskRepository.save(task);
+            });
+    }
+    
+    public Mono&lt;Long&gt; countTasksByStatus(TaskStatus status) {
+        return taskRepository.countByStatus(status);
+    }
+    
+    public Flux&lt;Task&gt; getRecentTasks(int days) {
+        LocalDateTime since = LocalDateTime.now().minusDays(days);
+        return taskRepository.findRecentTasks(since.toString());
+    }
+    
+    // Reactive batch operation
+    public Flux&lt;Task&gt; createMultipleTasks(Flux&lt;Task&gt; tasks) {
+        return tasks
+            .doOnNext(task -&gt; {
+                task.setCreatedAt(LocalDateTime.now());
+                task.setUpdatedAt(LocalDateTime.now());
+                if (task.getStatus() == null) {
+                    task.setStatus(TaskStatus.TODO);
+                }
+            })
+            .flatMap(taskRepository::save)
+            .doOnComplete(() -&gt; log.info(&#34;Batch task creation completed&#34;));
+    }
+}
+</code></pre>
+            <h2 is-upgraded>UserService</h2>
+            <pre><code language="language-java" class="language-java">package com.example.taskmanager.service;
+
+import com.example.taskmanager.model.User;
+import com.example.taskmanager.repository.UserRepository;
+import com.example.taskmanager.repository.UserRoleRepository;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+import java.time.LocalDateTime;
+
+@Service
+@Slf4j
+public class UserService {
+    
+    private final UserRepository userRepository;
+    private final UserRoleRepository userRoleRepository;
+    private final PasswordEncoder passwordEncoder;
+    
+    public UserService(UserRepository userRepository,
+                       UserRoleRepository userRoleRepository,
+                       PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.userRoleRepository = userRoleRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
+    
+    public Mono&lt;User&gt; registerUser(User user) {
+        log.debug(&#34;Registering user: {}&#34;, user.getUsername());
+        
+        return userRepository.existsByUsername(user.getUsername())
+            .flatMap(exists -&gt; {
+                if (exists) {
+                    return Mono.error(new RuntimeException(&#34;Username already exists&#34;));
+                }
+                return userRepository.existsByEmail(user.getEmail());
+            })
+            .flatMap(exists -&gt; {
+                if (exists) {
+                    return Mono.error(new RuntimeException(&#34;Email already exists&#34;));
+                }
+                
+                user.setPassword(passwordEncoder.encode(user.getPassword()));
+                user.setCreatedAt(LocalDateTime.now());
+                user.setEnabled(true);
+                
+                return userRepository.save(user);
+            })
+            .flatMap(savedUser -&gt; {
+                // Insert default role
+                return userRoleRepository.insertRole(savedUser.getId(), &#34;ROLE_USER&#34;)
+                    .thenReturn(savedUser);
+            })
+            .doOnSuccess(u -&gt; log.info(&#34;User registered: {}&#34;, u.getUsername()));
+    }
+    
+    public Mono&lt;User&gt; getUserById(Long id) {
+        return userRepository.findById(id)
+            .switchIfEmpty(Mono.error(new RuntimeException(&#34;User not found&#34;)))
+            .flatMap(this::loadUserRoles);
+    }
+    
+    public Mono&lt;User&gt; getUserByUsername(String username) {
+        return userRepository.findByUsername(username)
+            .switchIfEmpty(Mono.error(new RuntimeException(&#34;User not found&#34;)))
+            .flatMap(this::loadUserRoles);
+    }
+    
+    public Flux&lt;User&gt; getAllUsers() {
+        return userRepository.findAll()
+            .flatMap(this::loadUserRoles);
+    }
+    
+    public Mono&lt;Void&gt; deleteUser(Long id) {
+        return userRepository.existsById(id)
+            .flatMap(exists -&gt; {
+                if (!exists) {
+                    return Mono.error(new RuntimeException(&#34;User not found&#34;));
+                }
+                return userRepository.deleteById(id);
+            });
+    }
+    
+    // Helper: Load user roles
+    private Mono&lt;User&gt; loadUserRoles(User user) {
+        return userRoleRepository.findRolesByUserId(user.getId())
+            .collectList()
+            .map(roles -&gt; {
+                user.getRoles().addAll(roles);
+                return user;
+            });
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Reactive Patterns</h2>
+            <pre><code language="language-java" class="language-java">// Pattern 1: Chain operations
+mono.flatMap(value -&gt; doSomething(value))
+    .flatMap(result -&gt; doAnotherThing(result))
+    .map(finalResult -&gt; transform(finalResult));
+
+// Pattern 2: Error handling
+mono.switchIfEmpty(Mono.error(new NotFoundException()))
+    .onErrorResume(e -&gt; Mono.just(defaultValue));
+
+// Pattern 3: Combine multiple sources
+Mono.zip(mono1, mono2, mono3)
+    .map(tuple -&gt; combine(tuple.getT1(), tuple.getT2(), tuple.getT3()));
+
+// Pattern 4: Conditional logic
+mono.flatMap(value -&gt; {
+    if (condition) {
+        return Mono.just(value);
+    } else {
+        return Mono.error(new ValidationException());
+    }
+});
+
+// Pattern 5: Side effects
+mono.doOnSuccess(v -&gt; log.info(&#34;Success: {}&#34;, v))
+    .doOnError(e -&gt; log.error(&#34;Error: {}&#34;, e))
+    .doFinally(signal -&gt; log.debug(&#34;Completed with signal: {}&#34;, signal));
+</code></pre>
+            <aside class="special">
+                <p><strong>Reactive Composition:</strong> Chain operations using flatMap, map, filter. Each operator
+                    returns a new Publisher, enabling functional composition!</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Reactive Controllers" duration="8">
+            <p>Create WebFlux controllers with Mono and Flux.</p>
+            <h2 is-upgraded>TaskController</h2>
+            <pre><code language="language-java" class="language-java">package com.example.taskmanager.controller;
+
+import com.example.taskmanager.dto.CreateTaskRequest;
+import com.example.taskmanager.dto.TaskResponse;
+import com.example.taskmanager.dto.UpdateTaskRequest;
+import com.example.taskmanager.model.Task;
+import com.example.taskmanager.model.TaskStatus;
+import com.example.taskmanager.service.TaskService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+import java.net.URI;
+import java.time.Duration;
+import java.util.Map;
+
+@RestController
+@RequestMapping(&#34;/api/tasks&#34;)
+@Tag(name = &#34;Task Management (Reactive)&#34;)
+@SecurityRequirement(name = &#34;bearer-jwt&#34;)
+@Slf4j
+public class TaskController {
+    
+    private final TaskService taskService;
+    
+    public TaskController(TaskService taskService) {
+        this.taskService = taskService;
+    }
+    
+    @Operation(summary = &#34;Create a new task&#34;)
+    @PostMapping
+    public Mono&lt;ResponseEntity&lt;TaskResponse&gt;&gt; createTask(
+            @Valid @RequestBody CreateTaskRequest request) {
+        
+        log.info(&#34;POST /api/tasks - Creating task: {}&#34;, request.getTitle());
+        
+        Task task = new Task();
+        task.setTitle(request.getTitle());
+        task.setDescription(request.getDescription());
+        task.setStatus(request.getStatus() != null ? request.getStatus() : TaskStatus.TODO);
+        
+        return taskService.createTask(task)
+            .map(TaskResponse::new)
+            .map(response -&gt; ResponseEntity
+                .created(URI.create(&#34;/api/tasks/&#34; + response.getId()))
+                .body(response));
+    }
+    
+    @Operation(summary = &#34;Get all tasks&#34;)
+    @GetMapping
+    public Flux&lt;TaskResponse&gt; getAllTasks() {
+        log.info(&#34;GET /api/tasks&#34;);
+        return taskService.getAllTasks()
+            .map(TaskResponse::new);
+    }
+    
+    @Operation(summary = &#34;Get task by ID&#34;)
+    @GetMapping(&#34;/{id}&#34;)
+    public Mono&lt;ResponseEntity&lt;TaskResponse&gt;&gt; getTaskById(@PathVariable Long id) {
+        log.info(&#34;GET /api/tasks/{}&#34;, id);
+        return taskService.getTaskById(id)
+            .map(TaskResponse::new)
+            .map(ResponseEntity::ok)
+            .defaultIfEmpty(ResponseEntity.notFound().build());
+    }
+    
+    @Operation(summary = &#34;Update task&#34;)
+    @PutMapping(&#34;/{id}&#34;)
+    public Mono&lt;ResponseEntity&lt;TaskResponse&gt;&gt; updateTask(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateTaskRequest request) {
+        
+        log.info(&#34;PUT /api/tasks/{}&#34;, id);
+        
+        Task task = new Task();
+        task.setTitle(request.getTitle());
+        task.setDescription(request.getDescription());
+        task.setStatus(request.getStatus());
+        
+        return taskService.updateTask(id, task)
+            .map(TaskResponse::new)
+            .map(ResponseEntity::ok);
+    }
+    
+    @Operation(summary = &#34;Delete task&#34;)
+    @DeleteMapping(&#34;/{id}&#34;)
+    public Mono&lt;ResponseEntity&lt;Void&gt;&gt; deleteTask(@PathVariable Long id) {
+        log.info(&#34;DELETE /api/tasks/{}&#34;, id);
+        return taskService.deleteTask(id)
+            .then(Mono.just(ResponseEntity.noContent().&lt;Void&gt;build()));
+    }
+    
+    @Operation(summary = &#34;Update task status&#34;)
+    @PatchMapping(&#34;/{id}/status&#34;)
+    public Mono&lt;ResponseEntity&lt;TaskResponse&gt;&gt; updateTaskStatus(
+            @PathVariable Long id,
+            @RequestBody Map&lt;String, TaskStatus&gt; request) {
+        
+        log.info(&#34;PATCH /api/tasks/{}/status&#34;, id);
+        TaskStatus status = request.get(&#34;status&#34;);
+        
+        return taskService.updateTaskStatus(id, status)
+            .map(TaskResponse::new)
+            .map(ResponseEntity::ok);
+    }
+    
+    @Operation(summary = &#34;Get tasks by status&#34;)
+    @GetMapping(&#34;/status/{status}&#34;)
+    public Flux&lt;TaskResponse&gt; getTasksByStatus(@PathVariable TaskStatus status) {
+        log.info(&#34;GET /api/tasks/status/{}&#34;, status);
+        return taskService.getTasksByStatus(status)
+            .map(TaskResponse::new);
+    }
+    
+    @Operation(summary = &#34;Search tasks&#34;)
+    @GetMapping(&#34;/search&#34;)
+    public Flux&lt;TaskResponse&gt; searchTasks(@RequestParam String keyword) {
+        log.info(&#34;GET /api/tasks/search?keyword={}&#34;, keyword);
+        return taskService.searchTasks(keyword)
+            .map(TaskResponse::new);
+    }
+    
+    @Operation(summary = &#34;Get task statistics&#34;)
+    @GetMapping(&#34;/stats&#34;)
+    public Mono&lt;Map&lt;TaskStatus, Long&gt;&gt; getTaskStats() {
+        log.info(&#34;GET /api/tasks/stats&#34;);
+        
+        return Flux.fromArray(TaskStatus.values())
+            .flatMap(status -&gt; 
+                taskService.countTasksByStatus(status)
+                    .map(count -&gt; Map.entry(status, count))
+            )
+            .collectMap(Map.Entry::getKey, Map.Entry::getValue);
+    }
+    
+    // Server-Sent Events (SSE) - Real-time task updates
+    @Operation(summary = &#34;Stream task updates (SSE)&#34;)
+    @GetMapping(value = &#34;/stream&#34;, produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux&lt;TaskResponse&gt; streamTasks() {
+        log.info(&#34;GET /api/tasks/stream - SSE connection established&#34;);
+        
+        return taskService.getAllTasks()
+            .map(TaskResponse::new)
+            .delayElements(Duration.ofSeconds(1)); // Emit one task per second
+    }
+}
+</code></pre>
+            <h2 is-upgraded>AuthController (Reactive)</h2>
+            <pre><code language="language-java" class="language-java">package com.example.taskmanager.controller;
+
+import com.example.taskmanager.dto.AuthResponse;
+import com.example.taskmanager.dto.LoginRequest;
+import com.example.taskmanager.dto.SignupRequest;
+import com.example.taskmanager.service.AuthService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
+
+@RestController
+@RequestMapping(&#34;/api/auth&#34;)
+@Tag(name = &#34;Authentication (Reactive)&#34;)
+@Slf4j
+public class AuthController {
+    
+    private final AuthService authService;
+    
+    public AuthController(AuthService authService) {
+        this.authService = authService;
+    }
+    
+    @Operation(summary = &#34;User login - Get JWT token&#34;)
+    @PostMapping(&#34;/login&#34;)
+    public Mono&lt;ResponseEntity&lt;AuthResponse&gt;&gt; login(
+            @Valid @RequestBody LoginRequest loginRequest) {
+        
+        log.info(&#34;POST /api/auth/login - User: {}&#34;, loginRequest.getUsername());
+        return authService.login(loginRequest)
+            .map(ResponseEntity::ok);
+    }
+    
+    @Operation(summary = &#34;User signup - Register and get JWT token&#34;)
+    @PostMapping(&#34;/signup&#34;)
+    public Mono&lt;ResponseEntity&lt;AuthResponse&gt;&gt; signup(
+            @Valid @RequestBody SignupRequest signupRequest) {
+        
+        log.info(&#34;POST /api/auth/signup - User: {}&#34;, signupRequest.getUsername());
+        return authService.signup(signupRequest)
+            .map(ResponseEntity::ok);
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Server-Sent Events (SSE)</h2>
+            <pre><code language="language-java" class="language-java">// Real-time streaming example
+@GetMapping(value = &#34;/live-updates&#34;, produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+public Flux&lt;TaskResponse&gt; liveTaskUpdates() {
+    return Flux.interval(Duration.ofSeconds(5))
+        .flatMap(tick -&gt; taskService.getAllTasks())
+        .map(TaskResponse::new);
+}
+</code></pre>
+            <aside class="special">
+                <p><strong>SSE Advantage:</strong> With reactive streams, Server-Sent Events are trivial to implement.
+                    Just return Flux with TEXT_EVENT_STREAM_VALUE!</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Testing Reactive API" duration="5">
+            <p>Test reactive endpoints with WebTestClient.</p>
+            <h2 is-upgraded>Integration Test</h2>
+            <pre><code language="language-java" class="language-java">package com.example.taskmanager;
+
+import com.example.taskmanager.dto.CreateTaskRequest;
+import com.example.taskmanager.dto.TaskResponse;
+import com.example.taskmanager.model.TaskStatus;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.reactive.server.WebTestClient;
+import reactor.core.publisher.Mono;
+
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureWebTestClient
+public class TaskControllerIntegrationTest {
+    
+    @Autowired
+    private WebTestClient webTestClient;
+    
+    @Test
+    public void testCreateTask() {
+        CreateTaskRequest request = new CreateTaskRequest(
+            &#34;Test Task&#34;,
+            &#34;Test Description&#34;,
+            TaskStatus.TODO
+        );
+        
+        webTestClient.post()
+            .uri(&#34;/api/tasks&#34;)
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(Mono.just(request), CreateTaskRequest.class)
+            .exchange()
+            .expectStatus().isCreated()
+            .expectBody(TaskResponse.class)
+            .value(response -&gt; {
+                assert response.getTitle().equals(&#34;Test Task&#34;);
+                assert response.getStatus() == TaskStatus.TODO;
+            });
+    }
+    
+    @Test
+    public void testGetAllTasks() {
+        webTestClient.get()
+            .uri(&#34;/api/tasks&#34;)
+            .exchange()
+            .expectStatus().isOk()
+            .expectBodyList(TaskResponse.class)
+            .hasSize(0); // Assuming empty database
+    }
+    
+    @Test
+    public void testStreamTasks() {
+        webTestClient.get()
+            .uri(&#34;/api/tasks/stream&#34;)
+            .accept(MediaType.TEXT_EVENT_STREAM)
+            .exchange()
+            .expectStatus().isOk()
+            .expectHeader().contentType(MediaType.TEXT_EVENT_STREAM_VALUE)
+            .expectBodyList(TaskResponse.class);
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Unit Test with Reactor Test</h2>
+            <pre><code language="language-java" class="language-java">package com.example.taskmanager.service;
+
+import com.example.taskmanager.model.Task;
+import com.example.taskmanager.model.TaskStatus;
+import com.example.taskmanager.repository.TaskRepository;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
+public class TaskServiceTest {
+    
+    @Mock
+    private TaskRepository taskRepository;
+    
+    @InjectMocks
+    private TaskService taskService;
+    
+    @Test
+    public void testCreateTask() {
+        Task task = new Task(&#34;Test&#34;, &#34;Description&#34;);
+        task.setId(1L);
+        
+        when(taskRepository.save(any(Task.class))).thenReturn(Mono.just(task));
+        
+        Mono&lt;Task&gt; result = taskService.createTask(task);
+        
+        StepVerifier.create(result)
+            .expectNextMatches(t -&gt; t.getId().equals(1L))
+            .verifyComplete();
+    }
+    
+    @Test
+    public void testGetAllTasks() {
+        Task task1 = new Task(&#34;Task 1&#34;, &#34;Desc 1&#34;);
+        Task task2 = new Task(&#34;Task 2&#34;, &#34;Desc 2&#34;);
+        
+        when(taskRepository.findAll()).thenReturn(Flux.just(task1, task2));
+        
+        Flux&lt;Task&gt; result = taskService.getAllTasks();
+        
+        StepVerifier.create(result)
+            .expectNext(task1)
+            .expectNext(task2)
+            .verifyComplete();
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Run Tests</h2>
+            <pre><code language="language-bash" class="language-bash">mvn test
+</code></pre>
+            <aside class="special">
+                <p><strong>Reactor Test:</strong> StepVerifier provides a fluent API for testing reactive streams.
+                    Verify emissions, errors, and completion!</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Conclusion" duration="2">
+            <p>Congratulations! 🎉 You&#39;ve transformed your API to fully reactive!</p>
+            <h2 is-upgraded>What You&#39;ve Learned</h2>
+            <ul>
+                <li>✅ <strong>Reactive Programming:</strong> Non-blocking, event-driven paradigm</li>
+                <li>✅ <strong>Project Reactor:</strong> Mono and Flux for reactive streams</li>
+                <li>✅ <strong>Spring WebFlux:</strong> Reactive web framework</li>
+                <li>✅ <strong>R2DBC:</strong> Reactive database connectivity</li>
+                <li>✅ <strong>Reactive Repositories:</strong> Non-blocking data access</li>
+                <li>✅ <strong>Reactive Operators:</strong> map, flatMap, filter, zip, merge</li>
+                <li>✅ <strong>Error Handling:</strong> onErrorResume, switchIfEmpty</li>
+                <li>✅ <strong>Server-Sent Events:</strong> Real-time streaming</li>
+                <li>✅ <strong>Testing:</strong> WebTestClient and StepVerifier</li>
+            </ul>
+            <h2 is-upgraded>Task Management API v1.5</h2>
+            <p>Reactive features:</p>
+            <ul>
+                <li>✅ Fully non-blocking architecture</li>
+                <li>✅ WebFlux controllers with Mono/Flux</li>
+                <li>✅ R2DBC for reactive database access</li>
+                <li>✅ Reactive repositories and services</li>
+                <li>✅ Server-Sent Events for real-time updates</li>
+                <li>✅ Better scalability with event loop</li>
+                <li>✅ Lower memory footprint</li>
+                <li>✅ Backpressure support</li>
+                <li>✅ Functional reactive composition</li>
+            </ul>
+            <h2 is-upgraded>Performance Benefits</h2>
+            <p><strong>Blocking (Web MVC):</strong></p>
+            <ul>
+                <li>1000 requests = 1000 threads</li>
+                <li>High memory usage</li>
+                <li>Context switching overhead</li>
+            </ul>
+            <p><strong>Reactive (WebFlux):</strong></p>
+            <ul>
+                <li>1000 requests = ~10 threads (event loop)</li>
+                <li>Low memory usage</li>
+                <li>No context switching</li>
+                <li>10x+ better throughput</li>
+            </ul>
+            <h2 is-upgraded>Git Branching</h2>
+            <pre><code language="language-bash" class="language-bash">git add .
+git commit -m &#34;Codelab 3.6: Reactive WebFlux &amp; R2DBC complete&#34;
+git tag codelab-3.6
+</code></pre>
+            <h2 is-upgraded>Next Steps</h2>
+            <ul>
+                <li><strong>Codelab 3.7:</strong> Spring JMS &amp; Event-Driven Architecture</li>
+            </ul>
+            <h2 is-upgraded>Additional Resources</h2>
+            <ul>
+                <li><a href="https://projectreactor.io/docs" target="_blank">Project Reactor Documentation</a></li>
+                <li><a href="https://docs.spring.io/spring-framework/reference/web/webflux.html" target="_blank">Spring
+                        WebFlux Reference</a></li>
+                <li><a href="https://r2dbc.io/" target="_blank">R2DBC Documentation</a></li>
+                <li><a href="https://www.reactivemanifesto.org/" target="_blank">Reactive Manifesto</a></li>
+            </ul>
+            <aside class="special">
+                <p><strong>Cloud Native Ready!</strong> Your API now handles high concurrency with minimal resources -
+                    perfect for cloud deployments and microservices!</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+    </google-codelab>
+
+    <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
+    <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
+    <script src="https://storage.googleapis.com/claat-public/prettify.js"></script>
+    <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
+    <script src="//support.google.com/inapp/api.js"></script>
+
+</body>
+
+</html>

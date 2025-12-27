@@ -1,0 +1,26 @@
+{
+  "environment": "web",
+  "format": "html",
+  "prefix": "https://storage.googleapis.com",
+  "mainga": "UA-49880327-14",
+  "updated": "2025-12-27T18:48:58+05:30",
+  "id": "optional-datetime-modern-java",
+  "duration": 90,
+  "title": "Optional, Date/Time \u0026 Modern Java Features",
+  "summary": "Master Optional for null-safety, modern Date/Time API, immutable collections, var keyword, switch expressions, text blocks, and records by building a conference scheduling system",
+  "source": "codelab-2.2-optional-datetime-modern-java.md",
+  "theme": "",
+  "status": [
+    "published"
+  ],
+  "category": [
+    "java",
+    "java8+",
+    "modernjava",
+    "datetimeapi"
+  ],
+  "tags": [
+    "web"
+  ],
+  "url": "optional-datetime-modern-java"
+}

@@ -1,0 +1,1153 @@
+<!doctype html>
+
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+    <meta name="theme-color" content="#4F7DC9">
+    <meta charset="UTF-8">
+    <title>Memory Management &amp; Garbage Collection</title>
+    <link rel="stylesheet"
+        href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
+    <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
+    <style>
+        .success {
+            color: #1e8e3e;
+        }
+
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+    <google-codelab-analytics gaid="UA-49880327-14"></google-codelab-analytics>
+    <google-codelab codelab-gaid="" id="memory-management" title="Memory Management &amp; Garbage Collection"
+        environment="web" feedback-link="">
+
+        <google-codelab-step label="Introduction" duration="2">
+            <p>Understanding memory management is crucial for building performant Java applications. In this codelab,
+                you&#39;ll explore JVM memory architecture, garbage collection mechanisms, and learn to identify and
+                prevent memory leaks using real-world profiling tools.</p>
+            <h2 class="checklist" is-upgraded>What You&#39;ll Learn</h2>
+            <ul class="checklist">
+                <li>JVM memory model (Heap, Stack, Method Area)</li>
+                <li>Object lifecycle and memory allocation</li>
+                <li>Garbage collection algorithms (Serial, Parallel, G1GC, ZGC)</li>
+                <li>Memory leaks: causes and prevention</li>
+                <li>JVM monitoring tools (jconsole, VisualVM, JProfiler)</li>
+                <li>Memory optimization techniques</li>
+                <li>Best practices for memory-efficient code</li>
+                <li>Analyzing heap dumps and thread dumps</li>
+            </ul>
+            <h2 is-upgraded>What You&#39;ll Build</h2>
+            <p>Memory profiling exercises including:</p>
+            <ul>
+                <li>Memory-intensive applications to observe GC behavior</li>
+                <li>Memory leak scenarios and detection</li>
+                <li>Performance benchmarks comparing GC algorithms</li>
+                <li>Monitoring dashboard using JMX</li>
+                <li>Optimization exercises with before/after metrics</li>
+            </ul>
+            <h2 is-upgraded>Prerequisites</h2>
+            <ul>
+                <li>Completed Codelabs 1.1 through 1.4</li>
+                <li>Understanding of Java objects and collections</li>
+                <li>Java JDK 17+ installed</li>
+                <li>VisualVM or JConsole (included with JDK)</li>
+            </ul>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="JVM Memory Architecture" duration="12">
+            <p>Let&#39;s dive deep into how JVM manages memory.</p>
+            <h2 is-upgraded>Memory Areas Overview</h2>
+            <pre><code>JVM Memory Structure
+┌────────────────────────────────────────────────────────────┐
+│                    Runtime Data Areas                       │
+├────────────────────────────────────────────────────────────┤
+│ Method Area (Metaspace in Java 8+)                         │
+│ - Class metadata                                           │
+│ - Static variables                                         │
+│ - Constant pool                                            │
+├────────────────────────────────────────────────────────────┤
+│ Heap (Shared across all threads)                           │
+│ ┌─────────────────────────────────────────────────────────┐│
+│ │ Young Generation                                        ││
+│ │ ├─ Eden Space (new objects)                            ││
+│ │ ├─ Survivor Space 0 (S0)                               ││
+│ │ └─ Survivor Space 1 (S1)                               ││
+│ ├─────────────────────────────────────────────────────────┤│
+│ │ Old Generation (Tenured)                               ││
+│ │ - Long-lived objects                                   ││
+│ └─────────────────────────────────────────────────────────┘│
+├────────────────────────────────────────────────────────────┤
+│ Stack (Per thread)                                         │
+│ - Method calls                                             │
+│ - Local variables                                          │
+│ - Partial results                                          │
+├────────────────────────────────────────────────────────────┤
+│ PC Register (Per thread)                                   │
+│ - Current instruction pointer                              │
+├────────────────────────────────────────────────────────────┤
+│ Native Method Stack (Per thread)                           │
+│ - Native method calls                                      │
+└────────────────────────────────────────────────────────────┘
+</code></pre>
+            <h2 is-upgraded>Heap vs Stack Memory</h2>
+            <p><strong>Stack Memory:</strong></p>
+            <ul>
+                <li>Stores primitive local variables and object references</li>
+                <li>Fast allocation/deallocation (LIFO)</li>
+                <li>Thread-specific (each thread has its own stack)</li>
+                <li>Limited size (typically 1MB per thread)</li>
+                <li>Automatic cleanup when method exits</li>
+            </ul>
+            <p><strong>Heap Memory:</strong></p>
+            <ul>
+                <li>Stores all objects and instance variables</li>
+                <li>Shared across all threads</li>
+                <li>Larger size (configured with -Xms and -Xmx)</li>
+                <li>Managed by Garbage Collector</li>
+                <li>Slower access than stack</li>
+            </ul>
+            <h2 is-upgraded>Demonstration: Stack vs Heap</h2>
+            <pre><code language="language-java" class="language-java">public class MemoryDemo {
+    
+    // Class variable (Method Area/Metaspace)
+    private static int classCounter = 0;
+    
+    // Instance variable (Heap)
+    private String name;
+    private int value;
+    
+    public MemoryDemo(String name, int value) {
+        this.name = name;  // Heap
+        this.value = value;  // Heap
+        classCounter++;  // Method Area
+    }
+    
+    public void demonstrateMemory() {
+        // Local primitive variable (Stack)
+        int localNumber = 42;
+        
+        // Local object reference (Stack), object itself (Heap)
+        String localString = &#34;Hello&#34;;
+        
+        // Array reference (Stack), array object (Heap)
+        int[] localArray = new int[5];
+        
+        System.out.println(&#34;Method execution:&#34;);
+        System.out.println(&#34;  localNumber (stack): &#34; + localNumber);
+        System.out.println(&#34;  localString reference (stack), object (heap): &#34; + localString);
+        System.out.println(&#34;  localArray reference (stack), array (heap): &#34; + localArray.length);
+    }
+    
+    public static void main(String[] args) {
+        // Object reference (Stack), object (Heap)
+        MemoryDemo demo = new MemoryDemo(&#34;Example&#34;, 100);
+        demo.demonstrateMemory();
+        
+        // After method returns, localNumber, localString reference, 
+        // and localArray reference are removed from stack
+        // But objects remain in heap until GC collects them
+        
+        System.out.println(&#34;\nClass counter: &#34; + classCounter);
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Object Lifecycle</h2>
+            <pre><code language="language-java" class="language-java">public class ObjectLifecycle {
+    
+    public static void main(String[] args) {
+        // 1. Object Creation - allocated in Eden space
+        Person person = new Person(&#34;Alice&#34;, 25);
+        
+        // 2. Object in use - lives in heap
+        System.out.println(person.getName());
+        
+        // 3. Object becomes unreachable - eligible for GC
+        person = null;  // No more references to original object
+        
+        // 4. Garbage Collection - JVM reclaims memory (eventually)
+        // We can suggest GC (but JVM decides when to actually run it)
+        System.gc();
+        
+        // 5. finalize() called before reclamation (deprecated in Java 9+)
+        // Modern alternative: try-with-resources or Cleaner API
+    }
+}
+
+class Person {
+    private String name;
+    private int age;
+    
+    public Person(String name, int age) {
+        this.name = name;
+        this.age = age;
+        System.out.println(&#34;Person created: &#34; + name);
+    }
+    
+    public String getName() { return name; }
+    
+    // Deprecated since Java 9 - shown for educational purposes
+    @Override
+    protected void finalize() throws Throwable {
+        System.out.println(&#34;Person finalized: &#34; + name);
+        super.finalize();
+    }
+}
+</code></pre>
+            <aside class="warning">
+                <p><strong>Important:</strong> Never rely on <code>finalize()</code> for cleanup! Use try-with-resources
+                    for closeable resources or the Cleaner API for explicit cleanup.</p>
+            </aside>
+            <h2 is-upgraded>Viewing Memory Usage</h2>
+            <pre><code language="language-java" class="language-java">public class MemoryUsageDemo {
+    
+    public static void printMemoryStats() {
+        Runtime runtime = Runtime.getRuntime();
+        
+        long maxMemory = runtime.maxMemory();      // -Xmx
+        long totalMemory = runtime.totalMemory();  // Current heap size
+        long freeMemory = runtime.freeMemory();    // Free heap
+        long usedMemory = totalMemory - freeMemory;
+        
+        System.out.println(&#34;=== MEMORY STATISTICS ===&#34;);
+        System.out.println(&#34;Max Memory:   &#34; + formatBytes(maxMemory));
+        System.out.println(&#34;Total Memory: &#34; + formatBytes(totalMemory));
+        System.out.println(&#34;Used Memory:  &#34; + formatBytes(usedMemory));
+        System.out.println(&#34;Free Memory:  &#34; + formatBytes(freeMemory));
+        System.out.println(&#34;Used %:       &#34; + (usedMemory * 100 / totalMemory) + &#34;%&#34;);
+    }
+    
+    private static String formatBytes(long bytes) {
+        if (bytes &lt; 1024) return bytes + &#34; B&#34;;
+        if (bytes &lt; 1024 * 1024) return (bytes / 1024) + &#34; KB&#34;;
+        if (bytes &lt; 1024 * 1024 * 1024) return (bytes / (1024 * 1024)) + &#34; MB&#34;;
+        return (bytes / (1024 * 1024 * 1024)) + &#34; GB&#34;;
+    }
+    
+    public static void main(String[] args) {
+        printMemoryStats();
+        
+        System.out.println(&#34;\nCreating 1 million objects...&#34;);
+        String[] strings = new String[1_000_000];
+        for (int i = 0; i &lt; strings.length; i++) {
+            strings[i] = &#34;String &#34; + i;
+        }
+        
+        printMemoryStats();
+        
+        System.out.println(&#34;\nClearing references...&#34;);
+        strings = null;
+        System.gc();  // Suggest garbage collection
+        
+        try {
+            Thread.sleep(100);  // Give GC time to run
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        
+        printMemoryStats();
+    }
+}
+</code></pre>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Garbage Collection Basics" duration="12">
+            <p>Garbage Collection (GC) automatically reclaims memory occupied by unreachable objects.</p>
+            <h2 is-upgraded>When Does GC Run?</h2>
+            <p>GC runs when:</p>
+            <ol type="1">
+                <li>Eden space is full (Minor GC)</li>
+                <li>Old generation is full (Major GC / Full GC)</li>
+                <li><code>System.gc()</code> is called (suggestion only)</li>
+                <li>JVM decides based on algorithms</li>
+            </ol>
+            <h2 is-upgraded>Generational GC Theory</h2>
+            <p><strong>Key Observation:</strong> Most objects die young!</p>
+            <p><strong>Young Generation (Minor GC):</strong></p>
+            <ul>
+                <li>Eden: New objects allocated here</li>
+                <li>Survivor S0 and S1: Objects that survive one GC</li>
+                <li>Fast, frequent collections</li>
+                <li>Uses copying algorithm</li>
+            </ul>
+            <p><strong>Old Generation (Major GC):</strong></p>
+            <ul>
+                <li>Long-lived objects promoted from young generation</li>
+                <li>Slower, less frequent collections</li>
+                <li>Uses mark-sweep-compact algorithm</li>
+            </ul>
+            <h2 is-upgraded>Object Promotion Process</h2>
+            <pre><code>1. New object → Eden Space
+   [Eden: ████░░░░░░] [S0: ] [S1: ]
+
+2. Eden full → Minor GC → Survivors move to S0
+   [Eden: ░░░░░░░░░░] [S0: ██] [S1: ]
+
+3. Next Eden full → Minor GC → Survivors move to S1
+   [Eden: ░░░░░░░░░░] [S0: ] [S1: ███]
+
+4. After N cycles → Promote to Old Generation
+   [Eden: ░░░░░░░░░░] [S0: ] [S1: █] [Old: ██████]
+</code></pre>
+            <h2 is-upgraded>GC Demonstration</h2>
+            <pre><code language="language-java" class="language-java">public class GCDemo {
+    
+    private static final int ITERATIONS = 10;
+    private static final int OBJECTS_PER_ITERATION = 100_000;
+    
+    public static void main(String[] args) {
+        System.out.println(&#34;Starting GC demonstration...\n&#34;);
+        
+        for (int i = 0; i &lt; ITERATIONS; i++) {
+            System.out.println(&#34;--- Iteration &#34; + (i + 1) + &#34; ---&#34;);
+            allocateObjects();
+            printMemoryAndGC();
+            
+            try {
+                Thread.sleep(500);  // Pause between iterations
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    
+    private static void allocateObjects() {
+        // Create temporary objects
+        for (int i = 0; i &lt; OBJECTS_PER_ITERATION; i++) {
+            String temp = new String(&#34;Temporary object &#34; + i);
+            // Object becomes eligible for GC immediately after creation
+        }
+    }
+    
+    private static void printMemoryAndGC() {
+        Runtime runtime = Runtime.getRuntime();
+        long totalMemory = runtime.totalMemory();
+        long freeMemory = runtime.freeMemory();
+        long usedMemory = totalMemory - freeMemory;
+        
+        System.out.printf(&#34;Used: %d MB, Free: %d MB, Total: %d MB%n&#34;,
+            usedMemory / (1024 * 1024),
+            freeMemory / (1024 * 1024),
+            totalMemory / (1024 * 1024)
+        );
+    }
+}
+</code></pre>
+            <p>Run with GC logging:</p>
+            <pre>$ java -Xlog:gc* GCDemo
+</pre>
+            <h2 is-upgraded>GC Algorithms Overview</h2>
+            <p><strong>1. Serial GC (</strong></p>
+            <p><strong><code>-XX:+UseSerialGC</code></strong></p>
+            <p><strong>)</strong></p>
+            <ul>
+                <li>Single-threaded</li>
+                <li>Stop-the-world for both young and old generation</li>
+                <li>Best for: Small heaps, single-CPU systems</li>
+            </ul>
+            <p><strong>2. Parallel GC (</strong></p>
+            <p><strong><code>-XX:+UseParallelGC</code></strong></p>
+            <p><strong>)</strong></p>
+            <ul>
+                <li>Multi-threaded for young generation</li>
+                <li>Stop-the-world for both generations</li>
+                <li>Best for: Throughput-oriented applications</li>
+            </ul>
+            <p><strong>3. G1 GC (</strong></p>
+            <p><strong><code>-XX:+UseG1GC</code></strong></p>
+            <p><strong>) - Default since Java 9</strong></p>
+            <ul>
+                <li>Divides heap into regions</li>
+                <li>Predictable pause times</li>
+                <li>Best for: Large heaps, balanced throughput and latency</li>
+            </ul>
+            <p><strong>4. ZGC (</strong></p>
+            <p><strong><code>-XX:+UseZGC</code></strong></p>
+            <p><strong>)</strong></p>
+            <ul>
+                <li>Concurrent collector</li>
+                <li>Very low pause times (&lt;10ms)</li>
+                <li>Best for: Low-latency requirements, very large heaps</li>
+            </ul>
+            <p><strong>5. Shenandoah GC (</strong></p>
+            <p><strong><code>-XX:+UseShenandoahGC</code></strong></p>
+            <p><strong>)</strong></p>
+            <ul>
+                <li>Concurrent collector</li>
+                <li>Low pause times</li>
+                <li>Best for: Similar to ZGC, alternative implementation</li>
+            </ul>
+            <h2 is-upgraded>Comparing GC Algorithms</h2>
+            <pre><code language="language-java" class="language-java">public class GCComparison {
+    
+    private static final int HEAP_SIZE_MB = 512;
+    private static final int ITERATIONS = 100;
+    
+    public static void main(String[] args) {
+        System.out.println(&#34;=== GC PERFORMANCE COMPARISON ===&#34;);
+        System.out.println(&#34;Heap Size: &#34; + HEAP_SIZE_MB + &#34; MB&#34;);
+        System.out.println(&#34;Iterations: &#34; + ITERATIONS);
+        System.out.println(&#34;\nRun with different GC:&#34;);
+        System.out.println(&#34;  java -Xms512m -Xmx512m -XX:+UseSerialGC GCComparison&#34;);
+        System.out.println(&#34;  java -Xms512m -Xmx512m -XX:+UseParallelGC GCComparison&#34;);
+        System.out.println(&#34;  java -Xms512m -Xmx512m -XX:+UseG1GC GCComparison&#34;);
+        System.out.println();
+        
+        long startTime = System.currentTimeMillis();
+        
+        for (int i = 0; i &lt; ITERATIONS; i++) {
+            createGarbage();
+            if (i % 10 == 0) {
+                System.out.println(&#34;Iteration &#34; + i + &#34; completed&#34;);
+            }
+        }
+        
+        long endTime = System.currentTimeMillis();
+        long duration = endTime - startTime;
+        
+        System.out.println(&#34;\n=== RESULTS ===&#34;);
+        System.out.println(&#34;Total time: &#34; + duration + &#34; ms&#34;);
+        System.out.println(&#34;Average per iteration: &#34; + (duration / ITERATIONS) + &#34; ms&#34;);
+    }
+    
+    private static void createGarbage() {
+        // Create many short-lived objects
+        List&lt;String&gt; temp = new ArrayList&lt;&gt;();
+        for (int i = 0; i &lt; 10_000; i++) {
+            temp.add(new String(&#34;Object &#34; + i));
+        }
+        // temp goes out of scope - all objects eligible for GC
+    }
+}
+</code></pre>
+            <aside class="special">
+                <p><strong>Modern Choice:</strong> Use G1 GC (default) for most applications. It provides good balance
+                    between throughput and latency.</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Memory Leaks" duration="12">
+            <p>Memory leaks occur when objects are no longer needed but remain referenced, preventing GC from reclaiming
+                them.</p>
+            <h2 is-upgraded>Common Memory Leak Scenarios</h2>
+            <p><strong>1. Forgotten Collections</strong></p>
+            <pre><code language="language-java" class="language-java">public class LeakExample1 {
+    // BAD: Grows forever!
+    private static List&lt;User&gt; users = new ArrayList&lt;&gt;();
+    
+    public void registerUser(String name) {
+        User user = new User(name);
+        users.add(user);
+        // Even if user logs out, reference remains!
+    }
+}
+</code></pre>
+            <p><strong>Fix:</strong> Remove objects when no longer needed:</p>
+            <pre><code language="language-java" class="language-java">public void unregisterUser(User user) {
+    users.remove(user);
+}
+</code></pre>
+            <p><strong>2. Unclosed Resources</strong></p>
+            <pre><code language="language-java" class="language-java">public class LeakExample2 {
+    public void processFile(String filename) throws IOException {
+        FileInputStream fis = new FileInputStream(filename);
+        // Process file
+        // FORGOT to close! Memory and file descriptor leak
+    }
+}
+</code></pre>
+            <p><strong>Fix:</strong> Use try-with-resources:</p>
+            <pre><code language="language-java" class="language-java">public void processFile(String filename) throws IOException {
+    try (FileInputStream fis = new FileInputStream(filename)) {
+        // Process file
+    }  // Automatically closed
+}
+</code></pre>
+            <p><strong>3. Static Collections</strong></p>
+            <pre><code language="language-java" class="language-java">public class LeakExample3 {
+    // BAD: Static collection never garbage collected
+    private static Map&lt;String, byte[]&gt; cache = new HashMap&lt;&gt;();
+    
+    public byte[] getData(String key) {
+        if (!cache.containsKey(key)) {
+            byte[] data = loadFromDatabase(key);
+            cache.put(key, data);  // Grows forever!
+        }
+        return cache.get(key);
+    }
+}
+</code></pre>
+            <p><strong>Fix:</strong> Use bounded cache with eviction:</p>
+            <pre><code language="language-java" class="language-java">private static Map&lt;String, byte[]&gt; cache = new LinkedHashMap&lt;String, byte[]&gt;(100, 0.75f, true) {
+    @Override
+    protected boolean removeEldestEntry(Map.Entry eldest) {
+        return size() &gt; 100;  // Max 100 entries
+    }
+};
+</code></pre>
+            <p><strong>4. Anonymous Inner Classes</strong></p>
+            <pre><code language="language-java" class="language-java">public class LeakExample4 {
+    private String largeData = &#34;...&#34; ; // Large string
+    
+    public ActionListener createListener() {
+        // BAD: Anonymous class holds reference to outer class
+        return new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.out.println(&#34;Clicked&#34;);
+                // This holds reference to LeakExample4 instance
+                // and its largeData field!
+            }
+        };
+    }
+}
+</code></pre>
+            <p><strong>Fix:</strong> Use static inner class or lambda:</p>
+            <pre><code language="language-java" class="language-java">public ActionListener createListener() {
+    // Lambda doesn&#39;t capture &#39;this&#39; unless needed
+    return e -&gt; System.out.println(&#34;Clicked&#34;);
+}
+</code></pre>
+            <p><strong>5. ThreadLocal Misuse</strong></p>
+            <pre><code language="language-java" class="language-java">public class LeakExample5 {
+    // BAD: ThreadLocal not cleaned up
+    private static ThreadLocal&lt;HeavyObject&gt; threadLocal = new ThreadLocal&lt;&gt;();
+    
+    public void processRequest() {
+        threadLocal.set(new HeavyObject());
+        // Process request
+        // FORGOT to remove! Stays in thread pool threads
+    }
+}
+</code></pre>
+            <p><strong>Fix:</strong> Always remove ThreadLocal values:</p>
+            <pre><code language="language-java" class="language-java">public void processRequest() {
+    try {
+        threadLocal.set(new HeavyObject());
+        // Process request
+    } finally {
+        threadLocal.remove();  // Always cleanup
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Detecting Memory Leaks Exercise</h2>
+            <pre><code language="language-java" class="language-java">import java.util.*;
+
+public class MemoryLeakDetection {
+    
+    // Intentional memory leak for demonstration
+    private static List&lt;byte[]&gt; leakyList = new ArrayList&lt;&gt;();
+    
+    public static void main(String[] args) {
+        System.out.println(&#34;Starting memory leak demonstration...&#34;);
+        System.out.println(&#34;Monitor with jconsole or VisualVM&#34;);
+        System.out.println(&#34;Watch heap memory grow continuously\n&#34;);
+        
+        Runtime runtime = Runtime.getRuntime();
+        int iteration = 0;
+        
+        while (true) {
+            // Create 1MB of data each iteration
+            byte[] leak = new byte[1024 * 1024];  // 1 MB
+            leakyList.add(leak);  // Never removed!
+            
+            iteration++;
+            
+            if (iteration % 100 == 0) {
+                long usedMemory = (runtime.totalMemory() - runtime.freeMemory()) / (1024 * 1024);
+                long maxMemory = runtime.maxMemory() / (1024 * 1024);
+                
+                System.out.printf(&#34;Iteration %d: Used %d MB / %d MB (%.1f%%)%n&#34;,
+                    iteration, usedMemory, maxMemory, 
+                    (usedMemory * 100.0 / maxMemory));
+            }
+            
+            try {
+                Thread.sleep(100);  // 100ms delay
+            } catch (InterruptedException e) {
+                break;
+            }
+            
+            // Eventually will throw OutOfMemoryError
+        }
+    }
+}
+</code></pre>
+            <p>Run and monitor:</p>
+            <pre>$ java -Xmx256m MemoryLeakDetection
+</pre>
+            <aside class="warning">
+                <p><strong>Warning:</strong> This program will eventually crash with OutOfMemoryError! That&#39;s the
+                    point - to demonstrate a memory leak.</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="JVM Monitoring Tools" duration="15">
+            <p>Let&#39;s learn to use professional monitoring tools to diagnose memory issues.</p>
+            <h2 is-upgraded>JConsole - Built-in Monitoring</h2>
+            <p><strong>Starting JConsole:</strong></p>
+            <pre>$ jconsole
+</pre>
+            <p>Or connect to a running process:</p>
+            <pre>$ jps  # List Java processes
+12345 MyApplication
+$ jconsole 12345
+</pre>
+            <p><strong>What to Monitor:</strong></p>
+            <ul>
+                <li><strong>Memory Tab:</strong> Heap usage over time</li>
+                <li><strong>Threads Tab:</strong> Thread count and state</li>
+                <li><strong>Classes Tab:</strong> Loaded classes</li>
+                <li><strong>VM Summary:</strong> JVM configuration</li>
+            </ul>
+            <h2 is-upgraded>VisualVM - Advanced Profiling</h2>
+            <p><strong>Starting VisualVM:</strong></p>
+            <pre>$ jvisualvm
+</pre>
+            <p><strong>Key Features:</strong></p>
+            <ol type="1">
+                <li><strong>Monitor Tab:</strong> Real-time CPU, memory, classes, threads</li>
+                <li><strong>Profiler Tab:</strong> CPU and memory profiling</li>
+                <li><strong>Heap Dump:</strong> Take snapshot of heap</li>
+                <li><strong>Thread Dump:</strong> Analyze thread states</li>
+            </ol>
+            <h2 is-upgraded>Hands-On: Profiling Exercise</h2>
+            <p><strong>Step 1: Create Application to Profile</strong></p>
+            <pre><code language="language-java" class="language-java">import java.util.*;
+
+public class ProfileMe {
+    private static List&lt;Customer&gt; customers = new ArrayList&lt;&gt;();
+    private static Random random = new Random();
+    
+    public static void main(String[] args) throws InterruptedException {
+        System.out.println(&#34;Application started. Profile with VisualVM!&#34;);
+        System.out.println(&#34;PID: &#34; + ProcessHandle.current().pid());
+        
+        while (true) {
+            simulateWork();
+            Thread.sleep(1000);
+        }
+    }
+    
+    private static void simulateWork() {
+        // Simulate user registration
+        for (int i = 0; i &lt; 100; i++) {
+            registerCustomer();
+        }
+        
+        // Simulate some processing
+        processOrders();
+        
+        // Simulate cleanup (prevents memory leak)
+        if (customers.size() &gt; 10000) {
+            customers.subList(0, 5000).clear();
+        }
+    }
+    
+    private static void registerCustomer() {
+        Customer customer = new Customer(
+            &#34;Customer&#34; + random.nextInt(1000000),
+            &#34;customer&#34; + random.nextInt(1000000) + &#34;@email.com&#34;
+        );
+        customers.add(customer);
+    }
+    
+    private static void processOrders() {
+        // Simulate expensive computation
+        double sum = 0;
+        for (int i = 0; i &lt; 100000; i++) {
+            sum += Math.sqrt(i);
+        }
+    }
+}
+
+class Customer {
+    private String name;
+    private String email;
+    private List&lt;Order&gt; orders;
+    
+    public Customer(String name, String email) {
+        this.name = name;
+        this.email = email;
+        this.orders = new ArrayList&lt;&gt;();
+    }
+}
+
+class Order {
+    private String orderId;
+    private double amount;
+    
+    public Order(String orderId, double amount) {
+        this.orderId = orderId;
+        this.amount = amount;
+    }
+}
+</code></pre>
+            <p><strong>Step 2: Run and Profile</strong></p>
+            <ol type="1">
+                <li>Start the application</li>
+                <li>Open VisualVM</li>
+                <li>Select the process</li>
+                <li>Go to Monitor tab - observe memory pattern</li>
+                <li>Take heap dump - analyze what&#39;s using memory</li>
+                <li>Go to Profiler tab - start CPU profiling</li>
+                <li>Identify hot methods</li>
+            </ol>
+            <h2 is-upgraded>Heap Dump Analysis</h2>
+            <p><strong>Taking Heap Dump:</strong></p>
+            <pre>$ jps  # Find PID
+$ jmap -dump:format=b,file=heap.bin &lt;PID&gt;
+</pre>
+            <p>Or use VisualVM: Right-click process → Heap Dump</p>
+            <p><strong>Analyzing with VisualVM:</strong></p>
+            <ol type="1">
+                <li>Load heap dump file</li>
+                <li>Classes view - see instances per class</li>
+                <li>Find largest objects</li>
+                <li>Check for unexpected collections</li>
+                <li>Look for patterns indicating leaks</li>
+            </ol>
+            <h2 is-upgraded>Thread Dump Analysis</h2>
+            <p><strong>Taking Thread Dump:</strong></p>
+            <pre>$ jstack &lt;PID&gt; &gt; threads.txt
+</pre>
+            <p>Or use VisualVM: Right-click process → Thread Dump</p>
+            <p><strong>Thread States:</strong></p>
+            <ul>
+                <li><strong>RUNNABLE:</strong> Executing</li>
+                <li><strong>BLOCKED:</strong> Waiting for monitor lock</li>
+                <li><strong>WAITING:</strong> Waiting indefinitely</li>
+                <li><strong>TIMED_WAITING:</strong> Waiting with timeout</li>
+                <li><strong>TERMINATED:</strong> Finished execution</li>
+            </ul>
+            <pre><code language="language-java" class="language-java">public class ThreadDumpDemo {
+    
+    public static void main(String[] args) throws InterruptedException {
+        // Runnable thread
+        Thread worker = new Thread(() -&gt; {
+            while (true) {
+                try {
+                    Thread.sleep(1000);
+                    System.out.println(&#34;Working...&#34;);
+                } catch (InterruptedException e) {
+                    break;
+                }
+            }
+        }, &#34;Worker-Thread&#34;);
+        worker.start();
+        
+        // Blocked thread (deadlock example)
+        final Object lock1 = new Object();
+        final Object lock2 = new Object();
+        
+        Thread thread1 = new Thread(() -&gt; {
+            synchronized (lock1) {
+                System.out.println(&#34;Thread1 locked lock1&#34;);
+                try { Thread.sleep(100); } catch (InterruptedException e) {}
+                synchronized (lock2) {
+                    System.out.println(&#34;Thread1 locked lock2&#34;);
+                }
+            }
+        }, &#34;Deadlock-Thread-1&#34;);
+        
+        Thread thread2 = new Thread(() -&gt; {
+            synchronized (lock2) {
+                System.out.println(&#34;Thread2 locked lock2&#34;);
+                try { Thread.sleep(100); } catch (InterruptedException e) {}
+                synchronized (lock1) {
+                    System.out.println(&#34;Thread2 locked lock1&#34;);
+                }
+            }
+        }, &#34;Deadlock-Thread-2&#34;);
+        
+        thread1.start();
+        thread2.start();
+        
+        System.out.println(&#34;Take thread dump to see deadlock!&#34;);
+        System.out.println(&#34;PID: &#34; + ProcessHandle.current().pid());
+        
+        // Keep main thread alive
+        Thread.sleep(Long.MAX_VALUE);
+    }
+}
+</code></pre>
+            <aside class="special">
+                <p><strong>Profiling Best Practice:</strong> Always profile in conditions similar to production. Use
+                    realistic data volumes and load patterns.</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Memory Optimization Techniques" duration="10">
+            <p>Let&#39;s explore strategies to write memory-efficient code.</p>
+            <h2 is-upgraded>1. Object Pooling</h2>
+            <p>Reuse expensive objects instead of creating new ones:</p>
+            <pre><code language="language-java" class="language-java">import java.util.concurrent.*;
+
+public class ObjectPoolDemo {
+    
+    // Thread pool - reuses threads
+    private static ExecutorService executor = Executors.newFixedThreadPool(10);
+    
+    // Custom object pool
+    static class ExpensiveObject {
+        private byte[] data = new byte[1024 * 1024];  // 1 MB
+        
+        public void reset() {
+            // Reset state for reuse
+            Arrays.fill(data, (byte) 0);
+        }
+    }
+    
+    static class ObjectPool {
+        private BlockingQueue&lt;ExpensiveObject&gt; pool;
+        
+        public ObjectPool(int size) {
+            pool = new ArrayBlockingQueue&lt;&gt;(size);
+            for (int i = 0; i &lt; size; i++) {
+                pool.offer(new ExpensiveObject());
+            }
+        }
+        
+        public ExpensiveObject borrow() throws InterruptedException {
+            return pool.take();
+        }
+        
+        public void returnObject(ExpensiveObject obj) {
+            obj.reset();
+            pool.offer(obj);
+        }
+    }
+    
+    public static void main(String[] args) throws InterruptedException {
+        ObjectPool pool = new ObjectPool(10);
+        
+        // Reuse objects instead of creating new ones
+        for (int i = 0; i &lt; 100; i++) {
+            ExpensiveObject obj = pool.borrow();
+            // Use object
+            pool.returnObject(obj);
+        }
+        
+        System.out.println(&#34;Created only 10 objects, reused 100 times!&#34;);
+    }
+}
+</code></pre>
+            <h2 is-upgraded>2. Lazy Initialization</h2>
+            <p>Create objects only when needed:</p>
+            <pre><code language="language-java" class="language-java">public class LazyInitialization {
+    
+    private HeavyResource resource;  // Not initialized yet
+    
+    public HeavyResource getResource() {
+        if (resource == null) {
+            resource = new HeavyResource();  // Create only when needed
+        }
+        return resource;
+    }
+    
+    // Thread-safe lazy initialization
+    private volatile HeavyResource threadSafeResource;
+    
+    public HeavyResource getThreadSafeResource() {
+        if (threadSafeResource == null) {
+            synchronized (this) {
+                if (threadSafeResource == null) {  // Double-check
+                    threadSafeResource = new HeavyResource();
+                }
+            }
+        }
+        return threadSafeResource;
+    }
+    
+    // Best: Initialization-on-demand holder
+    private static class ResourceHolder {
+        private static final HeavyResource INSTANCE = new HeavyResource();
+    }
+    
+    public static HeavyResource getInstance() {
+        return ResourceHolder.INSTANCE;  // Lazy + thread-safe
+    }
+}
+
+class HeavyResource {
+    private byte[] data = new byte[10 * 1024 * 1024];  // 10 MB
+    
+    public HeavyResource() {
+        System.out.println(&#34;HeavyResource created&#34;);
+    }
+}
+</code></pre>
+            <h2 is-upgraded>3. Weak References</h2>
+            <p>Allow objects to be garbage collected when memory is low:</p>
+            <pre><code language="language-java" class="language-java">import java.lang.ref.*;
+import java.util.*;
+
+public class WeakReferenceDemo {
+    
+    // Strong reference - never GC&#39;d while referenced
+    private Object strongRef = new Object();
+    
+    // Weak reference - GC&#39;d when memory needed
+    private WeakReference&lt;Object&gt; weakRef = new WeakReference&lt;&gt;(new Object());
+    
+    // Soft reference - GC&#39;d only when memory critically low
+    private SoftReference&lt;Object&gt; softRef = new SoftReference&lt;&gt;(new Object());
+    
+    public static void main(String[] args) {
+        // Example: Image cache with soft references
+        Map&lt;String, SoftReference&lt;byte[]&gt;&gt; imageCache = new HashMap&lt;&gt;();
+        
+        // Load images
+        for (int i = 0; i &lt; 100; i++) {
+            byte[] image = new byte[1024 * 1024];  // 1 MB image
+            imageCache.put(&#34;image&#34; + i, new SoftReference&lt;&gt;(image));
+        }
+        
+        // Images stay in cache until memory pressure
+        // Then GC can reclaim them
+        
+        System.out.println(&#34;Cache size: &#34; + imageCache.size());
+        
+        // Force GC
+        System.gc();
+        
+        // Check what survived
+        int survived = 0;
+        for (SoftReference&lt;byte[]&gt; ref : imageCache.values()) {
+            if (ref.get() != null) {
+                survived++;
+            }
+        }
+        
+        System.out.println(&#34;Images survived GC: &#34; + survived);
+    }
+}
+</code></pre>
+            <h2 is-upgraded>4. String Optimization</h2>
+            <pre><code language="language-java" class="language-java">public class StringOptimization {
+    
+    public static void main(String[] args) {
+        // BAD: String concatenation in loop
+        String result = &#34;&#34;;
+        long start = System.nanoTime();
+        for (int i = 0; i &lt; 10000; i++) {
+            result += &#34;x&#34;;  // Creates new String each time!
+        }
+        long end = System.nanoTime();
+        System.out.println(&#34;String concat: &#34; + (end - start) / 1_000_000 + &#34; ms&#34;);
+        
+        // GOOD: StringBuilder
+        StringBuilder sb = new StringBuilder();
+        start = System.nanoTime();
+        for (int i = 0; i &lt; 10000; i++) {
+            sb.append(&#34;x&#34;);  // Reuses buffer
+        }
+        String result2 = sb.toString();
+        end = System.nanoTime();
+        System.out.println(&#34;StringBuilder: &#34; + (end - start) / 1_000_000 + &#34; ms&#34;);
+        
+        // String interning (use carefully)
+        String s1 = new String(&#34;Hello&#34;).intern();
+        String s2 = new String(&#34;Hello&#34;).intern();
+        System.out.println(&#34;Same instance: &#34; + (s1 == s2));  // true
+    }
+}
+</code></pre>
+            <h2 is-upgraded>5. Collection Sizing</h2>
+            <pre><code language="language-java" class="language-java">public class CollectionSizing {
+    
+    public static void main(String[] args) {
+        // BAD: Default size, many resizes
+        List&lt;Integer&gt; list1 = new ArrayList&lt;&gt;();  // Initial capacity: 10
+        for (int i = 0; i &lt; 10000; i++) {
+            list1.add(i);  // Resizes multiple times!
+        }
+        
+        // GOOD: Pre-sized
+        List&lt;Integer&gt; list2 = new ArrayList&lt;&gt;(10000);  // No resizing needed
+        for (int i = 0; i &lt; 10000; i++) {
+            list2.add(i);  // Efficient
+        }
+        
+        // HashMap sizing
+        // Default: 16 capacity, 0.75 load factor
+        // If you know size, specify: new HashMap&lt;&gt;(expectedSize / 0.75)
+        Map&lt;String, String&gt; map = new HashMap&lt;&gt;((int) (1000 / 0.75));
+    }
+}
+</code></pre>
+            <aside class="special">
+                <p><strong>Performance Tip:</strong> Pre-size collections when you know the approximate size. Saves time
+                    from resizing operations.</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Best Practices and Checklist" duration="5">
+            <p>Follow these guidelines for optimal memory management.</p>
+            <h2 is-upgraded>Memory Best Practices</h2>
+            <p><strong>1. Resource Management:</strong></p>
+            <ul>
+                <li>✅ Always use try-with-resources for closeable resources</li>
+                <li>✅ Remove objects from collections when no longer needed</li>
+                <li>✅ Clear ThreadLocal values in finally blocks</li>
+                <li>✅ Close database connections, streams, sockets</li>
+            </ul>
+            <p><strong>2. Object Creation:</strong></p>
+            <ul>
+                <li>✅ Reuse immutable objects (String, Integer cache)</li>
+                <li>✅ Use object pools for expensive objects</li>
+                <li>✅ Prefer primitive arrays over object arrays when possible</li>
+                <li>✅ Consider lazy initialization for heavy objects</li>
+            </ul>
+            <p><strong>3. Collections:</strong></p>
+            <ul>
+                <li>✅ Pre-size collections when size is known</li>
+                <li>✅ Use appropriate collection types</li>
+                <li>✅ Clear references when removing from collections</li>
+                <li>✅ Consider WeakHashMap for caches</li>
+            </ul>
+            <p><strong>4. Static Members:</strong></p>
+            <ul>
+                <li>✅ Minimize use of static collections</li>
+                <li>✅ Implement bounded caches</li>
+                <li>✅ Document lifecycle of static data</li>
+            </ul>
+            <p><strong>5. Monitoring:</strong></p>
+            <ul>
+                <li>✅ Profile application regularly</li>
+                <li>✅ Monitor production heap usage</li>
+                <li>✅ Set up alerts for memory thresholds</li>
+                <li>✅ Analyze heap dumps for memory leaks</li>
+            </ul>
+            <h2 is-upgraded>JVM Tuning Options</h2>
+            <pre><code language="language-bash" class="language-bash"># Heap size
+-Xms2g          # Initial heap size (2 GB)
+-Xmx4g          # Maximum heap size (4 GB)
+
+# GC selection
+-XX:+UseG1GC              # G1 Garbage Collector (default Java 9+)
+-XX:+UseZGC               # Z Garbage Collector (low latency)
+-XX:+UseSerialGC          # Serial GC (single-threaded)
+-XX:+UseParallelGC        # Parallel GC (throughput)
+
+# GC logging
+-Xlog:gc*:file=gc.log     # GC log to file
+
+# Heap dump on OutOfMemoryError
+-XX:+HeapDumpOnOutOfMemoryError
+-XX:HeapDumpPath=/path/to/dumps
+
+# Performance tuning
+-XX:MaxGCPauseMillis=200  # Target GC pause time (G1 only)
+-XX:G1HeapRegionSize=16m  # G1 region size
+
+# Metaspace (class metadata)
+-XX:MetaspaceSize=256m
+-XX:MaxMetaspaceSize=512m
+</code></pre>
+            <h2 is-upgraded>Memory Leak Checklist</h2>
+            <p>When investigating memory issues:</p>
+            <ul>
+                <li>[ ] Check static collections - are they bounded?</li>
+                <li>[ ] Verify all resources are closed (files, connections, streams)</li>
+                <li>[ ] Look for ThreadLocal usage - are values removed?</li>
+                <li>[ ] Check for listeners - are they unregistered?</li>
+                <li>[ ] Review cache implementations - do they have eviction?</li>
+                <li>[ ] Examine inner classes - do they hold unnecessary references?</li>
+                <li>[ ] Profile with VisualVM - identify growing objects</li>
+                <li>[ ] Analyze heap dump - find unexpected object retention</li>
+                <li>[ ] Review GC logs - is Old Gen growing continuously?</li>
+            </ul>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Conclusion" duration="2">
+            <p>Congratulations! 🎉 You&#39;ve mastered JVM memory management!</p>
+            <h2 is-upgraded>What You&#39;ve Learned</h2>
+            <ul>
+                <li>✅ <strong>JVM Memory Model:</strong> Heap, Stack, Method Area architecture</li>
+                <li>✅ <strong>Object Lifecycle:</strong> Creation, usage, garbage collection</li>
+                <li>✅ <strong>Garbage Collection:</strong> Algorithms, generations, tuning</li>
+                <li>✅ <strong>Memory Leaks:</strong> Common causes and prevention</li>
+                <li>✅ <strong>Monitoring Tools:</strong> JConsole, VisualVM, heap/thread dumps</li>
+                <li>✅ <strong>Optimization:</strong> Object pooling, lazy init, weak references</li>
+                <li>✅ <strong>Best Practices:</strong> Resource management, collection sizing</li>
+                <li>✅ <strong>JVM Tuning:</strong> Heap sizing, GC selection, monitoring</li>
+            </ul>
+            <h2 is-upgraded>Key Takeaways</h2>
+            <ol type="1">
+                <li><strong>Understand memory layout</strong> - Know where your objects live</li>
+                <li><strong>Trust the GC</strong> - But understand how it works</li>
+                <li><strong>Close resources</strong> - Always use try-with-resources</li>
+                <li><strong>Monitor production</strong> - Catch issues before they become critical</li>
+                <li><strong>Profile regularly</strong> - Find bottlenecks and leaks early</li>
+                <li><strong>Size appropriately</strong> - Right-size heap and collections</li>
+                <li><strong>Use modern GCs</strong> - G1 GC is excellent default choice</li>
+                <li><strong>Prevent leaks</strong> - Review code for common leak patterns</li>
+            </ol>
+            <h2 is-upgraded>Next Steps</h2>
+            <p>Congratulations on completing Section 1! Continue to:</p>
+            <ul>
+                <li><strong>Section 2:</strong> Java 8+ Features (Functional Programming, Streams, Async)</li>
+                <li><strong>Section 3:</strong> Spring Boot &amp; IoC</li>
+                <li><strong>Section 4:</strong> Microservices Architecture</li>
+            </ul>
+            <h2 is-upgraded>Practice Exercises</h2>
+            <p>Master memory management:</p>
+            <ol type="1">
+                <li><strong>Memory Leak Hunt:</strong> Find and fix leaks in provided code</li>
+                <li><strong>GC Comparison:</strong> Benchmark different GCs with your application</li>
+                <li><strong>Heap Analysis:</strong> Analyze heap dumps, identify optimization opportunities</li>
+                <li><strong>Custom Profiler:</strong> Build JMX-based monitoring dashboard</li>
+                <li><strong>Cache Implementation:</strong> Create LRU cache with SoftReferences</li>
+                <li><strong>Performance Tuning:</strong> Optimize application memory footprint by 50%</li>
+            </ol>
+            <h2 is-upgraded>Additional Resources</h2>
+            <ul>
+                <li><a href="https://www.oreilly.com/library/view/java-performance-2nd/9781492056102/"
+                        target="_blank">Java Performance by Scott Oaks</a></li>
+                <li><a href="https://docs.oracle.com/en/java/javase/17/gctuning/" target="_blank">JVM Garbage Collection
+                        Guide</a></li>
+                <li><a href="https://visualvm.github.io/" target="_blank">VisualVM Documentation</a></li>
+                <li><a href="https://www.baeldung.com/java-memory-management-interview-questions" target="_blank">Java
+                        Memory Management (Baeldung)</a></li>
+                <li><a href="https://www.oracle.com/technical-resources/articles/java/g1gc.html" target="_blank">G1 GC
+                        Tuning Guide</a></li>
+            </ul>
+            <aside class="special">
+                <p><strong>Excellent Work!</strong> Understanding memory management separates good Java developers from
+                    great ones. You now have the knowledge to build efficient, scalable applications!</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+    </google-codelab>
+
+    <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
+    <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
+    <script src="https://storage.googleapis.com/claat-public/prettify.js"></script>
+    <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
+    <script src="//support.google.com/inapp/api.js"></script>
+
+</body>
+
+</html>

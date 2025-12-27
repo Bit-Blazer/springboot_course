@@ -1,0 +1,1670 @@
+<!doctype html>
+
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+    <meta name="theme-color" content="#4F7DC9">
+    <meta charset="UTF-8">
+    <title>Collections Framework &amp; Generics</title>
+    <link rel="stylesheet"
+        href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
+    <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
+    <style>
+        .success {
+            color: #1e8e3e;
+        }
+
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+    <google-codelab-analytics gaid="UA-49880327-14"></google-codelab-analytics>
+    <google-codelab codelab-gaid="" id="collections-generics" title="Collections Framework &amp; Generics"
+        environment="web" feedback-link="">
+
+        <google-codelab-step label="Introduction" duration="2">
+            <p>Java&#39;s Collections Framework provides powerful data structures for storing and manipulating groups of
+                objects. Combined with Generics for type safety, you can build robust, efficient applications. In this
+                codelab, you&#39;ll master all major collection types while building a complete inventory management
+                system.</p>
+            <h2 class="checklist" is-upgraded>What You&#39;ll Learn</h2>
+            <ul class="checklist">
+                <li>Collections Framework architecture and interfaces</li>
+                <li>List implementations (ArrayList, LinkedList)</li>
+                <li>Set implementations (HashSet, TreeSet, LinkedHashSet)</li>
+                <li>Map implementations (HashMap, TreeMap, LinkedHashMap)</li>
+                <li>Queue and Deque interfaces (PriorityQueue, ArrayDeque)</li>
+                <li>Generics: type parameters, bounded types, wildcards</li>
+                <li>Comparable and Comparator for custom sorting</li>
+                <li>Iterator and enhanced for-loop</li>
+                <li>Collections utility class methods</li>
+                <li>Performance characteristics of each collection type</li>
+            </ul>
+            <h2 is-upgraded>What You&#39;ll Build</h2>
+            <p>An <strong>Inventory Management System</strong> featuring:</p>
+            <ul>
+                <li>Product catalog with multiple collection types</li>
+                <li>Generic utility classes for common operations</li>
+                <li>Custom sorting with Comparable and Comparator</li>
+                <li>Priority-based order processing with Queue</li>
+                <li>Search and filtering capabilities</li>
+                <li>Performance comparisons between collection types</li>
+            </ul>
+            <h2 is-upgraded>Prerequisites</h2>
+            <ul>
+                <li>Completed Codelabs 1.1, 1.2, and 1.3</li>
+                <li>Understanding of OOP, interfaces, and exceptions</li>
+                <li>Java JDK 17+ installed</li>
+            </ul>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Collections Framework Overview" duration="10">
+            <p>The Collections Framework provides a unified architecture for representing and manipulating collections.
+            </p>
+            <h2 is-upgraded>Collection Hierarchy</h2>
+            <pre><code>Collection Interface
+├── List (ordered, allows duplicates)
+│   ├── ArrayList
+│   ├── LinkedList
+│   └── Vector (legacy)
+├── Set (no duplicates)
+│   ├── HashSet
+│   ├── LinkedHashSet
+│   └── TreeSet (sorted)
+└── Queue (FIFO or priority-based)
+    ├── PriorityQueue
+    ├── ArrayDeque
+    └── LinkedList
+
+Map Interface (key-value pairs, separate hierarchy)
+├── HashMap
+├── LinkedHashMap (maintains insertion order)
+└── TreeMap (sorted by keys)
+</code></pre>
+            <h2 is-upgraded>Core Interfaces</h2>
+            <p><strong>Collection Interface:</strong></p>
+            <pre><code language="language-java" class="language-java">public interface Collection&lt;E&gt; {
+    boolean add(E element);
+    boolean remove(Object element);
+    boolean contains(Object element);
+    int size();
+    boolean isEmpty();
+    void clear();
+    Iterator&lt;E&gt; iterator();
+    Object[] toArray();
+}
+</code></pre>
+            <p><strong>List Interface (extends Collection):</strong></p>
+            <pre><code language="language-java" class="language-java">public interface List&lt;E&gt; extends Collection&lt;E&gt; {
+    E get(int index);
+    E set(int index, E element);
+    void add(int index, E element);
+    E remove(int index);
+    int indexOf(Object element);
+    int lastIndexOf(Object element);
+}
+</code></pre>
+            <p><strong>Set Interface (extends Collection):</strong></p>
+            <pre><code language="language-java" class="language-java">public interface Set&lt;E&gt; extends Collection&lt;E&gt; {
+    // Same methods as Collection
+    // But ensures no duplicates
+}
+</code></pre>
+            <p><strong>Map Interface (separate hierarchy):</strong></p>
+            <pre><code language="language-java" class="language-java">public interface Map&lt;K, V&gt; {
+    V put(K key, V value);
+    V get(Object key);
+    V remove(Object key);
+    boolean containsKey(Object key);
+    boolean containsValue(Object value);
+    Set&lt;K&gt; keySet();
+    Collection&lt;V&gt; values();
+    Set&lt;Map.Entry&lt;K, V&gt;&gt; entrySet();
+}
+</code></pre>
+            <aside class="special">
+                <p><strong>Key Insight:</strong> List maintains order and allows duplicates. Set guarantees uniqueness.
+                    Map stores key-value pairs. Choose based on your needs!</p>
+            </aside>
+            <h2 is-upgraded>When to Use Each Collection</h2>
+            <table>
+                <tr>
+                    <td colspan="1" rowspan="1">
+                        <p>Collection</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>Use When</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>Performance</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="1" rowspan="1">
+                        <p><strong>ArrayList</strong></p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>Frequent reads, rare insertions/deletions</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>O(1) get, O(n) add/remove</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="1" rowspan="1">
+                        <p><strong>LinkedList</strong></p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>Frequent insertions/deletions at ends</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>O(n) get, O(1) add/remove at ends</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="1" rowspan="1">
+                        <p><strong>HashSet</strong></p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>Need uniqueness, order doesn&#39;t matter</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>O(1) add/remove/contains (average)</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="1" rowspan="1">
+                        <p><strong>TreeSet</strong></p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>Need uniqueness AND sorted order</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>O(log n) add/remove/contains</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="1" rowspan="1">
+                        <p><strong>HashMap</strong></p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>Fast key-value lookups</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>O(1) get/put (average)</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="1" rowspan="1">
+                        <p><strong>TreeMap</strong></p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>Key-value pairs in sorted key order</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>O(log n) get/put</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="1" rowspan="1">
+                        <p><strong>PriorityQueue</strong></p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>Process elements by priority</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>O(log n) add/remove</p>
+                    </td>
+                </tr>
+            </table>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="List Collections" duration="15">
+            <p>Lists are ordered collections that allow duplicate elements.</p>
+            <h2 is-upgraded>ArrayList - Dynamic Array</h2>
+            <p><strong>Characteristics:</strong></p>
+            <ul>
+                <li>Resizable array implementation</li>
+                <li>Fast random access: O(1)</li>
+                <li>Slow insertions/deletions in middle: O(n)</li>
+                <li>Best for: Reading more than writing</li>
+            </ul>
+            <pre><code language="language-java" class="language-java">import java.util.*;
+
+public class ArrayListDemo {
+    public static void main(String[] args) {
+        // Creating ArrayList
+        List&lt;String&gt; fruits = new ArrayList&lt;&gt;();
+        
+        // Adding elements
+        fruits.add(&#34;Apple&#34;);
+        fruits.add(&#34;Banana&#34;);
+        fruits.add(&#34;Cherry&#34;);
+        fruits.add(&#34;Apple&#34;);  // Duplicates allowed
+        
+        System.out.println(&#34;Fruits: &#34; + fruits);
+        System.out.println(&#34;Size: &#34; + fruits.size());
+        
+        // Accessing elements
+        System.out.println(&#34;First fruit: &#34; + fruits.get(0));
+        System.out.println(&#34;Last fruit: &#34; + fruits.get(fruits.size() - 1));
+        
+        // Modifying elements
+        fruits.set(1, &#34;Blueberry&#34;);
+        System.out.println(&#34;After modification: &#34; + fruits);
+        
+        // Checking existence
+        System.out.println(&#34;Contains Apple: &#34; + fruits.contains(&#34;Apple&#34;));
+        System.out.println(&#34;Index of Apple: &#34; + fruits.indexOf(&#34;Apple&#34;));
+        System.out.println(&#34;Last index of Apple: &#34; + fruits.lastIndexOf(&#34;Apple&#34;));
+        
+        // Removing elements
+        fruits.remove(&#34;Cherry&#34;);  // Remove by object
+        fruits.remove(0);         // Remove by index
+        System.out.println(&#34;After removal: &#34; + fruits);
+        
+        // Iterating
+        System.out.println(&#34;\nIterating:&#34;);
+        for (String fruit : fruits) {
+            System.out.println(&#34;  - &#34; + fruit);
+        }
+        
+        // Bulk operations
+        List&lt;String&gt; moreFruits = Arrays.asList(&#34;Date&#34;, &#34;Elderberry&#34;);
+        fruits.addAll(moreFruits);
+        System.out.println(&#34;After addAll: &#34; + fruits);
+        
+        // Clearing
+        fruits.clear();
+        System.out.println(&#34;After clear, is empty: &#34; + fruits.isEmpty());
+    }
+}
+</code></pre>
+            <h2 is-upgraded>LinkedList - Doubly Linked List</h2>
+            <p><strong>Characteristics:</strong></p>
+            <ul>
+                <li>Doubly-linked list implementation</li>
+                <li>Slow random access: O(n)</li>
+                <li>Fast insertions/deletions at ends: O(1)</li>
+                <li>Best for: Frequent insertions/deletions</li>
+                <li>Also implements Deque interface</li>
+            </ul>
+            <pre><code language="language-java" class="language-java">import java.util.*;
+
+public class LinkedListDemo {
+    public static void main(String[] args) {
+        LinkedList&lt;Integer&gt; numbers = new LinkedList&lt;&gt;();
+        
+        // Adding elements
+        numbers.add(10);
+        numbers.add(20);
+        numbers.add(30);
+        
+        // LinkedList-specific methods
+        numbers.addFirst(5);   // Add at beginning
+        numbers.addLast(40);   // Add at end
+        
+        System.out.println(&#34;Numbers: &#34; + numbers);
+        
+        // Accessing ends
+        System.out.println(&#34;First: &#34; + numbers.getFirst());
+        System.out.println(&#34;Last: &#34; + numbers.getLast());
+        
+        // Peek without removing
+        System.out.println(&#34;Peek first: &#34; + numbers.peekFirst());
+        System.out.println(&#34;Peek last: &#34; + numbers.peekLast());
+        
+        // Remove from ends
+        numbers.removeFirst();
+        numbers.removeLast();
+        System.out.println(&#34;After removing ends: &#34; + numbers);
+        
+        // Use as Stack (LIFO)
+        LinkedList&lt;String&gt; stack = new LinkedList&lt;&gt;();
+        stack.push(&#34;First&#34;);
+        stack.push(&#34;Second&#34;);
+        stack.push(&#34;Third&#34;);
+        System.out.println(&#34;Stack: &#34; + stack);
+        System.out.println(&#34;Pop: &#34; + stack.pop());  // Third
+        System.out.println(&#34;After pop: &#34; + stack);
+        
+        // Use as Queue (FIFO)
+        LinkedList&lt;String&gt; queue = new LinkedList&lt;&gt;();
+        queue.offer(&#34;First&#34;);
+        queue.offer(&#34;Second&#34;);
+        queue.offer(&#34;Third&#34;);
+        System.out.println(&#34;Queue: &#34; + queue);
+        System.out.println(&#34;Poll: &#34; + queue.poll());  // First
+        System.out.println(&#34;After poll: &#34; + queue);
+    }
+}
+</code></pre>
+            <h2 is-upgraded>ArrayList vs LinkedList Performance</h2>
+            <pre><code language="language-java" class="language-java">import java.util.*;
+
+public class ListPerformanceComparison {
+    public static void main(String[] args) {
+        int n = 100000;
+        
+        // ArrayList - Fast random access
+        List&lt;Integer&gt; arrayList = new ArrayList&lt;&gt;();
+        long start = System.nanoTime();
+        for (int i = 0; i &lt; n; i++) {
+            arrayList.add(i);
+        }
+        long end = System.nanoTime();
+        System.out.println(&#34;ArrayList add: &#34; + (end - start) / 1_000_000 + &#34; ms&#34;);
+        
+        start = System.nanoTime();
+        for (int i = 0; i &lt; n; i++) {
+            arrayList.get(i);
+        }
+        end = System.nanoTime();
+        System.out.println(&#34;ArrayList get: &#34; + (end - start) / 1_000_000 + &#34; ms&#34;);
+        
+        // LinkedList - Fast insertions at ends
+        List&lt;Integer&gt; linkedList = new LinkedList&lt;&gt;();
+        start = System.nanoTime();
+        for (int i = 0; i &lt; n; i++) {
+            linkedList.add(i);
+        }
+        end = System.nanoTime();
+        System.out.println(&#34;LinkedList add: &#34; + (end - start) / 1_000_000 + &#34; ms&#34;);
+        
+        start = System.nanoTime();
+        for (int i = 0; i &lt; n; i++) {
+            linkedList.get(i);  // Slow!
+        }
+        end = System.nanoTime();
+        System.out.println(&#34;LinkedList get: &#34; + (end - start) / 1_000_000 + &#34; ms&#34;);
+    }
+}
+</code></pre>
+            <aside class="warning">
+                <p><strong>Performance Warning:</strong> ArrayList.get(i) is O(1), LinkedList.get(i) is O(n). For random
+                    access, ArrayList is much faster!</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Set Collections" duration="15">
+            <p>Sets store unique elements with no duplicates.</p>
+            <h2 is-upgraded>HashSet - Hash Table Based</h2>
+            <p><strong>Characteristics:</strong></p>
+            <ul>
+                <li>No duplicates, no ordering</li>
+                <li>Very fast: O(1) average for add/remove/contains</li>
+                <li>Uses hashCode() and equals() methods</li>
+                <li>Best for: Fast uniqueness checking</li>
+            </ul>
+            <pre><code language="language-java" class="language-java">import java.util.*;
+
+public class HashSetDemo {
+    public static void main(String[] args) {
+        Set&lt;String&gt; languages = new HashSet&lt;&gt;();
+        
+        // Adding elements
+        languages.add(&#34;Java&#34;);
+        languages.add(&#34;Python&#34;);
+        languages.add(&#34;JavaScript&#34;);
+        languages.add(&#34;Java&#34;);  // Duplicate - ignored!
+        
+        System.out.println(&#34;Languages: &#34; + languages);  // No duplicates
+        System.out.println(&#34;Size: &#34; + languages.size());  // 3, not 4
+        
+        // Checking existence
+        System.out.println(&#34;Contains Python: &#34; + languages.contains(&#34;Python&#34;));
+        System.out.println(&#34;Contains C++: &#34; + languages.contains(&#34;C++&#34;));
+        
+        // Removing
+        languages.remove(&#34;JavaScript&#34;);
+        System.out.println(&#34;After removal: &#34; + languages);
+        
+        // Iterating (order not guaranteed)
+        System.out.println(&#34;\nIterating:&#34;);
+        for (String lang : languages) {
+            System.out.println(&#34;  - &#34; + lang);
+        }
+        
+        // Set operations
+        Set&lt;String&gt; frontend = new HashSet&lt;&gt;(Arrays.asList(&#34;JavaScript&#34;, &#34;TypeScript&#34;, &#34;HTML&#34;));
+        Set&lt;String&gt; backend = new HashSet&lt;&gt;(Arrays.asList(&#34;Java&#34;, &#34;Python&#34;, &#34;JavaScript&#34;));
+        
+        // Union
+        Set&lt;String&gt; union = new HashSet&lt;&gt;(frontend);
+        union.addAll(backend);
+        System.out.println(&#34;\nUnion: &#34; + union);
+        
+        // Intersection
+        Set&lt;String&gt; intersection = new HashSet&lt;&gt;(frontend);
+        intersection.retainAll(backend);
+        System.out.println(&#34;Intersection: &#34; + intersection);
+        
+        // Difference
+        Set&lt;String&gt; difference = new HashSet&lt;&gt;(frontend);
+        difference.removeAll(backend);
+        System.out.println(&#34;Difference (frontend - backend): &#34; + difference);
+    }
+}
+</code></pre>
+            <h2 is-upgraded>TreeSet - Red-Black Tree (Sorted)</h2>
+            <p><strong>Characteristics:</strong></p>
+            <ul>
+                <li>No duplicates, sorted order</li>
+                <li>O(log n) for add/remove/contains</li>
+                <li>Elements must implement Comparable or provide Comparator</li>
+                <li>Best for: Maintaining sorted unique elements</li>
+            </ul>
+            <pre><code language="language-java" class="language-java">import java.util.*;
+
+public class TreeSetDemo {
+    public static void main(String[] args) {
+        // Natural ordering (alphabetical)
+        Set&lt;String&gt; names = new TreeSet&lt;&gt;();
+        names.add(&#34;Charlie&#34;);
+        names.add(&#34;Alice&#34;);
+        names.add(&#34;Bob&#34;);
+        names.add(&#34;Diana&#34;);
+        
+        System.out.println(&#34;Names (sorted): &#34; + names);
+        // Output: [Alice, Bob, Charlie, Diana]
+        
+        // Numbers sorted
+        Set&lt;Integer&gt; numbers = new TreeSet&lt;&gt;();
+        numbers.add(50);
+        numbers.add(10);
+        numbers.add(30);
+        numbers.add(20);
+        
+        System.out.println(&#34;Numbers (sorted): &#34; + numbers);
+        // Output: [10, 20, 30, 50]
+        
+        // Custom ordering with Comparator
+        Set&lt;String&gt; reversedNames = new TreeSet&lt;&gt;(Comparator.reverseOrder());
+        reversedNames.add(&#34;Charlie&#34;);
+        reversedNames.add(&#34;Alice&#34;);
+        reversedNames.add(&#34;Bob&#34;);
+        
+        System.out.println(&#34;Names (reversed): &#34; + reversedNames);
+        // Output: [Charlie, Bob, Alice]
+        
+        // TreeSet specific methods
+        TreeSet&lt;Integer&gt; scores = new TreeSet&lt;&gt;(Arrays.asList(85, 92, 78, 95, 88));
+        System.out.println(&#34;First (lowest): &#34; + scores.first());
+        System.out.println(&#34;Last (highest): &#34; + scores.last());
+        System.out.println(&#34;Lower than 90: &#34; + scores.lower(90));
+        System.out.println(&#34;Higher than 90: &#34; + scores.higher(90));
+        System.out.println(&#34;Ceiling of 90: &#34; + scores.ceiling(90));
+        System.out.println(&#34;Floor of 90: &#34; + scores.floor(90));
+        
+        // Range views
+        System.out.println(&#34;Scores &gt;= 85 and &lt; 92: &#34; + scores.subSet(85, 92));
+        System.out.println(&#34;Scores &lt; 90: &#34; + scores.headSet(90));
+        System.out.println(&#34;Scores &gt;= 90: &#34; + scores.tailSet(90));
+    }
+}
+</code></pre>
+            <h2 is-upgraded>LinkedHashSet - Maintains Insertion Order</h2>
+            <p><strong>Characteristics:</strong></p>
+            <ul>
+                <li>No duplicates, maintains insertion order</li>
+                <li>Slightly slower than HashSet</li>
+                <li>Best for: Unique elements with predictable iteration order</li>
+            </ul>
+            <pre><code language="language-java" class="language-java">import java.util.*;
+
+public class LinkedHashSetDemo {
+    public static void main(String[] args) {
+        Set&lt;String&gt; orderedSet = new LinkedHashSet&lt;&gt;();
+        orderedSet.add(&#34;First&#34;);
+        orderedSet.add(&#34;Second&#34;);
+        orderedSet.add(&#34;Third&#34;);
+        orderedSet.add(&#34;First&#34;);  // Duplicate ignored
+        
+        System.out.println(&#34;LinkedHashSet (insertion order): &#34; + orderedSet);
+        // Output: [First, Second, Third]
+        
+        // Compare with HashSet (no guaranteed order)
+        Set&lt;String&gt; unorderedSet = new HashSet&lt;&gt;();
+        unorderedSet.add(&#34;First&#34;);
+        unorderedSet.add(&#34;Second&#34;);
+        unorderedSet.add(&#34;Third&#34;);
+        
+        System.out.println(&#34;HashSet (no order guarantee): &#34; + unorderedSet);
+        // Output: [First, Second, Third] or [Third, First, Second] etc.
+    }
+}
+</code></pre>
+            <aside class="special">
+                <p><strong>Choosing a Set:</strong> Use HashSet for best performance, TreeSet for sorted elements,
+                    LinkedHashSet for insertion order.</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Map Collections" duration="15">
+            <p>Maps store key-value pairs with unique keys.</p>
+            <h2 is-upgraded>HashMap - Hash Table Based</h2>
+            <p><strong>Characteristics:</strong></p>
+            <ul>
+                <li>Key-value pairs, unique keys</li>
+                <li>Very fast: O(1) average for get/put</li>
+                <li>No ordering of keys</li>
+                <li>Best for: Fast lookups by key</li>
+            </ul>
+            <pre><code language="language-java" class="language-java">import java.util.*;
+
+public class HashMapDemo {
+    public static void main(String[] args) {
+        Map&lt;String, Integer&gt; ages = new HashMap&lt;&gt;();
+        
+        // Adding key-value pairs
+        ages.put(&#34;Alice&#34;, 25);
+        ages.put(&#34;Bob&#34;, 30);
+        ages.put(&#34;Charlie&#34;, 28);
+        ages.put(&#34;Alice&#34;, 26);  // Updates existing key
+        
+        System.out.println(&#34;Ages: &#34; + ages);
+        System.out.println(&#34;Size: &#34; + ages.size());
+        
+        // Accessing values
+        System.out.println(&#34;Alice&#39;s age: &#34; + ages.get(&#34;Alice&#34;));
+        System.out.println(&#34;Diana&#39;s age: &#34; + ages.get(&#34;Diana&#34;));  // null
+        
+        // Check existence
+        System.out.println(&#34;Contains Alice: &#34; + ages.containsKey(&#34;Alice&#34;));
+        System.out.println(&#34;Contains age 30: &#34; + ages.containsValue(30));
+        
+        // Default values
+        System.out.println(&#34;Diana&#39;s age (with default): &#34; + 
+                          ages.getOrDefault(&#34;Diana&#34;, 0));
+        
+        // putIfAbsent - only adds if key doesn&#39;t exist
+        ages.putIfAbsent(&#34;Bob&#34;, 35);  // No change, key exists
+        ages.putIfAbsent(&#34;Diana&#34;, 29);  // Adds new entry
+        System.out.println(&#34;After putIfAbsent: &#34; + ages);
+        
+        // Removing
+        ages.remove(&#34;Charlie&#34;);
+        System.out.println(&#34;After removal: &#34; + ages);
+        
+        // Iterating over keys
+        System.out.println(&#34;\nIterating keys:&#34;);
+        for (String name : ages.keySet()) {
+            System.out.println(&#34;  &#34; + name);
+        }
+        
+        // Iterating over values
+        System.out.println(&#34;\nIterating values:&#34;);
+        for (Integer age : ages.values()) {
+            System.out.println(&#34;  &#34; + age);
+        }
+        
+        // Iterating over entries
+        System.out.println(&#34;\nIterating entries:&#34;);
+        for (Map.Entry&lt;String, Integer&gt; entry : ages.entrySet()) {
+            System.out.println(&#34;  &#34; + entry.getKey() + &#34; = &#34; + entry.getValue());
+        }
+        
+        // Java 8+ forEach
+        System.out.println(&#34;\nUsing forEach:&#34;);
+        ages.forEach((name, age) -&gt; 
+            System.out.println(&#34;  &#34; + name + &#34; is &#34; + age + &#34; years old&#34;)
+        );
+        
+        // compute methods
+        ages.compute(&#34;Alice&#34;, (name, age) -&gt; age + 1);  // Increment Alice&#39;s age
+        ages.computeIfAbsent(&#34;Eve&#34;, name -&gt; 27);  // Add if absent
+        ages.computeIfPresent(&#34;Bob&#34;, (name, age) -&gt; age + 2);  // Update if present
+        
+        System.out.println(&#34;\nAfter compute operations: &#34; + ages);
+        
+        // merge method
+        ages.merge(&#34;Alice&#34;, 5, (oldValue, newValue) -&gt; oldValue + newValue);
+        System.out.println(&#34;After merge: &#34; + ages);
+    }
+}
+</code></pre>
+            <h2 is-upgraded>TreeMap - Red-Black Tree (Sorted Keys)</h2>
+            <p><strong>Characteristics:</strong></p>
+            <ul>
+                <li>Key-value pairs, sorted by keys</li>
+                <li>O(log n) for get/put</li>
+                <li>Keys must implement Comparable or provide Comparator</li>
+                <li>Best for: Sorted key-value pairs</li>
+            </ul>
+            <pre><code language="language-java" class="language-java">import java.util.*;
+
+public class TreeMapDemo {
+    public static void main(String[] args) {
+        // Sorted by keys (alphabetically)
+        Map&lt;String, Double&gt; prices = new TreeMap&lt;&gt;();
+        prices.put(&#34;Laptop&#34;, 999.99);
+        prices.put(&#34;Mouse&#34;, 29.99);
+        prices.put(&#34;Keyboard&#34;, 79.99);
+        prices.put(&#34;Monitor&#34;, 299.99);
+        
+        System.out.println(&#34;Prices (sorted by product name):&#34;);
+        prices.forEach((product, price) -&gt; 
+            System.out.println(&#34;  &#34; + product + &#34;: $&#34; + price)
+        );
+        
+        // TreeMap specific methods
+        TreeMap&lt;Integer, String&gt; grades = new TreeMap&lt;&gt;();
+        grades.put(95, &#34;A&#34;);
+        grades.put(85, &#34;B&#34;);
+        grades.put(75, &#34;C&#34;);
+        grades.put(65, &#34;D&#34;);
+        
+        System.out.println(&#34;\nFirst entry: &#34; + grades.firstEntry());
+        System.out.println(&#34;Last entry: &#34; + grades.lastEntry());
+        System.out.println(&#34;Entry for 85: &#34; + grades.floorEntry(85));
+        System.out.println(&#34;Entry above 85: &#34; + grades.higherEntry(85));
+        
+        // Range views
+        System.out.println(&#34;Grades 70-90: &#34; + grades.subMap(70, 91));
+        System.out.println(&#34;Grades below 80: &#34; + grades.headMap(80));
+        System.out.println(&#34;Grades 80+: &#34; + grades.tailMap(80));
+    }
+}
+</code></pre>
+            <h2 is-upgraded>LinkedHashMap - Maintains Insertion Order</h2>
+            <p><strong>Characteristics:</strong></p>
+            <ul>
+                <li>Key-value pairs, maintains insertion order</li>
+                <li>Slightly slower than HashMap</li>
+                <li>Can also maintain access order (LRU cache)</li>
+                <li>Best for: Predictable iteration order</li>
+            </ul>
+            <pre><code language="language-java" class="language-java">import java.util.*;
+
+public class LinkedHashMapDemo {
+    public static void main(String[] args) {
+        // Insertion order
+        Map&lt;String, String&gt; capitals = new LinkedHashMap&lt;&gt;();
+        capitals.put(&#34;USA&#34;, &#34;Washington&#34;);
+        capitals.put(&#34;France&#34;, &#34;Paris&#34;);
+        capitals.put(&#34;Japan&#34;, &#34;Tokyo&#34;);
+        capitals.put(&#34;India&#34;, &#34;New Delhi&#34;);
+        
+        System.out.println(&#34;Capitals (insertion order):&#34;);
+        capitals.forEach((country, capital) -&gt; 
+            System.out.println(&#34;  &#34; + country + &#34; -&gt; &#34; + capital)
+        );
+        
+        // Access order (LRU cache implementation)
+        Map&lt;String, Integer&gt; lruCache = new LinkedHashMap&lt;&gt;(16, 0.75f, true);
+        lruCache.put(&#34;A&#34;, 1);
+        lruCache.put(&#34;B&#34;, 2);
+        lruCache.put(&#34;C&#34;, 3);
+        
+        System.out.println(&#34;\nBefore access: &#34; + lruCache.keySet());
+        
+        lruCache.get(&#34;A&#34;);  // Access A - moves to end
+        
+        System.out.println(&#34;After accessing A: &#34; + lruCache.keySet());
+        // Output shows A at the end
+    }
+}
+</code></pre>
+            <aside class="special">
+                <p><strong>Map Selection:</strong> HashMap for speed, TreeMap for sorted keys, LinkedHashMap for
+                    insertion order. Most common: HashMap!</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Queue and Deque" duration="10">
+            <p>Queues process elements in specific orders.</p>
+            <h2 is-upgraded>PriorityQueue - Heap Based Priority Queue</h2>
+            <p><strong>Characteristics:</strong></p>
+            <ul>
+                <li>Elements ordered by priority (natural order or Comparator)</li>
+                <li>O(log n) for add/remove</li>
+                <li>Not thread-safe</li>
+                <li>Best for: Processing by priority</li>
+            </ul>
+            <pre><code language="language-java" class="language-java">import java.util.*;
+
+public class PriorityQueueDemo {
+    public static void main(String[] args) {
+        // Natural ordering (min heap)
+        PriorityQueue&lt;Integer&gt; numbers = new PriorityQueue&lt;&gt;();
+        numbers.add(50);
+        numbers.add(10);
+        numbers.add(30);
+        numbers.add(20);
+        
+        System.out.println(&#34;Priority Queue: &#34; + numbers);
+        // Note: toString() doesn&#39;t show priority order
+        
+        System.out.println(&#34;\nPolling (removes in priority order):&#34;);
+        while (!numbers.isEmpty()) {
+            System.out.println(&#34;  &#34; + numbers.poll());  // 10, 20, 30, 50
+        }
+        
+        // Max heap using reverse order
+        PriorityQueue&lt;Integer&gt; maxHeap = new PriorityQueue&lt;&gt;(Comparator.reverseOrder());
+        maxHeap.addAll(Arrays.asList(50, 10, 30, 20));
+        
+        System.out.println(&#34;\nMax heap polling:&#34;);
+        while (!maxHeap.isEmpty()) {
+            System.out.println(&#34;  &#34; + maxHeap.poll());  // 50, 30, 20, 10
+        }
+        
+        // Custom objects with priority
+        PriorityQueue&lt;Task&gt; tasks = new PriorityQueue&lt;&gt;(
+            Comparator.comparingInt(Task::getPriority).reversed()
+        );
+        
+        tasks.add(new Task(&#34;Low priority&#34;, 1));
+        tasks.add(new Task(&#34;High priority&#34;, 5));
+        tasks.add(new Task(&#34;Medium priority&#34;, 3));
+        
+        System.out.println(&#34;\nProcessing tasks by priority:&#34;);
+        while (!tasks.isEmpty()) {
+            Task task = tasks.poll();
+            System.out.println(&#34;  &#34; + task.getName() + &#34; (priority: &#34; + 
+                             task.getPriority() + &#34;)&#34;);
+        }
+    }
+}
+
+class Task {
+    private String name;
+    private int priority;
+    
+    public Task(String name, int priority) {
+        this.name = name;
+        this.priority = priority;
+    }
+    
+    public String getName() { return name; }
+    public int getPriority() { return priority; }
+}
+</code></pre>
+            <h2 is-upgraded>ArrayDeque - Resizable Array Double-Ended Queue</h2>
+            <p><strong>Characteristics:</strong></p>
+            <ul>
+                <li>Fast add/remove at both ends</li>
+                <li>No capacity restrictions</li>
+                <li>Faster than LinkedList for queue/stack operations</li>
+                <li>Best for: General-purpose queue/stack</li>
+            </ul>
+            <pre><code language="language-java" class="language-java">import java.util.*;
+
+public class ArrayDequeDemo {
+    public static void main(String[] args) {
+        Deque&lt;String&gt; deque = new ArrayDeque&lt;&gt;();
+        
+        // Add to both ends
+        deque.addFirst(&#34;First&#34;);
+        deque.addLast(&#34;Last&#34;);
+        deque.addFirst(&#34;New First&#34;);
+        deque.addLast(&#34;New Last&#34;);
+        
+        System.out.println(&#34;Deque: &#34; + deque);
+        
+        // Peek both ends
+        System.out.println(&#34;Peek first: &#34; + deque.peekFirst());
+        System.out.println(&#34;Peek last: &#34; + deque.peekLast());
+        
+        // Remove from both ends
+        System.out.println(&#34;Remove first: &#34; + deque.removeFirst());
+        System.out.println(&#34;Remove last: &#34; + deque.removeLast());
+        System.out.println(&#34;After removal: &#34; + deque);
+        
+        // Use as Stack (LIFO)
+        Deque&lt;Integer&gt; stack = new ArrayDeque&lt;&gt;();
+        stack.push(1);
+        stack.push(2);
+        stack.push(3);
+        System.out.println(&#34;\nStack: &#34; + stack);
+        System.out.println(&#34;Pop: &#34; + stack.pop());  // 3
+        
+        // Use as Queue (FIFO)
+        Deque&lt;Integer&gt; queue = new ArrayDeque&lt;&gt;();
+        queue.offer(1);
+        queue.offer(2);
+        queue.offer(3);
+        System.out.println(&#34;\nQueue: &#34; + queue);
+        System.out.println(&#34;Poll: &#34; + queue.poll());  // 1
+    }
+}
+</code></pre>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Generics Fundamentals" duration="12">
+            <p>Generics provide type safety and eliminate casting.</p>
+            <h2 is-upgraded>Why Generics?</h2>
+            <p><strong>Before Generics (Java 4 and earlier):</strong></p>
+            <pre><code language="language-java" class="language-java">List list = new ArrayList();
+list.add(&#34;Hello&#34;);
+list.add(123);  // No compile error!
+
+String s = (String) list.get(0);  // Casting required
+String s2 = (String) list.get(1);  // Runtime ClassCastException!
+</code></pre>
+            <p><strong>With Generics (Java 5+):</strong></p>
+            <pre><code language="language-java" class="language-java">List&lt;String&gt; list = new ArrayList&lt;&gt;();
+list.add(&#34;Hello&#34;);
+// list.add(123);  // Compile error - type safety!
+
+String s = list.get(0);  // No casting needed
+</code></pre>
+            <aside class="special">
+                <p><strong>Key Benefit:</strong> Generics catch type errors at compile-time instead of runtime!</p>
+            </aside>
+            <h2 is-upgraded>Generic Classes</h2>
+            <pre><code language="language-java" class="language-java">// Generic Box class
+public class Box&lt;T&gt; {
+    private T content;
+    
+    public void set(T content) {
+        this.content = content;
+    }
+    
+    public T get() {
+        return content;
+    }
+    
+    public boolean isEmpty() {
+        return content == null;
+    }
+}
+
+// Usage
+Box&lt;String&gt; stringBox = new Box&lt;&gt;();
+stringBox.set(&#34;Hello&#34;);
+String value = stringBox.get();  // No casting
+
+Box&lt;Integer&gt; intBox = new Box&lt;&gt;();
+intBox.set(123);
+Integer num = intBox.get();
+</code></pre>
+            <h2 is-upgraded>Multiple Type Parameters</h2>
+            <pre><code language="language-java" class="language-java">public class Pair&lt;K, V&gt; {
+    private K key;
+    private V value;
+    
+    public Pair(K key, V value) {
+        this.key = key;
+        this.value = value;
+    }
+    
+    public K getKey() { return key; }
+    public V getValue() { return value; }
+    
+    @Override
+    public String toString() {
+        return &#34;(&#34; + key + &#34;, &#34; + value + &#34;)&#34;;
+    }
+}
+
+// Usage
+Pair&lt;String, Integer&gt; age = new Pair&lt;&gt;(&#34;Alice&#34;, 25);
+Pair&lt;Integer, String&gt; idName = new Pair&lt;&gt;(101, &#34;Bob&#34;);
+
+System.out.println(age);      // (Alice, 25)
+System.out.println(idName);   // (101, Bob)
+</code></pre>
+            <h2 is-upgraded>Generic Methods</h2>
+            <pre><code language="language-java" class="language-java">public class GenericMethods {
+    
+    // Generic method
+    public static &lt;T&gt; void printArray(T[] array) {
+        for (T element : array) {
+            System.out.print(element + &#34; &#34;);
+        }
+        System.out.println();
+    }
+    
+    // Generic method with return type
+    public static &lt;T&gt; T getFirst(List&lt;T&gt; list) {
+        if (list.isEmpty()) {
+            return null;
+        }
+        return list.get(0);
+    }
+    
+    // Multiple type parameters
+    public static &lt;K, V&gt; boolean containsKeyValue(Map&lt;K, V&gt; map, K key, V value) {
+        return value.equals(map.get(key));
+    }
+    
+    public static void main(String[] args) {
+        Integer[] intArray = {1, 2, 3, 4, 5};
+        String[] strArray = {&#34;Hello&#34;, &#34;World&#34;, &#34;Java&#34;};
+        
+        printArray(intArray);  // 1 2 3 4 5
+        printArray(strArray);  // Hello World Java
+        
+        List&lt;String&gt; names = Arrays.asList(&#34;Alice&#34;, &#34;Bob&#34;, &#34;Charlie&#34;);
+        String first = getFirst(names);
+        System.out.println(&#34;First: &#34; + first);  // Alice
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Bounded Type Parameters</h2>
+            <p>Restrict type parameters to specific types or subclasses:</p>
+            <pre><code language="language-java" class="language-java">// Upper bound - T must be Number or subclass
+public class NumberBox&lt;T extends Number&gt; {
+    private T number;
+    
+    public NumberBox(T number) {
+        this.number = number;
+    }
+    
+    public double getDoubleValue() {
+        return number.doubleValue();  // Can call Number methods
+    }
+}
+
+// Usage
+NumberBox&lt;Integer&gt; intBox = new NumberBox&lt;&gt;(123);
+NumberBox&lt;Double&gt; doubleBox = new NumberBox&lt;&gt;(123.45);
+// NumberBox&lt;String&gt; strBox = new NumberBox&lt;&gt;(&#34;Hello&#34;);  // Compile error!
+
+// Multiple bounds
+public class ComparableBox&lt;T extends Number &amp; Comparable&lt;T&gt;&gt; {
+    private T value;
+    
+    public ComparableBox(T value) {
+        this.value = value;
+    }
+    
+    public boolean isGreaterThan(T other) {
+        return value.compareTo(other) &gt; 0;
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Wildcards</h2>
+            <pre><code language="language-java" class="language-java">public class WildcardDemo {
+    
+    // Upper bounded wildcard - read only
+    public static double sumNumbers(List&lt;? extends Number&gt; list) {
+        double sum = 0;
+        for (Number num : list) {
+            sum += num.doubleValue();
+        }
+        return sum;
+    }
+    
+    // Lower bounded wildcard - write only
+    public static void addNumbers(List&lt;? super Integer&gt; list) {
+        for (int i = 1; i &lt;= 5; i++) {
+            list.add(i);
+        }
+    }
+    
+    // Unbounded wildcard
+    public static void printList(List&lt;?&gt; list) {
+        for (Object element : list) {
+            System.out.println(element);
+        }
+    }
+    
+    public static void main(String[] args) {
+        List&lt;Integer&gt; integers = Arrays.asList(1, 2, 3);
+        List&lt;Double&gt; doubles = Arrays.asList(1.5, 2.5, 3.5);
+        
+        System.out.println(&#34;Sum of integers: &#34; + sumNumbers(integers));
+        System.out.println(&#34;Sum of doubles: &#34; + sumNumbers(doubles));
+        
+        List&lt;Number&gt; numbers = new ArrayList&lt;&gt;();
+        addNumbers(numbers);
+        System.out.println(&#34;Numbers: &#34; + numbers);
+        
+        printList(integers);
+        printList(doubles);
+    }
+}
+</code></pre>
+            <aside class="special">
+                <p><strong>PECS Principle:</strong> Producer Extends, Consumer Super. Use <code><? extends T></code> for
+                    reading, <code><? super T></code> for writing.</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Comparable and Comparator" duration="12">
+            <p>Sort custom objects using natural ordering or custom comparisons.</p>
+            <h2 is-upgraded>Comparable Interface</h2>
+            <p>Define natural ordering for a class:</p>
+            <pre><code language="language-java" class="language-java">public class Product implements Comparable&lt;Product&gt; {
+    private String name;
+    private double price;
+    private int quantity;
+    
+    public Product(String name, double price, int quantity) {
+        this.name = name;
+        this.price = price;
+        this.quantity = quantity;
+    }
+    
+    @Override
+    public int compareTo(Product other) {
+        // Natural ordering by price
+        return Double.compare(this.price, other.price);
+    }
+    
+    @Override
+    public String toString() {
+        return name + &#34; ($&#34; + price + &#34;, qty: &#34; + quantity + &#34;)&#34;;
+    }
+    
+    // Getters
+    public String getName() { return name; }
+    public double getPrice() { return price; }
+    public int getQuantity() { return quantity; }
+}
+
+// Usage
+List&lt;Product&gt; products = new ArrayList&lt;&gt;();
+products.add(new Product(&#34;Laptop&#34;, 999.99, 5));
+products.add(new Product(&#34;Mouse&#34;, 29.99, 50));
+products.add(new Product(&#34;Keyboard&#34;, 79.99, 20));
+
+Collections.sort(products);  // Sorts by price (natural ordering)
+System.out.println(&#34;Sorted by price: &#34; + products);
+</code></pre>
+            <h2 is-upgraded>Comparator Interface</h2>
+            <p>Define alternative orderings:</p>
+            <pre><code language="language-java" class="language-java">import java.util.*;
+
+public class ComparatorDemo {
+    public static void main(String[] args) {
+        List&lt;Product&gt; products = new ArrayList&lt;&gt;();
+        products.add(new Product(&#34;Laptop&#34;, 999.99, 5));
+        products.add(new Product(&#34;Mouse&#34;, 29.99, 50));
+        products.add(new Product(&#34;Keyboard&#34;, 79.99, 20));
+        products.add(new Product(&#34;Monitor&#34;, 299.99, 10));
+        
+        // Sort by name
+        Collections.sort(products, new Comparator&lt;Product&gt;() {
+            @Override
+            public int compare(Product p1, Product p2) {
+                return p1.getName().compareTo(p2.getName());
+            }
+        });
+        System.out.println(&#34;Sorted by name: &#34; + products);
+        
+        // Sort by quantity (lambda)
+        products.sort((p1, p2) -&gt; Integer.compare(p1.getQuantity(), p2.getQuantity()));
+        System.out.println(&#34;Sorted by quantity: &#34; + products);
+        
+        // Sort by price (method reference)
+        products.sort(Comparator.comparingDouble(Product::getPrice));
+        System.out.println(&#34;Sorted by price: &#34; + products);
+        
+        // Reverse order
+        products.sort(Comparator.comparingDouble(Product::getPrice).reversed());
+        System.out.println(&#34;Sorted by price (descending): &#34; + products);
+        
+        // Multiple criteria - by price, then by name
+        products.sort(
+            Comparator.comparingDouble(Product::getPrice)
+                      .thenComparing(Product::getName)
+        );
+        System.out.println(&#34;Sorted by price, then name: &#34; + products);
+        
+        // Natural order with nulls
+        List&lt;Product&gt; withNulls = new ArrayList&lt;&gt;(products);
+        withNulls.add(null);
+        withNulls.sort(Comparator.nullsLast(Comparator.naturalOrder()));
+        System.out.println(&#34;With null handling: &#34; + withNulls);
+    }
+}
+</code></pre>
+            <aside class="special">
+                <p><strong>Modern Java:</strong> Use Comparator static methods and lambdas instead of anonymous classes.
+                    Much cleaner!</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Build Inventory Management System" duration="20">
+            <p>Now let&#39;s build a complete inventory system using all collection types!</p>
+            <h2 is-upgraded>Complete Product Class</h2>
+            <pre><code language="language-java" class="language-java">public class Product implements Comparable&lt;Product&gt; {
+    private String id;
+    private String name;
+    private String category;
+    private double price;
+    private int quantity;
+    
+    public Product(String id, String name, String category, double price, int quantity) {
+        this.id = id;
+        this.name = name;
+        this.category = category;
+        this.price = price;
+        this.quantity = quantity;
+    }
+    
+    @Override
+    public int compareTo(Product other) {
+        return this.name.compareTo(other.name);
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Product product = (Product) obj;
+        return id.equals(product.id);
+    }
+    
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
+    
+    @Override
+    public String toString() {
+        return String.format(&#34;%-8s %-20s %-15s $%-8.2f qty:%-4d&#34;, 
+                           id, name, category, price, quantity);
+    }
+    
+    // Getters and setters
+    public String getId() { return id; }
+    public String getName() { return name; }
+    public String getCategory() { return category; }
+    public double getPrice() { return price; }
+    public int getQuantity() { return quantity; }
+    public void setQuantity(int quantity) { this.quantity = quantity; }
+}
+</code></pre>
+            <h2 is-upgraded>Inventory Manager</h2>
+            <p><strong>InventoryManager.java:</strong></p>
+            <pre><code language="language-java" class="language-java">import java.util.*;
+
+public class InventoryManager {
+    // Primary storage - fast lookups by ID
+    private Map&lt;String, Product&gt; productsById;
+    
+    // Category index - products grouped by category
+    private Map&lt;String, Set&lt;Product&gt;&gt; productsByCategory;
+    
+    // Low stock priority queue
+    private PriorityQueue&lt;Product&gt; lowStockQueue;
+    
+    // Order history
+    private Deque&lt;Order&gt; orderHistory;
+    
+    private static final int LOW_STOCK_THRESHOLD = 10;
+    
+    public InventoryManager() {
+        this.productsById = new HashMap&lt;&gt;();
+        this.productsByCategory = new HashMap&lt;&gt;();
+        this.lowStockQueue = new PriorityQueue&lt;&gt;(
+            Comparator.comparingInt(Product::getQuantity)
+        );
+        this.orderHistory = new ArrayDeque&lt;&gt;();
+    }
+    
+    public void addProduct(Product product) {
+        productsById.put(product.getId(), product);
+        
+        // Add to category index
+        productsByCategory
+            .computeIfAbsent(product.getCategory(), k -&gt; new HashSet&lt;&gt;())
+            .add(product);
+        
+        // Add to low stock queue if applicable
+        if (product.getQuantity() &lt;= LOW_STOCK_THRESHOLD) {
+            lowStockQueue.offer(product);
+        }
+        
+        System.out.println(&#34;Product added: &#34; + product.getId());
+    }
+    
+    public Product getProduct(String id) {
+        return productsById.get(id);
+    }
+    
+    public List&lt;Product&gt; getAllProducts() {
+        return new ArrayList&lt;&gt;(productsById.values());
+    }
+    
+    public Set&lt;Product&gt; getProductsByCategory(String category) {
+        return productsByCategory.getOrDefault(category, new HashSet&lt;&gt;());
+    }
+    
+    public List&lt;Product&gt; searchByName(String keyword) {
+        List&lt;Product&gt; results = new ArrayList&lt;&gt;();
+        String lowerKeyword = keyword.toLowerCase();
+        
+        for (Product product : productsById.values()) {
+            if (product.getName().toLowerCase().contains(lowerKeyword)) {
+                results.add(product);
+            }
+        }
+        
+        return results;
+    }
+    
+    public void updateStock(String productId, int quantity) {
+        Product product = productsById.get(productId);
+        if (product == null) {
+            System.out.println(&#34;Product not found: &#34; + productId);
+            return;
+        }
+        
+        int oldQuantity = product.getQuantity();
+        product.setQuantity(product.getQuantity() + quantity);
+        
+        // Update low stock queue
+        if (oldQuantity &gt; LOW_STOCK_THRESHOLD &amp;&amp; 
+            product.getQuantity() &lt;= LOW_STOCK_THRESHOLD) {
+            lowStockQueue.offer(product);
+        }
+        
+        System.out.println(&#34;Stock updated for &#34; + productId + 
+                         &#34;: &#34; + oldQuantity + &#34; -&gt; &#34; + product.getQuantity());
+    }
+    
+    public boolean placeOrder(String productId, int quantity) {
+        Product product = productsById.get(productId);
+        if (product == null) {
+            System.out.println(&#34;Product not found: &#34; + productId);
+            return false;
+        }
+        
+        if (product.getQuantity() &lt; quantity) {
+            System.out.println(&#34;Insufficient stock for &#34; + productId);
+            return false;
+        }
+        
+        product.setQuantity(product.getQuantity() - quantity);
+        
+        Order order = new Order(
+            &#34;ORD-&#34; + System.currentTimeMillis(),
+            productId,
+            product.getName(),
+            quantity,
+            product.getPrice() * quantity
+        );
+        
+        orderHistory.addFirst(order);  // Most recent first
+        
+        // Check low stock
+        if (product.getQuantity() &lt;= LOW_STOCK_THRESHOLD) {
+            lowStockQueue.offer(product);
+        }
+        
+        System.out.println(&#34;Order placed: &#34; + order.getId());
+        return true;
+    }
+    
+    public List&lt;Product&gt; getLowStockProducts() {
+        List&lt;Product&gt; lowStock = new ArrayList&lt;&gt;();
+        for (Product product : productsById.values()) {
+            if (product.getQuantity() &lt;= LOW_STOCK_THRESHOLD) {
+                lowStock.add(product);
+            }
+        }
+        lowStock.sort(Comparator.comparingInt(Product::getQuantity));
+        return lowStock;
+    }
+    
+    public List&lt;Order&gt; getRecentOrders(int count) {
+        List&lt;Order&gt; recent = new ArrayList&lt;&gt;();
+        int added = 0;
+        for (Order order : orderHistory) {
+            if (added &gt;= count) break;
+            recent.add(order);
+            added++;
+        }
+        return recent;
+    }
+    
+    public Map&lt;String, Integer&gt; getCategoryStats() {
+        Map&lt;String, Integer&gt; stats = new TreeMap&lt;&gt;();  // Sorted by category
+        
+        for (Map.Entry&lt;String, Set&lt;Product&gt;&gt; entry : productsByCategory.entrySet()) {
+            stats.put(entry.getKey(), entry.getValue().size());
+        }
+        
+        return stats;
+    }
+    
+    public void displayInventory() {
+        System.out.println(&#34;\n=== INVENTORY ===&#34;);
+        System.out.println(&#34;ID       Name                 Category        Price    Quantity&#34;);
+        System.out.println(&#34;-&#34;.repeat(80));
+        
+        List&lt;Product&gt; sorted = getAllProducts();
+        Collections.sort(sorted);  // Sort by name
+        
+        for (Product product : sorted) {
+            System.out.println(product);
+        }
+    }
+    
+    public void displayLowStock() {
+        List&lt;Product&gt; lowStock = getLowStockProducts();
+        
+        if (lowStock.isEmpty()) {
+            System.out.println(&#34;\nNo low stock products.&#34;);
+            return;
+        }
+        
+        System.out.println(&#34;\n=== LOW STOCK ALERT ===&#34;);
+        System.out.println(&#34;Products with quantity &lt;= &#34; + LOW_STOCK_THRESHOLD + &#34;:&#34;);
+        System.out.println(&#34;ID       Name                 Category        Price    Quantity&#34;);
+        System.out.println(&#34;-&#34;.repeat(80));
+        
+        for (Product product : lowStock) {
+            System.out.println(product);
+        }
+    }
+}
+
+class Order {
+    private String id;
+    private String productId;
+    private String productName;
+    private int quantity;
+    private double totalPrice;
+    
+    public Order(String id, String productId, String productName, 
+                int quantity, double totalPrice) {
+        this.id = id;
+        this.productId = productId;
+        this.productName = productName;
+        this.quantity = quantity;
+        this.totalPrice = totalPrice;
+    }
+    
+    public String getId() { return id; }
+    public String getProductId() { return productId; }
+    public String getProductName() { return productName; }
+    public int getQuantity() { return quantity; }
+    public double getTotalPrice() { return totalPrice; }
+    
+    @Override
+    public String toString() {
+        return String.format(&#34;%s: %s x%d ($%.2f)&#34;, 
+                           id, productName, quantity, totalPrice);
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Main Application</h2>
+            <pre><code language="language-java" class="language-java">import java.util.*;
+
+public class InventoryApp {
+    public static void main(String[] args) {
+        InventoryManager manager = new InventoryManager();
+        
+        // Add products
+        manager.addProduct(new Product(&#34;P001&#34;, &#34;Laptop&#34;, &#34;Electronics&#34;, 999.99, 15));
+        manager.addProduct(new Product(&#34;P002&#34;, &#34;Mouse&#34;, &#34;Electronics&#34;, 29.99, 50));
+        manager.addProduct(new Product(&#34;P003&#34;, &#34;Keyboard&#34;, &#34;Electronics&#34;, 79.99, 8));
+        manager.addProduct(new Product(&#34;P004&#34;, &#34;Monitor&#34;, &#34;Electronics&#34;, 299.99, 20));
+        manager.addProduct(new Product(&#34;P005&#34;, &#34;Desk Chair&#34;, &#34;Furniture&#34;, 199.99, 5));
+        manager.addProduct(new Product(&#34;P006&#34;, &#34;Desk&#34;, &#34;Furniture&#34;, 349.99, 3));
+        manager.addProduct(new Product(&#34;P007&#34;, &#34;Notebook&#34;, &#34;Stationery&#34;, 4.99, 100));
+        manager.addProduct(new Product(&#34;P008&#34;, &#34;Pen Set&#34;, &#34;Stationery&#34;, 12.99, 75));
+        
+        // Display inventory
+        manager.displayInventory();
+        
+        // Search products
+        System.out.println(&#34;\n=== SEARCH RESULTS (keyword: &#39;desk&#39;) ===&#34;);
+        List&lt;Product&gt; searchResults = manager.searchByName(&#34;desk&#34;);
+        for (Product product : searchResults) {
+            System.out.println(product);
+        }
+        
+        // Get products by category
+        System.out.println(&#34;\n=== ELECTRONICS CATEGORY ===&#34;);
+        Set&lt;Product&gt; electronics = manager.getProductsByCategory(&#34;Electronics&#34;);
+        for (Product product : electronics) {
+            System.out.println(product);
+        }
+        
+        // Place orders
+        System.out.println(&#34;\n=== PLACING ORDERS ===&#34;);
+        manager.placeOrder(&#34;P001&#34;, 5);  // Laptop
+        manager.placeOrder(&#34;P003&#34;, 3);  // Keyboard
+        manager.placeOrder(&#34;P006&#34;, 2);  // Desk
+        
+        // Display recent orders
+        System.out.println(&#34;\n=== RECENT ORDERS ===&#34;);
+        List&lt;Order&gt; recentOrders = manager.getRecentOrders(5);
+        for (Order order : recentOrders) {
+            System.out.println(order);
+        }
+        
+        // Display low stock alert
+        manager.displayLowStock();
+        
+        // Category statistics
+        System.out.println(&#34;\n=== CATEGORY STATISTICS ===&#34;);
+        Map&lt;String, Integer&gt; stats = manager.getCategoryStats();
+        stats.forEach((category, count) -&gt; 
+            System.out.println(category + &#34;: &#34; + count + &#34; products&#34;)
+        );
+        
+        // Update stock
+        System.out.println(&#34;\n=== RESTOCKING ===&#34;);
+        manager.updateStock(&#34;P003&#34;, 20);  // Restock keyboard
+        manager.updateStock(&#34;P006&#34;, 10);  // Restock desk
+        
+        // Final inventory
+        manager.displayInventory();
+        manager.displayLowStock();
+    }
+}
+</code></pre>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Conclusion" duration="2">
+            <p>Congratulations! 🎉 You&#39;ve mastered the Java Collections Framework and Generics!</p>
+            <h2 is-upgraded>What You&#39;ve Learned</h2>
+            <ul>
+                <li>✅ <strong>Collections Framework:</strong> Complete understanding of List, Set, Map, Queue</li>
+                <li>✅ <strong>ArrayList vs LinkedList:</strong> Performance trade-offs and use cases</li>
+                <li>✅ <strong>HashSet vs TreeSet:</strong> Uniqueness with and without ordering</li>
+                <li>✅ <strong>HashMap vs TreeMap:</strong> Fast lookups vs sorted keys</li>
+                <li>✅ <strong>PriorityQueue:</strong> Processing elements by priority</li>
+                <li>✅ <strong>Generics:</strong> Type-safe collections and methods</li>
+                <li>✅ <strong>Bounded Types:</strong> Restricting generic type parameters</li>
+                <li>✅ <strong>Wildcards:</strong> Flexible generic APIs (PECS principle)</li>
+                <li>✅ <strong>Comparable/Comparator:</strong> Natural and custom sorting</li>
+                <li>✅ <strong>Real-World Application:</strong> Complete inventory management system</li>
+            </ul>
+            <h2 is-upgraded>Key Takeaways</h2>
+            <ol type="1">
+                <li><strong>Choose the right collection</strong> - Performance matters</li>
+                <li><strong>Use Generics</strong> - Type safety eliminates runtime errors</li>
+                <li><strong>Prefer interfaces</strong> - Code to interfaces (List, Set, Map), not implementations</li>
+                <li><strong>ArrayList is default</strong> - Unless you have specific needs</li>
+                <li><strong>HashMap is default</strong> - Fast lookups for key-value pairs</li>
+                <li><strong>TreeSet/TreeMap for sorting</strong> - When you need ordered elements</li>
+                <li><strong>PriorityQueue for priorities</strong> - Process most important first</li>
+                <li><strong>Comparator for flexibility</strong> - Multiple sorting strategies</li>
+            </ol>
+            <h2 is-upgraded>Performance Summary</h2>
+            <table>
+                <tr>
+                    <td colspan="1" rowspan="1">
+                        <p>Operation</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>ArrayList</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>LinkedList</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>HashSet</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>TreeSet</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>HashMap</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>TreeMap</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="1" rowspan="1">
+                        <p>Add</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>O(1)*</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>O(1)</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>O(1)</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>O(log n)</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>O(1)</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>O(log n)</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="1" rowspan="1">
+                        <p>Remove</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>O(n)</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>O(1)**</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>O(1)</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>O(log n)</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>O(1)</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>O(log n)</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="1" rowspan="1">
+                        <p>Get</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>O(1)</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>O(n)</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>N/A</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>N/A</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>O(1)</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>O(log n)</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="1" rowspan="1">
+                        <p>Contains</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>O(n)</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>O(n)</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>O(1)</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>O(log n)</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>O(1)</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>O(log n)</p>
+                    </td>
+                </tr>
+            </table>
+            <p>*Amortized, **At ends</p>
+            <h2 is-upgraded>Next Steps</h2>
+            <ul>
+                <li><strong>Codelab 1.5:</strong> Memory Management &amp; Garbage Collection</li>
+                <li><strong>Section 2:</strong> Java 8+ Features (Streams, Lambdas, Optional)</li>
+            </ul>
+            <h2 is-upgraded>Practice Exercises</h2>
+            <p>Enhance the Inventory System:</p>
+            <ol type="1">
+                <li><strong>Supplier Management:</strong> Add Supplier class with products</li>
+                <li><strong>Order Analytics:</strong> Calculate total sales, most popular products</li>
+                <li><strong>Price History:</strong> Track price changes over time (TreeMap with dates)</li>
+                <li><strong>Bulk Operations:</strong> Import/export from CSV files</li>
+                <li><strong>Recommendations:</strong> Suggest products based on order history</li>
+                <li><strong>Generic Repository:</strong> Create generic CRUD repository pattern</li>
+                <li><strong>Cache Implementation:</strong> Build LRU cache using LinkedHashMap</li>
+            </ol>
+            <h2 is-upgraded>Additional Resources</h2>
+            <ul>
+                <li><a href="https://docs.oracle.com/javase/tutorial/collections/" target="_blank">Java Collections
+                        Tutorial</a></li>
+                <li><a href="http://www.angelikalanger.com/GenericsFAQ/JavaGenericsFAQ.html" target="_blank">Java
+                        Generics FAQ</a></li>
+                <li><a href="https://www.oreilly.com/library/view/effective-java/9780134686097/"
+                        target="_blank">Effective Java - Chapter on Generics</a></li>
+                <li><a href="https://www.baeldung.com/java-collections-complexity" target="_blank">Java Collections
+                        Performance</a></li>
+            </ul>
+            <aside class="special">
+                <p><strong>Outstanding!</strong> Collections and Generics are fundamental to Java programming. You now
+                    have the tools to build efficient, type-safe applications!</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+    </google-codelab>
+
+    <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
+    <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
+    <script src="https://storage.googleapis.com/claat-public/prettify.js"></script>
+    <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
+    <script src="//support.google.com/inapp/api.js"></script>
+
+</body>
+
+</html>

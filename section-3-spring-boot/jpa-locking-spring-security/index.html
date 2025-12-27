@@ -1,0 +1,1285 @@
+<!doctype html>
+
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+    <meta name="theme-color" content="#4F7DC9">
+    <meta charset="UTF-8">
+    <title>JPA Locking Mechanisms &amp; Spring Security</title>
+    <link rel="stylesheet"
+        href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
+    <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
+    <style>
+        .success {
+            color: #1e8e3e;
+        }
+
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+    <google-codelab-analytics gaid="UA-49880327-14"></google-codelab-analytics>
+    <google-codelab codelab-gaid="" id="jpa-locking-spring-security"
+        title="JPA Locking Mechanisms &amp; Spring Security" environment="web" feedback-link="">
+
+        <google-codelab-step label="Introduction" duration="3">
+            <p>Add concurrency control with JPA locking and secure the application with Spring Security.</p>
+            <h2 class="checklist" is-upgraded>What You&#39;ll Learn</h2>
+            <ul class="checklist">
+                <li><strong>JPA Locking:</strong> Optimistic vs pessimistic locking</li>
+                <li><strong>@Version:</strong> Optimistic locking with version fields</li>
+                <li><strong>LockModeType:</strong> Pessimistic locking strategies</li>
+                <li><strong>Spring Security:</strong> Authentication and authorization</li>
+                <li><strong>Security Configuration:</strong> SecurityFilterChain setup</li>
+                <li><strong>User Authentication:</strong> UserDetailsService implementation</li>
+                <li><strong>Password Encoding:</strong> BCrypt password hashing</li>
+                <li><strong>Method Security:</strong> @PreAuthorize, @Secured annotations</li>
+                <li><strong>Role-Based Access:</strong> Admin, user, guest roles</li>
+                <li><strong>Security Context:</strong> Authentication principal access</li>
+            </ul>
+            <h2 is-upgraded>What You&#39;ll Build</h2>
+            <p>Secure Task Management API with:</p>
+            <ul>
+                <li><strong>Optimistic Locking</strong> on Task entity to prevent lost updates</li>
+                <li><strong>Version Conflict Handling</strong> with custom exception</li>
+                <li><strong>User Entity</strong> with password and roles</li>
+                <li><strong>Spring Security</strong> configuration with form and HTTP Basic auth</li>
+                <li><strong>Password Encoder</strong> for secure password storage</li>
+                <li><strong>Custom UserDetailsService</strong> for database authentication</li>
+                <li><strong>Role-Based Endpoints:</strong> Admin-only and user-specific access</li>
+                <li><strong>Method Security</strong> on service layer</li>
+                <li><strong>Security Integration</strong> with existing API</li>
+            </ul>
+            <h2 is-upgraded>Prerequisites</h2>
+            <ul>
+                <li>Completed Codelab 3.3 (ORM &amp; Spring Data JPA)</li>
+                <li>Understanding of JPA entities and repositories</li>
+            </ul>
+            <h2 is-upgraded>New Dependencies</h2>
+            <p>Add to <code>pom.xml</code>:</p>
+            <pre><code language="language-xml" class="language-xml">&lt;!-- Spring Security --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-security&lt;/artifactId&gt;
+&lt;/dependency&gt;
+
+&lt;!-- Security Test --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.security&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-security-test&lt;/artifactId&gt;
+    &lt;scope&gt;test&lt;/scope&gt;
+&lt;/dependency&gt;
+</code></pre>
+            <aside class="special">
+                <p><strong>Git Branch:</strong> Start from <code>codelab-3.3</code> or continue. This codelab adds
+                    enterprise-grade security and concurrency control.</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Understanding Concurrency Problems" duration="8">
+            <p>Learn why locking is necessary in multi-user applications.</p>
+            <h2 is-upgraded>The Lost Update Problem</h2>
+            <p><strong>Scenario:</strong> Two users edit the same task simultaneously.</p>
+            <pre><code>Time  User A                    User B                    Database
+----  ----------------------    ----------------------    -------------
+T1    Read task (status=TODO)                            status=TODO
+T2                               Read task (status=TODO)  status=TODO
+T3    Update status=DOING       
+T4                               Update status=DONE       
+T5    Save (status=DOING)                                 status=DOING
+T6                               Save (status=DONE)       status=DONE ❌
+</code></pre>
+            <p><strong>Result:</strong> User A&#39;s update is lost! User B overwrote it.</p>
+            <h2 is-upgraded>Dirty Reads</h2>
+            <p><strong>Scenario:</strong> One transaction reads uncommitted changes from another.</p>
+            <pre><code>Time  Transaction A             Transaction B             
+----  ----------------------    ----------------------    
+T1    Update task price=100                               
+T2                               Read task price=100      
+T3    ROLLBACK                                            
+T4                               Use price=100 ❌ (dirty) 
+</code></pre>
+            <h2 is-upgraded>Non-Repeatable Reads</h2>
+            <p><strong>Scenario:</strong> Reading the same data twice in a transaction gives different results.</p>
+            <pre><code>Time  Transaction A             Transaction B             
+----  ----------------------    ----------------------    
+T1    Read task (status=TODO)                             
+T2                               Update status=DONE       
+T3                               COMMIT                   
+T4    Read task (status=DONE) ❌ Different value!         
+</code></pre>
+            <h2 is-upgraded>Solution: Locking</h2>
+            <p>Two approaches to prevent these problems:</p>
+            <ol type="1">
+                <li><strong>Optimistic Locking:</strong> Assume conflicts are rare, detect them when saving</li>
+                <li><strong>Pessimistic Locking:</strong> Assume conflicts are common, lock data while reading</li>
+            </ol>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Optimistic Locking with @Version" duration="10">
+            <p>Add version field to detect concurrent modifications.</p>
+            <h2 is-upgraded>Update Task Entity</h2>
+            <pre><code language="language-java" class="language-java">package com.example.taskmanager.model;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
+
+@Entity
+@Table(name = &#34;tasks&#34;)
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Task {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @Column(nullable = false, length = 100)
+    private String title;
+    
+    @Column(length = 500)
+    private String description;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private TaskStatus status;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = &#34;user_id&#34;)
+    private User assignedTo;
+    
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = &#34;task_categories&#34;,
+        joinColumns = @JoinColumn(name = &#34;task_id&#34;),
+        inverseJoinColumns = @JoinColumn(name = &#34;category_id&#34;)
+    )
+    private Set&lt;Category&gt; categories = new HashSet&lt;&gt;();
+    
+    // ⭐ Optimistic locking version field
+    @Version
+    private Long version;
+    
+    @CreationTimestamp
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+    
+    @UpdateTimestamp
+    @Column(nullable = false)
+    private LocalDateTime updatedAt;
+    
+    public Task(String title, String description) {
+        this.title = title;
+        this.description = description;
+        this.status = TaskStatus.TODO;
+    }
+}
+</code></pre>
+            <h2 is-upgraded>How @Version Works</h2>
+            <pre><code>Initial State: Task(id=1, title=&#34;Fix bug&#34;, version=0)
+
+User A reads:  Task(id=1, version=0)
+User B reads:  Task(id=1, version=0)
+
+User A updates:
+  UPDATE tasks 
+  SET title=&#39;Fixed bug&#39;, version=1 
+  WHERE id=1 AND version=0  ✅ Success (1 row updated)
+
+User B updates:
+  UPDATE tasks 
+  SET title=&#39;Bug fixed&#39;, version=1 
+  WHERE id=1 AND version=0  ❌ Fails (0 rows updated)
+  
+  Throws: OptimisticLockException
+</code></pre>
+            <p><strong>Version increments automatically on each update.</strong></p>
+            <h2 is-upgraded>Version Conflict Exception</h2>
+            <p>Create custom exception:</p>
+            <pre><code language="language-java" class="language-java">package com.example.taskmanager.exception;
+
+public class TaskVersionConflictException extends RuntimeException {
+    
+    private final Long taskId;
+    private final Long attemptedVersion;
+    
+    public TaskVersionConflictException(Long taskId, Long attemptedVersion) {
+        super(String.format(
+            &#34;Task %d was modified by another user. Expected version: %d. &#34; +
+            &#34;Please refresh and try again.&#34;, taskId, attemptedVersion
+        ));
+        this.taskId = taskId;
+        this.attemptedVersion = attemptedVersion;
+    }
+    
+    public Long getTaskId() {
+        return taskId;
+    }
+    
+    public Long getAttemptedVersion() {
+        return attemptedVersion;
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Handle OptimisticLockException</h2>
+            <p>Update GlobalExceptionHandler:</p>
+            <pre><code language="language-java" class="language-java">import jakarta.persistence.OptimisticLockException;
+
+@RestControllerAdvice
+@Slf4j
+public class GlobalExceptionHandler {
+    
+    // ... existing handlers ...
+    
+    @ExceptionHandler(OptimisticLockException.class)
+    public ResponseEntity&lt;ErrorResponse&gt; handleOptimisticLock(
+            OptimisticLockException ex,
+            HttpServletRequest request) {
+        
+        log.warn(&#34;Optimistic lock conflict: {}&#34;, ex.getMessage());
+        
+        ErrorResponse error = new ErrorResponse(
+            LocalDateTime.now(),
+            HttpStatus.CONFLICT.value(),
+            &#34;Conflict&#34;,
+            &#34;The resource was modified by another user. Please refresh and retry.&#34;,
+            request.getRequestURI(),
+            null
+        );
+        
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
+    
+    @ExceptionHandler(TaskVersionConflictException.class)
+    public ResponseEntity&lt;ErrorResponse&gt; handleVersionConflict(
+            TaskVersionConflictException ex,
+            HttpServletRequest request) {
+        
+        log.warn(&#34;Task version conflict: taskId={}, version={}&#34;, 
+            ex.getTaskId(), ex.getAttemptedVersion());
+        
+        ErrorResponse error = new ErrorResponse(
+            LocalDateTime.now(),
+            HttpStatus.CONFLICT.value(),
+            &#34;Version Conflict&#34;,
+            ex.getMessage(),
+            request.getRequestURI(),
+            null
+        );
+        
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Update TaskService</h2>
+            <p>Add version checking in update method:</p>
+            <pre><code language="language-java" class="language-java">@Transactional
+public Task updateTask(Long id, Task taskDetails) {
+    log.debug(&#34;Updating task with ID: {}&#34;, id);
+    
+    Task task = taskRepository.findById(id)
+        .orElseThrow(() -&gt; new TaskNotFoundException(id));
+    
+    // Check if client provided version for optimistic locking
+    if (taskDetails.getVersion() != null &amp;&amp; 
+        !task.getVersion().equals(taskDetails.getVersion())) {
+        throw new TaskVersionConflictException(id, taskDetails.getVersion());
+    }
+    
+    task.setTitle(taskDetails.getTitle());
+    task.setDescription(taskDetails.getDescription());
+    task.setStatus(taskDetails.getStatus());
+    
+    return taskRepository.save(task);
+}
+</code></pre>
+            <h2 is-upgraded>Testing Optimistic Locking</h2>
+            <pre><code language="language-bash" class="language-bash"># Create task
+curl -X POST http://localhost:8080/api/tasks \
+  -H &#34;Content-Type: application/json&#34; \
+  -d &#39;{&#34;title&#34;: &#34;Test Locking&#34;, &#34;description&#34;: &#34;Version test&#34;}&#39;
+
+# Response: {&#34;id&#34;: 1, &#34;title&#34;: &#34;Test Locking&#34;, &#34;version&#34;: 0, ...}
+
+# Update with correct version
+curl -X PUT http://localhost:8080/api/tasks/1 \
+  -H &#34;Content-Type: application/json&#34; \
+  -d &#39;{&#34;title&#34;: &#34;Updated&#34;, &#34;version&#34;: 0}&#39;
+
+# Response: {&#34;id&#34;: 1, &#34;title&#34;: &#34;Updated&#34;, &#34;version&#34;: 1, ...}
+
+# Update with old version (simulates conflict)
+curl -X PUT http://localhost:8080/api/tasks/1 \
+  -H &#34;Content-Type: application/json&#34; \
+  -d &#39;{&#34;title&#34;: &#34;Conflict&#34;, &#34;version&#34;: 0}&#39;
+
+# Response: 409 Conflict
+# {&#34;error&#34;: &#34;Version Conflict&#34;, &#34;message&#34;: &#34;Task was modified...&#34;}
+</code></pre>
+            <aside class="special">
+                <p><strong>Best Practice:</strong> Optimistic locking is perfect for web applications where conflicts
+                    are rare. Include version in DTOs and UI to detect conflicts.</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Pessimistic Locking" duration="7">
+            <p>Lock records during read to prevent concurrent modifications.</p>
+            <h2 is-upgraded>Pessimistic Lock Modes</h2>
+            <pre><code language="language-java" class="language-java">// Shared lock (read lock) - allows other reads, blocks writes
+LockModeType.PESSIMISTIC_READ
+
+// Exclusive lock (write lock) - blocks all other access
+LockModeType.PESSIMISTIC_WRITE
+
+// Increment version without lock
+LockModeType.PESSIMISTIC_FORCE_INCREMENT
+</code></pre>
+            <h2 is-upgraded>Add Lock Support to Repository</h2>
+            <pre><code language="language-java" class="language-java">package com.example.taskmanager.repository;
+
+import com.example.taskmanager.model.Task;
+import com.example.taskmanager.model.TaskStatus;
+import jakarta.persistence.LockModeType;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
+
+@Repository
+public interface TaskRepository extends JpaRepository&lt;Task, Long&gt; {
+    
+    // ... existing methods ...
+    
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query(&#34;SELECT t FROM Task t WHERE t.id = :id&#34;)
+    Optional&lt;Task&gt; findByIdWithLock(@Param(&#34;id&#34;) Long id);
+    
+    @Lock(LockModeType.PESSIMISTIC_READ)
+    @Query(&#34;SELECT t FROM Task t WHERE t.status = :status&#34;)
+    List&lt;Task&gt; findByStatusWithLock(@Param(&#34;status&#34;) TaskStatus status);
+}
+</code></pre>
+            <h2 is-upgraded>Use Pessimistic Locking in Service</h2>
+            <pre><code language="language-java" class="language-java">@Transactional
+public Task updateTaskWithLock(Long id, Task taskDetails) {
+    log.debug(&#34;Updating task {} with pessimistic lock&#34;, id);
+    
+    // Acquire write lock (blocks other transactions)
+    Task task = taskRepository.findByIdWithLock(id)
+        .orElseThrow(() -&gt; new TaskNotFoundException(id));
+    
+    // Hold lock until transaction commits
+    task.setTitle(taskDetails.getTitle());
+    task.setDescription(taskDetails.getDescription());
+    task.setStatus(taskDetails.getStatus());
+    
+    return taskRepository.save(task);
+    // Lock released when transaction commits
+}
+</code></pre>
+            <h2 is-upgraded>Generated SQL</h2>
+            <pre><code language="language-sql" class="language-sql">-- PostgreSQL
+SELECT * FROM tasks WHERE id = 1 FOR UPDATE;
+
+-- MySQL
+SELECT * FROM tasks WHERE id = 1 FOR UPDATE;
+
+-- H2
+SELECT * FROM tasks WHERE id = 1 FOR UPDATE;
+</code></pre>
+            <h2 is-upgraded>Pessimistic vs Optimistic</h2>
+            <table>
+                <tr>
+                    <td colspan="1" rowspan="1">
+                        <p>Aspect</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>Optimistic</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>Pessimistic</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="1" rowspan="1">
+                        <p><strong>When to use</strong></p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>Low contention</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>High contention</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="1" rowspan="1">
+                        <p><strong>Performance</strong></p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>Better (no locks)</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>Slower (locks)</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="1" rowspan="1">
+                        <p><strong>Failures</strong></p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>At save time</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>At read time</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="1" rowspan="1">
+                        <p><strong>Scalability</strong></p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>Better</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>Limited</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="1" rowspan="1">
+                        <p><strong>Deadlocks</strong></p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>No</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>Possible</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="1" rowspan="1">
+                        <p><strong>User Experience</strong></p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>May need retry</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>Blocks/waits</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="1" rowspan="1">
+                        <p><strong>Use case</strong></p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>Web apps, REST APIs</p>
+                    </td>
+                    <td colspan="1" rowspan="1">
+                        <p>Banking, inventory</p>
+                    </td>
+                </tr>
+            </table>
+            <aside class="warning">
+                <p><strong>Deadlock Warning:</strong> Pessimistic locking can cause deadlocks if two transactions lock
+                    resources in different orders. Always lock in consistent order!</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Spring Security Setup" duration="10">
+            <p>Configure Spring Security for authentication and authorization.</p>
+            <h2 is-upgraded>Update User Entity</h2>
+            <pre><code language="language-java" class="language-java">package com.example.taskmanager.model;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+@Entity
+@Table(name = &#34;users&#34;)
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class User {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @Column(nullable = false, unique = true, length = 50)
+    private String username;
+    
+    @Column(nullable = false, unique = true, length = 100)
+    private String email;
+    
+    @Column(nullable = false, length = 100)
+    private String fullName;
+    
+    // ⭐ Security fields
+    @Column(nullable = false)
+    private String password;
+    
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = &#34;user_roles&#34;, joinColumns = @JoinColumn(name = &#34;user_id&#34;))
+    @Column(name = &#34;role&#34;)
+    private Set&lt;String&gt; roles = new HashSet&lt;&gt;();
+    
+    @Column(nullable = false)
+    private boolean enabled = true;
+    
+    @OneToMany(mappedBy = &#34;assignedTo&#34;, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List&lt;Task&gt; tasks = new ArrayList&lt;&gt;();
+    
+    @CreationTimestamp
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+    
+    public User(String username, String email, String fullName, String password) {
+        this.username = username;
+        this.email = email;
+        this.fullName = fullName;
+        this.password = password;
+        this.roles.add(&#34;ROLE_USER&#34;);
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Create UserDetailsService Implementation</h2>
+            <pre><code language="language-java" class="language-java">package com.example.taskmanager.security;
+
+import com.example.taskmanager.model.User;
+import com.example.taskmanager.repository.UserRepository;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Collection;
+import java.util.stream.Collectors;
+
+@Service
+public class CustomUserDetailsService implements UserDetailsService {
+    
+    private final UserRepository userRepository;
+    
+    public CustomUserDetailsService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+    
+    @Override
+    @Transactional(readOnly = true)
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userRepository.findByUsername(username)
+            .orElseThrow(() -&gt; new UsernameNotFoundException(
+                &#34;User not found with username: &#34; + username));
+        
+        return new org.springframework.security.core.userdetails.User(
+            user.getUsername(),
+            user.getPassword(),
+            user.isEnabled(),
+            true, // accountNonExpired
+            true, // credentialsNonExpired
+            true, // accountNonLocked
+            getAuthorities(user)
+        );
+    }
+    
+    private Collection&lt;? extends GrantedAuthority&gt; getAuthorities(User user) {
+        return user.getRoles().stream()
+            .map(SimpleGrantedAuthority::new)
+            .collect(Collectors.toList());
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Security Configuration</h2>
+            <pre><code language="language-java" class="language-java">package com.example.taskmanager.config;
+
+import com.example.taskmanager.security.CustomUserDetailsService;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+
+@Configuration
+@EnableWebSecurity
+@EnableMethodSecurity(prePostEnabled = true, securedEnabled = true)
+public class SecurityConfig {
+    
+    private final CustomUserDetailsService userDetailsService;
+    
+    public SecurityConfig(CustomUserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
+    }
+    
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+            .csrf(csrf -&gt; csrf.disable()) // Disable for REST API
+            .authorizeHttpRequests(auth -&gt; auth
+                // Public endpoints
+                .requestMatchers(&#34;/h2-console/**&#34;).permitAll()
+                .requestMatchers(&#34;/swagger-ui/**&#34;, &#34;/api-docs/**&#34;).permitAll()
+                .requestMatchers(HttpMethod.POST, &#34;/api/users/register&#34;).permitAll()
+                
+                // Admin only endpoints
+                .requestMatchers(&#34;/api/users/**&#34;).hasRole(&#34;ADMIN&#34;)
+                .requestMatchers(HttpMethod.DELETE, &#34;/api/tasks/**&#34;).hasRole(&#34;ADMIN&#34;)
+                
+                // Authenticated endpoints
+                .requestMatchers(&#34;/api/tasks/**&#34;).authenticated()
+                .requestMatchers(&#34;/api/categories/**&#34;).authenticated()
+                
+                // All other requests require authentication
+                .anyRequest().authenticated()
+            )
+            .httpBasic(basic -&gt; {})  // Enable HTTP Basic authentication
+            .sessionManagement(session -&gt; 
+                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            )
+            .headers(headers -&gt; headers.frameOptions(frame -&gt; frame.disable())); // For H2 console
+        
+        return http.build();
+    }
+    
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+    
+    @Bean
+    public DaoAuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(userDetailsService);
+        authProvider.setPasswordEncoder(passwordEncoder());
+        return authProvider;
+    }
+    
+    @Bean
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration authConfig) throws Exception {
+        return authConfig.getAuthenticationManager();
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Understanding Security Configuration</h2>
+            <pre><code language="language-java" class="language-java">// Public access (no authentication required)
+.requestMatchers(&#34;/swagger-ui/**&#34;).permitAll()
+
+// Role-based access (requires specific role)
+.requestMatchers(&#34;/api/users/**&#34;).hasRole(&#34;ADMIN&#34;)
+
+// Authenticated (any logged-in user)
+.requestMatchers(&#34;/api/tasks/**&#34;).authenticated()
+
+// HTTP Basic Authentication
+.httpBasic()
+
+// Stateless sessions (for REST APIs)
+.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+</code></pre>
+            <p><strong>Role Naming Convention:</strong></p>
+            <ul>
+                <li>Database: <code>ROLE_ADMIN</code>, <code>ROLE_USER</code></li>
+                <li>Code: <code>hasRole("ADMIN")</code> - Spring adds &#34;ROLE_&#34; prefix automatically</li>
+            </ul>
+            <aside class="special">
+                <p><strong>Security Note:</strong> We disabled CSRF for REST APIs using stateless sessions. Enable CSRF
+                    for traditional web apps with session-based authentication.</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Method Security" duration="8">
+            <p>Secure service methods with annotations.</p>
+            <h2 is-upgraded>Update UserService</h2>
+            <pre><code language="language-java" class="language-java">package com.example.taskmanager.service;
+
+import com.example.taskmanager.model.User;
+import com.example.taskmanager.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+@Service
+@Slf4j
+@Transactional(readOnly = true)
+public class UserService {
+    
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
+    
+    @Transactional
+    public User registerUser(User user) {
+        log.debug(&#34;Registering user: {}&#34;, user.getUsername());
+        
+        if (userRepository.existsByUsername(user.getUsername())) {
+            throw new RuntimeException(&#34;Username already exists: &#34; + user.getUsername());
+        }
+        
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new RuntimeException(&#34;Email already exists: &#34; + user.getEmail());
+        }
+        
+        // Encode password
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        
+        // Set default role
+        if (user.getRoles().isEmpty()) {
+            user.getRoles().add(&#34;ROLE_USER&#34;);
+        }
+        
+        return userRepository.save(user);
+    }
+    
+    @Transactional
+    @PreAuthorize(&#34;hasRole(&#39;ADMIN&#39;)&#34;)
+    public User createUserAsAdmin(User user, String role) {
+        log.debug(&#34;Admin creating user: {} with role: {}&#34;, user.getUsername(), role);
+        user.getRoles().add(role);
+        return registerUser(user);
+    }
+    
+    @PreAuthorize(&#34;hasRole(&#39;ADMIN&#39;) or #username == authentication.principal.username&#34;)
+    public User getUserByUsername(String username) {
+        return userRepository.findByUsername(username)
+            .orElseThrow(() -&gt; new RuntimeException(&#34;User not found: &#34; + username));
+    }
+    
+    @PreAuthorize(&#34;hasRole(&#39;ADMIN&#39;)&#34;)
+    public List&lt;User&gt; getAllUsers() {
+        return userRepository.findAll();
+    }
+    
+    @Transactional
+    @PreAuthorize(&#34;hasRole(&#39;ADMIN&#39;) or #id == principal.id&#34;)
+    public void deleteUser(Long id) {
+        if (!userRepository.existsById(id)) {
+            throw new RuntimeException(&#34;User not found with id: &#34; + id);
+        }
+        userRepository.deleteById(id);
+    }
+    
+    public User getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        return userRepository.findByUsername(username)
+            .orElseThrow(() -&gt; new RuntimeException(&#34;Current user not found&#34;));
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Update TaskService</h2>
+            <pre><code language="language-java" class="language-java">@Service
+@Slf4j
+@Transactional(readOnly = true)
+public class TaskService {
+    
+    // ... existing fields ...
+    
+    @Transactional
+    @PreAuthorize(&#34;hasRole(&#39;USER&#39;)&#34;)
+    public Task createTask(Task task) {
+        log.debug(&#34;Creating new task: {}&#34;, task.getTitle());
+        
+        // Auto-assign to current user
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+        User currentUser = userRepository.findByUsername(username)
+            .orElseThrow(() -&gt; new RuntimeException(&#34;User not found&#34;));
+        
+        task.setAssignedTo(currentUser);
+        
+        if (task.getStatus() == null) {
+            task.setStatus(TaskStatus.TODO);
+        }
+        
+        Task savedTask = taskRepository.save(task);
+        log.info(&#34;Task created with ID: {}&#34;, savedTask.getId());
+        return savedTask;
+    }
+    
+    @PreAuthorize(&#34;hasRole(&#39;USER&#39;)&#34;)
+    public Task getTaskById(Long id) {
+        Task task = taskRepository.findById(id)
+            .orElseThrow(() -&gt; new TaskNotFoundException(id));
+        
+        // Check ownership
+        checkTaskOwnership(task);
+        return task;
+    }
+    
+    @Transactional
+    @PreAuthorize(&#34;hasRole(&#39;USER&#39;)&#34;)
+    public Task updateTask(Long id, Task taskDetails) {
+        Task task = taskRepository.findById(id)
+            .orElseThrow(() -&gt; new TaskNotFoundException(id));
+        
+        // Check ownership
+        checkTaskOwnership(task);
+        
+        task.setTitle(taskDetails.getTitle());
+        task.setDescription(taskDetails.getDescription());
+        task.setStatus(taskDetails.getStatus());
+        
+        return taskRepository.save(task);
+    }
+    
+    @Transactional
+    @PreAuthorize(&#34;hasRole(&#39;ADMIN&#39;)&#34;)
+    public void deleteTask(Long id) {
+        if (!taskRepository.existsById(id)) {
+            throw new TaskNotFoundException(id);
+        }
+        taskRepository.deleteById(id);
+    }
+    
+    @PreAuthorize(&#34;hasRole(&#39;USER&#39;)&#34;)
+    public List&lt;Task&gt; getMyTasks() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+        User user = userRepository.findByUsername(username)
+            .orElseThrow(() -&gt; new RuntimeException(&#34;User not found&#34;));
+        
+        return taskRepository.findByAssignedToId(user.getId());
+    }
+    
+    private void checkTaskOwnership(Task task) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+        
+        if (task.getAssignedTo() != null &amp;&amp; 
+            !task.getAssignedTo().getUsername().equals(username)) {
+            
+            // Check if user has ADMIN role
+            boolean isAdmin = auth.getAuthorities().stream()
+                .anyMatch(a -&gt; a.getAuthority().equals(&#34;ROLE_ADMIN&#34;));
+            
+            if (!isAdmin) {
+                throw new RuntimeException(&#34;Access denied: Task belongs to another user&#34;);
+            }
+        }
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Method Security Annotations</h2>
+            <pre><code language="language-java" class="language-java">// @PreAuthorize - Check before method execution
+@PreAuthorize(&#34;hasRole(&#39;ADMIN&#39;)&#34;)
+public void adminMethod() { }
+
+@PreAuthorize(&#34;hasRole(&#39;USER&#39;) or hasRole(&#39;ADMIN&#39;)&#34;)
+public void userOrAdminMethod() { }
+
+@PreAuthorize(&#34;#username == authentication.principal.username&#34;)
+public void ownResourceMethod(String username) { }
+
+// @PostAuthorize - Check after method execution
+@PostAuthorize(&#34;returnObject.owner == authentication.principal.username&#34;)
+public Task getTask(Long id) { }
+
+// @Secured - Simple role checking
+@Secured(&#34;ROLE_ADMIN&#34;)
+public void simpleAdminMethod() { }
+
+@Secured({&#34;ROLE_USER&#34;, &#34;ROLE_ADMIN&#34;})
+public void multiRoleMethod() { }
+</code></pre>
+            <h2 is-upgraded>SpEL Expressions in Security</h2>
+            <pre><code language="language-java" class="language-java">// Authentication principal
+authentication.principal.username
+principal.username  // shorthand
+
+// Authorities/Roles
+hasRole(&#39;ADMIN&#39;)
+hasAnyRole(&#39;USER&#39;, &#39;ADMIN&#39;)
+hasAuthority(&#39;READ_PRIVILEGE&#39;)
+
+// Method parameters
+#username == principal.username
+#id == principal.id
+
+// Return value
+returnObject.owner == principal.username
+
+// Combine conditions
+hasRole(&#39;ADMIN&#39;) or #user.id == principal.id
+</code></pre>
+            <aside class="special">
+                <p><strong>Best Practice:</strong> Use method security to protect service layer. Never rely only on
+                    controller-level security - someone could call service methods directly.</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Update Controllers" duration="6">
+            <p>Add registration endpoint and update controllers for security.</p>
+            <h2 is-upgraded>Update UserController</h2>
+            <pre><code language="language-java" class="language-java">package com.example.taskmanager.controller;
+
+import com.example.taskmanager.model.User;
+import com.example.taskmanager.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import java.net.URI;
+import java.util.List;
+
+@RestController
+@RequestMapping(&#34;/api/users&#34;)
+@Tag(name = &#34;User Management&#34;)
+@Slf4j
+public class UserController {
+    
+    private final UserService userService;
+    
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
+    
+    @Operation(summary = &#34;Register a new user (public)&#34;)
+    @PostMapping(&#34;/register&#34;)
+    public ResponseEntity&lt;User&gt; registerUser(@RequestBody User user) {
+        log.info(&#34;POST /api/users/register - Registering: {}&#34;, user.getUsername());
+        User registered = userService.registerUser(user);
+        // Don&#39;t expose password in response
+        registered.setPassword(null);
+        URI location = URI.create(&#34;/api/users/&#34; + registered.getId());
+        return ResponseEntity.created(location).body(registered);
+    }
+    
+    @Operation(summary = &#34;Get current user&#34;, security = @SecurityRequirement(name = &#34;basicAuth&#34;))
+    @GetMapping(&#34;/me&#34;)
+    public ResponseEntity&lt;User&gt; getCurrentUser() {
+        log.info(&#34;GET /api/users/me&#34;);
+        User user = userService.getCurrentUser();
+        user.setPassword(null);
+        return ResponseEntity.ok(user);
+    }
+    
+    @Operation(summary = &#34;Get all users (Admin only)&#34;, security = @SecurityRequirement(name = &#34;basicAuth&#34;))
+    @GetMapping
+    @PreAuthorize(&#34;hasRole(&#39;ADMIN&#39;)&#34;)
+    public ResponseEntity&lt;List&lt;User&gt;&gt; getAllUsers() {
+        log.info(&#34;GET /api/users&#34;);
+        List&lt;User&gt; users = userService.getAllUsers();
+        users.forEach(u -&gt; u.setPassword(null));
+        return ResponseEntity.ok(users);
+    }
+    
+    @Operation(summary = &#34;Get user by username&#34;, security = @SecurityRequirement(name = &#34;basicAuth&#34;))
+    @GetMapping(&#34;/username/{username}&#34;)
+    public ResponseEntity&lt;User&gt; getUserByUsername(@PathVariable String username) {
+        log.info(&#34;GET /api/users/username/{}&#34;, username);
+        User user = userService.getUserByUsername(username);
+        user.setPassword(null);
+        return ResponseEntity.ok(user);
+    }
+    
+    @Operation(summary = &#34;Delete user (Admin only)&#34;, security = @SecurityRequirement(name = &#34;basicAuth&#34;))
+    @DeleteMapping(&#34;/{id}&#34;)
+    @PreAuthorize(&#34;hasRole(&#39;ADMIN&#39;)&#34;)
+    public ResponseEntity&lt;Void&gt; deleteUser(@PathVariable Long id) {
+        log.info(&#34;DELETE /api/users/{}&#34;, id);
+        userService.deleteUser(id);
+        return ResponseEntity.noContent().build();
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Update TaskController</h2>
+            <pre><code language="language-java" class="language-java">@RestController
+@RequestMapping(&#34;/api/tasks&#34;)
+@Tag(name = &#34;Task Management&#34;)
+@SecurityRequirement(name = &#34;basicAuth&#34;)
+@Slf4j
+public class TaskController {
+    
+    // ... existing code ...
+    
+    @Operation(summary = &#34;Get my tasks&#34;)
+    @GetMapping(&#34;/my-tasks&#34;)
+    public ResponseEntity&lt;List&lt;TaskResponse&gt;&gt; getMyTasks() {
+        log.info(&#34;GET /api/tasks/my-tasks&#34;);
+        List&lt;TaskResponse&gt; tasks = taskService.getMyTasks().stream()
+            .map(TaskResponse::new)
+            .toList();
+        return ResponseEntity.ok(tasks);
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Update OpenAPIConfig</h2>
+            <pre><code language="language-java" class="language-java">package com.example.taskmanager.config;
+
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Contact;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.info.License;
+import io.swagger.v3.oas.models.security.SecurityScheme;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class OpenAPIConfig {
+    
+    @Bean
+    public OpenAPI customOpenAPI() {
+        return new OpenAPI()
+            .components(new Components()
+                .addSecuritySchemes(&#34;basicAuth&#34;,
+                    new SecurityScheme()
+                        .type(SecurityScheme.Type.HTTP)
+                        .scheme(&#34;basic&#34;)
+                        .description(&#34;HTTP Basic Authentication&#34;)
+                )
+            )
+            .info(new Info()
+                .title(&#34;Task Management API&#34;)
+                .version(&#34;1.3.0&#34;)
+                .description(&#34;Secure Task Management API with JPA locking and Spring Security&#34;)
+                .contact(new Contact()
+                    .name(&#34;Your Name&#34;)
+                    .email(&#34;your.email@example.com&#34;)
+                    .url(&#34;https://yourwebsite.com&#34;)
+                )
+                .license(new License()
+                    .name(&#34;Apache 2.0&#34;)
+                    .url(&#34;https://www.apache.org/licenses/LICENSE-2.0.html&#34;)
+                )
+            );
+    }
+}
+</code></pre>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Testing Secured API" duration="5">
+            <p>Test authentication and authorization.</p>
+            <h2 is-upgraded>Create Test Users</h2>
+            <p>Add data initialization:</p>
+            <pre><code language="language-java" class="language-java">package com.example.taskmanager;
+
+import com.example.taskmanager.model.User;
+import com.example.taskmanager.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+@Configuration
+@Slf4j
+public class DataInitializer {
+    
+    @Bean
+    public CommandLineRunner initData(UserRepository userRepository, 
+                                       PasswordEncoder passwordEncoder) {
+        return args -&gt; {
+            if (userRepository.count() == 0) {
+                // Create admin user
+                User admin = new User();
+                admin.setUsername(&#34;admin&#34;);
+                admin.setEmail(&#34;admin@example.com&#34;);
+                admin.setFullName(&#34;Admin User&#34;);
+                admin.setPassword(passwordEncoder.encode(&#34;admin123&#34;));
+                admin.getRoles().add(&#34;ROLE_ADMIN&#34;);
+                admin.getRoles().add(&#34;ROLE_USER&#34;);
+                userRepository.save(admin);
+                
+                // Create regular user
+                User user = new User();
+                user.setUsername(&#34;john&#34;);
+                user.setEmail(&#34;john@example.com&#34;);
+                user.setFullName(&#34;John Doe&#34;);
+                user.setPassword(passwordEncoder.encode(&#34;user123&#34;));
+                user.getRoles().add(&#34;ROLE_USER&#34;);
+                userRepository.save(user);
+                
+                log.info(&#34;Test users created: admin/admin123, john/user123&#34;);
+            }
+        };
+    }
+}
+</code></pre>
+            <h2 is-upgraded>Test Authentication</h2>
+            <p><strong>1. Register new user:</strong></p>
+            <pre><code language="language-bash" class="language-bash">curl -X POST http://localhost:8080/api/users/register \
+  -H &#34;Content-Type: application/json&#34; \
+  -d &#39;{
+    &#34;username&#34;: &#34;alice&#34;,
+    &#34;email&#34;: &#34;alice@example.com&#34;,
+    &#34;fullName&#34;: &#34;Alice Smith&#34;,
+    &#34;password&#34;: &#34;password123&#34;
+  }&#39;
+</code></pre>
+            <p><strong>2. Get current user (authenticated):</strong></p>
+            <pre><code language="language-bash" class="language-bash">curl -u john:user123 http://localhost:8080/api/users/me
+</code></pre>
+            <p><strong>3. Create task (auto-assigned):</strong></p>
+            <pre><code language="language-bash" class="language-bash">curl -u john:user123 -X POST http://localhost:8080/api/tasks \
+  -H &#34;Content-Type: application/json&#34; \
+  -d &#39;{
+    &#34;title&#34;: &#34;My Secure Task&#34;,
+    &#34;description&#34;: &#34;Testing Spring Security&#34;
+  }&#39;
+</code></pre>
+            <p><strong>4. Get my tasks:</strong></p>
+            <pre><code language="language-bash" class="language-bash">curl -u john:user123 http://localhost:8080/api/tasks/my-tasks
+</code></pre>
+            <p><strong>5. Try admin endpoint (should fail):</strong></p>
+            <pre><code language="language-bash" class="language-bash">curl -u john:user123 http://localhost:8080/api/users
+# Response: 403 Forbidden
+</code></pre>
+            <p><strong>6. Admin endpoint (should succeed):</strong></p>
+            <pre><code language="language-bash" class="language-bash">curl -u admin:admin123 http://localhost:8080/api/users
+</code></pre>
+            <p><strong>7. Delete task (admin only):</strong></p>
+            <pre><code language="language-bash" class="language-bash">curl -u admin:admin123 -X DELETE http://localhost:8080/api/tasks/1
+</code></pre>
+            <h2 is-upgraded>Test in Swagger UI</h2>
+            <ol type="1">
+                <li>Visit: http://localhost:8080/swagger-ui.html</li>
+                <li>Click <strong>Authorize</strong> button</li>
+                <li>Enter credentials: <code>john</code> / <code>user123</code></li>
+                <li>Try endpoints with authentication</li>
+            </ol>
+            <aside class="special">
+                <p><strong>Production Note:</strong> In production, use JWT tokens instead of HTTP Basic auth for better
+                    security and stateless authentication.</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+        <google-codelab-step label="Conclusion" duration="2">
+            <p>Congratulations! 🎉 You&#39;ve secured your application with Spring Security and JPA locking!</p>
+            <h2 is-upgraded>What You&#39;ve Learned</h2>
+            <ul>
+                <li>✅ <strong>Optimistic Locking:</strong> @Version for conflict detection</li>
+                <li>✅ <strong>Pessimistic Locking:</strong> Database-level locks</li>
+                <li>✅ <strong>Spring Security:</strong> Authentication and authorization</li>
+                <li>✅ <strong>Password Encoding:</strong> BCrypt for secure passwords</li>
+                <li>✅ <strong>Role-Based Access:</strong> ADMIN and USER roles</li>
+                <li>✅ <strong>Method Security:</strong> @PreAuthorize annotations</li>
+                <li>✅ <strong>Security Context:</strong> Access current user</li>
+                <li>✅ <strong>HTTP Basic Auth:</strong> Simple authentication for REST</li>
+            </ul>
+            <h2 is-upgraded>Task Management API v1.3</h2>
+            <p>Security features:</p>
+            <ul>
+                <li>✅ Optimistic locking with @Version</li>
+                <li>✅ Pessimistic locking for critical operations</li>
+                <li>✅ Spring Security configuration</li>
+                <li>✅ User registration and authentication</li>
+                <li>✅ Role-based access control (RBAC)</li>
+                <li>✅ Method-level security</li>
+                <li>✅ Password encryption with BCrypt</li>
+                <li>✅ Public registration endpoint</li>
+                <li>✅ Protected task operations</li>
+                <li>✅ Admin-only user management</li>
+            </ul>
+            <h2 is-upgraded>Key Security Principles</h2>
+            <ol type="1">
+                <li><strong>Defense in Depth:</strong> Multiple layers of security</li>
+                <li><strong>Least Privilege:</strong> Users get minimum required access</li>
+                <li><strong>Password Security:</strong> Never store plain passwords</li>
+                <li><strong>Stateless Sessions:</strong> Better for REST APIs</li>
+                <li><strong>Method Security:</strong> Protect service layer</li>
+                <li><strong>Ownership Checks:</strong> Users access only their resources</li>
+                <li><strong>Role-Based Access:</strong> Organize permissions by roles</li>
+            </ol>
+            <h2 is-upgraded>Git Branching</h2>
+            <pre><code language="language-bash" class="language-bash">git add .
+git commit -m &#34;Codelab 3.4: JPA Locking &amp; Spring Security complete&#34;
+git tag codelab-3.4
+</code></pre>
+            <h2 is-upgraded>Next Steps</h2>
+            <ul>
+                <li><strong>Codelab 3.5:</strong> JWT Authentication &amp; Spring Cloud</li>
+            </ul>
+            <h2 is-upgraded>Additional Resources</h2>
+            <ul>
+                <li><a href="https://docs.spring.io/spring-security/reference/" target="_blank">Spring Security
+                        Reference</a></li>
+                <li><a href="https://docs.oracle.com/javaee/7/tutorial/persistence-locking.htm" target="_blank">JPA
+                        Locking</a></li>
+                <li><a href="https://owasp.org/www-project-top-ten/" target="_blank">OWASP Security Guidelines</a></li>
+            </ul>
+            <aside class="special">
+                <p><strong>Enterprise Ready!</strong> Your API now has proper security and concurrency control, ready
+                    for multi-user production environments!</p>
+            </aside>
+
+
+        </google-codelab-step>
+
+    </google-codelab>
+
+    <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
+    <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
+    <script src="https://storage.googleapis.com/claat-public/prettify.js"></script>
+    <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
+    <script src="//support.google.com/inapp/api.js"></script>
+
+</body>
+
+</html>

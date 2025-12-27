@@ -1,0 +1,1355 @@
+<!doctype html>
+
+<html>
+
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <title>JWT Authentication &amp; Spring Cloud Config</title>
+  <link rel="stylesheet"
+    href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
+  <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
+  <style>
+    .success {
+      color: #1e8e3e;
+    }
+
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+
+<body>
+  <google-codelab-analytics gaid="UA-49880327-14"></google-codelab-analytics>
+  <google-codelab codelab-gaid="" id="jwt-spring-cloud" title="JWT Authentication &amp; Spring Cloud Config"
+    environment="web" feedback-link="">
+
+    <google-codelab-step label="Introduction" duration="3">
+      <p>Replace HTTP Basic authentication with JWT tokens and introduce Spring Cloud Config for centralized
+        configuration.</p>
+      <h2 class="checklist" is-upgraded>What You&#39;ll Learn</h2>
+      <ul class="checklist">
+        <li><strong>JWT Basics:</strong> JSON Web Token structure and flow</li>
+        <li><strong>JWT Authentication:</strong> Token generation and validation</li>
+        <li><strong>Token Security:</strong> Signing, expiration, refresh tokens</li>
+        <li><strong>JWT Filter:</strong> Custom authentication filter</li>
+        <li><strong>Spring Cloud Config:</strong> Centralized configuration server</li>
+        <li><strong>Config Client:</strong> Connect applications to config server</li>
+        <li><strong>Git Backend:</strong> Store configs in Git repository</li>
+        <li><strong>Profiles:</strong> Environment-specific configurations</li>
+        <li><strong>Encryption:</strong> Secure sensitive properties</li>
+        <li><strong>Service Discovery:</strong> Introduction to Eureka</li>
+      </ul>
+      <h2 is-upgraded>What You&#39;ll Build</h2>
+      <p>JWT-secured Task Management API with:</p>
+      <ul>
+        <li><strong>JWT Token Generation</strong> on login</li>
+        <li><strong>Token Validation</strong> on each request</li>
+        <li><strong>Refresh Token</strong> mechanism</li>
+        <li><strong>Custom JWT Filter</strong> for Spring Security</li>
+        <li><strong>Login &amp; Signup</strong> endpoints</li>
+        <li><strong>Config Server</strong> for centralized properties</li>
+        <li><strong>Task API</strong> as config client</li>
+        <li><strong>Git-backed</strong> configuration storage</li>
+        <li><strong>Profile-specific</strong> configs (dev, prod)</li>
+        <li><strong>Encrypted</strong> database passwords</li>
+      </ul>
+      <h2 is-upgraded>Prerequisites</h2>
+      <ul>
+        <li>Completed Codelab 3.4 (JPA Locking &amp; Spring Security)</li>
+        <li>Understanding of Spring Security</li>
+      </ul>
+      <h2 is-upgraded>New Dependencies</h2>
+      <p><strong>Task API (pom.xml):</strong></p>
+      <pre><code language="language-xml" class="language-xml">&lt;!-- JWT --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;io.jsonwebtoken&lt;/groupId&gt;
+    &lt;artifactId&gt;jjwt-api&lt;/artifactId&gt;
+    &lt;version&gt;0.12.3&lt;/version&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;io.jsonwebtoken&lt;/groupId&gt;
+    &lt;artifactId&gt;jjwt-impl&lt;/artifactId&gt;
+    &lt;version&gt;0.12.3&lt;/version&gt;
+    &lt;scope&gt;runtime&lt;/scope&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;io.jsonwebtoken&lt;/groupId&gt;
+    &lt;artifactId&gt;jjwt-jackson&lt;/artifactId&gt;
+    &lt;version&gt;0.12.3&lt;/version&gt;
+    &lt;scope&gt;runtime&lt;/scope&gt;
+&lt;/dependency&gt;
+
+&lt;!-- Spring Cloud Config Client --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-cloud-starter-config&lt;/artifactId&gt;
+&lt;/dependency&gt;
+</code></pre>
+      <p><strong>Config Server (separate project):</strong></p>
+      <pre><code language="language-xml" class="language-xml">&lt;!-- Spring Cloud Config Server --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-cloud-config-server&lt;/artifactId&gt;
+&lt;/dependency&gt;
+</code></pre>
+      <p><strong>Add to both projects:</strong></p>
+      <pre><code language="language-xml" class="language-xml">&lt;dependencyManagement&gt;
+    &lt;dependencies&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-cloud-dependencies&lt;/artifactId&gt;
+            &lt;version&gt;2023.0.0&lt;/version&gt;
+            &lt;type&gt;pom&lt;/type&gt;
+            &lt;scope&gt;import&lt;/scope&gt;
+        &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+&lt;/dependencyManagement&gt;
+</code></pre>
+      <aside class="special">
+        <p><strong>Architecture Shift:</strong> We&#39;re moving from monolithic configuration to distributed
+          configuration management - a key step toward microservices!</p>
+      </aside>
+
+
+    </google-codelab-step>
+
+    <google-codelab-step label="Understanding JWT" duration="8">
+      <p>Learn how JSON Web Tokens work for stateless authentication.</p>
+      <h2 is-upgraded>JWT Structure</h2>
+      <p>A JWT has three parts separated by dots:</p>
+      <pre><code>eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqb2huIiwiaWF0IjoxNjE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+
+[Header].[Payload].[Signature]
+</code></pre>
+      <h2 is-upgraded>1. Header</h2>
+      <pre><code language="language-json" class="language-json">{
+  &#34;alg&#34;: &#34;HS256&#34;,
+  &#34;typ&#34;: &#34;JWT&#34;
+}
+</code></pre>
+      <p>Base64URL encoded → <code>eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9</code></p>
+      <h2 is-upgraded>2. Payload (Claims)</h2>
+      <pre><code language="language-json" class="language-json">{
+  &#34;sub&#34;: &#34;john&#34;,           // Subject (username)
+  &#34;iat&#34;: 1616239022,       // Issued at
+  &#34;exp&#34;: 1616242622,       // Expiration (1 hour)
+  &#34;roles&#34;: [&#34;ROLE_USER&#34;]
+}
+</code></pre>
+      <p>Base64URL encoded → <code>eyJzdWIiOiJqb2huIiwiaWF0IjoxNjE2MjM5MDIyfQ</code></p>
+      <h2 is-upgraded>3. Signature</h2>
+      <pre><code language="language-javascript" class="language-javascript">HMACSHA256(
+  base64UrlEncode(header) + &#34;.&#34; +
+  base64UrlEncode(payload),
+  secret_key
+)
+</code></pre>
+      <p>Result → <code>SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c</code></p>
+      <h2 is-upgraded>JWT Authentication Flow</h2>
+      <pre><code>Client                        Server
+  |                              |
+  |  POST /auth/login            |
+  |  {username, password}        |
+  |-----------------------------&gt;|
+  |                              | 1. Validate credentials
+  |                              | 2. Generate JWT token
+  |  200 OK                      |
+  |  {token: &#34;eyJ...&#34;}           |
+  |&lt;-----------------------------|
+  |                              |
+  |  GET /api/tasks              |
+  |  Authorization: Bearer eyJ...|
+  |-----------------------------&gt;|
+  |                              | 3. Extract token
+  |                              | 4. Validate signature
+  |                              | 5. Extract username &amp; roles
+  |                              | 6. Process request
+  |  200 OK                      |
+  |  [tasks...]                  |
+  |&lt;-----------------------------|
+</code></pre>
+      <h2 is-upgraded>JWT vs Session-Based Auth</h2>
+      <table>
+        <tr>
+          <td colspan="1" rowspan="1">
+            <p>Aspect</p>
+          </td>
+          <td colspan="1" rowspan="1">
+            <p>JWT</p>
+          </td>
+          <td colspan="1" rowspan="1">
+            <p>Session</p>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="1" rowspan="1">
+            <p><strong>Storage</strong></p>
+          </td>
+          <td colspan="1" rowspan="1">
+            <p>Client-side (localStorage)</p>
+          </td>
+          <td colspan="1" rowspan="1">
+            <p>Server-side (memory/DB)</p>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="1" rowspan="1">
+            <p><strong>Scalability</strong></p>
+          </td>
+          <td colspan="1" rowspan="1">
+            <p>Excellent (stateless)</p>
+          </td>
+          <td colspan="1" rowspan="1">
+            <p>Limited (stateful)</p>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="1" rowspan="1">
+            <p><strong>Performance</strong></p>
+          </td>
+          <td colspan="1" rowspan="1">
+            <p>No DB lookup per request</p>
+          </td>
+          <td colspan="1" rowspan="1">
+            <p>DB lookup needed</p>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="1" rowspan="1">
+            <p><strong>Revocation</strong></p>
+          </td>
+          <td colspan="1" rowspan="1">
+            <p>Hard (until expiry)</p>
+          </td>
+          <td colspan="1" rowspan="1">
+            <p>Easy (delete session)</p>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="1" rowspan="1">
+            <p><strong>Size</strong></p>
+          </td>
+          <td colspan="1" rowspan="1">
+            <p>Larger (sent in every request)</p>
+          </td>
+          <td colspan="1" rowspan="1">
+            <p>Smaller (session ID only)</p>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="1" rowspan="1">
+            <p><strong>Best for</strong></p>
+          </td>
+          <td colspan="1" rowspan="1">
+            <p>Microservices, APIs</p>
+          </td>
+          <td colspan="1" rowspan="1">
+            <p>Traditional web apps</p>
+          </td>
+        </tr>
+      </table>
+      <h2 is-upgraded>JWT Security Considerations</h2>
+      <p>✅ <strong>Best Practices:</strong></p>
+      <ul>
+        <li>Use strong secret keys (256+ bits)</li>
+        <li>Set short expiration times (15-60 min)</li>
+        <li>Implement refresh tokens for long sessions</li>
+        <li>Use HTTPS to prevent token interception</li>
+        <li>Store tokens securely (HttpOnly cookies or secure storage)</li>
+        <li>Validate signature on every request</li>
+      </ul>
+      <p>❌ <strong>Don&#39;t:</strong></p>
+      <ul>
+        <li>Store sensitive data in JWT (it&#39;s base64, not encrypted!)</li>
+        <li>Use weak secrets</li>
+        <li>Set very long expiration</li>
+        <li>Store tokens in localStorage (XSS vulnerable)</li>
+        <li>Trust JWT without signature validation</li>
+      </ul>
+      <aside class="special">
+        <p><strong>JWT Advantage:</strong> Stateless authentication means no server-side session storage - perfect for
+          distributed systems and microservices!</p>
+      </aside>
+
+
+    </google-codelab-step>
+
+    <google-codelab-step label="Create JWT Utility" duration="10">
+      <p>Build JWT token generation and validation utility.</p>
+      <h2 is-upgraded>JWT Configuration Properties</h2>
+      <pre><code language="language-java" class="language-java">package com.example.taskmanager.config;
+
+import lombok.Data;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+@ConfigurationProperties(prefix = &#34;jwt&#34;)
+@Data
+public class JwtProperties {
+    
+    private String secret = &#34;myDefaultSecretKeyThatShouldBeChangedInProduction12345678&#34;;
+    private long expiration = 3600000; // 1 hour in milliseconds
+    private long refreshExpiration = 86400000; // 24 hours
+    private String tokenPrefix = &#34;Bearer &#34;;
+    private String headerString = &#34;Authorization&#34;;
+}
+</code></pre>
+      <h2 is-upgraded>JWT Utility Class</h2>
+      <pre><code language="language-java" class="language-java">package com.example.taskmanager.security.jwt;
+
+import com.example.taskmanager.config.JwtProperties;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
+
+import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+@Component
+@Slf4j
+public class JwtTokenUtil {
+    
+    private final JwtProperties jwtProperties;
+    private final SecretKey secretKey;
+    
+    public JwtTokenUtil(JwtProperties jwtProperties) {
+        this.jwtProperties = jwtProperties;
+        this.secretKey = Keys.hmacShaKeyFor(
+            jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8)
+        );
+    }
+    
+    // Generate token with user details
+    public String generateToken(UserDetails userDetails) {
+        Map&lt;String, Object&gt; claims = new HashMap&lt;&gt;();
+        
+        // Add roles to claims
+        String roles = userDetails.getAuthorities().stream()
+            .map(GrantedAuthority::getAuthority)
+            .collect(Collectors.joining(&#34;,&#34;));
+        claims.put(&#34;roles&#34;, roles);
+        
+        return createToken(claims, userDetails.getUsername(), jwtProperties.getExpiration());
+    }
+    
+    // Generate refresh token
+    public String generateRefreshToken(UserDetails userDetails) {
+        Map&lt;String, Object&gt; claims = new HashMap&lt;&gt;();
+        return createToken(claims, userDetails.getUsername(), jwtProperties.getRefreshExpiration());
+    }
+    
+    // Create token with claims
+    private String createToken(Map&lt;String, Object&gt; claims, String subject, long expiration) {
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + expiration);
+        
+        return Jwts.builder()
+            .setClaims(claims)
+            .setSubject(subject)
+            .setIssuedAt(now)
+            .setExpiration(expiryDate)
+            .signWith(secretKey, SignatureAlgorithm.HS256)
+            .compact();
+    }
+    
+    // Extract username from token
+    public String extractUsername(String token) {
+        return extractClaim(token, Claims::getSubject);
+    }
+    
+    // Extract expiration date
+    public Date extractExpiration(String token) {
+        return extractClaim(token, Claims::getExpiration);
+    }
+    
+    // Extract specific claim
+    public &lt;T&gt; T extractClaim(String token, Function&lt;Claims, T&gt; claimsResolver) {
+        final Claims claims = extractAllClaims(token);
+        return claimsResolver.apply(claims);
+    }
+    
+    // Extract all claims
+    private Claims extractAllClaims(String token) {
+        return Jwts.parserBuilder()
+            .setSigningKey(secretKey)
+            .build()
+            .parseClaimsJws(token)
+            .getBody();
+    }
+    
+    // Check if token is expired
+    public boolean isTokenExpired(String token) {
+        return extractExpiration(token).before(new Date());
+    }
+    
+    // Validate token
+    public boolean validateToken(String token, UserDetails userDetails) {
+        final String username = extractUsername(token);
+        return (username.equals(userDetails.getUsername()) &amp;&amp; !isTokenExpired(token));
+    }
+    
+    // Extract roles from token
+    public String extractRoles(String token) {
+        Claims claims = extractAllClaims(token);
+        return claims.get(&#34;roles&#34;, String.class);
+    }
+}
+</code></pre>
+      <h2 is-upgraded>Authentication Request/Response DTOs</h2>
+      <pre><code language="language-java" class="language-java">package com.example.taskmanager.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import jakarta.validation.constraints.NotBlank;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class LoginRequest {
+    
+    @NotBlank(message = &#34;Username is required&#34;)
+    private String username;
+    
+    @NotBlank(message = &#34;Password is required&#34;)
+    private String password;
+}
+</code></pre>
+      <pre><code language="language-java" class="language-java">package com.example.taskmanager.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.Set;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class AuthResponse {
+    
+    private String token;
+    private String refreshToken;
+    private String tokenType = &#34;Bearer&#34;;
+    private Long expiresIn;
+    private String username;
+    private Set&lt;String&gt; roles;
+}
+</code></pre>
+      <pre><code language="language-java" class="language-java">package com.example.taskmanager.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class SignupRequest {
+    
+    @NotBlank(message = &#34;Username is required&#34;)
+    @Size(min = 3, max = 50)
+    private String username;
+    
+    @NotBlank(message = &#34;Email is required&#34;)
+    @Email(message = &#34;Invalid email format&#34;)
+    private String email;
+    
+    @NotBlank(message = &#34;Full name is required&#34;)
+    private String fullName;
+    
+    @NotBlank(message = &#34;Password is required&#34;)
+    @Size(min = 6, message = &#34;Password must be at least 6 characters&#34;)
+    private String password;
+}
+</code></pre>
+      <h2 is-upgraded>Update application.yml</h2>
+      <pre><code language="language-yaml" class="language-yaml"># JWT Configuration
+jwt:
+  secret: ${JWT_SECRET:mySecretKeyForDevelopmentOnlyChangeInProduction1234567890}
+  expiration: 3600000  # 1 hour
+  refresh-expiration: 86400000  # 24 hours
+  token-prefix: &#34;Bearer &#34;
+  header-string: &#34;Authorization&#34;
+</code></pre>
+      <aside class="special">
+        <p><strong>Security Note:</strong> In production, use environment variables for JWT secret and generate a strong
+          random key (256+ bits).</p>
+      </aside>
+
+
+    </google-codelab-step>
+
+    <google-codelab-step label="JWT Authentication Filter" duration="10">
+      <p>Create custom filter to validate JWT tokens on each request.</p>
+      <h2 is-upgraded>JWT Authentication Filter</h2>
+      <pre><code language="language-java" class="language-java">package com.example.taskmanager.security.jwt;
+
+import com.example.taskmanager.config.JwtProperties;
+import com.example.taskmanager.security.CustomUserDetailsService;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import java.io.IOException;
+
+@Component
+@Slf4j
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
+    
+    private final JwtTokenUtil jwtTokenUtil;
+    private final CustomUserDetailsService userDetailsService;
+    private final JwtProperties jwtProperties;
+    
+    public JwtAuthenticationFilter(JwtTokenUtil jwtTokenUtil,
+                                   CustomUserDetailsService userDetailsService,
+                                   JwtProperties jwtProperties) {
+        this.jwtTokenUtil = jwtTokenUtil;
+        this.userDetailsService = userDetailsService;
+        this.jwtProperties = jwtProperties;
+    }
+    
+    @Override
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain) throws ServletException, IOException {
+        
+        try {
+            String jwt = extractJwtFromRequest(request);
+            
+            if (jwt != null &amp;&amp; SecurityContextHolder.getContext().getAuthentication() == null) {
+                String username = jwtTokenUtil.extractUsername(jwt);
+                
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                
+                if (jwtTokenUtil.validateToken(jwt, userDetails)) {
+                    UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(
+                            userDetails, null, userDetails.getAuthorities()
+                        );
+                    
+                    authentication.setDetails(
+                        new WebAuthenticationDetailsSource().buildDetails(request)
+                    );
+                    
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                    log.debug(&#34;Set authentication for user: {}&#34;, username);
+                }
+            }
+        } catch (Exception e) {
+            log.error(&#34;Cannot set user authentication: {}&#34;, e.getMessage());
+        }
+        
+        filterChain.doFilter(request, response);
+    }
+    
+    private String extractJwtFromRequest(HttpServletRequest request) {
+        String bearerToken = request.getHeader(jwtProperties.getHeaderString());
+        
+        if (bearerToken != null &amp;&amp; bearerToken.startsWith(jwtProperties.getTokenPrefix())) {
+            return bearerToken.substring(jwtProperties.getTokenPrefix().length());
+        }
+        
+        return null;
+    }
+}
+</code></pre>
+      <h2 is-upgraded>JWT Authentication Entry Point</h2>
+      <pre><code language="language-java" class="language-java">package com.example.taskmanager.security.jwt;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+
+@Component
+@Slf4j
+public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
+    
+    private final ObjectMapper objectMapper = new ObjectMapper();
+    
+    @Override
+    public void commence(HttpServletRequest request,
+                         HttpServletResponse response,
+                         AuthenticationException authException) throws IOException, ServletException {
+        
+        log.error(&#34;Unauthorized error: {}&#34;, authException.getMessage());
+        
+        response.setContentType(&#34;application/json&#34;);
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        
+        Map&lt;String, Object&gt; errorDetails = new HashMap&lt;&gt;();
+        errorDetails.put(&#34;timestamp&#34;, LocalDateTime.now().toString());
+        errorDetails.put(&#34;status&#34;, HttpServletResponse.SC_UNAUTHORIZED);
+        errorDetails.put(&#34;error&#34;, &#34;Unauthorized&#34;);
+        errorDetails.put(&#34;message&#34;, authException.getMessage());
+        errorDetails.put(&#34;path&#34;, request.getRequestURI());
+        
+        response.getWriter().write(objectMapper.writeValueAsString(errorDetails));
+    }
+}
+</code></pre>
+      <h2 is-upgraded>Update Security Configuration</h2>
+      <pre><code language="language-java" class="language-java">package com.example.taskmanager.config;
+
+import com.example.taskmanager.security.CustomUserDetailsService;
+import com.example.taskmanager.security.jwt.JwtAuthenticationEntryPoint;
+import com.example.taskmanager.security.jwt.JwtAuthenticationFilter;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+@Configuration
+@EnableWebSecurity
+@EnableMethodSecurity(prePostEnabled = true, securedEnabled = true)
+public class SecurityConfig {
+    
+    private final CustomUserDetailsService userDetailsService;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    
+    public SecurityConfig(CustomUserDetailsService userDetailsService,
+                          JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
+                          JwtAuthenticationFilter jwtAuthenticationFilter) {
+        this.userDetailsService = userDetailsService;
+        this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+    }
+    
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+            .csrf(csrf -&gt; csrf.disable())
+            .exceptionHandling(exception -&gt; 
+                exception.authenticationEntryPoint(jwtAuthenticationEntryPoint)
+            )
+            .sessionManagement(session -&gt; 
+                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            )
+            .authorizeHttpRequests(auth -&gt; auth
+                // Public endpoints
+                .requestMatchers(&#34;/h2-console/**&#34;).permitAll()
+                .requestMatchers(&#34;/swagger-ui/**&#34;, &#34;/api-docs/**&#34;).permitAll()
+                .requestMatchers(&#34;/api/auth/**&#34;).permitAll()
+                
+                // Admin only endpoints
+                .requestMatchers(&#34;/api/users/**&#34;).hasRole(&#34;ADMIN&#34;)
+                .requestMatchers(HttpMethod.DELETE, &#34;/api/tasks/**&#34;).hasRole(&#34;ADMIN&#34;)
+                
+                // Authenticated endpoints
+                .requestMatchers(&#34;/api/tasks/**&#34;).authenticated()
+                .requestMatchers(&#34;/api/categories/**&#34;).authenticated()
+                
+                .anyRequest().authenticated()
+            )
+            .headers(headers -&gt; headers.frameOptions(frame -&gt; frame.disable()));
+        
+        // Add JWT filter
+        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        
+        return http.build();
+    }
+    
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+    
+    @Bean
+    public DaoAuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(userDetailsService);
+        authProvider.setPasswordEncoder(passwordEncoder());
+        return authProvider;
+    }
+    
+    @Bean
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration authConfig) throws Exception {
+        return authConfig.getAuthenticationManager();
+    }
+}
+</code></pre>
+      <aside class="special">
+        <p><strong>Filter Order Matters:</strong> JWT filter runs before UsernamePasswordAuthenticationFilter to
+          intercept and validate tokens on every request.</p>
+      </aside>
+
+
+    </google-codelab-step>
+
+    <google-codelab-step label="Authentication Controller" duration="8">
+      <p>Create login, signup, and token refresh endpoints.</p>
+      <h2 is-upgraded>Authentication Service</h2>
+      <pre><code language="language-java" class="language-java">package com.example.taskmanager.service;
+
+import com.example.taskmanager.dto.AuthResponse;
+import com.example.taskmanager.dto.LoginRequest;
+import com.example.taskmanager.dto.SignupRequest;
+import com.example.taskmanager.model.User;
+import com.example.taskmanager.repository.UserRepository;
+import com.example.taskmanager.security.jwt.JwtTokenUtil;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@Slf4j
+public class AuthService {
+    
+    private final AuthenticationManager authenticationManager;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtTokenUtil jwtTokenUtil;
+    
+    public AuthService(AuthenticationManager authenticationManager,
+                       UserRepository userRepository,
+                       PasswordEncoder passwordEncoder,
+                       JwtTokenUtil jwtTokenUtil) {
+        this.authenticationManager = authenticationManager;
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtTokenUtil = jwtTokenUtil;
+    }
+    
+    public AuthResponse login(LoginRequest loginRequest) {
+        log.debug(&#34;Authenticating user: {}&#34;, loginRequest.getUsername());
+        
+        Authentication authentication = authenticationManager.authenticate(
+            new UsernamePasswordAuthenticationToken(
+                loginRequest.getUsername(),
+                loginRequest.getPassword()
+            )
+        );
+        
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        
+        String token = jwtTokenUtil.generateToken(userDetails);
+        String refreshToken = jwtTokenUtil.generateRefreshToken(userDetails);
+        
+        User user = userRepository.findByUsername(loginRequest.getUsername())
+            .orElseThrow(() -&gt; new RuntimeException(&#34;User not found&#34;));
+        
+        log.info(&#34;User logged in: {}&#34;, loginRequest.getUsername());
+        
+        return new AuthResponse(
+            token,
+            refreshToken,
+            &#34;Bearer&#34;,
+            3600L, // 1 hour
+            user.getUsername(),
+            user.getRoles()
+        );
+    }
+    
+    @Transactional
+    public AuthResponse signup(SignupRequest signupRequest) {
+        log.debug(&#34;Registering new user: {}&#34;, signupRequest.getUsername());
+        
+        if (userRepository.existsByUsername(signupRequest.getUsername())) {
+            throw new RuntimeException(&#34;Username already exists&#34;);
+        }
+        
+        if (userRepository.existsByEmail(signupRequest.getEmail())) {
+            throw new RuntimeException(&#34;Email already exists&#34;);
+        }
+        
+        User user = new User();
+        user.setUsername(signupRequest.getUsername());
+        user.setEmail(signupRequest.getEmail());
+        user.setFullName(signupRequest.getFullName());
+        user.setPassword(passwordEncoder.encode(signupRequest.getPassword()));
+        user.getRoles().add(&#34;ROLE_USER&#34;);
+        
+        userRepository.save(user);
+        
+        log.info(&#34;User registered: {}&#34;, signupRequest.getUsername());
+        
+        // Auto-login after signup
+        LoginRequest loginRequest = new LoginRequest(
+            signupRequest.getUsername(),
+            signupRequest.getPassword()
+        );
+        
+        return login(loginRequest);
+    }
+    
+    public AuthResponse refreshToken(String refreshToken) {
+        String username = jwtTokenUtil.extractUsername(refreshToken);
+        
+        UserDetails userDetails = userRepository.findByUsername(username)
+            .map(user -&gt; org.springframework.security.core.userdetails.User.builder()
+                .username(user.getUsername())
+                .password(user.getPassword())
+                .authorities(user.getRoles().toArray(new String[0]))
+                .build())
+            .orElseThrow(() -&gt; new RuntimeException(&#34;User not found&#34;));
+        
+        if (jwtTokenUtil.validateToken(refreshToken, userDetails)) {
+            String newToken = jwtTokenUtil.generateToken(userDetails);
+            
+            User user = userRepository.findByUsername(username).get();
+            
+            return new AuthResponse(
+                newToken,
+                refreshToken,
+                &#34;Bearer&#34;,
+                3600L,
+                user.getUsername(),
+                user.getRoles()
+            );
+        }
+        
+        throw new RuntimeException(&#34;Invalid refresh token&#34;);
+    }
+}
+</code></pre>
+      <h2 is-upgraded>Authentication Controller</h2>
+      <pre><code language="language-java" class="language-java">package com.example.taskmanager.controller;
+
+import com.example.taskmanager.dto.AuthResponse;
+import com.example.taskmanager.dto.LoginRequest;
+import com.example.taskmanager.dto.SignupRequest;
+import com.example.taskmanager.service.AuthService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
+
+@RestController
+@RequestMapping(&#34;/api/auth&#34;)
+@Tag(name = &#34;Authentication&#34;)
+@Slf4j
+public class AuthController {
+    
+    private final AuthService authService;
+    
+    public AuthController(AuthService authService) {
+        this.authService = authService;
+    }
+    
+    @Operation(summary = &#34;User login - Get JWT token&#34;)
+    @PostMapping(&#34;/login&#34;)
+    public ResponseEntity&lt;AuthResponse&gt; login(@Valid @RequestBody LoginRequest loginRequest) {
+        log.info(&#34;POST /api/auth/login - User: {}&#34;, loginRequest.getUsername());
+        AuthResponse response = authService.login(loginRequest);
+        return ResponseEntity.ok(response);
+    }
+    
+    @Operation(summary = &#34;User signup - Register and get JWT token&#34;)
+    @PostMapping(&#34;/signup&#34;)
+    public ResponseEntity&lt;AuthResponse&gt; signup(@Valid @RequestBody SignupRequest signupRequest) {
+        log.info(&#34;POST /api/auth/signup - User: {}&#34;, signupRequest.getUsername());
+        AuthResponse response = authService.signup(signupRequest);
+        return ResponseEntity.ok(response);
+    }
+    
+    @Operation(summary = &#34;Refresh JWT token&#34;)
+    @PostMapping(&#34;/refresh&#34;)
+    public ResponseEntity&lt;AuthResponse&gt; refreshToken(@RequestBody Map&lt;String, String&gt; request) {
+        log.info(&#34;POST /api/auth/refresh&#34;);
+        String refreshToken = request.get(&#34;refreshToken&#34;);
+        AuthResponse response = authService.refreshToken(refreshToken);
+        return ResponseEntity.ok(response);
+    }
+}
+</code></pre>
+
+
+    </google-codelab-step>
+
+    <google-codelab-step label="Spring Cloud Config Server" duration="10">
+      <p>Create centralized configuration server.</p>
+      <h2 is-upgraded>Create Config Server Project</h2>
+      <p>Create a new Spring Boot project:</p>
+      <p><strong>config-server/pom.xml:</strong></p>
+      <pre><code language="language-xml" class="language-xml">&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
+&lt;project xmlns=&#34;http://maven.apache.org/POM/4.0.0&#34;
+         xmlns:xsi=&#34;http://www.w3.org/2001/XMLSchema-instance&#34;
+         xsi:schemaLocation=&#34;http://maven.apache.org/POM/4.0.0
+         http://maven.apache.org/xsd/maven-4.0.0.xsd&#34;&gt;
+    &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+    
+    &lt;parent&gt;
+        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+        &lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;
+        &lt;version&gt;3.2.0&lt;/version&gt;
+        &lt;relativePath/&gt;
+    &lt;/parent&gt;
+    
+    &lt;groupId&gt;com.example&lt;/groupId&gt;
+    &lt;artifactId&gt;config-server&lt;/artifactId&gt;
+    &lt;version&gt;1.0.0&lt;/version&gt;
+    &lt;name&gt;Config Server&lt;/name&gt;
+    
+    &lt;properties&gt;
+        &lt;java.version&gt;17&lt;/java.version&gt;
+        &lt;spring-cloud.version&gt;2023.0.0&lt;/spring-cloud.version&gt;
+    &lt;/properties&gt;
+    
+    &lt;dependencies&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-cloud-config-server&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+        
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-actuator&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+    
+    &lt;dependencyManagement&gt;
+        &lt;dependencies&gt;
+            &lt;dependency&gt;
+                &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+                &lt;artifactId&gt;spring-cloud-dependencies&lt;/artifactId&gt;
+                &lt;version&gt;${spring-cloud.version}&lt;/version&gt;
+                &lt;type&gt;pom&lt;/type&gt;
+                &lt;scope&gt;import&lt;/scope&gt;
+            &lt;/dependency&gt;
+        &lt;/dependencies&gt;
+    &lt;/dependencyManagement&gt;
+    
+    &lt;build&gt;
+        &lt;plugins&gt;
+            &lt;plugin&gt;
+                &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+                &lt;artifactId&gt;spring-boot-maven-plugin&lt;/artifactId&gt;
+            &lt;/plugin&gt;
+        &lt;/plugins&gt;
+    &lt;/build&gt;
+&lt;/project&gt;
+</code></pre>
+      <h2 is-upgraded>Config Server Application</h2>
+      <pre><code language="language-java" class="language-java">package com.example.configserver;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.config.server.EnableConfigServer;
+
+@SpringBootApplication
+@EnableConfigServer
+public class ConfigServerApplication {
+    
+    public static void main(String[] args) {
+        SpringApplication.run(ConfigServerApplication.class, args);
+    }
+}
+</code></pre>
+      <h2 is-upgraded>Config Server Configuration</h2>
+      <p><strong>config-server/src/main/resources/application.yml:</strong></p>
+      <pre><code language="language-yaml" class="language-yaml">server:
+  port: 8888
+
+spring:
+  application:
+    name: config-server
+  
+  cloud:
+    config:
+      server:
+        git:
+          uri: ${CONFIG_REPO_URI:file://${user.home}/config-repo}
+          default-label: main
+          clone-on-start: true
+        # Alternative: Use local filesystem
+        # native:
+        #   search-locations: classpath:/configs
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,refresh
+</code></pre>
+      <h2 is-upgraded>Create Configuration Repository</h2>
+      <p>Create a Git repository for configurations:</p>
+      <pre><code language="language-bash" class="language-bash"># Create config repository
+mkdir ~/config-repo
+cd ~/config-repo
+git init
+
+# Create configuration files
+</code></pre>
+      <p><strong>~/config-repo/task-manager.yml (default profile):</strong></p>
+      <pre><code language="language-yaml" class="language-yaml"># Default configuration for Task Manager
+spring:
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+
+jwt:
+  expiration: 3600000  # 1 hour
+  refresh-expiration: 86400000  # 24 hours
+
+logging:
+  level:
+    com.example.taskmanager: INFO
+</code></pre>
+      <p><strong>~/config-repo/task-manager-dev.yml:</strong></p>
+      <pre><code language="language-yaml" class="language-yaml"># Development profile
+spring:
+  datasource:
+    url: jdbc:h2:mem:taskdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  
+  h2:
+    console:
+      enabled: true
+  
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: create-drop
+
+logging:
+  level:
+    com.example.taskmanager: DEBUG
+    org.hibernate.SQL: DEBUG
+</code></pre>
+      <p><strong>~/config-repo/task-manager-prod.yml:</strong></p>
+      <pre><code language="language-yaml" class="language-yaml"># Production profile
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/taskdb
+    driver-class-name: org.postgresql.Driver
+    username: postgres
+    password: &#39;{cipher}AQA1234...&#39;  # Encrypted password
+  
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: validate
+
+jwt:
+  secret: &#39;{cipher}AQB5678...&#39;  # Encrypted JWT secret
+
+logging:
+  level:
+    com.example.taskmanager: WARN
+</code></pre>
+      <p><strong>Commit configurations:</strong></p>
+      <pre><code language="language-bash" class="language-bash">git add .
+git commit -m &#34;Initial configuration&#34;
+</code></pre>
+      <h2 is-upgraded>Directory Structure</h2>
+      <pre><code>config-repo/
+├── task-manager.yml          # Default config
+├── task-manager-dev.yml      # Dev profile
+├── task-manager-prod.yml     # Prod profile
+└── task-manager-test.yml     # Test profile (optional)
+</code></pre>
+
+
+    </google-codelab-step>
+
+    <google-codelab-step label="Configure Task API as Config Client" duration="6">
+      <p>Connect Task Manager API to Config Server.</p>
+      <h2 is-upgraded>Update Task API Dependencies</h2>
+      <p>Already added in earlier step:</p>
+      <pre><code language="language-xml" class="language-xml">&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-cloud-starter-config&lt;/artifactId&gt;
+&lt;/dependency&gt;
+</code></pre>
+      <h2 is-upgraded>Create bootstrap.yml</h2>
+      <p><strong>task-manager/src/main/resources/bootstrap.yml:</strong></p>
+      <pre><code language="language-yaml" class="language-yaml">spring:
+  application:
+    name: task-manager
+  
+  cloud:
+    config:
+      uri: http://localhost:8888
+      fail-fast: true
+      retry:
+        initial-interval: 1000
+        max-attempts: 6
+        max-interval: 2000
+        multiplier: 1.1
+  
+  profiles:
+    active: dev
+</code></pre>
+      <h2 is-upgraded>Update application.yml</h2>
+      <p><strong>task-manager/src/main/resources/application.yml:</strong></p>
+      <pre><code language="language-yaml" class="language-yaml"># Local overrides (will be overridden by config server)
+server:
+  port: 8080
+
+spring:
+  application:
+    name: task-manager
+
+# Actuator for refresh endpoint
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,refresh
+</code></pre>
+      <h2 is-upgraded>Configuration Priority</h2>
+      <pre><code>1. Config Server (highest priority)
+2. application.yml in project
+3. Default values in code
+</code></pre>
+      <h2 is-upgraded>Refresh Configuration at Runtime</h2>
+      <p>Add @RefreshScope to components that need dynamic config:</p>
+      <pre><code language="language-java" class="language-java">package com.example.taskmanager.config;
+
+import lombok.Data;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+@ConfigurationProperties(prefix = &#34;jwt&#34;)
+@RefreshScope  // Enable runtime refresh
+@Data
+public class JwtProperties {
+    private String secret;
+    private long expiration;
+    private long refreshExpiration;
+    private String tokenPrefix = &#34;Bearer &#34;;
+    private String headerString = &#34;Authorization&#34;;
+}
+</code></pre>
+      <h2 is-upgraded>Refresh Configuration</h2>
+      <pre><code language="language-bash" class="language-bash"># Update configuration in Git repo
+cd ~/config-repo
+# Edit task-manager-dev.yml
+git add .
+git commit -m &#34;Update JWT expiration&#34;
+
+# Refresh application configuration
+curl -X POST http://localhost:8080/actuator/refresh
+</code></pre>
+      <aside class="special">
+        <p><strong>Centralized Config Benefits:</strong> Change configurations for all microservices from one place
+          without redeploying applications!</p>
+      </aside>
+
+
+    </google-codelab-step>
+
+    <google-codelab-step label="Testing JWT &amp; Config" duration="5">
+      <p>Test JWT authentication and configuration management.</p>
+      <h2 is-upgraded>Start Config Server</h2>
+      <pre><code language="language-bash" class="language-bash">cd config-server
+mvn spring-boot:run
+</code></pre>
+      <p>Verify: http://localhost:8888/task-manager/dev</p>
+      <h2 is-upgraded>Start Task Manager</h2>
+      <pre><code language="language-bash" class="language-bash">cd task-manager
+mvn spring-boot:run
+</code></pre>
+      <p>Check logs for:</p>
+      <pre><code>Fetching config from server at: http://localhost:8888
+Located environment: name=task-manager, profiles=[dev], ...
+</code></pre>
+      <h2 is-upgraded>Test JWT Authentication</h2>
+      <p><strong>1. Signup:</strong></p>
+      <pre><code language="language-bash" class="language-bash">curl -X POST http://localhost:8080/api/auth/signup \
+  -H &#34;Content-Type: application/json&#34; \
+  -d &#39;{
+    &#34;username&#34;: &#34;testuser&#34;,
+    &#34;email&#34;: &#34;test@example.com&#34;,
+    &#34;fullName&#34;: &#34;Test User&#34;,
+    &#34;password&#34;: &#34;password123&#34;
+  }&#39;
+</code></pre>
+      <p><strong>Response:</strong></p>
+      <pre><code language="language-json" class="language-json">{
+  &#34;token&#34;: &#34;eyJhbGciOiJIUzI1NiJ9...&#34;,
+  &#34;refreshToken&#34;: &#34;eyJhbGciOiJIUzI1NiJ9...&#34;,
+  &#34;tokenType&#34;: &#34;Bearer&#34;,
+  &#34;expiresIn&#34;: 3600,
+  &#34;username&#34;: &#34;testuser&#34;,
+  &#34;roles&#34;: [&#34;ROLE_USER&#34;]
+}
+</code></pre>
+      <p><strong>2. Login:</strong></p>
+      <pre><code language="language-bash" class="language-bash">curl -X POST http://localhost:8080/api/auth/login \
+  -H &#34;Content-Type: application/json&#34; \
+  -d &#39;{
+    &#34;username&#34;: &#34;testuser&#34;,
+    &#34;password&#34;: &#34;password123&#34;
+  }&#39;
+</code></pre>
+      <p><strong>3. Use Token:</strong></p>
+      <pre><code language="language-bash" class="language-bash">TOKEN=&#34;eyJhbGciOiJIUzI1NiJ9...&#34;
+
+curl -X POST http://localhost:8080/api/tasks \
+  -H &#34;Authorization: Bearer $TOKEN&#34; \
+  -H &#34;Content-Type: application/json&#34; \
+  -d &#39;{
+    &#34;title&#34;: &#34;JWT Test Task&#34;,
+    &#34;description&#34;: &#34;Testing JWT authentication&#34;
+  }&#39;
+</code></pre>
+      <p><strong>4. Get My Tasks:</strong></p>
+      <pre><code language="language-bash" class="language-bash">curl -X GET http://localhost:8080/api/tasks/my-tasks \
+  -H &#34;Authorization: Bearer $TOKEN&#34;
+</code></pre>
+      <p><strong>5. Refresh Token:</strong></p>
+      <pre><code language="language-bash" class="language-bash">REFRESH_TOKEN=&#34;eyJhbGciOiJIUzI1NiJ9...&#34;
+
+curl -X POST http://localhost:8080/api/auth/refresh \
+  -H &#34;Content-Type: application/json&#34; \
+  -d &#34;{\&#34;refreshToken\&#34;: \&#34;$REFRESH_TOKEN\&#34;}&#34;
+</code></pre>
+      <h2 is-upgraded>Test Config Changes</h2>
+      <p><strong>1. Check current config:</strong></p>
+      <pre><code language="language-bash" class="language-bash">curl http://localhost:8888/task-manager/dev
+</code></pre>
+      <p><strong>2. Update config:</strong></p>
+      <pre><code language="language-bash" class="language-bash">cd ~/config-repo
+# Edit task-manager-dev.yml - change jwt.expiration
+git add . &amp;&amp; git commit -m &#34;Update expiration&#34;
+</code></pre>
+      <p><strong>3. Refresh application:</strong></p>
+      <pre><code language="language-bash" class="language-bash">curl -X POST http://localhost:8080/actuator/refresh
+</code></pre>
+      <h2 is-upgraded>Test in Swagger</h2>
+      <ol type="1">
+        <li>Visit: http://localhost:8080/swagger-ui.html</li>
+        <li>Try <code>/api/auth/signup</code> or <code>/api/auth/login</code></li>
+        <li>Copy the <code>token</code> from response</li>
+        <li>Click <strong>Authorize</strong> button</li>
+        <li>Enter: <code>Bearer <your-token></code></li>
+        <li>Test protected endpoints</li>
+      </ol>
+
+
+    </google-codelab-step>
+
+    <google-codelab-step label="Conclusion" duration="2">
+      <p>Congratulations! 🎉 You&#39;ve implemented JWT authentication and Spring Cloud Config!</p>
+      <h2 is-upgraded>What You&#39;ve Learned</h2>
+      <ul>
+        <li>✅ <strong>JWT Basics:</strong> Token structure and flow</li>
+        <li>✅ <strong>Token Generation:</strong> Creating signed JWT tokens</li>
+        <li>✅ <strong>Token Validation:</strong> Verifying signature and expiration</li>
+        <li>✅ <strong>Custom Filter:</strong> JWT authentication filter</li>
+        <li>✅ <strong>Refresh Tokens:</strong> Long-lived token renewal</li>
+        <li>✅ <strong>Config Server:</strong> Centralized configuration management</li>
+        <li>✅ <strong>Git Backend:</strong> Version-controlled configurations</li>
+        <li>✅ <strong>Profile Support:</strong> Environment-specific configs</li>
+        <li>✅ <strong>Runtime Refresh:</strong> Dynamic configuration updates</li>
+      </ul>
+      <h2 is-upgraded>Task Management API v1.4</h2>
+      <p>JWT &amp; Config features:</p>
+      <ul>
+        <li>✅ JWT token-based authentication</li>
+        <li>✅ Stateless API (no server-side sessions)</li>
+        <li>✅ Login and signup endpoints</li>
+        <li>✅ Refresh token mechanism</li>
+        <li>✅ Custom JWT authentication filter</li>
+        <li>✅ Spring Cloud Config Server</li>
+        <li>✅ Externalized configuration</li>
+        <li>✅ Profile-specific configurations</li>
+        <li>✅ Runtime configuration refresh</li>
+        <li>✅ Git-backed configuration storage</li>
+      </ul>
+      <h2 is-upgraded>Microservices Foundation</h2>
+      <p>You&#39;ve now built the foundation for microservices:</p>
+      <ul>
+        <li><strong>Stateless Authentication:</strong> JWT enables horizontal scaling</li>
+        <li><strong>Centralized Config:</strong> Easy multi-service management</li>
+        <li><strong>Service Communication:</strong> Ready for inter-service calls</li>
+      </ul>
+      <h2 is-upgraded>Git Branching</h2>
+      <pre><code language="language-bash" class="language-bash">git add .
+git commit -m &#34;Codelab 3.5: JWT &amp; Spring Cloud Config complete&#34;
+git tag codelab-3.5
+</code></pre>
+      <h2 is-upgraded>Next Steps</h2>
+      <ul>
+        <li><strong>Codelab 3.6:</strong> Reactive Programming &amp; R2DBC</li>
+      </ul>
+      <h2 is-upgraded>Additional Resources</h2>
+      <ul>
+        <li><a href="https://jwt.io/" target="_blank">JWT.io</a> - JWT debugger and information</li>
+        <li><a href="https://spring.io/projects/spring-cloud-config" target="_blank">Spring Cloud Config</a></li>
+        <li><a href="https://github.com/jwtk/jjwt" target="_blank">JJWT Library</a></li>
+      </ul>
+      <aside class="special">
+        <p><strong>Production Ready!</strong> Your API now has stateless JWT authentication and centralized
+          configuration - key requirements for cloud-native microservices!</p>
+      </aside>
+
+
+    </google-codelab-step>
+
+  </google-codelab>
+
+  <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/prettify.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
+  <script src="//support.google.com/inapp/api.js"></script>
+
+</body>
+
+</html>

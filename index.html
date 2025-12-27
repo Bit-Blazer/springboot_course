@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spring Boot Complete Course</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@300;400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: #202124;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: #fff;
+            border-bottom: 1px solid #dadce0;
+            padding: 16px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 2px 0 rgba(60, 64, 67, .3), 0 1px 3px 1px rgba(60, 64, 67, .15);
+        }
+
+        .header-content {
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .logo {
+            font-family: 'Google Sans', sans-serif;
+            font-size: 22px;
+            font-weight: 500;
+            color: #1a73e8;
+            text-decoration: none;
+        }
+
+        .syllabus-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: #1a73e8;
+            color: white;
+            text-decoration: none;
+            border-radius: 24px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+            box-shadow: 0 1px 2px 0 rgba(26,115,232,.3);
+        }
+
+        .syllabus-btn:hover {
+            background: #1765cc;
+            box-shadow: 0 2px 4px 0 rgba(26,115,232,.5);
+            transform: translateY(-1px);
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #1a73e8 0%, #174ea6 100%);
+            color: white;
+            padding: 64px 24px;
+            text-align: center;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-family: 'Google Sans', sans-serif;
+            font-size: 48px;
+            font-weight: 500;
+            margin-bottom: 16px;
+            line-height: 1.2;
+        }
+
+        .hero-subtitle {
+            font-size: 20px;
+            opacity: 0.95;
+            margin-bottom: 24px;
+        }
+
+        .hero-meta {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            flex-wrap: wrap;
+            margin-top: 32px;
+        }
+
+        .hero-meta-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .hero-meta-value {
+            font-family: 'Google Sans', sans-serif;
+            font-size: 32px;
+            font-weight: 500;
+        }
+
+        .hero-meta-label {
+            font-size: 14px;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 48px 24px;
+        }
+
+        .section {
+            margin-bottom: 56px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .section-number {
+            background: #1a73e8;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Google Sans', sans-serif;
+            font-size: 18px;
+            font-weight: 500;
+            flex-shrink: 0;
+        }
+
+        .section-info {
+            flex: 1;
+        }
+
+        .section-title {
+            font-family: 'Google Sans', sans-serif;
+            font-size: 28px;
+            font-weight: 500;
+            color: #202124;
+            margin-bottom: 4px;
+        }
+
+        .section-meta {
+            font-size: 14px;
+            color: #5f6368;
+        }
+
+        .codelabs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 24px;
+        }
+
+        .codelab-card {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 1px 2px 0 rgba(60, 64, 67, .3), 0 1px 3px 1px rgba(60, 64, 67, .15);
+        }
+
+        .codelab-card:hover {
+            box-shadow: 0 4px 12px 0 rgba(60, 64, 67, .3), 0 8px 16px 4px rgba(60, 64, 67, .15);
+            transform: translateY(-4px);
+        }
+
+        .codelab-header {
+            background: #f8f9fa;
+            padding: 12px 20px;
+            border-bottom: 1px solid #e8eaed;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .codelab-icon {
+            color: #1a73e8;
+            font-size: 24px;
+        }
+
+        .codelab-id {
+            font-size: 12px;
+            color: #5f6368;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 500;
+        }
+
+        .codelab-body {
+            padding: 20px;
+            flex: 1;
+        }
+
+        .codelab-title {
+            font-family: 'Google Sans', sans-serif;
+            font-size: 18px;
+            font-weight: 500;
+            color: #202124;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        .codelab-description {
+            font-size: 14px;
+            color: #5f6368;
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+
+        .codelab-details {
+            margin-top: 12px;
+        }
+
+        .codelab-topics {
+            background: #f8f9fa;
+            border-left: 3px solid #1a73e8;
+            padding: 12px;
+            margin-bottom: 12px;
+            border-radius: 4px;
+        }
+
+        .codelab-topics-title {
+            font-weight: 500;
+            font-size: 13px;
+            color: #202124;
+            margin-bottom: 6px;
+        }
+
+        .codelab-topics-list {
+            font-size: 12px;
+            color: #5f6368;
+            line-height: 1.6;
+        }
+
+        .codelab-build {
+            background: #e8f0fe;
+            border-left: 3px solid #1a73e8;
+            padding: 12px;
+            border-radius: 4px;
+        }
+
+        .codelab-build-title {
+            font-weight: 500;
+            font-size: 13px;
+            color: #202124;
+            margin-bottom: 6px;
+        }
+
+        .codelab-build-desc {
+            font-size: 12px;
+            color: #5f6368;
+            line-height: 1.6;
+        }
+
+        .codelab-footer {
+            padding: 16px 20px;
+            border-top: 1px solid #e8eaed;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .duration-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: #5f6368;
+            background: #f8f9fa;
+            padding: 4px 12px;
+            border-radius: 12px;
+        }
+
+        .type-badge {
+            font-size: 11px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 500;
+        }
+
+        .type-standalone {
+            background: #e8f5e9;
+            color: #1e8e3e;
+        }
+
+        .type-project {
+            background: #fce8e6;
+            color: #c5221f;
+        }
+
+        footer {
+            background: white;
+            border-top: 1px solid #dadce0;
+            padding: 32px 24px;
+            text-align: center;
+            margin-top: 64px;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            color: #5f6368;
+            font-size: 14px;
+        }
+
+        .footer-content a {
+            color: #1a73e8;
+            text-decoration: none;
+        }
+
+        .footer-content a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 32px;
+            }
+
+            .hero-subtitle {
+                font-size: 16px;
+            }
+
+            .hero-meta {
+                gap: 24px;
+            }
+
+            .hero-meta-value {
+                font-size: 24px;
+            }
+
+            .section-title {
+                font-size: 24px;
+            }
+
+            .codelabs-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <div class="header-content">
+            <span class="logo">Spring Boot Course</span>
+            <a href="syllabus/Java_Full_Stack_Programme.pdf" target="_blank" class="syllabus-btn">
+                <span class="material-symbols-outlined" style="font-size: 20px;">description</span>
+                View Syllabus
+            </a>
+        </div>
+    </header>
+
+    <div class="hero">
+        <div class="hero-content">
+            <h1>Spring Boot Complete Course</h1>
+            <div class="hero-subtitle">From Core Java to Microservices - Interactive Codelabs</div>
+            <div class="hero-subtitle">For HCL Java Training</div>
+            <div class="hero-meta">
+                <div class="hero-meta-item">
+                    <div class="hero-meta-value">20</div>
+                    <div class="hero-meta-label">Codelabs</div>
+                </div>
+                <div class="hero-meta-item">
+                    <div class="hero-meta-value">24</div>
+                    <div class="hero-meta-label">Hours</div>
+                </div>
+                <div class="hero-meta-item">
+                    <div class="hero-meta-value">4</div>
+                    <div class="hero-meta-label">Sections</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+
+        <!-- Section 1: Core Java Programming -->
+        <section class="section">
+            <div class="section-header">
+                <div class="section-number">1</div>
+                <div class="section-info">
+                    <h2 class="section-title">Core Java Programming</h2>
+                    <div class="section-meta">5 codelabs • 6 hours</div>
+                </div>
+            </div>
+            <div class="codelabs-grid">
+                <a href="section-1-core-java/java-fundamentals-control-flow/index.html" class="codelab-card">
+                    <div class="codelab-header">
+                        <span class="material-symbols-outlined codelab-icon">code</span>
+                        <div class="codelab-id">Codelab 1.1</div>
+                    </div>
+                    <div class="codelab-body">
+                        <h3 class="codelab-title">Java Platform, Data Types & Control Flow</h3>
+                        <p class="codelab-description">Master Java fundamentals including JVM architecture, primitive
+                            types, and control structures.</p>
+                        <div class="codelab-details">
+                            <div class="codelab-topics">
+                                <div class="codelab-topics-title">Topics Covered</div>
+                                <div class="codelab-topics-list">
+                                    Java Platform (JVM, JRE, JDK) • JVM Architecture • Primitive data types & arrays •
+                                    Branching & looping statements
+                                </div>
+                            </div>
+                            <div class="codelab-build">
+                                <div class="codelab-build-title">What You'll Build</div>
+                                <div class="codelab-build-desc">
+                                    Calculator application with menu-driven interface using control flow and array-based
+                                    calculation history
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="codelab-footer">
+                        <span class="duration-badge">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">schedule</span>
+                            75 min
+                        </span>
+                        <span class="type-badge type-standalone">Standalone</span>
+                    </div>
+                </a>
+                <a href="section-1-core-java/oop-complete/index.html" class="codelab-card">
+                    <div class="codelab-header">
+                        <span class="material-symbols-outlined codelab-icon">apps</span>
+                        <div class="codelab-id">Codelab 1.2</div>
+                    </div>
+                    <div class="codelab-body">
+                        <h3 class="codelab-title">Object-Oriented Programming Complete</h3>
+                        <p class="codelab-description">Deep dive into OOP concepts with classes, inheritance,
+                            interfaces, and polymorphism.</p>
+                        <div class="codelab-details">
+                            <div class="codelab-topics">
+                                <div class="codelab-topics-title">Topics Covered</div>
+                                <div class="codelab-topics-list">
+                                    Classes & objects • Inheritance & interfaces • Abstract classes • Method overloading
+                                    & overriding • Polymorphism • Packages & access modifiers
+                                </div>
+                            </div>
+                            <div class="codelab-build">
+                                <div class="codelab-build-title">What You'll Build</div>
+                                <div class="codelab-build-desc">
+                                    Complete banking system with Account hierarchy and multi-package structure
+                                    demonstrating inheritance and polymorphism
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="codelab-footer">
+                        <span class="duration-badge">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">schedule</span>
+                            90 min
+                        </span>
+                        <span class="type-badge type-standalone">Standalone</span>
+                    </div>
+                </a>
+                <a href="section-1-core-java/exception-handling-file-io/index.html" class="codelab-card">
+                    <div class="codelab-header">
+                        <span class="material-symbols-outlined codelab-icon">folder</span>
+                        <div class="codelab-id">Codelab 1.3</div>
+                    </div>
+                    <div class="codelab-body">
+                        <h3 class="codelab-title">Exception Handling & File I/O</h3>
+                        <p class="codelab-description">Learn robust error handling and file operations with try-catch,
+                            custom exceptions, and Java I/O.</p>
+                        <div class="codelab-details">
+                            <div class="codelab-topics">
+                                <div class="codelab-topics-title">Topics Covered</div>
+                                <div class="codelab-topics-list">
+                                    Try-catch-finally • Custom exceptions • Checked vs unchecked • File I/O streams •
+                                    BufferedReader & PrintWriter • try-with-resources
+                                </div>
+                            </div>
+                            <div class="codelab-build">
+                                <div class="codelab-build-title">What You'll Build</div>
+                                <div class="codelab-build-desc">
+                                    Contact book application with file persistence, custom validation exceptions, and
+                                    CSV import/export functionality
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="codelab-footer">
+                        <span class="duration-badge">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">schedule</span>
+                            75 min
+                        </span>
+                        <span class="type-badge type-standalone">Standalone</span>
+                    </div>
+                </a>
+                <a href="section-1-core-java/collections-generics/index.html" class="codelab-card">
+                    <div class="codelab-header">
+                        <span class="material-symbols-outlined codelab-icon">inventory_2</span>
+                        <div class="codelab-id">Codelab 1.4</div>
+                    </div>
+                    <div class="codelab-body">
+                        <h3 class="codelab-title">Collections Framework & Generics</h3>
+                        <p class="codelab-description">Master Java collections with List, Set, Map, and type-safe
+                            generic programming.</p>
+                        <div class="codelab-details">
+                            <div class="codelab-topics">
+                                <div class="codelab-topics-title">Topics Covered</div>
+                                <div class="codelab-topics-list">
+                                    List (ArrayList, LinkedList) • Set (HashSet, TreeSet) • Map (HashMap, TreeMap) •
+                                    Generics • Comparable & Comparator • Iterator patterns
+                                </div>
+                            </div>
+                            <div class="codelab-build">
+                                <div class="codelab-build-title">What You'll Build</div>
+                                <div class="codelab-build-desc">
+                                    Library management system with book catalog, member database, and borrowing history
+                                    using appropriate collection types
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="codelab-footer">
+                        <span class="duration-badge">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">schedule</span>
+                            75 min
+                        </span>
+                        <span class="type-badge type-standalone">Standalone</span>
+                    </div>
+                </a>
+                <a href="section-1-core-java/memory-management/index.html" class="codelab-card">
+                    <div class="codelab-header">
+                        <span class="material-symbols-outlined codelab-icon">memory</span>
+                        <div class="codelab-id">Codelab 1.5</div>
+                    </div>
+                    <div class="codelab-body">
+                        <h3 class="codelab-title">Memory Management & Garbage Collection</h3>
+                        <p class="codelab-description">Understand JVM memory model, garbage collection algorithms, and
+                            performance tuning.</p>
+                        <div class="codelab-details">
+                            <div class="codelab-topics">
+                                <div class="codelab-topics-title">Topics Covered</div>
+                                <div class="codelab-topics-list">
+                                    Heap vs Stack memory • Object lifecycle • GC algorithms (Serial, Parallel, G1, ZGC)
+                                    • Memory leaks • JVM flags & tuning • VisualVM profiling
+                                </div>
+                            </div>
+                            <div class="codelab-build">
+                                <div class="codelab-build-title">What You'll Build</div>
+                                <div class="codelab-build-desc">
+                                    Memory analysis exercises with intentional leaks, profiling with VisualVM, and GC
+                                    tuning experiments
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="codelab-footer">
+                        <span class="duration-badge">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">schedule</span>
+                            45 min
+                        </span>
+                        <span class="type-badge type-standalone">Standalone</span>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Section 2: Java 8 & Latest Features -->
+        <section class="section">
+            <div class="section-header">
+                <div class="section-number">2</div>
+                <div class="section-info">
+                    <h2 class="section-title">Java 8 & Latest Features</h2>
+                    <div class="section-meta">5 codelabs • 7 hours</div>
+                </div>
+            </div>
+            <div class="codelabs-grid">
+                <a href="section-2-java8-features/functional-programming-streams/index.html" class="codelab-card">
+                    <div class="codelab-header">
+                        <span class="material-symbols-outlined codelab-icon">function</span>
+                        <div class="codelab-id">Codelab 2.1</div>
+                    </div>
+                    <div class="codelab-body">
+                        <h3 class="codelab-title">Functional Programming & Streams API</h3>
+                        <p class="codelab-description">Transform your coding style with lambdas, functional interfaces,
+                            and powerful stream operations.</p>
+                        <div class="codelab-details">
+                            <div class="codelab-topics">
+                                <div class="codelab-topics-title">Topics Covered</div>
+                                <div class="codelab-topics-list">
+                                    Lambda expressions • Functional interfaces • Stream API (map, filter, reduce) •
+                                    Method references • Collectors • Parallel streams
+                                </div>
+                            </div>
+                            <div class="codelab-build">
+                                <div class="codelab-build-title">What You'll Build</div>
+                                <div class="codelab-build-desc">
+                                    Sales analytics application with functional style including data filtering,
+                                    transformation, and complex aggregations
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="codelab-footer">
+                        <span class="duration-badge">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">schedule</span>
+                            90 min
+                        </span>
+                        <span class="type-badge type-standalone">Standalone</span>
+                    </div>
+                </a>
+                <a href="section-2-java8-features/optional-datetime-modern-java/index.html" class="codelab-card">
+                    <div class="codelab-header">
+                        <span class="material-symbols-outlined codelab-icon">schedule</span>
+                        <div class="codelab-id">Codelab 2.2</div>
+                    </div>
+                    <div class="codelab-body">
+                        <h3 class="codelab-title">Optional, Date/Time & Modern Java Features</h3>
+                        <p class="codelab-description">Eliminate null pointer exceptions and handle dates properly with
+                            Java 8+ modern APIs.</p>
+                        <div class="codelab-details">
+                            <div class="codelab-topics">
+                                <div class="codelab-topics-title">Topics Covered</div>
+                                <div class="codelab-topics-list">
+                                    Optional best practices • LocalDate, LocalDateTime, ZonedDateTime • Date formatting
+                                    & parsing • Duration & Period • Records • Switch expressions
+                                </div>
+                            </div>
+                            <div class="codelab-build">
+                                <div class="codelab-build-title">What You'll Build</div>
+                                <div class="codelab-build-desc">
+                                    Conference scheduling system with time zones, Optional null-safety, and
+                                    configuration manager using Records
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="codelab-footer">
+                        <span class="duration-badge">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">schedule</span>
+                            90 min
+                        </span>
+                        <span class="type-badge type-standalone">Standalone</span>
+                    </div>
+                </a>
+                <a href="section-2-java8-features/async-programming-complete/index.html" class="codelab-card">
+                    <div class="codelab-header">
+                        <span class="material-symbols-outlined codelab-icon">bolt</span>
+                        <div class="codelab-id">Codelab 2.3</div>
+                    </div>
+                    <div class="codelab-body">
+                        <h3 class="codelab-title">Asynchronous Programming Complete</h3>
+                        <p class="codelab-description">Build responsive applications with threads, executors, and
+                            CompletableFuture.</p>
+                        <div class="codelab-details">
+                            <div class="codelab-topics">
+                                <div class="codelab-topics-title">Topics Covered</div>
+                                <div class="codelab-topics-list">
+                                    Thread basics & lifecycle • ExecutorService patterns • Thread pools •
+                                    CompletableFuture • Async composition • Exception handling in async code
+                                </div>
+                            </div>
+                            <div class="codelab-build">
+                                <div class="codelab-build-title">What You'll Build</div>
+                                <div class="codelab-build-desc">
+                                    Microservice orchestration with CompletableFuture chaining multiple async API calls
+                                    with fallback strategies
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="codelab-footer">
+                        <span class="duration-badge">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">schedule</span>
+                            90 min
+                        </span>
+                        <span class="type-badge type-standalone">Standalone</span>
+                    </div>
+                </a>
+                <a href="section-2-java8-features/logging-log4j/index.html" class="codelab-card">
+                    <div class="codelab-header">
+                        <span class="material-symbols-outlined codelab-icon">description</span>
+                        <div class="codelab-id">Codelab 2.4</div>
+                    </div>
+                    <div class="codelab-body">
+                        <h3 class="codelab-title">Logging with Log4j</h3>
+                        <p class="codelab-description">Master production-grade logging with Log4j2 for debugging and
+                            monitoring.</p>
+                        <div class="codelab-details">
+                            <div class="codelab-topics">
+                                <div class="codelab-topics-title">Topics Covered</div>
+                                <div class="codelab-topics-list">
+                                    Log4j2 configuration • Log levels • Appenders (console, file, rolling) • Layouts &
+                                    patterns • MDC context • Best practices for production logging
+                                </div>
+                            </div>
+                            <div class="codelab-build">
+                                <div class="codelab-build-title">What You'll Build</div>
+                                <div class="codelab-build-desc">
+                                    Multi-environment logging setup with file rotation, error tracking, and structured
+                                    logging patterns
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="codelab-footer">
+                        <span class="duration-badge">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">schedule</span>
+                            60 min
+                        </span>
+                        <span class="type-badge type-standalone">Standalone</span>
+                    </div>
+                </a>
+                <a href="section-2-java8-features/ide-debugging-mastery/index.html" class="codelab-card">
+                    <div class="codelab-header">
+                        <span class="material-symbols-outlined codelab-icon">bug_report</span>
+                        <div class="codelab-id">Codelab 2.5</div>
+                    </div>
+                    <div class="codelab-body">
+                        <h3 class="codelab-title">IDE Debugging Mastery</h3>
+                        <p class="codelab-description">Become a debugging expert with breakpoints, watches, and advanced
+                            IDE techniques.</p>
+                        <div class="codelab-details">
+                            <div class="codelab-topics">
+                                <div class="codelab-topics-title">Topics Covered</div>
+                                <div class="codelab-topics-list">
+                                    Breakpoint types • Step debugging • Watch expressions • Conditional breakpoints •
+                                    Stack traces • Thread debugging • Remote debugging setup
+                                </div>
+                            </div>
+                            <div class="codelab-build">
+                                <div class="codelab-build-title">What You'll Build</div>
+                                <div class="codelab-build-desc">
+                                    Debug challenge exercises covering common patterns, thread issues, performance
+                                    problems, and remote debugging configuration
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="codelab-footer">
+                        <span class="duration-badge">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">schedule</span>
+                            90 min
+                        </span>
+                        <span class="type-badge type-standalone">Standalone</span>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Section 3: Spring Boot -->
+        <section class="section">
+            <div class="section-header">
+                <div class="section-number">3</div>
+                <div class="section-info">
+                    <h2 class="section-title">Spring Boot Deep Dive</h2>
+                    <div class="section-meta">8 codelabs • 8 hours • Evolving Task Management API</div>
+                </div>
+            </div>
+            <div class="codelabs-grid">
+                <a href="section-3-spring-boot/spring-core-boot-basics/index.html" class="codelab-card">
+                    <div class="codelab-header">
+                        <span class="material-symbols-outlined codelab-icon">eco</span>
+                        <div class="codelab-id">Codelab 3.1</div>
+                    </div>
+                    <div class="codelab-body">
+                        <h3 class="codelab-title">Spring Core, IoC, DI & Spring Boot Web</h3>
+                        <p class="codelab-description">Start your Spring journey with dependency injection,
+                            auto-configuration, and REST basics.</p>
+                        <div class="codelab-details">
+                            <div class="codelab-topics">
+                                <div class="codelab-topics-title">Topics Covered</div>
+                                <div class="codelab-topics-list">
+                                    IoC container • Dependency Injection • Component scanning • @Controller, @Service,
+                                    @Repository • Spring Boot auto-configuration • Basic REST endpoints
+                                </div>
+                            </div>
+                            <div class="codelab-build">
+                                <div class="codelab-build-title">What You'll Build</div>
+                                <div class="codelab-build-desc">
+                                    Task Management API - Part 1: Basic CRUD endpoints with in-memory storage and
+                                    layered architecture
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="codelab-footer">
+                        <span class="duration-badge">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">schedule</span>
+                            60 min
+                        </span>
+                        <span class="type-badge type-project">Project</span>
+                    </div>
+                </a>
+                <a href="section-3-spring-boot/rest-apis-swagger/index.html" class="codelab-card">
+                    <div class="codelab-header">
+                        <span class="material-symbols-outlined codelab-icon">api</span>
+                        <div class="codelab-id">Codelab 3.2</div>
+                    </div>
+                    <div class="codelab-body">
+                        <h3 class="codelab-title">RESTful APIs, Swagger & Exception Handling</h3>
+                        <p class="codelab-description">Design professional REST APIs with OpenAPI documentation and
+                            global error handling.</p>
+                        <div class="codelab-details">
+                            <div class="codelab-topics">
+                                <div class="codelab-topics-title">Topics Covered</div>
+                                <div class="codelab-topics-list">
+                                    REST best practices • HTTP status codes • Request/Response DTOs • Swagger/OpenAPI
+                                    integration • @ControllerAdvice • Custom exceptions • Validation
+                                </div>
+                            </div>
+                            <div class="codelab-build">
+                                <div class="codelab-build-title">What You'll Build</div>
+                                <div class="codelab-build-desc">
+                                    Task Management API - Part 2: Add Swagger docs, validation, global exception
+                                    handling, and search/filter endpoints
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="codelab-footer">
+                        <span class="duration-badge">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">schedule</span>
+                            60 min
+                        </span>
+                        <span class="type-badge type-project">Project</span>
+                    </div>
+                </a>
+                <a href="section-3-spring-boot/orm-spring-data-jpa/index.html" class="codelab-card">
+                    <div class="codelab-header">
+                        <span class="material-symbols-outlined codelab-icon">storage</span>
+                        <div class="codelab-id">Codelab 3.3</div>
+                    </div>
+                    <div class="codelab-body">
+                        <h3 class="codelab-title">ORM Concepts & Spring Data JPA</h3>
+                        <p class="codelab-description">Persist data effortlessly with JPA entities, repositories, and
+                            relationship mappings.</p>
+                        <div class="codelab-details">
+                            <div class="codelab-topics">
+                                <div class="codelab-topics-title">Topics Covered</div>
+                                <div class="codelab-topics-list">
+                                    JPA entities & annotations • Repository patterns • Query methods • @Query •
+                                    Relationships (OneToMany, ManyToOne) • Transactions • H2 vs PostgreSQL
+                                </div>
+                            </div>
+                            <div class="codelab-build">
+                                <div class="codelab-build-title">What You'll Build</div>
+                                <div class="codelab-build-desc">
+                                    Task Management API - Part 3: Migrate to database persistence with Task-Category
+                                    relationships and custom queries
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="codelab-footer">
+                        <span class="duration-badge">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">schedule</span>
+                            60 min
+                        </span>
+                        <span class="type-badge type-project">Project</span>
+                    </div>
+                </a>
+                <a href="section-3-spring-boot/jpa-locking-spring-security/index.html" class="codelab-card">
+                    <div class="codelab-header">
+                        <span class="material-symbols-outlined codelab-icon">lock</span>
+                        <div class="codelab-id">Codelab 3.4</div>
+                    </div>
+                    <div class="codelab-body">
+                        <h3 class="codelab-title">Advanced JPA Locking & Spring Security</h3>
+                        <p class="codelab-description">Handle concurrent updates and secure your API with authentication
+                            and authorization.</p>
+                        <div class="codelab-details">
+                            <div class="codelab-topics">
+                                <div class="codelab-topics-title">Topics Covered</div>
+                                <div class="codelab-topics-list">
+                                    Optimistic locking (@Version) • Pessimistic locking • Spring Security setup •
+                                    UserDetailsService • BCrypt password encoding • Role-based access control
+                                </div>
+                            </div>
+                            <div class="codelab-build">
+                                <div class="codelab-build-title">What You'll Build</div>
+                                <div class="codelab-build-desc">
+                                    Task Management API - Part 4: Add user authentication, role-based permissions, and
+                                    concurrent update handling
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="codelab-footer">
+                        <span class="duration-badge">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">schedule</span>
+                            75 min
+                        </span>
+                        <span class="type-badge type-project">Project</span>
+                    </div>
+                </a>
+                <a href="section-3-spring-boot/jwt-spring-cloud/index.html" class="codelab-card">
+                    <div class="codelab-header">
+                        <span class="material-symbols-outlined codelab-icon">badge</span>
+                        <div class="codelab-id">Codelab 3.5</div>
+                    </div>
+                    <div class="codelab-body">
+                        <h3 class="codelab-title">JWT Authentication & Spring Cloud</h3>
+                        <p class="codelab-description">Implement token-based authentication and explore cloud-native
+                            patterns.</p>
+                        <div class="codelab-details">
+                            <div class="codelab-topics">
+                                <div class="codelab-topics-title">Topics Covered</div>
+                                <div class="codelab-topics-list">
+                                    JWT structure • Stateless authentication • Token generation & validation • Spring
+                                    Cloud Config • Externalized configuration • Profiles
+                                </div>
+                            </div>
+                            <div class="codelab-build">
+                                <div class="codelab-build-title">What You'll Build</div>
+                                <div class="codelab-build-desc">
+                                    Task Management API - Part 5: Replace session-based auth with JWT tokens and
+                                    externalize config with Spring Cloud Config
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="codelab-footer">
+                        <span class="duration-badge">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">schedule</span>
+                            75 min
+                        </span>
+                        <span class="type-badge type-project">Project</span>
+                    </div>
+                </a>
+                <a href="section-3-spring-boot/reactive-webflux-r2dbc/index.html" class="codelab-card">
+                    <div class="codelab-header">
+                        <span class="material-symbols-outlined codelab-icon">waves</span>
+                        <div class="codelab-id">Codelab 3.6</div>
+                    </div>
+                    <div class="codelab-body">
+                        <h3 class="codelab-title">Spring Boot Reactive Stack & R2DBC</h3>
+                        <p class="codelab-description">Build high-performance non-blocking applications with WebFlux and
+                            reactive databases.</p>
+                        <div class="codelab-details">
+                            <div class="codelab-topics">
+                                <div class="codelab-topics-title">Topics Covered</div>
+                                <div class="codelab-topics-list">
+                                    Reactive programming concepts • Mono & Flux • WebFlux REST APIs • R2DBC for reactive
+                                    DB access • Backpressure • When to use reactive vs blocking
+                                </div>
+                            </div>
+                            <div class="codelab-build">
+                                <div class="codelab-build-title">What You'll Build</div>
+                                <div class="codelab-build-desc">
+                                    Task Management API - Part 6: Create reactive version using WebFlux and R2DBC for
+                                    high-throughput scenarios
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="codelab-footer">
+                        <span class="duration-badge">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">schedule</span>
+                            75 min
+                        </span>
+                        <span class="type-badge type-project">Project</span>
+                    </div>
+                </a>
+                <a href="section-3-spring-boot/spring-jms-event-driven/index.html" class="codelab-card">
+                    <div class="codelab-header">
+                        <span class="material-symbols-outlined codelab-icon">mail</span>
+                        <div class="codelab-id">Codelab 3.7</div>
+                    </div>
+                    <div class="codelab-body">
+                        <h3 class="codelab-title">Spring Messaging with JMS</h3>
+                        <p class="codelab-description">Build event-driven architectures with message queues and
+                            asynchronous processing.</p>
+                        <div class="codelab-details">
+                            <div class="codelab-topics">
+                                <div class="codelab-topics-title">Topics Covered</div>
+                                <div class="codelab-topics-list">
+                                    Message queue concepts • Spring JMS • ActiveMQ setup • @JmsListener • Message
+                                    producers • Point-to-point vs Pub-Sub • Error handling in messaging
+                                </div>
+                            </div>
+                            <div class="codelab-build">
+                                <div class="codelab-build-title">What You'll Build</div>
+                                <div class="codelab-build-desc">
+                                    Task Management API - Part 7: Add async notifications using JMS for task assignments
+                                    and status changes
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="codelab-footer">
+                        <span class="duration-badge">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">schedule</span>
+                            45 min
+                        </span>
+                        <span class="type-badge type-project">Project</span>
+                    </div>
+                </a>
+                <a href="section-3-spring-boot/testing-remote-debugging/index.html" class="codelab-card">
+                    <div class="codelab-header">
+                        <span class="material-symbols-outlined codelab-icon">check_circle</span>
+                        <div class="codelab-id">Codelab 3.8</div>
+                    </div>
+                    <div class="codelab-body">
+                        <h3 class="codelab-title">Unit Testing & Remote Debugging</h3>
+                        <p class="codelab-description">Write comprehensive tests and debug production issues with remote
+                            debugging.</p>
+                        <div class="codelab-details">
+                            <div class="codelab-topics">
+                                <div class="codelab-topics-title">Topics Covered</div>
+                                <div class="codelab-topics-list">
+                                    JUnit 5 • MockMvc • @SpringBootTest • Mockito • Test slices (@WebMvcTest,
+                                    @DataJpaTest) • Remote debugging setup • JDWP
+                                </div>
+                            </div>
+                            <div class="codelab-build">
+                                <div class="codelab-build-title">What You'll Build</div>
+                                <div class="codelab-build-desc">
+                                    Task Management API - Part 8: Add comprehensive unit & integration tests, setup
+                                    remote debugging for Docker deployments
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="codelab-footer">
+                        <span class="duration-badge">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">schedule</span>
+                            60 min
+                        </span>
+                        <span class="type-badge type-project">Project</span>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Section 4: Microservices -->
+        <section class="section">
+            <div class="section-header">
+                <div class="section-number">4</div>
+                <div class="section-info">
+                    <h2 class="section-title">Web Applications & Services</h2>
+                    <div class="section-meta">2 codelabs • 3 hours</div>
+                </div>
+            </div>
+            <div class="codelabs-grid">
+                <a href="section-4-microservices/microservices-architecture/index.html" class="codelab-card">
+                    <div class="codelab-header">
+                        <span class="material-symbols-outlined codelab-icon">account_tree</span>
+                        <div class="codelab-id">Codelab 4.1</div>
+                    </div>
+                    <div class="codelab-body">
+                        <h3 class="codelab-title">Microservices Architecture & Implementation</h3>
+                        <p class="codelab-description">Design and build distributed systems with service discovery and
+                            API gateways.</p>
+                        <div class="codelab-details">
+                            <div class="codelab-topics">
+                                <div class="codelab-topics-title">Topics Covered</div>
+                                <div class="codelab-topics-list">
+                                    Microservices patterns • Service discovery (Eureka) • API Gateway • Inter-service
+                                    communication • Distributed tracing • Circuit breakers
+                                </div>
+                            </div>
+                            <div class="codelab-build">
+                                <div class="codelab-build-title">What You'll Build</div>
+                                <div class="codelab-build-desc">
+                                    Multi-service ecosystem with Eureka Server, API Gateway, Product Service, and Order
+                                    Service demonstrating service discovery
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="codelab-footer">
+                        <span class="duration-badge">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">schedule</span>
+                            90 min
+                        </span>
+                        <span class="type-badge type-standalone">Standalone</span>
+                    </div>
+                </a>
+                <a href="section-4-microservices/servlets-blocking-reactive/index.html" class="codelab-card">
+                    <div class="codelab-header">
+                        <span class="material-symbols-outlined codelab-icon">compare_arrows</span>
+                        <div class="codelab-id">Codelab 4.2</div>
+                    </div>
+                    <div class="codelab-body">
+                        <h3 class="codelab-title">Java Servlets & Blocking vs Reactive Stacks</h3>
+                        <p class="codelab-description">Understand the evolution from servlets to modern reactive
+                            architectures.</p>
+                        <div class="codelab-details">
+                            <div class="codelab-topics">
+                                <div class="codelab-topics-title">Topics Covered</div>
+                                <div class="codelab-topics-list">
+                                    Servlet lifecycle • Request/Response handling • Blocking I/O model •
+                                    Thread-per-request • Reactive non-blocking model • Performance comparison
+                                </div>
+                            </div>
+                            <div class="codelab-build">
+                                <div class="codelab-build-title">What You'll Build</div>
+                                <div class="codelab-build-desc">
+                                    Side-by-side comparison apps: traditional servlet-based app vs reactive WebFlux app
+                                    with load testing and metrics
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="codelab-footer">
+                        <span class="duration-badge">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">schedule</span>
+                            90 min
+                        </span>
+                        <span class="type-badge type-standalone">Standalone</span>
+                    </div>
+                </a>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <p>Built with <a href="https://github.com/googlecodelabs/tools" target="_blank">Google Codelabs</a></p>
+            <p style="margin-top: 8px; color: #80868b;">© 2025 Spring Boot Course</p>
+        </div>
+    </footer>
+</body>
+
+</html>

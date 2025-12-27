@@ -1,0 +1,26 @@
+{
+  "environment": "web",
+  "format": "html",
+  "prefix": "https://storage.googleapis.com",
+  "mainga": "UA-49880327-14",
+  "updated": "2025-12-27T18:48:58+05:30",
+  "id": "functional-programming-streams",
+  "duration": 120,
+  "title": "Functional Programming \u0026 Streams API",
+  "summary": "Master functional programming with lambdas, functional interfaces, Stream API operations, and collectors by building a sales analytics application",
+  "source": "codelab-2.1-functional-programming-streams.md",
+  "theme": "",
+  "status": [
+    "published"
+  ],
+  "category": [
+    "java",
+    "java8",
+    "functionalprogramming",
+    "streamsapi"
+  ],
+  "tags": [
+    "web"
+  ],
+  "url": "functional-programming-streams"
+}
