@@ -3,6 +3,7 @@ id: optional-datetime-modern-java
 categories: Java, Java 8+, Modern Java, Date Time API
 environments: Web
 status: Published
+home url: /springboot_course/
 
 # Optional, Date/Time & Modern Java Features
 

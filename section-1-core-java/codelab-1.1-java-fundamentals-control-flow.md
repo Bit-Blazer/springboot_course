@@ -3,6 +3,7 @@ id: java-fundamentals-control-flow
 categories: Java, Core Java, Programming Fundamentals
 environments: Web
 status: Published
+home url: /springboot_course/
 
 # Java Platform, Data Types & Control Flow
 

@@ -3,6 +3,7 @@ id: jwt-spring-cloud
 categories: Spring Boot, JWT, Spring Cloud, Security, Microservices
 environments: Web
 status: Published
+home url: /springboot_course/
 
 # JWT Authentication & Spring Cloud Config
 

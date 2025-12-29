@@ -1,77 +1,75 @@
+
 <!doctype html>
 
 <html>
-
 <head>
-    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
-    <meta name="theme-color" content="#4F7DC9">
-    <meta charset="UTF-8">
-    <title>Spring Core &amp; Spring Boot Basics</title>
-    <link rel="stylesheet"
-        href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
-    <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
-    <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
-    <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1  /build/styles/monokai.min.css">
-    <link rel="stylesheet" href="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.css">
-    <style>
-        .success {
-            color: #1e8e3e;
-        }
-
-        .error {
-            color: red;
-        }
-    </style>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <title>Spring Core &amp; Spring Boot Basics</title>
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
+  <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1  /build/styles/monokai.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.css">
+  <style>
+    .success {
+      color: #1e8e3e;
+    }
+    .error {
+      color: red;
+    }
+  </style>
 </head>
-
 <body>
-    <google-codelab-analytics gaid="UA-49880327-14" ga4id=""></google-codelab-analytics>
-    <google-codelab codelab-gaid="" codelab-ga4id="" id="spring-core-boot-basics"
-        title="Spring Core &amp; Spring Boot Basics" environment="web" feedback-link="">
-
-        <google-codelab-step label="Introduction" duration="3">
-            <p>Welcome to Spring Boot! Spring is the most popular Java framework for building enterprise applications.
-                Spring Boot makes it easy to create production-grade Spring applications with minimal configuration.</p>
-            <h2 class="checklist" is-upgraded>What You&#39;ll Learn</h2>
-            <ul class="checklist">
-                <li><strong>Inversion of Control (IoC):</strong> Understanding the core Spring principle</li>
-                <li><strong>Dependency Injection (DI):</strong> Constructor, setter, and field injection</li>
-                <li><strong>Spring Beans:</strong> Component scanning and bean lifecycle</li>
-                <li><strong>Spring Annotations:</strong> @Component, @Service, @Repository, @Autowired</li>
-                <li><strong>Spring Boot:</strong> Auto-configuration and starters</li>
-                <li><strong>REST Controllers:</strong> Building web endpoints</li>
-                <li><strong>Application Configuration:</strong> Properties and YAML files</li>
-                <li><strong>Project Structure:</strong> Best practices for organizing Spring Boot apps</li>
-            </ul>
-            <h2 is-upgraded>What You&#39;ll Build</h2>
-            <p><strong>Task Management API</strong> - A RESTful API for managing tasks:</p>
-            <ul>
-                <li>Basic task CRUD operations (in-memory for now)</li>
-                <li>RESTful endpoints</li>
-                <li>Service and repository layers</li>
-                <li>Dependency injection throughout</li>
-                <li>Spring Boot auto-configuration</li>
-            </ul>
-            <p>This is the <strong>first codelab in an evolving project</strong> that will grow through Codelabs
-                3.1-3.8, adding features like:</p>
-            <ul>
-                <li>Database persistence (3.3)</li>
-                <li>Security &amp; JWT (3.4-3.5)</li>
-                <li>Reactive programming (3.6)</li>
-                <li>Messaging (3.7)</li>
-                <li>Testing (3.8)</li>
-            </ul>
-            <h2 is-upgraded>Prerequisites</h2>
-            <ul>
-                <li>Completed Section 1 and Section 2 codelabs</li>
-                <li>JDK 17 or higher installed</li>
-                <li>Maven or Gradle installed</li>
-                <li>IDE (IntelliJ IDEA recommended, with Spring plugin)</li>
-                <li>Basic understanding of REST APIs</li>
-            </ul>
-            <h2 is-upgraded>Key Dependencies</h2>
-            <pre><code language="language-xml" class="language-xml">&lt;!-- Spring Boot Starter Web --&gt;
+  <google-codelab-analytics gaid="UA-49880327-14" ga4id=""></google-codelab-analytics>
+  <google-codelab codelab-gaid=""
+                  codelab-ga4id=""
+                  id="spring-core-boot-basics"
+                  title="Spring Core &amp; Spring Boot Basics"
+                  environment="web"
+                  feedback-link="">
+    
+      <google-codelab-step label="Introduction" duration="3">
+        <p>Welcome to Spring Boot! Spring is the most popular Java framework for building enterprise applications. Spring Boot makes it easy to create production-grade Spring applications with minimal configuration.</p>
+<h2 class="checklist" is-upgraded>What You&#39;ll Learn</h2>
+<ul class="checklist">
+<li><strong>Inversion of Control (IoC):</strong> Understanding the core Spring principle</li>
+<li><strong>Dependency Injection (DI):</strong> Constructor, setter, and field injection</li>
+<li><strong>Spring Beans:</strong> Component scanning and bean lifecycle</li>
+<li><strong>Spring Annotations:</strong> @Component, @Service, @Repository, @Autowired</li>
+<li><strong>Spring Boot:</strong> Auto-configuration and starters</li>
+<li><strong>REST Controllers:</strong> Building web endpoints</li>
+<li><strong>Application Configuration:</strong> Properties and YAML files</li>
+<li><strong>Project Structure:</strong> Best practices for organizing Spring Boot apps</li>
+</ul>
+<h2 is-upgraded>What You&#39;ll Build</h2>
+<p><strong>Task Management API</strong> - A RESTful API for managing tasks:</p>
+<ul>
+<li>Basic task CRUD operations (in-memory for now)</li>
+<li>RESTful endpoints</li>
+<li>Service and repository layers</li>
+<li>Dependency injection throughout</li>
+<li>Spring Boot auto-configuration</li>
+</ul>
+<p>This is the <strong>first codelab in an evolving project</strong> that will grow through Codelabs 3.1-3.8, adding features like:</p>
+<ul>
+<li>Database persistence (3.3)</li>
+<li>Security &amp; JWT (3.4-3.5)</li>
+<li>Reactive programming (3.6)</li>
+<li>Messaging (3.7)</li>
+<li>Testing (3.8)</li>
+</ul>
+<h2 is-upgraded>Prerequisites</h2>
+<ul>
+<li>Completed Section 1 and Section 2 codelabs</li>
+<li>JDK 17 or higher installed</li>
+<li>Maven or Gradle installed</li>
+<li>IDE (IntelliJ IDEA recommended, with Spring plugin)</li>
+<li>Basic understanding of REST APIs</li>
+</ul>
+<h2 is-upgraded>Key Dependencies</h2>
+<pre><code language="language-xml" class="language-xml">&lt;!-- Spring Boot Starter Web --&gt;
 &lt;dependency&gt;
     &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
     &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
@@ -92,19 +90,17 @@
     &lt;optional&gt;true&lt;/optional&gt;
 &lt;/dependency&gt;
 </code></pre>
-            <aside class="special">
-                <p><strong>Evolution Strategy:</strong> We&#39;ll use Git branches to track progress. Each codelab
-                    builds on the previous one. You can always refer back to earlier branches if needed!</p>
-            </aside>
+<aside class="special"><p><strong>Evolution Strategy:</strong> We&#39;ll use Git branches to track progress. Each codelab builds on the previous one. You can always refer back to earlier branches if needed!</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Understanding IoC and DI" duration="10">
-            <p>Before diving into Spring, let&#39;s understand the core concepts that make it powerful.</p>
-            <h2 is-upgraded>The Problem: Tight Coupling</h2>
-            <p>Without IoC and DI, classes create their own dependencies:</p>
-            <pre><code language="language-java" class="language-java">// Tightly coupled code - BAD
+      </google-codelab-step>
+    
+      <google-codelab-step label="Understanding IoC and DI" duration="10">
+        <p>Before diving into Spring, let&#39;s understand the core concepts that make it powerful.</p>
+<h2 is-upgraded>The Problem: Tight Coupling</h2>
+<p>Without IoC and DI, classes create their own dependencies:</p>
+<pre><code language="language-java" class="language-java">// Tightly coupled code - BAD
 public class TaskService {
     private TaskRepository repository;
 
@@ -118,17 +114,16 @@ public class TaskService {
     }
 }
 </code></pre>
-            <p><strong>Problems:</strong></p>
-            <ul>
-                <li>❌ Hard to test (can&#39;t mock repository)</li>
-                <li>❌ Hard to change implementation</li>
-                <li>❌ TaskService knows how to construct TaskRepository</li>
-                <li>❌ Tight coupling between classes</li>
-            </ul>
-            <h2 is-upgraded>Inversion of Control (IoC)</h2>
-            <p><strong>IoC Principle:</strong> Don&#39;t create dependencies yourself - let someone else provide them.
-            </p>
-            <pre><code language="language-java" class="language-java">// Loosely coupled with IoC - GOOD
+<p><strong>Problems:</strong></p>
+<ul>
+<li>❌ Hard to test (can&#39;t mock repository)</li>
+<li>❌ Hard to change implementation</li>
+<li>❌ TaskService knows how to construct TaskRepository</li>
+<li>❌ Tight coupling between classes</li>
+</ul>
+<h2 is-upgraded>Inversion of Control (IoC)</h2>
+<p><strong>IoC Principle:</strong> Don&#39;t create dependencies yourself - let someone else provide them.</p>
+<pre><code language="language-java" class="language-java">// Loosely coupled with IoC - GOOD
 public class TaskService {
     private TaskRepository repository;
 
@@ -142,18 +137,18 @@ public class TaskService {
     }
 }
 </code></pre>
-            <p><strong>Benefits:</strong></p>
-            <ul>
-                <li>✅ TaskService doesn&#39;t create TaskRepository</li>
-                <li>✅ Easy to test (inject mock repository)</li>
-                <li>✅ Easy to change implementation</li>
-                <li>✅ Loose coupling</li>
-            </ul>
-            <h2 is-upgraded>Dependency Injection (DI)</h2>
-            <p>DI is a way to implement IoC. The framework &#34;injects&#34; dependencies into your classes.</p>
-            <p><strong>Three types of DI:</strong></p>
-            <h3 is-upgraded>1. Constructor Injection (Recommended)</h3>
-            <pre><code language="language-java" class="language-java">@Service
+<p><strong>Benefits:</strong></p>
+<ul>
+<li>✅ TaskService doesn&#39;t create TaskRepository</li>
+<li>✅ Easy to test (inject mock repository)</li>
+<li>✅ Easy to change implementation</li>
+<li>✅ Loose coupling</li>
+</ul>
+<h2 is-upgraded>Dependency Injection (DI)</h2>
+<p>DI is a way to implement IoC. The framework &#34;injects&#34; dependencies into your classes.</p>
+<p><strong>Three types of DI:</strong></p>
+<h3 is-upgraded>1. Constructor Injection (Recommended)</h3>
+<pre><code language="language-java" class="language-java">@Service
 public class TaskService {
     private final TaskRepository repository;
 
@@ -164,9 +159,9 @@ public class TaskService {
     }
 }
 </code></pre>
-            <p><strong>Best for:</strong> Required dependencies, immutable fields</p>
-            <h3 is-upgraded>2. Setter Injection</h3>
-            <pre><code language="language-java" class="language-java">@Service
+<p><strong>Best for:</strong> Required dependencies, immutable fields</p>
+<h3 is-upgraded>2. Setter Injection</h3>
+<pre><code language="language-java" class="language-java">@Service
 public class TaskService {
     private TaskRepository repository;
 
@@ -177,30 +172,27 @@ public class TaskService {
     }
 }
 </code></pre>
-            <p><strong>Best for:</strong> Optional dependencies, reconfigurable beans</p>
-            <h3 is-upgraded>3. Field Injection (Not Recommended)</h3>
-            <pre><code language="language-java" class="language-java">@Service
+<p><strong>Best for:</strong> Optional dependencies, reconfigurable beans</p>
+<h3 is-upgraded>3. Field Injection (Not Recommended)</h3>
+<pre><code language="language-java" class="language-java">@Service
 public class TaskService {
     // Spring injects directly into field
     @Autowired
     private TaskRepository repository;
 }
 </code></pre>
-            <p><strong>Problems:</strong> Hard to test, breaks encapsulation, can&#39;t make final</p>
-            <aside class="special">
-                <p><strong>Best Practice:</strong> Always use constructor injection for required dependencies. It makes
-                    your code more testable and dependencies explicit.</p>
-            </aside>
-            <h2 is-upgraded>The Spring Container</h2>
-            <p>The <strong>Spring Container</strong> (ApplicationContext) manages the lifecycle of beans and their
-                dependencies.</p>
-            <pre><code language="language-java" class="language-java">// Spring does this for you:
+<p><strong>Problems:</strong> Hard to test, breaks encapsulation, can&#39;t make final</p>
+<aside class="special"><p><strong>Best Practice:</strong> Always use constructor injection for required dependencies. It makes your code more testable and dependencies explicit.</p>
+</aside>
+<h2 is-upgraded>The Spring Container</h2>
+<p>The <strong>Spring Container</strong> (ApplicationContext) manages the lifecycle of beans and their dependencies.</p>
+<pre><code language="language-java" class="language-java">// Spring does this for you:
 TaskRepository repository = new TaskRepository();
 TaskService service = new TaskService(repository);
 TaskController controller = new TaskController(service);
 </code></pre>
-            <h2 is-upgraded>Bean Lifecycle</h2>
-            <pre><code>1. Container Starts
+<h2 is-upgraded>Bean Lifecycle</h2>
+<pre><code>1. Container Starts
 2. Bean Definitions Scanned (@Component, @Service, etc.)
 3. Beans Instantiated
 4. Dependencies Injected
@@ -209,8 +201,8 @@ TaskController controller = new TaskController(service);
 7. Pre-Destruction Methods Called (@PreDestroy)
 8. Container Shuts Down
 </code></pre>
-            <h2 is-upgraded>Practical Example</h2>
-            <pre><code language="language-java" class="language-java">// Without Spring (manual wiring)
+<h2 is-upgraded>Practical Example</h2>
+<pre><code language="language-java" class="language-java">// Without Spring (manual wiring)
 public class Application {
     public static void main(String[] args) {
         // We create and wire everything manually
@@ -239,33 +231,32 @@ public class Application {
 </code></pre>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Spring Boot Project Setup" duration="10">
-            <p>Let&#39;s create our Task Management API using Spring Initializr.</p>
-            <h2 is-upgraded>Using Spring Initializr</h2>
-            <p>Visit <a href="https://start.spring.io" target="_blank">start.spring.io</a> or use your IDE&#39;s Spring
-                Initializr.</p>
-            <p><strong>Configuration:</strong></p>
-            <ul>
-                <li><strong>Project:</strong> Maven</li>
-                <li><strong>Language:</strong> Java</li>
-                <li><strong>Spring Boot:</strong> 3.2.x (latest stable)</li>
-                <li><strong>Group:</strong> com.example</li>
-                <li><strong>Artifact:</strong> taskmanager</li>
-                <li><strong>Name:</strong> Task Manager</li>
-                <li><strong>Package name:</strong> com.example.taskmanager</li>
-                <li><strong>Packaging:</strong> Jar</li>
-                <li><strong>Java:</strong> 17</li>
-            </ul>
-            <p><strong>Dependencies:</strong></p>
-            <ul>
-                <li>Spring Web</li>
-                <li>Spring Boot DevTools</li>
-                <li>Lombok</li>
-            </ul>
-            <h2 is-upgraded>Project Structure</h2>
-            <pre><code>taskmanager/
+      </google-codelab-step>
+    
+      <google-codelab-step label="Spring Boot Project Setup" duration="10">
+        <p>Let&#39;s create our Task Management API using Spring Initializr.</p>
+<h2 is-upgraded>Using Spring Initializr</h2>
+<p>Visit <a href="https://start.spring.io" target="_blank">start.spring.io</a> or use your IDE&#39;s Spring Initializr.</p>
+<p><strong>Configuration:</strong></p>
+<ul>
+<li><strong>Project:</strong> Maven</li>
+<li><strong>Language:</strong> Java</li>
+<li><strong>Spring Boot:</strong> 3.2.x (latest stable)</li>
+<li><strong>Group:</strong> com.example</li>
+<li><strong>Artifact:</strong> taskmanager</li>
+<li><strong>Name:</strong> Task Manager</li>
+<li><strong>Package name:</strong> com.example.taskmanager</li>
+<li><strong>Packaging:</strong> Jar</li>
+<li><strong>Java:</strong> 17</li>
+</ul>
+<p><strong>Dependencies:</strong></p>
+<ul>
+<li>Spring Web</li>
+<li>Spring Boot DevTools</li>
+<li>Lombok</li>
+</ul>
+<h2 is-upgraded>Project Structure</h2>
+<pre><code>taskmanager/
 ├── src/
 │   ├── main/
 │   │   ├── java/
@@ -288,8 +279,8 @@ public class Application {
 ├── pom.xml
 └── README.md
 </code></pre>
-            <h2 is-upgraded>Maven pom.xml</h2>
-            <pre><code language="language-xml" class="language-xml">&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
+<h2 is-upgraded>Maven pom.xml</h2>
+<pre><code language="language-xml" class="language-xml">&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
 &lt;project xmlns=&#34;http://maven.apache.org/POM/4.0.0&#34;
          xmlns:xsi=&#34;http://www.w3.org/2001/XMLSchema-instance&#34;
          xsi:schemaLocation=&#34;http://maven.apache.org/POM/4.0.0
@@ -361,8 +352,8 @@ public class Application {
     &lt;/build&gt;
 &lt;/project&gt;
 </code></pre>
-            <h2 is-upgraded>Main Application Class</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager;
+<h2 is-upgraded>Main Application Class</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -375,14 +366,14 @@ public class TaskManagerApplication {
     }
 }
 </code></pre>
-            <p><strong>@SpringBootApplication is a combination of:</strong></p>
-            <ul>
-                <li><code>@Configuration</code>: Tags class as configuration source</li>
-                <li><code>@EnableAutoConfiguration</code>: Enables Spring Boot auto-configuration</li>
-                <li><code>@ComponentScan</code>: Scans for components in current package and sub-packages</li>
-            </ul>
-            <h2 is-upgraded>application.properties</h2>
-            <pre><code language="language-properties" class="language-properties"># Application name
+<p><strong>@SpringBootApplication is a combination of:</strong></p>
+<ul>
+<li><code>@Configuration</code>: Tags class as configuration source</li>
+<li><code>@EnableAutoConfiguration</code>: Enables Spring Boot auto-configuration</li>
+<li><code>@ComponentScan</code>: Scans for components in current package and sub-packages</li>
+</ul>
+<h2 is-upgraded>application.properties</h2>
+<pre><code language="language-properties" class="language-properties"># Application name
 spring.application.name=task-manager
 
 # Server configuration
@@ -395,16 +386,16 @@ logging.level.com.example.taskmanager=DEBUG
 # DevTools
 spring.devtools.restart.enabled=true
 </code></pre>
-            <h2 is-upgraded>Build and Run</h2>
-            <pre><code language="language-bash" class="language-bash"># Maven
+<h2 is-upgraded>Build and Run</h2>
+<pre><code language="language-bash" class="language-bash"># Maven
 mvn clean install
 mvn spring-boot:run
 
 # Or run the generated JAR
 java -jar target/taskmanager-0.0.1-SNAPSHOT.jar
 </code></pre>
-            <p>Output:</p>
-            <pre><code>  .   ____          _            __ _ _
+<p>Output:</p>
+<pre><code>  .   ____          _            __ _ _
  /\\ / ___&#39;_ __ _ _(_)_ __  __ _ \ \ \ \
 ( ( )\___ | &#39;_ | &#39;_| | &#39;_ \/ _` | \ \ \ \
  \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
@@ -416,18 +407,16 @@ java -jar target/taskmanager-0.0.1-SNAPSHOT.jar
 2025-12-24T14:30:46.789  INFO 12345 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http)
 2025-12-24T14:30:46.800  INFO 12345 --- [main] c.e.t.TaskManagerApplication : Started TaskManagerApplication in 2.5 seconds
 </code></pre>
-            <aside class="special">
-                <p><strong>Spring Boot Magic:</strong> Notice we didn&#39;t configure Tomcat manually! Spring Boot
-                    auto-configures an embedded server for us.</p>
-            </aside>
+<aside class="special"><p><strong>Spring Boot Magic:</strong> Notice we didn&#39;t configure Tomcat manually! Spring Boot auto-configures an embedded server for us.</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Create Task Model" duration="5">
-            <p>Let&#39;s create our Task entity using Lombok to reduce boilerplate.</p>
-            <h2 is-upgraded>Task.java</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.model;
+      </google-codelab-step>
+    
+      <google-codelab-step label="Create Task Model" duration="5">
+        <p>Let&#39;s create our Task entity using Lombok to reduce boilerplate.</p>
+<h2 is-upgraded>Task.java</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -456,8 +445,8 @@ public class Task {
     }
 }
 </code></pre>
-            <h2 is-upgraded>TaskStatus.java</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.model;
+<h2 is-upgraded>TaskStatus.java</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.model;
 
 public enum TaskStatus {
     TODO,
@@ -466,8 +455,8 @@ public enum TaskStatus {
     CANCELLED
 }
 </code></pre>
-            <h2 is-upgraded>Understanding Lombok Annotations</h2>
-            <pre><code language="language-java" class="language-java">@Data
+<h2 is-upgraded>Understanding Lombok Annotations</h2>
+<pre><code language="language-java" class="language-java">@Data
 // Generates:
 // - getters for all fields
 // - setters for all non-final fields
@@ -487,8 +476,8 @@ public enum TaskStatus {
 @ToString  // Only toString()
 @EqualsAndHashCode  // Only equals/hashCode
 </code></pre>
-            <p><strong>Without Lombok, we&#39;d need:</strong></p>
-            <pre><code language="language-java" class="language-java">public class Task {
+<p><strong>Without Lombok, we&#39;d need:</strong></p>
+<pre><code language="language-java" class="language-java">public class Task {
     private Long id;
     private String title;
     // ... other fields
@@ -509,19 +498,17 @@ public enum TaskStatus {
     // Constructors - 10+ lines
 }
 </code></pre>
-            <p><strong>Lombok saves ~70 lines of boilerplate!</strong></p>
-            <aside class="special">
-                <p><strong>IDE Setup:</strong> Install the Lombok plugin in IntelliJ (Settings → Plugins → Search
-                    &#34;Lombok&#34;) or Eclipse (download from projectlombok.org).</p>
-            </aside>
+<p><strong>Lombok saves ~70 lines of boilerplate!</strong></p>
+<aside class="special"><p><strong>IDE Setup:</strong> Install the Lombok plugin in IntelliJ (Settings → Plugins → Search &#34;Lombok&#34;) or Eclipse (download from projectlombok.org).</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Repository Layer" duration="8">
-            <p>Create the repository layer to manage task storage (in-memory for now).</p>
-            <h2 is-upgraded>TaskRepository Interface</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.repository;
+      </google-codelab-step>
+    
+      <google-codelab-step label="Repository Layer" duration="8">
+        <p>Create the repository layer to manage task storage (in-memory for now).</p>
+<h2 is-upgraded>TaskRepository Interface</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.repository;
 
 import com.example.taskmanager.model.Task;
 import java.util.List;
@@ -535,8 +522,8 @@ public interface TaskRepository {
     boolean existsById(Long id);
 }
 </code></pre>
-            <h2 is-upgraded>InMemoryTaskRepository Implementation</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.repository;
+<h2 is-upgraded>InMemoryTaskRepository Implementation</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.repository;
 
 import com.example.taskmanager.model.Task;
 import org.springframework.stereotype.Repository;
@@ -585,15 +572,15 @@ public class InMemoryTaskRepository implements TaskRepository {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Understanding @Repository</h2>
-            <pre><code language="language-java" class="language-java">@Repository
+<h2 is-upgraded>Understanding @Repository</h2>
+<pre><code language="language-java" class="language-java">@Repository
 // 1. Marks class as a Spring bean
 // 2. Indicates it&#39;s a data access component
 // 3. Enables exception translation (DB exceptions → Spring DataAccessException)
 // 4. Component scanning will find and register it
 </code></pre>
-            <p><strong>Component Stereotypes in Spring:</strong></p>
-            <pre><code language="language-java" class="language-java">@Component  // Generic Spring bean
+<p><strong>Component Stereotypes in Spring:</strong></p>
+<pre><code language="language-java" class="language-java">@Component  // Generic Spring bean
 @Service    // Business logic layer
 @Repository // Data access layer
 @Controller // Web controller (returns views)
@@ -601,18 +588,16 @@ public class InMemoryTaskRepository implements TaskRepository {
 
 // All extend @Component but provide semantic meaning
 </code></pre>
-            <aside class="special">
-                <p><strong>Thread Safety:</strong> We use <code>ConcurrentHashMap</code> and <code>AtomicLong</code> to
-                    make our in-memory repository thread-safe for concurrent requests.</p>
-            </aside>
+<aside class="special"><p><strong>Thread Safety:</strong> We use <code>ConcurrentHashMap</code> and <code>AtomicLong</code> to make our in-memory repository thread-safe for concurrent requests.</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Service Layer" duration="8">
-            <p>Create the service layer to implement business logic.</p>
-            <h2 is-upgraded>TaskService.java</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.service;
+      </google-codelab-step>
+    
+      <google-codelab-step label="Service Layer" duration="8">
+        <p>Create the service layer to implement business logic.</p>
+<h2 is-upgraded>TaskService.java</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.service;
 
 import com.example.taskmanager.model.Task;
 import com.example.taskmanager.model.TaskStatus;
@@ -711,8 +696,8 @@ public class TaskService {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Understanding @Slf4j</h2>
-            <pre><code language="language-java" class="language-java">@Slf4j
+<h2 is-upgraded>Understanding @Slf4j</h2>
+<pre><code language="language-java" class="language-java">@Slf4j
 // Lombok generates:
 private static final Logger log = LoggerFactory.getLogger(TaskService.class);
 
@@ -721,8 +706,8 @@ log.debug(&#34;Debug message&#34;);
 log.info(&#34;Info message&#34;);
 log.error(&#34;Error message&#34;, exception);
 </code></pre>
-            <h2 is-upgraded>Dependency Injection in Action</h2>
-            <pre><code language="language-java" class="language-java">public class TaskService {
+<h2 is-upgraded>Dependency Injection in Action</h2>
+<pre><code language="language-java" class="language-java">public class TaskService {
     private final TaskRepository taskRepository;
 
     // Spring calls this constructor
@@ -744,18 +729,16 @@ public class TaskService {
     }
 }
 </code></pre>
-            <aside class="special">
-                <p><strong>Business Logic in Service:</strong> The service layer contains business rules (validation,
-                    status defaults, etc.), while the repository only handles data storage.</p>
-            </aside>
+<aside class="special"><p><strong>Business Logic in Service:</strong> The service layer contains business rules (validation, status defaults, etc.), while the repository only handles data storage.</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="REST Controller" duration="12">
-            <p>Create the REST controller to expose HTTP endpoints.</p>
-            <h2 is-upgraded>TaskController.java</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.controller;
+      </google-codelab-step>
+    
+      <google-codelab-step label="REST Controller" duration="12">
+        <p>Create the REST controller to expose HTTP endpoints.</p>
+<h2 is-upgraded>TaskController.java</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.controller;
 
 import com.example.taskmanager.model.Task;
 import com.example.taskmanager.model.TaskStatus;
@@ -846,8 +829,8 @@ public class TaskController {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Understanding REST Annotations</h2>
-            <pre><code language="language-java" class="language-java">@RestController
+<h2 is-upgraded>Understanding REST Annotations</h2>
+<pre><code language="language-java" class="language-java">@RestController
 // Combines @Controller + @ResponseBody
 // All methods return data (JSON/XML) not views
 
@@ -878,8 +861,8 @@ public class TaskController {
 @RequestBody Task task
 // Parse JSON request body into Task object
 </code></pre>
-            <h2 is-upgraded>HTTP Status Codes</h2>
-            <pre><code language="language-java" class="language-java">// Success
+<h2 is-upgraded>HTTP Status Codes</h2>
+<pre><code language="language-java" class="language-java">// Success
 HttpStatus.OK (200) - GET, PUT, PATCH success
 HttpStatus.CREATED (201) - POST success
 HttpStatus.NO_CONTENT (204) - DELETE success
@@ -892,8 +875,8 @@ HttpStatus.CONFLICT (409) - Resource conflict
 // Server Errors
 HttpStatus.INTERNAL_SERVER_ERROR (500) - Server error
 </code></pre>
-            <h2 is-upgraded>ResponseEntity</h2>
-            <pre><code language="language-java" class="language-java">// Different ways to create ResponseEntity:
+<h2 is-upgraded>ResponseEntity</h2>
+<pre><code language="language-java" class="language-java">// Different ways to create ResponseEntity:
 
 // 1. With status
 return new ResponseEntity&lt;&gt;(task, HttpStatus.CREATED);
@@ -916,16 +899,16 @@ return ResponseEntity.status(HttpStatus.ACCEPTED).body(task);
 </code></pre>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Testing the API" duration="10">
-            <p>Let&#39;s test our API using curl, Postman, or the browser.</p>
-            <h2 is-upgraded>Start the Application</h2>
-            <pre><code language="language-bash" class="language-bash">mvn spring-boot:run
+      </google-codelab-step>
+    
+      <google-codelab-step label="Testing the API" duration="10">
+        <p>Let&#39;s test our API using curl, Postman, or the browser.</p>
+<h2 is-upgraded>Start the Application</h2>
+<pre><code language="language-bash" class="language-bash">mvn spring-boot:run
 </code></pre>
-            <h2 is-upgraded>API Endpoints</h2>
-            <h3 is-upgraded>1. Create Task</h3>
-            <pre><code language="language-bash" class="language-bash">curl -X POST http://localhost:8080/api/tasks \
+<h2 is-upgraded>API Endpoints</h2>
+<h3 is-upgraded>1. Create Task</h3>
+<pre><code language="language-bash" class="language-bash">curl -X POST http://localhost:8080/api/tasks \
   -H &#34;Content-Type: application/json&#34; \
   -d &#39;{
     &#34;title&#34;: &#34;Complete Spring Boot Codelab&#34;,
@@ -933,8 +916,8 @@ return ResponseEntity.status(HttpStatus.ACCEPTED).body(task);
     &#34;status&#34;: &#34;TODO&#34;
   }&#39;
 </code></pre>
-            <p>Response (201 Created):</p>
-            <pre><code language="language-json" class="language-json">{
+<p>Response (201 Created):</p>
+<pre><code language="language-json" class="language-json">{
   &#34;id&#34;: 1,
   &#34;title&#34;: &#34;Complete Spring Boot Codelab&#34;,
   &#34;description&#34;: &#34;Learn Spring Core and Boot basics&#34;,
@@ -943,11 +926,11 @@ return ResponseEntity.status(HttpStatus.ACCEPTED).body(task);
   &#34;updatedAt&#34;: &#34;2025-12-24T14:30:00&#34;
 }
 </code></pre>
-            <h3 is-upgraded>2. Get All Tasks</h3>
-            <pre><code language="language-bash" class="language-bash">curl http://localhost:8080/api/tasks
+<h3 is-upgraded>2. Get All Tasks</h3>
+<pre><code language="language-bash" class="language-bash">curl http://localhost:8080/api/tasks
 </code></pre>
-            <p>Response (200 OK):</p>
-            <pre><code language="language-json" class="language-json">[
+<p>Response (200 OK):</p>
+<pre><code language="language-json" class="language-json">[
   {
     &#34;id&#34;: 1,
     &#34;title&#34;: &#34;Complete Spring Boot Codelab&#34;,
@@ -958,12 +941,12 @@ return ResponseEntity.status(HttpStatus.ACCEPTED).body(task);
   }
 ]
 </code></pre>
-            <h3 is-upgraded>3. Get Task by ID</h3>
-            <pre><code language="language-bash" class="language-bash">curl http://localhost:8080/api/tasks/1
+<h3 is-upgraded>3. Get Task by ID</h3>
+<pre><code language="language-bash" class="language-bash">curl http://localhost:8080/api/tasks/1
 </code></pre>
-            <p>Response (200 OK): Single task JSON</p>
-            <h3 is-upgraded>4. Update Task</h3>
-            <pre><code language="language-bash" class="language-bash">curl -X PUT http://localhost:8080/api/tasks/1 \
+<p>Response (200 OK): Single task JSON</p>
+<h3 is-upgraded>4. Update Task</h3>
+<pre><code language="language-bash" class="language-bash">curl -X PUT http://localhost:8080/api/tasks/1 \
   -H &#34;Content-Type: application/json&#34; \
   -d &#39;{
     &#34;title&#34;: &#34;Complete Spring Boot Codelab - Updated&#34;,
@@ -971,46 +954,43 @@ return ResponseEntity.status(HttpStatus.ACCEPTED).body(task);
     &#34;status&#34;: &#34;IN_PROGRESS&#34;
   }&#39;
 </code></pre>
-            <p>Response (200 OK): Updated task JSON</p>
-            <h3 is-upgraded>5. Update Task Status</h3>
-            <pre><code language="language-bash" class="language-bash">curl -X PATCH http://localhost:8080/api/tasks/1/status?status=DONE
+<p>Response (200 OK): Updated task JSON</p>
+<h3 is-upgraded>5. Update Task Status</h3>
+<pre><code language="language-bash" class="language-bash">curl -X PATCH http://localhost:8080/api/tasks/1/status?status=DONE
 </code></pre>
-            <p>Response (200 OK): Task with new status</p>
-            <h3 is-upgraded>6. Get Tasks by Status</h3>
-            <pre><code language="language-bash" class="language-bash">curl http://localhost:8080/api/tasks/status/TODO
+<p>Response (200 OK): Task with new status</p>
+<h3 is-upgraded>6. Get Tasks by Status</h3>
+<pre><code language="language-bash" class="language-bash">curl http://localhost:8080/api/tasks/status/TODO
 </code></pre>
-            <p>Response (200 OK): Array of tasks with TODO status</p>
-            <h3 is-upgraded>7. Delete Task</h3>
-            <pre><code language="language-bash" class="language-bash">curl -X DELETE http://localhost:8080/api/tasks/1
+<p>Response (200 OK): Array of tasks with TODO status</p>
+<h3 is-upgraded>7. Delete Task</h3>
+<pre><code language="language-bash" class="language-bash">curl -X DELETE http://localhost:8080/api/tasks/1
 </code></pre>
-            <p>Response (204 No Content)</p>
-            <h2 is-upgraded>Using Postman</h2>
-            <ol type="1">
-                <li><strong>Import Collection:</strong>
-                    <ul>
-                        <li>Create new collection &#34;Task Manager API&#34;</li>
-                        <li>Base URL: <code>http://localhost:8080</code></li>
-                    </ul>
-                </li>
-                <li><strong>Create Requests:</strong>
-                    <ul>
-                        <li>POST /api/tasks (Body → raw → JSON)</li>
-                        <li>GET /api/tasks</li>
-                        <li>GET /api/tasks/:id</li>
-                        <li>PUT /api/tasks/:id</li>
-                        <li>PATCH /api/tasks/:id/status</li>
-                        <li>DELETE /api/tasks/:id</li>
-                    </ul>
-                </li>
-                <li><strong>Save Examples:</strong>
-                    <ul>
-                        <li>Save successful responses as examples</li>
-                        <li>Document expected request/response</li>
-                    </ul>
-                </li>
-            </ol>
-            <h2 is-upgraded>Test Scenarios</h2>
-            <pre><code language="language-bash" class="language-bash"># Scenario 1: Create multiple tasks
+<p>Response (204 No Content)</p>
+<h2 is-upgraded>Using Postman</h2>
+<ol type="1">
+<li><strong>Import Collection:</strong><ul>
+<li>Create new collection &#34;Task Manager API&#34;</li>
+<li>Base URL: <code>http://localhost:8080</code></li>
+</ul>
+</li>
+<li><strong>Create Requests:</strong><ul>
+<li>POST /api/tasks (Body → raw → JSON)</li>
+<li>GET /api/tasks</li>
+<li>GET /api/tasks/:id</li>
+<li>PUT /api/tasks/:id</li>
+<li>PATCH /api/tasks/:id/status</li>
+<li>DELETE /api/tasks/:id</li>
+</ul>
+</li>
+<li><strong>Save Examples:</strong><ul>
+<li>Save successful responses as examples</li>
+<li>Document expected request/response</li>
+</ul>
+</li>
+</ol>
+<h2 is-upgraded>Test Scenarios</h2>
+<pre><code language="language-bash" class="language-bash"># Scenario 1: Create multiple tasks
 curl -X POST http://localhost:8080/api/tasks \
   -H &#34;Content-Type: application/json&#34; \
   -d &#39;{&#34;title&#34;: &#34;Task 1&#34;, &#34;description&#34;: &#34;First task&#34;}&#39;
@@ -1041,9 +1021,9 @@ curl http://localhost:8080/api/tasks/999
 curl -X DELETE http://localhost:8080/api/tasks/999
 # Response: 404 Not Found
 </code></pre>
-            <h2 is-upgraded>Verify Logs</h2>
-            <p>Check console output to see Spring&#39;s dependency injection and logging:</p>
-            <pre><code>2025-12-24 14:30:45.123  INFO --- [main] c.e.t.TaskManagerApplication : Starting TaskManagerApplication
+<h2 is-upgraded>Verify Logs</h2>
+<p>Check console output to see Spring&#39;s dependency injection and logging:</p>
+<pre><code>2025-12-24 14:30:45.123  INFO --- [main] c.e.t.TaskManagerApplication : Starting TaskManagerApplication
 2025-12-24 14:30:45.456  INFO --- [main] c.e.t.service.TaskService    : TaskService initialized with repository: InMemoryTaskRepository
 2025-12-24 14:30:45.789  INFO --- [main] c.e.t.controller.TaskController : TaskController initialized
 2025-12-24 14:30:46.123  INFO --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer : Tomcat started on port(s): 8080 (http)
@@ -1052,25 +1032,23 @@ curl -X DELETE http://localhost:8080/api/tasks/999
 2025-12-24 14:31:00.457  DEBUG --- [nio-8080-exec-1] c.e.t.service.TaskService : Creating new task: Complete Spring Boot Codelab
 2025-12-24 14:31:00.458  INFO --- [nio-8080-exec-1] c.e.t.service.TaskService : Task created with ID: 1
 </code></pre>
-            <aside class="special">
-                <p><strong>DevTools Magic:</strong> With Spring Boot DevTools, changes to code automatically restart the
-                    application. Try modifying a controller method and save - the app restarts instantly!</p>
-            </aside>
+<aside class="special"><p><strong>DevTools Magic:</strong> With Spring Boot DevTools, changes to code automatically restart the application. Try modifying a controller method and save - the app restarts instantly!</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Configuration Deep Dive" duration="8">
-            <p>Understanding Spring Boot configuration and customization.</p>
-            <h2 is-upgraded>application.properties vs application.yml</h2>
-            <p><strong>application.properties:</strong></p>
-            <pre><code language="language-properties" class="language-properties">spring.application.name=task-manager
+      </google-codelab-step>
+    
+      <google-codelab-step label="Configuration Deep Dive" duration="8">
+        <p>Understanding Spring Boot configuration and customization.</p>
+<h2 is-upgraded>application.properties vs application.yml</h2>
+<p><strong>application.properties:</strong></p>
+<pre><code language="language-properties" class="language-properties">spring.application.name=task-manager
 server.port=8080
 logging.level.root=INFO
 logging.level.com.example.taskmanager=DEBUG
 </code></pre>
-            <p><strong>application.yml (same config):</strong></p>
-            <pre><code language="language-yaml" class="language-yaml">spring:
+<p><strong>application.yml (same config):</strong></p>
+<pre><code language="language-yaml" class="language-yaml">spring:
   application:
     name: task-manager
 
@@ -1082,8 +1060,8 @@ logging:
     root: INFO
     com.example.taskmanager: DEBUG
 </code></pre>
-            <h2 is-upgraded>Expanded Configuration</h2>
-            <pre><code language="language-yaml" class="language-yaml"># Application
+<h2 is-upgraded>Expanded Configuration</h2>
+<pre><code language="language-yaml" class="language-yaml"># Application
 spring:
   application:
     name: task-manager
@@ -1125,26 +1103,26 @@ management:
     health:
       show-details: always
 </code></pre>
-            <h2 is-upgraded>Profile-Specific Configuration</h2>
-            <p>Create multiple config files for different environments:</p>
-            <p><strong>application-dev.yml:</strong></p>
-            <pre><code language="language-yaml" class="language-yaml">server:
+<h2 is-upgraded>Profile-Specific Configuration</h2>
+<p>Create multiple config files for different environments:</p>
+<p><strong>application-dev.yml:</strong></p>
+<pre><code language="language-yaml" class="language-yaml">server:
   port: 8080
 
 logging:
   level:
     com.example.taskmanager: DEBUG
 </code></pre>
-            <p><strong>application-prod.yml:</strong></p>
-            <pre><code language="language-yaml" class="language-yaml">server:
+<p><strong>application-prod.yml:</strong></p>
+<pre><code language="language-yaml" class="language-yaml">server:
   port: 80
 
 logging:
   level:
     com.example.taskmanager: INFO
 </code></pre>
-            <p><strong>Activate profile:</strong></p>
-            <pre><code language="language-bash" class="language-bash"># Command line
+<p><strong>Activate profile:</strong></p>
+<pre><code language="language-bash" class="language-bash"># Command line
 mvn spring-boot:run -Dspring-boot.run.profiles=dev
 
 # Environment variable
@@ -1154,15 +1132,15 @@ mvn spring-boot:run
 # In application.properties
 spring.profiles.active=dev
 </code></pre>
-            <h2 is-upgraded>Custom Properties</h2>
-            <p><strong>application.yml:</strong></p>
-            <pre><code language="language-yaml" class="language-yaml">app:
+<h2 is-upgraded>Custom Properties</h2>
+<p><strong>application.yml:</strong></p>
+<pre><code language="language-yaml" class="language-yaml">app:
   name: Task Manager
   version: 1.0.0
   max-tasks: 1000
 </code></pre>
-            <p><strong>Configuration class:</strong></p>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.config;
+<p><strong>Configuration class:</strong></p>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -1177,8 +1155,8 @@ public class AppProperties {
     private int maxTasks;
 }
 </code></pre>
-            <p><strong>Usage:</strong></p>
-            <pre><code language="language-java" class="language-java">@Service
+<p><strong>Usage:</strong></p>
+<pre><code language="language-java" class="language-java">@Service
 public class TaskService {
     private final TaskRepository taskRepository;
     private final AppProperties appProperties;
@@ -1201,9 +1179,9 @@ public class TaskService {
     }
 }
 </code></pre>
-            <h2 is-upgraded>@Value Annotation</h2>
-            <p>For simple property injection:</p>
-            <pre><code language="language-java" class="language-java">@Service
+<h2 is-upgraded>@Value Annotation</h2>
+<p>For simple property injection:</p>
+<pre><code language="language-java" class="language-java">@Service
 public class TaskService {
 
     @Value(&#34;${app.name}&#34;)
@@ -1216,20 +1194,16 @@ public class TaskService {
     private boolean featureEnabled;
 }
 </code></pre>
-            <aside class="special">
-                <p><strong>Best Practice:</strong> Use <code>@ConfigurationProperties</code> for grouped properties and
-                    <code>@Value</code> for single properties. ConfigurationProperties provides type safety and
-                    validation.
-                </p>
-            </aside>
+<aside class="special"><p><strong>Best Practice:</strong> Use <code>@ConfigurationProperties</code> for grouped properties and <code>@Value</code> for single properties. ConfigurationProperties provides type safety and validation.</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Bean Scopes and Lifecycle" duration="6">
-            <p>Understanding bean scopes and lifecycle hooks.</p>
-            <h2 is-upgraded>Bean Scopes</h2>
-            <pre><code language="language-java" class="language-java">// 1. Singleton (default) - one instance per container
+      </google-codelab-step>
+    
+      <google-codelab-step label="Bean Scopes and Lifecycle" duration="6">
+        <p>Understanding bean scopes and lifecycle hooks.</p>
+<h2 is-upgraded>Bean Scopes</h2>
+<pre><code language="language-java" class="language-java">// 1. Singleton (default) - one instance per container
 @Service
 @Scope(&#34;singleton&#34;)
 public class TaskService { }
@@ -1254,8 +1228,8 @@ public class UserSession { }
 @Scope(&#34;application&#34;)
 public class AppConfig { }
 </code></pre>
-            <h2 is-upgraded>Bean Lifecycle Hooks</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.service;
+<h2 is-upgraded>Bean Lifecycle Hooks</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.service;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
@@ -1295,8 +1269,8 @@ public class TaskService {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Lifecycle Order</h2>
-            <pre><code>1. Constructor called
+<h2 is-upgraded>Lifecycle Order</h2>
+<pre><code>1. Constructor called
 2. Dependencies injected
 3. @PostConstruct method called
 4. Bean ready for use
@@ -1305,8 +1279,8 @@ public class TaskService {
 7. @PreDestroy method called
 8. Bean destroyed
 </code></pre>
-            <h2 is-upgraded>InitializingBean and DisposableBean (Alternative)</h2>
-            <pre><code language="language-java" class="language-java">import org.springframework.beans.factory.DisposableBean;
+<h2 is-upgraded>InitializingBean and DisposableBean (Alternative)</h2>
+<pre><code language="language-java" class="language-java">import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 
 @Service
@@ -1325,53 +1299,48 @@ public class TaskService implements InitializingBean, DisposableBean {
     }
 }
 </code></pre>
-            <aside class="special">
-                <p><strong>Recommendation:</strong> Use <code>@PostConstruct</code> and <code>@PreDestroy</code>
-                    annotations. They&#39;re standard Java annotations and don&#39;t couple your code to Spring
-                    interfaces.</p>
-            </aside>
+<aside class="special"><p><strong>Recommendation:</strong> Use <code>@PostConstruct</code> and <code>@PreDestroy</code> annotations. They&#39;re standard Java annotations and don&#39;t couple your code to Spring interfaces.</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Conclusion" duration="2">
-            <p>Congratulations! 🎉 You&#39;ve built the foundation of a Spring Boot application!</p>
-            <h2 is-upgraded>What You&#39;ve Learned</h2>
-            <ul>
-                <li>✅ <strong>IoC and DI:</strong> Understanding Spring&#39;s core principles</li>
-                <li>✅ <strong>Spring Beans:</strong> Component scanning, stereotypes, injection</li>
-                <li>✅ <strong>Spring Boot:</strong> Auto-configuration, starters, embedded server</li>
-                <li>✅ <strong>Layered Architecture:</strong> Controller → Service → Repository</li>
-                <li>✅ <strong>REST API:</strong> Building RESTful endpoints with proper HTTP semantics</li>
-                <li>✅ <strong>Configuration:</strong> Properties, profiles, custom properties</li>
-                <li>✅ <strong>Bean Lifecycle:</strong> Scopes, initialization, destruction</li>
-                <li>✅ <strong>Lombok:</strong> Reducing boilerplate code</li>
-                <li>✅ <strong>Logging:</strong> Structured logging with SLF4J</li>
-            </ul>
-            <h2 is-upgraded>Task Management API v1.0</h2>
-            <p>You&#39;ve created a complete REST API with:</p>
-            <ul>
-                <li>✅ CRUD operations for tasks</li>
-                <li>✅ Status management workflow</li>
-                <li>✅ Filtering by status</li>
-                <li>✅ In-memory storage (thread-safe)</li>
-                <li>✅ Proper HTTP status codes</li>
-                <li>✅ Structured logging</li>
-                <li>✅ Clean architecture (separation of concerns)</li>
-            </ul>
-            <h2 is-upgraded>Key Takeaways</h2>
-            <ol type="1">
-                <li><strong>Constructor injection is best</strong> for required dependencies</li>
-                <li><strong>Spring Boot auto-configures</strong> most things intelligently</li>
-                <li><strong>Lombok saves time</strong> with <code>@Data</code>, <code>@Slf4j</code>, etc.</li>
-                <li><strong>Stereotype annotations</strong> provide semantic meaning (<code>@Service</code>,
-                    <code>@Repository</code>)
-                </li>
-                <li><strong>ResponseEntity</strong> gives full control over HTTP responses</li>
-                <li><strong>Configuration profiles</strong> enable environment-specific settings</li>
-            </ol>
-            <h2 is-upgraded>Git Branching Strategy</h2>
-            <pre><code language="language-bash" class="language-bash"># Tag this version
+      </google-codelab-step>
+    
+      <google-codelab-step label="Conclusion" duration="2">
+        <p>Congratulations! 🎉 You&#39;ve built the foundation of a Spring Boot application!</p>
+<h2 is-upgraded>What You&#39;ve Learned</h2>
+<ul>
+<li>✅ <strong>IoC and DI:</strong> Understanding Spring&#39;s core principles</li>
+<li>✅ <strong>Spring Beans:</strong> Component scanning, stereotypes, injection</li>
+<li>✅ <strong>Spring Boot:</strong> Auto-configuration, starters, embedded server</li>
+<li>✅ <strong>Layered Architecture:</strong> Controller → Service → Repository</li>
+<li>✅ <strong>REST API:</strong> Building RESTful endpoints with proper HTTP semantics</li>
+<li>✅ <strong>Configuration:</strong> Properties, profiles, custom properties</li>
+<li>✅ <strong>Bean Lifecycle:</strong> Scopes, initialization, destruction</li>
+<li>✅ <strong>Lombok:</strong> Reducing boilerplate code</li>
+<li>✅ <strong>Logging:</strong> Structured logging with SLF4J</li>
+</ul>
+<h2 is-upgraded>Task Management API v1.0</h2>
+<p>You&#39;ve created a complete REST API with:</p>
+<ul>
+<li>✅ CRUD operations for tasks</li>
+<li>✅ Status management workflow</li>
+<li>✅ Filtering by status</li>
+<li>✅ In-memory storage (thread-safe)</li>
+<li>✅ Proper HTTP status codes</li>
+<li>✅ Structured logging</li>
+<li>✅ Clean architecture (separation of concerns)</li>
+</ul>
+<h2 is-upgraded>Key Takeaways</h2>
+<ol type="1">
+<li><strong>Constructor injection is best</strong> for required dependencies</li>
+<li><strong>Spring Boot auto-configures</strong> most things intelligently</li>
+<li><strong>Lombok saves time</strong> with <code>@Data</code>, <code>@Slf4j</code>, etc.</li>
+<li><strong>Stereotype annotations</strong> provide semantic meaning (<code>@Service</code>, <code>@Repository</code>)</li>
+<li><strong>ResponseEntity</strong> gives full control over HTTP responses</li>
+<li><strong>Configuration profiles</strong> enable environment-specific settings</li>
+</ol>
+<h2 is-upgraded>Git Branching Strategy</h2>
+<pre><code language="language-bash" class="language-bash"># Tag this version
 git add .
 git commit -m &#34;Codelab 3.1: Spring Core &amp; Boot basics complete&#34;
 git tag codelab-3.1
@@ -1380,68 +1349,70 @@ git push origin codelab-3.1
 # Create branch for next codelab
 git checkout -b codelab-3.2
 </code></pre>
-            <h2 is-upgraded>Next Steps</h2>
-            <p>Continue to:</p>
-            <ul>
-                <li><strong>Codelab 3.2:</strong> RESTful APIs &amp; Swagger Documentation<ul>
-                        <li>Add Swagger UI</li>
-                        <li>Request/response validation</li>
-                        <li>Global exception handling</li>
-                        <li>Custom error responses</li>
-                    </ul>
-                </li>
-                <li><strong>Codelab 3.3:</strong> ORM &amp; Spring Data JPA<ul>
-                        <li>Replace in-memory storage with database</li>
-                        <li>JPA entities and relationships</li>
-                        <li>Query methods and custom queries</li>
-                    </ul>
-                </li>
-            </ul>
-            <h2 is-upgraded>Project Evolution</h2>
-            <p>Our Task Management API will grow through:</p>
-            <ul>
-                <li><strong>3.2:</strong> Swagger docs, validation, exception handling</li>
-                <li><strong>3.3:</strong> Database persistence with JPA</li>
-                <li><strong>3.4:</strong> Security and JWT authentication</li>
-                <li><strong>3.5:</strong> Spring Cloud and microservices</li>
-                <li><strong>3.6:</strong> Reactive programming with WebFlux</li>
-                <li><strong>3.7:</strong> Messaging with JMS</li>
-                <li><strong>3.8:</strong> Comprehensive testing</li>
-            </ul>
-            <h2 is-upgraded>Additional Resources</h2>
-            <ul>
-                <li><a href="https://spring.io/projects/spring-framework" target="_blank">Spring Framework
-                        Documentation</a></li>
-                <li><a href="https://spring.io/projects/spring-boot" target="_blank">Spring Boot Documentation</a></li>
-                <li><a href="https://spring.io/guides" target="_blank">Spring Boot Guides</a></li>
-                <li><a href="https://www.baeldung.com/spring-tutorial" target="_blank">Baeldung Spring Tutorials</a>
-                </li>
-                <li><a href="https://docs.spring.io/spring-boot/docs/current/reference/html/" target="_blank">Spring
-                        Boot Reference</a></li>
-            </ul>
-            <aside class="special">
-                <p><strong>Production Ready Foundation!</strong> You&#39;ve built a solid Spring Boot application
-                    following best practices. The architecture you&#39;ve learned scales from small apps to enterprise
-                    systems!</p>
-            </aside>
+<h2 is-upgraded>Next Steps</h2>
+<p>Continue to:</p>
+<ul>
+<li><strong>Codelab 3.2:</strong> RESTful APIs &amp; Swagger Documentation<ul>
+<li>Add Swagger UI</li>
+<li>Request/response validation</li>
+<li>Global exception handling</li>
+<li>Custom error responses</li>
+</ul>
+</li>
+<li><strong>Codelab 3.3:</strong> ORM &amp; Spring Data JPA<ul>
+<li>Replace in-memory storage with database</li>
+<li>JPA entities and relationships</li>
+<li>Query methods and custom queries</li>
+</ul>
+</li>
+</ul>
+<h2 is-upgraded>Project Evolution</h2>
+<p>Our Task Management API will grow through:</p>
+<ul>
+<li><strong>3.2:</strong> Swagger docs, validation, exception handling</li>
+<li><strong>3.3:</strong> Database persistence with JPA</li>
+<li><strong>3.4:</strong> Security and JWT authentication</li>
+<li><strong>3.5:</strong> Spring Cloud and microservices</li>
+<li><strong>3.6:</strong> Reactive programming with WebFlux</li>
+<li><strong>3.7:</strong> Messaging with JMS</li>
+<li><strong>3.8:</strong> Comprehensive testing</li>
+</ul>
+<h2 is-upgraded>Additional Resources</h2>
+<ul>
+<li><a href="https://spring.io/projects/spring-framework" target="_blank">Spring Framework Documentation</a></li>
+<li><a href="https://spring.io/projects/spring-boot" target="_blank">Spring Boot Documentation</a></li>
+<li><a href="https://spring.io/guides" target="_blank">Spring Boot Guides</a></li>
+<li><a href="https://www.baeldung.com/spring-tutorial" target="_blank">Baeldung Spring Tutorials</a></li>
+<li><a href="https://docs.spring.io/spring-boot/docs/current/reference/html/" target="_blank">Spring Boot Reference</a></li>
+</ul>
+<aside class="special"><p><strong>Production Ready Foundation!</strong> You&#39;ve built a solid Spring Boot application following best practices. The architecture you&#39;ve learned scales from small apps to enterprise systems!</p>
+</aside>
 
 
-        </google-codelab-step>
+      </google-codelab-step>
+    
+  </google-codelab>
 
-    </google-codelab>
-
-    <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
-    <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
-    <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
-    <script src="//support.google.com/inapp/api.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js"></script>
-    <script src="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.js"></script>
-    <script>
-        hljs.highlightAll();
-        hljs.addPlugin(new CopyButtonPlugin({ autohide: false }));
-
-    </script>
+  <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
+  <script src="//support.google.com/inapp/api.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js"></script>
+  <script src="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.js"></script>
+  <script>
+    hljs.highlightAll();
+    hljs.addPlugin(new CopyButtonPlugin({ autohide: false}));
+    
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      const homeUrl = "\/springboot_course\/";
+      const arrowBack = document.getElementById('arrow-back');
+      const doneBtn = document.getElementById('done');
+      if (arrowBack) arrowBack.href = homeUrl;
+      if (doneBtn) doneBtn.href = homeUrl;
+    });
+    
+  </script>
 
 </body>
-
 </html>

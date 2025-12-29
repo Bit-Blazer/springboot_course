@@ -1,69 +1,69 @@
+
 <!doctype html>
 
 <html>
-
 <head>
-    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
-    <meta name="theme-color" content="#4F7DC9">
-    <meta charset="UTF-8">
-    <title>Testing &amp; Remote Debugging Spring Boot Apps</title>
-    <link rel="stylesheet"
-        href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
-    <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
-    <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
-    <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1  /build/styles/monokai.min.css">
-    <link rel="stylesheet" href="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.css">
-    <style>
-        .success {
-            color: #1e8e3e;
-        }
-
-        .error {
-            color: red;
-        }
-    </style>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <title>Testing &amp; Remote Debugging Spring Boot Apps</title>
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
+  <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1  /build/styles/monokai.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.css">
+  <style>
+    .success {
+      color: #1e8e3e;
+    }
+    .error {
+      color: red;
+    }
+  </style>
 </head>
-
 <body>
-    <google-codelab-analytics gaid="UA-49880327-14" ga4id=""></google-codelab-analytics>
-    <google-codelab codelab-gaid="" codelab-ga4id="" id="testing-remote-debugging"
-        title="Testing &amp; Remote Debugging Spring Boot Apps" environment="web" feedback-link="">
-
-        <google-codelab-step label="Introduction" duration="3">
-            <p>Build comprehensive test coverage and master remote debugging for production troubleshooting.</p>
-            <h2 class="checklist" is-upgraded>What You&#39;ll Learn</h2>
-            <ul class="checklist">
-                <li><strong>Unit Testing:</strong> JUnit 5 and Mockito</li>
-                <li><strong>Integration Testing:</strong> @SpringBootTest</li>
-                <li><strong>Test Slices:</strong> @WebMvcTest, @DataJpaTest, @JsonTest</li>
-                <li><strong>Testcontainers:</strong> Docker-based integration tests</li>
-                <li><strong>WebTestClient:</strong> Testing reactive endpoints</li>
-                <li><strong>MockMvc:</strong> Testing MVC controllers</li>
-                <li><strong>Test Coverage:</strong> JaCoCo code coverage</li>
-                <li><strong>Remote Debugging:</strong> JDWP and IntelliJ/Eclipse</li>
-                <li><strong>Production Debugging:</strong> Thread dumps, heap dumps</li>
-                <li><strong>Actuator:</strong> Health checks and metrics</li>
-            </ul>
-            <h2 is-upgraded>What You&#39;ll Build</h2>
-            <p>Comprehensive test suite for Task API:</p>
-            <ul>
-                <li><strong>Unit Tests:</strong> Services, repositories, utilities</li>
-                <li><strong>Integration Tests:</strong> Full application context</li>
-                <li><strong>Controller Tests:</strong> REST API endpoints</li>
-                <li><strong>Repository Tests:</strong> Database operations</li>
-                <li><strong>Security Tests:</strong> Authentication and authorization</li>
-                <li><strong>Testcontainers:</strong> PostgreSQL integration tests</li>
-                <li><strong>Code Coverage:</strong> 80%+ coverage with JaCoCo</li>
-                <li><strong>Remote Debugging:</strong> Debug running containers</li>
-            </ul>
-            <h2 is-upgraded>Prerequisites</h2>
-            <ul>
-                <li>Completed Codelab 3.7 (Spring JMS)</li>
-                <li>Understanding of testing concepts</li>
-            </ul>
-            <h2 is-upgraded>Testing Pyramid</h2>
-            <pre><code>        /\
+  <google-codelab-analytics gaid="UA-49880327-14" ga4id=""></google-codelab-analytics>
+  <google-codelab codelab-gaid=""
+                  codelab-ga4id=""
+                  id="testing-remote-debugging"
+                  title="Testing &amp; Remote Debugging Spring Boot Apps"
+                  environment="web"
+                  feedback-link="">
+    
+      <google-codelab-step label="Introduction" duration="3">
+        <p>Build comprehensive test coverage and master remote debugging for production troubleshooting.</p>
+<h2 class="checklist" is-upgraded>What You&#39;ll Learn</h2>
+<ul class="checklist">
+<li><strong>Unit Testing:</strong> JUnit 5 and Mockito</li>
+<li><strong>Integration Testing:</strong> @SpringBootTest</li>
+<li><strong>Test Slices:</strong> @WebMvcTest, @DataJpaTest, @JsonTest</li>
+<li><strong>Testcontainers:</strong> Docker-based integration tests</li>
+<li><strong>WebTestClient:</strong> Testing reactive endpoints</li>
+<li><strong>MockMvc:</strong> Testing MVC controllers</li>
+<li><strong>Test Coverage:</strong> JaCoCo code coverage</li>
+<li><strong>Remote Debugging:</strong> JDWP and IntelliJ/Eclipse</li>
+<li><strong>Production Debugging:</strong> Thread dumps, heap dumps</li>
+<li><strong>Actuator:</strong> Health checks and metrics</li>
+</ul>
+<h2 is-upgraded>What You&#39;ll Build</h2>
+<p>Comprehensive test suite for Task API:</p>
+<ul>
+<li><strong>Unit Tests:</strong> Services, repositories, utilities</li>
+<li><strong>Integration Tests:</strong> Full application context</li>
+<li><strong>Controller Tests:</strong> REST API endpoints</li>
+<li><strong>Repository Tests:</strong> Database operations</li>
+<li><strong>Security Tests:</strong> Authentication and authorization</li>
+<li><strong>Testcontainers:</strong> PostgreSQL integration tests</li>
+<li><strong>Code Coverage:</strong> 80%+ coverage with JaCoCo</li>
+<li><strong>Remote Debugging:</strong> Debug running containers</li>
+</ul>
+<h2 is-upgraded>Prerequisites</h2>
+<ul>
+<li>Completed Codelab 3.7 (Spring JMS)</li>
+<li>Understanding of testing concepts</li>
+</ul>
+<h2 is-upgraded>Testing Pyramid</h2>
+<pre><code>        /\
        /  \  E2E Tests (Few)
       /____\
      /      \
@@ -77,9 +77,9 @@ Unit: Fast, isolated, many
 Integration: Slower, real components, some
 E2E: Slowest, full system, few
 </code></pre>
-            <h2 is-upgraded>New Dependencies</h2>
-            <p>Add to <code>pom.xml</code>:</p>
-            <pre><code language="language-xml" class="language-xml">&lt;!-- Testing --&gt;
+<h2 is-upgraded>New Dependencies</h2>
+<p>Add to <code>pom.xml</code>:</p>
+<pre><code language="language-xml" class="language-xml">&lt;!-- Testing --&gt;
 &lt;dependency&gt;
     &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
     &lt;artifactId&gt;spring-boot-starter-test&lt;/artifactId&gt;
@@ -120,18 +120,16 @@ E2E: Slowest, full system, few
     &lt;version&gt;0.8.11&lt;/version&gt;
 &lt;/dependency&gt;
 </code></pre>
-            <aside class="special">
-                <p><strong>Testing is NOT optional!</strong> Tests are your safety net for refactoring, documentation
-                    for new developers, and confidence for deployment.</p>
-            </aside>
+<aside class="special"><p><strong>Testing is NOT optional!</strong> Tests are your safety net for refactoring, documentation for new developers, and confidence for deployment.</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Unit Testing with JUnit 5" duration="10">
-            <p>Write unit tests for services and business logic.</p>
-            <h2 is-upgraded>TaskService Unit Test</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.service;
+      </google-codelab-step>
+    
+      <google-codelab-step label="Unit Testing with JUnit 5" duration="10">
+        <p>Write unit tests for services and business logic.</p>
+<h2 is-upgraded>TaskService Unit Test</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.service;
 
 import com.example.taskmanager.event.*;
 import com.example.taskmanager.exception.TaskNotFoundException;
@@ -349,8 +347,8 @@ class TaskServiceTest {
     }
 }
 </code></pre>
-            <h2 is-upgraded>JUnit 5 Assertions</h2>
-            <pre><code language="language-java" class="language-java">// AssertJ assertions (recommended)
+<h2 is-upgraded>JUnit 5 Assertions</h2>
+<pre><code language="language-java" class="language-java">// AssertJ assertions (recommended)
 assertThat(actual).isEqualTo(expected);
 assertThat(list).hasSize(3);
 assertThat(string).contains(&#34;substring&#34;);
@@ -370,8 +368,8 @@ assertNotNull(object);
 assertTrue(condition);
 assertThrows(Exception.class, () -&gt; method());
 </code></pre>
-            <h2 is-upgraded>Mockito Mocking</h2>
-            <pre><code language="language-java" class="language-java">// Create mock
+<h2 is-upgraded>Mockito Mocking</h2>
+<pre><code language="language-java" class="language-java">// Create mock
 @Mock
 private Repository repository;
 
@@ -392,18 +390,16 @@ verify(repository).save(captor.capture());
 Task captured = captor.getValue();
 assertThat(captured.getTitle()).isEqualTo(&#34;Expected&#34;);
 </code></pre>
-            <aside class="special">
-                <p><strong>Best Practice:</strong> Use AssertJ for fluent, readable assertions. Use Mockito for mocking
-                    dependencies in unit tests.</p>
-            </aside>
+<aside class="special"><p><strong>Best Practice:</strong> Use AssertJ for fluent, readable assertions. Use Mockito for mocking dependencies in unit tests.</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Integration Testing" duration="10">
-            <p>Test with full Spring context and real components.</p>
-            <h2 is-upgraded>Integration Test with @SpringBootTest</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager;
+      </google-codelab-step>
+    
+      <google-codelab-step label="Integration Testing" duration="10">
+        <p>Test with full Spring context and real components.</p>
+<h2 is-upgraded>Integration Test with @SpringBootTest</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager;
 
 import com.example.taskmanager.dto.CreateTaskRequest;
 import com.example.taskmanager.dto.TaskResponse;
@@ -540,9 +536,9 @@ class TaskApiIntegrationTest {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Test Configuration</h2>
-            <p><strong>src/test/resources/application-test.yml:</strong></p>
-            <pre><code language="language-yaml" class="language-yaml">spring:
+<h2 is-upgraded>Test Configuration</h2>
+<p><strong>src/test/resources/application-test.yml:</strong></p>
+<pre><code language="language-yaml" class="language-yaml">spring:
   datasource:
     url: jdbc:h2:mem:testdb
     driver-class-name: org.h2.Driver
@@ -569,8 +565,8 @@ logging:
     com.example.taskmanager: DEBUG
     org.hibernate.SQL: DEBUG
 </code></pre>
-            <h2 is-upgraded>WebMvc Test Slice</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.controller;
+<h2 is-upgraded>WebMvc Test Slice</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.controller;
 
 import com.example.taskmanager.dto.TaskResponse;
 import com.example.taskmanager.model.Task;
@@ -683,12 +679,12 @@ class TaskControllerTest {
 </code></pre>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Testcontainers for Integration Tests" duration="10">
-            <p>Use Docker containers for realistic integration tests.</p>
-            <h2 is-upgraded>PostgreSQL Testcontainer</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager;
+      </google-codelab-step>
+    
+      <google-codelab-step label="Testcontainers for Integration Tests" duration="10">
+        <p>Use Docker containers for realistic integration tests.</p>
+<h2 is-upgraded>PostgreSQL Testcontainer</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager;
 
 import com.example.taskmanager.model.Task;
 import com.example.taskmanager.model.TaskStatus;
@@ -808,8 +804,8 @@ class TaskRepositoryIntegrationTest {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Base Testcontainer Configuration</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.config;
+<h2 is-upgraded>Base Testcontainer Configuration</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.config;
 
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -835,8 +831,8 @@ public abstract class AbstractIntegrationTest {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Use Base Class</h2>
-            <pre><code language="language-java" class="language-java">@SpringBootTest
+<h2 is-upgraded>Use Base Class</h2>
+<pre><code language="language-java" class="language-java">@SpringBootTest
 class MyIntegrationTest extends AbstractIntegrationTest {
     // Inherits Testcontainer configuration
 
@@ -846,18 +842,16 @@ class MyIntegrationTest extends AbstractIntegrationTest {
     }
 }
 </code></pre>
-            <aside class="special">
-                <p><strong>Testcontainers Benefits:</strong> Test against real databases, message brokers, etc.
-                    Containers start automatically and are cleaned up after tests.</p>
-            </aside>
+<aside class="special"><p><strong>Testcontainers Benefits:</strong> Test against real databases, message brokers, etc. Containers start automatically and are cleaned up after tests.</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Security Testing" duration="6">
-            <p>Test authentication and authorization.</p>
-            <h2 is-upgraded>Security Integration Test</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.security;
+      </google-codelab-step>
+    
+      <google-codelab-step label="Security Testing" duration="6">
+        <p>Test authentication and authorization.</p>
+<h2 is-upgraded>Security Integration Test</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.security;
 
 import com.example.taskmanager.dto.LoginRequest;
 import com.example.taskmanager.dto.SignupRequest;
@@ -988,8 +982,8 @@ class SecurityIntegrationTest {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Test with Security Context</h2>
-            <pre><code language="language-java" class="language-java">@Test
+<h2 is-upgraded>Test with Security Context</h2>
+<pre><code language="language-java" class="language-java">@Test
 @WithMockUser(username = &#34;testuser&#34;, roles = {&#34;USER&#34;})
 void shouldAccessEndpointWithMockUser() {
     // Test runs with authenticated user context
@@ -1003,13 +997,13 @@ void shouldAccessAdminEndpoint() {
 </code></pre>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Code Coverage with JaCoCo" duration="5">
-            <p>Measure and enforce code coverage.</p>
-            <h2 is-upgraded>JaCoCo Maven Plugin</h2>
-            <p>Add to <code>pom.xml</code>:</p>
-            <pre><code language="language-xml" class="language-xml">&lt;build&gt;
+      </google-codelab-step>
+    
+      <google-codelab-step label="Code Coverage with JaCoCo" duration="5">
+        <p>Measure and enforce code coverage.</p>
+<h2 is-upgraded>JaCoCo Maven Plugin</h2>
+<p>Add to <code>pom.xml</code>:</p>
+<pre><code language="language-xml" class="language-xml">&lt;build&gt;
     &lt;plugins&gt;
         &lt;plugin&gt;
             &lt;groupId&gt;org.jacoco&lt;/groupId&gt;
@@ -1054,21 +1048,21 @@ void shouldAccessAdminEndpoint() {
     &lt;/plugins&gt;
 &lt;/build&gt;
 </code></pre>
-            <h2 is-upgraded>Generate Coverage Report</h2>
-            <pre><code language="language-bash" class="language-bash">mvn clean test
+<h2 is-upgraded>Generate Coverage Report</h2>
+<pre><code language="language-bash" class="language-bash">mvn clean test
 mvn jacoco:report
 </code></pre>
-            <p><strong>View report:</strong> Open <code>target/site/jacoco/index.html</code> in browser</p>
-            <h2 is-upgraded>Coverage Metrics</h2>
-            <ul>
-                <li><strong>Line Coverage:</strong> % of lines executed</li>
-                <li><strong>Branch Coverage:</strong> % of if/else branches taken</li>
-                <li><strong>Method Coverage:</strong> % of methods called</li>
-                <li><strong>Class Coverage:</strong> % of classes loaded</li>
-            </ul>
-            <p><strong>Target:</strong> 80% line coverage minimum</p>
-            <h2 is-upgraded>Exclude from Coverage</h2>
-            <pre><code language="language-java" class="language-java">@Generated  // Exclude generated code
+<p><strong>View report:</strong> Open <code>target/site/jacoco/index.html</code> in browser</p>
+<h2 is-upgraded>Coverage Metrics</h2>
+<ul>
+<li><strong>Line Coverage:</strong> % of lines executed</li>
+<li><strong>Branch Coverage:</strong> % of if/else branches taken</li>
+<li><strong>Method Coverage:</strong> % of methods called</li>
+<li><strong>Class Coverage:</strong> % of classes loaded</li>
+</ul>
+<p><strong>Target:</strong> 80% line coverage minimum</p>
+<h2 is-upgraded>Exclude from Coverage</h2>
+<pre><code language="language-java" class="language-java">@Generated  // Exclude generated code
 public class AutoGeneratedClass {
 }
 
@@ -1081,72 +1075,68 @@ public class AutoGeneratedClass {
     &lt;/excludes&gt;
 &lt;/configuration&gt;
 </code></pre>
-            <aside class="special">
-                <p><strong>Coverage Goal:</strong> Aim for 80%+ coverage, but focus on testing critical business logic
-                    over hitting arbitrary numbers.</p>
-            </aside>
+<aside class="special"><p><strong>Coverage Goal:</strong> Aim for 80%+ coverage, but focus on testing critical business logic over hitting arbitrary numbers.</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Remote Debugging" duration="8">
-            <p>Debug running applications in development and production.</p>
-            <h2 is-upgraded>Enable Remote Debugging</h2>
-            <p><strong>application.yml (development):</strong></p>
-            <pre><code language="language-yaml" class="language-yaml">spring:
+      </google-codelab-step>
+    
+      <google-codelab-step label="Remote Debugging" duration="8">
+        <p>Debug running applications in development and production.</p>
+<h2 is-upgraded>Enable Remote Debugging</h2>
+<p><strong>application.yml (development):</strong></p>
+<pre><code language="language-yaml" class="language-yaml">spring:
   devtools:
     remote:
       secret: mysecret
 </code></pre>
-            <p><strong>Run with Debug Mode:</strong></p>
-            <pre><code language="language-bash" class="language-bash">java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 \
+<p><strong>Run with Debug Mode:</strong></p>
+<pre><code language="language-bash" class="language-bash">java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 \
   -jar target/task-manager.jar
 </code></pre>
-            <p><strong>Parameters:</strong></p>
-            <ul>
-                <li><code>transport=dt_socket</code>: Use socket transport</li>
-                <li><code>server=y</code>: Act as debug server</li>
-                <li><code>suspend=n</code>: Don&#39;t wait for debugger (use <code>y</code> to wait)</li>
-                <li><code>address=*:5005</code>: Listen on all interfaces, port 5005</li>
-            </ul>
-            <h2 is-upgraded>IntelliJ IDEA Remote Debug</h2>
-            <ol type="1">
-                <li><strong>Run → Edit Configurations</strong></li>
-                <li><strong>Add New Configuration → Remote JVM Debug</strong></li>
-                <li><strong>Configure:</strong>
-                    <ul>
-                        <li>Name: <code>Remote Debug</code></li>
-                        <li>Host: <code>localhost</code></li>
-                        <li>Port: <code>5005</code></li>
-                        <li>Use module classpath: <code>task-manager</code></li>
-                    </ul>
-                </li>
-                <li><strong>Click Debug</strong> (ensure app is running with debug agent)</li>
-            </ol>
-            <h2 is-upgraded>Eclipse Remote Debug</h2>
-            <ol type="1">
-                <li><strong>Run → Debug Configurations</strong></li>
-                <li><strong>Remote Java Application → New</strong></li>
-                <li><strong>Configure:</strong>
-                    <ul>
-                        <li>Project: <code>task-manager</code></li>
-                        <li>Host: <code>localhost</code></li>
-                        <li>Port: <code>5005</code></li>
-                    </ul>
-                </li>
-                <li><strong>Click Debug</strong></li>
-            </ol>
-            <h2 is-upgraded>Debug Docker Container</h2>
-            <p><strong>Dockerfile:</strong></p>
-            <pre><code language="language-dockerfile" class="language-dockerfile">FROM openjdk:17-slim
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>transport=dt_socket</code>: Use socket transport</li>
+<li><code>server=y</code>: Act as debug server</li>
+<li><code>suspend=n</code>: Don&#39;t wait for debugger (use <code>y</code> to wait)</li>
+<li><code>address=*:5005</code>: Listen on all interfaces, port 5005</li>
+</ul>
+<h2 is-upgraded>IntelliJ IDEA Remote Debug</h2>
+<ol type="1">
+<li><strong>Run → Edit Configurations</strong></li>
+<li><strong>Add New Configuration → Remote JVM Debug</strong></li>
+<li><strong>Configure:</strong><ul>
+<li>Name: <code>Remote Debug</code></li>
+<li>Host: <code>localhost</code></li>
+<li>Port: <code>5005</code></li>
+<li>Use module classpath: <code>task-manager</code></li>
+</ul>
+</li>
+<li><strong>Click Debug</strong> (ensure app is running with debug agent)</li>
+</ol>
+<h2 is-upgraded>Eclipse Remote Debug</h2>
+<ol type="1">
+<li><strong>Run → Debug Configurations</strong></li>
+<li><strong>Remote Java Application → New</strong></li>
+<li><strong>Configure:</strong><ul>
+<li>Project: <code>task-manager</code></li>
+<li>Host: <code>localhost</code></li>
+<li>Port: <code>5005</code></li>
+</ul>
+</li>
+<li><strong>Click Debug</strong></li>
+</ol>
+<h2 is-upgraded>Debug Docker Container</h2>
+<p><strong>Dockerfile:</strong></p>
+<pre><code language="language-dockerfile" class="language-dockerfile">FROM openjdk:17-slim
 COPY target/task-manager.jar app.jar
 EXPOSE 8080 5005
 ENTRYPOINT [&#34;java&#34;, \
     &#34;-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005&#34;, \
     &#34;-jar&#34;, &#34;/app.jar&#34;]
 </code></pre>
-            <p><strong>docker-compose.yml:</strong></p>
-            <pre><code language="language-yaml" class="language-yaml">version: &#34;3.8&#34;
+<p><strong>docker-compose.yml:</strong></p>
+<pre><code language="language-yaml" class="language-yaml">version: &#34;3.8&#34;
 services:
   app:
     build: .
@@ -1156,13 +1146,13 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=dev
 </code></pre>
-            <p><strong>Run and attach debugger:</strong></p>
-            <pre><code language="language-bash" class="language-bash">docker-compose up
+<p><strong>Run and attach debugger:</strong></p>
+<pre><code language="language-bash" class="language-bash">docker-compose up
 # Attach IDE debugger to localhost:5005
 </code></pre>
-            <h2 is-upgraded>Kubernetes Debug</h2>
-            <p><strong>deployment.yaml:</strong></p>
-            <pre><code language="language-yaml" class="language-yaml">apiVersion: apps/v1
+<h2 is-upgraded>Kubernetes Debug</h2>
+<p><strong>deployment.yaml:</strong></p>
+<pre><code language="language-yaml" class="language-yaml">apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: task-manager
@@ -1179,46 +1169,44 @@ spec:
             - name: JAVA_TOOL_OPTIONS
               value: &#34;-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005&#34;
 </code></pre>
-            <p><strong>Port forward:</strong></p>
-            <pre><code language="language-bash" class="language-bash">kubectl port-forward pod/task-manager-xxx 5005:5005
+<p><strong>Port forward:</strong></p>
+<pre><code language="language-bash" class="language-bash">kubectl port-forward pod/task-manager-xxx 5005:5005
 # Attach IDE debugger to localhost:5005
 </code></pre>
-            <h2 is-upgraded>Debug Tips</h2>
-            <p><strong>Conditional Breakpoints:</strong></p>
-            <pre><code language="language-java" class="language-java">// Right-click breakpoint → Condition
+<h2 is-upgraded>Debug Tips</h2>
+<p><strong>Conditional Breakpoints:</strong></p>
+<pre><code language="language-java" class="language-java">// Right-click breakpoint → Condition
 // Break only when: taskId == 42L
 </code></pre>
-            <p><strong>Logpoints (no code change):</strong></p>
-            <pre><code language="language-java" class="language-java">// Right-click line → Add Logpoint
+<p><strong>Logpoints (no code change):</strong></p>
+<pre><code language="language-java" class="language-java">// Right-click line → Add Logpoint
 // Message: Task {taskId} status changed to {status}
 </code></pre>
-            <p><strong>Evaluate Expression:</strong></p>
-            <pre><code>Alt+F8 (IntelliJ) or Ctrl+Shift+I (Eclipse)
+<p><strong>Evaluate Expression:</strong></p>
+<pre><code>Alt+F8 (IntelliJ) or Ctrl+Shift+I (Eclipse)
 Evaluate any expression in current context
 </code></pre>
-            <p><strong>Watch Variables:</strong></p>
-            <pre><code>Add variables to watch list
+<p><strong>Watch Variables:</strong></p>
+<pre><code>Add variables to watch list
 See values update in real-time
 </code></pre>
-            <aside class="warning">
-                <p><strong>Production Warning:</strong> Never enable debug ports in production without proper network
-                    security. Use VPN or SSH tunnels for remote debugging production systems.</p>
-            </aside>
+<aside class="warning"><p><strong>Production Warning:</strong> Never enable debug ports in production without proper network security. Use VPN or SSH tunnels for remote debugging production systems.</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Production Debugging Tools" duration="6">
-            <p>Diagnose issues in running production systems.</p>
-            <h2 is-upgraded>Spring Boot Actuator</h2>
-            <p><strong>Enable Actuator:</strong></p>
-            <pre><code language="language-xml" class="language-xml">&lt;dependency&gt;
+      </google-codelab-step>
+    
+      <google-codelab-step label="Production Debugging Tools" duration="6">
+        <p>Diagnose issues in running production systems.</p>
+<h2 is-upgraded>Spring Boot Actuator</h2>
+<p><strong>Enable Actuator:</strong></p>
+<pre><code language="language-xml" class="language-xml">&lt;dependency&gt;
     &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
     &lt;artifactId&gt;spring-boot-starter-actuator&lt;/artifactId&gt;
 &lt;/dependency&gt;
 </code></pre>
-            <p><strong>application.yml:</strong></p>
-            <pre><code language="language-yaml" class="language-yaml">management:
+<p><strong>application.yml:</strong></p>
+<pre><code language="language-yaml" class="language-yaml">management:
   endpoints:
     web:
       exposure:
@@ -1228,8 +1216,8 @@ See values update in real-time
     health:
       show-details: always
 </code></pre>
-            <p><strong>Endpoints:</strong></p>
-            <pre><code language="language-bash" class="language-bash"># Health check
+<p><strong>Endpoints:</strong></p>
+<pre><code language="language-bash" class="language-bash"># Health check
 curl http://localhost:8080/actuator/health
 
 # Metrics
@@ -1247,21 +1235,21 @@ curl -X POST http://localhost:8080/actuator/loggers/com.example.taskmanager \
   -H &#34;Content-Type: application/json&#34; \
   -d &#39;{&#34;configuredLevel&#34;: &#34;DEBUG&#34;}&#39;
 </code></pre>
-            <h2 is-upgraded>Thread Dump Analysis</h2>
-            <p><strong>Get thread dump:</strong></p>
-            <pre><code language="language-bash" class="language-bash">jstack &lt;pid&gt; &gt; threaddump.txt
+<h2 is-upgraded>Thread Dump Analysis</h2>
+<p><strong>Get thread dump:</strong></p>
+<pre><code language="language-bash" class="language-bash">jstack &lt;pid&gt; &gt; threaddump.txt
 # Or via Actuator
 curl http://localhost:8080/actuator/threaddump &gt; threaddump.json
 </code></pre>
-            <p><strong>Analyze for:</strong></p>
-            <ul>
-                <li>Deadlocks</li>
-                <li>Thread pool exhaustion</li>
-                <li>Blocked threads</li>
-                <li>CPU-intensive threads</li>
-            </ul>
-            <p><strong>Example deadlock:</strong></p>
-            <pre><code>Found one Java-level deadlock:
+<p><strong>Analyze for:</strong></p>
+<ul>
+<li>Deadlocks</li>
+<li>Thread pool exhaustion</li>
+<li>Blocked threads</li>
+<li>CPU-intensive threads</li>
+</ul>
+<p><strong>Example deadlock:</strong></p>
+<pre><code>Found one Java-level deadlock:
 =============================
 &#34;Thread-1&#34;:
   waiting to lock monitor 0x00007f8f8c004e00 (object 0x000000076ab80000, a java.lang.Object),
@@ -1270,27 +1258,27 @@ curl http://localhost:8080/actuator/threaddump &gt; threaddump.json
   waiting to lock monitor 0x00007f8f8c006b00 (object 0x000000076ab80010, a java.lang.Object),
   which is held by &#34;Thread-1&#34;
 </code></pre>
-            <h2 is-upgraded>Heap Dump Analysis</h2>
-            <p><strong>Generate heap dump:</strong></p>
-            <pre><code language="language-bash" class="language-bash">jmap -dump:live,format=b,file=heapdump.hprof &lt;pid&gt;
+<h2 is-upgraded>Heap Dump Analysis</h2>
+<p><strong>Generate heap dump:</strong></p>
+<pre><code language="language-bash" class="language-bash">jmap -dump:live,format=b,file=heapdump.hprof &lt;pid&gt;
 # Or via Actuator
 curl http://localhost:8080/actuator/heapdump -o heapdump.hprof
 </code></pre>
-            <p><strong>Analyze with tools:</strong></p>
-            <ul>
-                <li><strong>Eclipse MAT</strong> (Memory Analyzer Tool)</li>
-                <li><strong>VisualVM</strong></li>
-                <li><strong>JProfiler</strong></li>
-            </ul>
-            <p><strong>Look for:</strong></p>
-            <ul>
-                <li>Memory leaks</li>
-                <li>Large object retentions</li>
-                <li>Unexpected object counts</li>
-            </ul>
-            <h2 is-upgraded>JVM Metrics</h2>
-            <p><strong>Key metrics to monitor:</strong></p>
-            <pre><code language="language-bash" class="language-bash"># Memory usage
+<p><strong>Analyze with tools:</strong></p>
+<ul>
+<li><strong>Eclipse MAT</strong> (Memory Analyzer Tool)</li>
+<li><strong>VisualVM</strong></li>
+<li><strong>JProfiler</strong></li>
+</ul>
+<p><strong>Look for:</strong></p>
+<ul>
+<li>Memory leaks</li>
+<li>Large object retentions</li>
+<li>Unexpected object counts</li>
+</ul>
+<h2 is-upgraded>JVM Metrics</h2>
+<p><strong>Key metrics to monitor:</strong></p>
+<pre><code language="language-bash" class="language-bash"># Memory usage
 jcmd &lt;pid&gt; GC.heap_info
 
 # CPU usage
@@ -1299,8 +1287,8 @@ top -H -p &lt;pid&gt;
 # GC logs
 java -Xlog:gc*:file=gc.log -jar app.jar
 </code></pre>
-            <h2 is-upgraded>Logging Best Practices</h2>
-            <pre><code language="language-java" class="language-java">// Use parameterized logging (no string concatenation)
+<h2 is-upgraded>Logging Best Practices</h2>
+<pre><code language="language-java" class="language-java">// Use parameterized logging (no string concatenation)
 log.debug(&#34;Processing task: {} for user: {}&#34;, taskId, userId);
 
 // Include correlation IDs
@@ -1318,13 +1306,13 @@ log.error(&#34;Error&#34;);           // Actual error
 </code></pre>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Performance Testing" duration="4">
-            <p>Test application performance and load handling.</p>
-            <h2 is-upgraded>Load Test with JMeter</h2>
-            <p><strong>Test Plan:</strong></p>
-            <pre><code language="language-xml" class="language-xml">&lt;!-- task-api-load-test.jmx --&gt;
+      </google-codelab-step>
+    
+      <google-codelab-step label="Performance Testing" duration="4">
+        <p>Test application performance and load handling.</p>
+<h2 is-upgraded>Load Test with JMeter</h2>
+<p><strong>Test Plan:</strong></p>
+<pre><code language="language-xml" class="language-xml">&lt;!-- task-api-load-test.jmx --&gt;
 &lt;jmeterTestPlan&gt;
   &lt;ThreadGroup&gt;
     &lt;stringProp name=&#34;ThreadGroup.num_threads&#34;&gt;100&lt;/stringProp&gt;
@@ -1340,11 +1328,11 @@ log.error(&#34;Error&#34;);           // Actual error
   &lt;/HTTPSamplerProxy&gt;
 &lt;/jmeterTestPlan&gt;
 </code></pre>
-            <p><strong>Run:</strong></p>
-            <pre><code language="language-bash" class="language-bash">jmeter -n -t task-api-load-test.jmx -l results.jtl -e -o report/
+<p><strong>Run:</strong></p>
+<pre><code language="language-bash" class="language-bash">jmeter -n -t task-api-load-test.jmx -l results.jtl -e -o report/
 </code></pre>
-            <h2 is-upgraded>Performance Assertions</h2>
-            <pre><code language="language-java" class="language-java">@Test
+<h2 is-upgraded>Performance Assertions</h2>
+<pre><code language="language-java" class="language-java">@Test
 @DisplayName(&#34;Should handle 1000 tasks in under 1 second&#34;)
 void shouldHandleHighLoad() {
     StopWatch stopWatch = new StopWatch();
@@ -1358,8 +1346,8 @@ void shouldHandleHighLoad() {
     assertThat(stopWatch.getTotalTimeMillis()).isLessThan(1000);
 }
 </code></pre>
-            <h2 is-upgraded>Database Performance</h2>
-            <pre><code language="language-java" class="language-java">@Test
+<h2 is-upgraded>Database Performance</h2>
+<pre><code language="language-java" class="language-java">@Test
 @DisplayName(&#34;Should avoid N+1 query problem&#34;)
 void shouldAvoidNPlusOne() {
     // Given
@@ -1379,98 +1367,101 @@ void shouldAvoidNPlusOne() {
 </code></pre>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Conclusion" duration="2">
-            <p>Congratulations! 🎉 You&#39;ve mastered testing and debugging Spring Boot applications!</p>
-            <h2 is-upgraded>What You&#39;ve Learned</h2>
-            <ul>
-                <li>✅ <strong>Unit Testing:</strong> JUnit 5 and Mockito</li>
-                <li>✅ <strong>Integration Testing:</strong> @SpringBootTest</li>
-                <li>✅ <strong>Test Slices:</strong> @WebMvcTest, @DataJpaTest</li>
-                <li>✅ <strong>Testcontainers:</strong> Docker-based tests</li>
-                <li>✅ <strong>Security Testing:</strong> Authentication tests</li>
-                <li>✅ <strong>Code Coverage:</strong> JaCoCo reports</li>
-                <li>✅ <strong>Remote Debugging:</strong> JDWP protocol</li>
-                <li>✅ <strong>Container Debugging:</strong> Docker and K8s</li>
-                <li>✅ <strong>Production Tools:</strong> Actuator, thread/heap dumps</li>
-                <li>✅ <strong>Performance Testing:</strong> Load testing basics</li>
-            </ul>
-            <h2 is-upgraded>Testing Best Practices</h2>
-            <ol type="1">
-                <li><strong>Test Pyramid:</strong> Many unit, some integration, few E2E</li>
-                <li><strong>Fast Tests:</strong> Unit tests &lt; 100ms, integration &lt; 1s</li>
-                <li><strong>Isolated Tests:</strong> No dependencies between tests</li>
-                <li><strong>Readable Tests:</strong> Given-When-Then structure</li>
-                <li><strong>Meaningful Assertions:</strong> Test behavior, not implementation</li>
-                <li><strong>Test Data:</strong> Use builders or factories</li>
-                <li><strong>Coverage:</strong> 80%+ for critical code</li>
-                <li><strong>CI/CD:</strong> Run tests on every commit</li>
-            </ol>
-            <h2 is-upgraded>Debugging Best Practices</h2>
-            <ol type="1">
-                <li><strong>Logging First:</strong> Good logs prevent most debugging</li>
-                <li><strong>Correlation IDs:</strong> Track requests across services</li>
-                <li><strong>Structured Logging:</strong> Use JSON for production</li>
-                <li><strong>Metrics:</strong> Monitor key indicators</li>
-                <li><strong>Alerting:</strong> Proactive error detection</li>
-                <li><strong>Production Access:</strong> Secure debug ports</li>
-                <li><strong>Reproduce Locally:</strong> Test with production data patterns</li>
-            </ol>
-            <h2 is-upgraded>Git Branching</h2>
-            <pre><code language="language-bash" class="language-bash">git add .
+      </google-codelab-step>
+    
+      <google-codelab-step label="Conclusion" duration="2">
+        <p>Congratulations! 🎉 You&#39;ve mastered testing and debugging Spring Boot applications!</p>
+<h2 is-upgraded>What You&#39;ve Learned</h2>
+<ul>
+<li>✅ <strong>Unit Testing:</strong> JUnit 5 and Mockito</li>
+<li>✅ <strong>Integration Testing:</strong> @SpringBootTest</li>
+<li>✅ <strong>Test Slices:</strong> @WebMvcTest, @DataJpaTest</li>
+<li>✅ <strong>Testcontainers:</strong> Docker-based tests</li>
+<li>✅ <strong>Security Testing:</strong> Authentication tests</li>
+<li>✅ <strong>Code Coverage:</strong> JaCoCo reports</li>
+<li>✅ <strong>Remote Debugging:</strong> JDWP protocol</li>
+<li>✅ <strong>Container Debugging:</strong> Docker and K8s</li>
+<li>✅ <strong>Production Tools:</strong> Actuator, thread/heap dumps</li>
+<li>✅ <strong>Performance Testing:</strong> Load testing basics</li>
+</ul>
+<h2 is-upgraded>Testing Best Practices</h2>
+<ol type="1">
+<li><strong>Test Pyramid:</strong> Many unit, some integration, few E2E</li>
+<li><strong>Fast Tests:</strong> Unit tests &lt; 100ms, integration &lt; 1s</li>
+<li><strong>Isolated Tests:</strong> No dependencies between tests</li>
+<li><strong>Readable Tests:</strong> Given-When-Then structure</li>
+<li><strong>Meaningful Assertions:</strong> Test behavior, not implementation</li>
+<li><strong>Test Data:</strong> Use builders or factories</li>
+<li><strong>Coverage:</strong> 80%+ for critical code</li>
+<li><strong>CI/CD:</strong> Run tests on every commit</li>
+</ol>
+<h2 is-upgraded>Debugging Best Practices</h2>
+<ol type="1">
+<li><strong>Logging First:</strong> Good logs prevent most debugging</li>
+<li><strong>Correlation IDs:</strong> Track requests across services</li>
+<li><strong>Structured Logging:</strong> Use JSON for production</li>
+<li><strong>Metrics:</strong> Monitor key indicators</li>
+<li><strong>Alerting:</strong> Proactive error detection</li>
+<li><strong>Production Access:</strong> Secure debug ports</li>
+<li><strong>Reproduce Locally:</strong> Test with production data patterns</li>
+</ol>
+<h2 is-upgraded>Git Branching</h2>
+<pre><code language="language-bash" class="language-bash">git add .
 git commit -m &#34;Codelab 3.8: Testing &amp; Remote Debugging complete&#34;
 git tag codelab-3.8
 </code></pre>
-            <h2 is-upgraded>Section 3 Complete!</h2>
-            <p>All 8 Spring Boot codelabs finished:</p>
-            <ul>
-                <li>✅ 3.1: Spring Core &amp; Boot basics</li>
-                <li>✅ 3.2: REST APIs &amp; Swagger</li>
-                <li>✅ 3.3: ORM &amp; Spring Data JPA</li>
-                <li>✅ 3.4: JPA Locking &amp; Spring Security</li>
-                <li>✅ 3.5: JWT &amp; Spring Cloud Config</li>
-                <li>✅ 3.6: Reactive Programming &amp; R2DBC</li>
-                <li>✅ 3.7: Spring JMS &amp; Event-Driven</li>
-                <li>✅ 3.8: Testing &amp; Remote Debugging</li>
-            </ul>
-            <h2 is-upgraded>Next Steps</h2>
-            <ul>
-                <li><strong>Section 4:</strong> Microservices Architecture</li>
-            </ul>
-            <h2 is-upgraded>Additional Resources</h2>
-            <ul>
-                <li><a href="https://junit.org/junit5/docs/current/user-guide/" target="_blank">JUnit 5 User Guide</a>
-                </li>
-                <li><a href="https://javadoc.io/doc/org.mockito/mockito-core/latest/org/mockito/Mockito.html"
-                        target="_blank">Mockito Documentation</a></li>
-                <li><a href="https://www.testcontainers.org/" target="_blank">Testcontainers</a></li>
-                <li><a href="https://docs.spring.io/spring-boot/docs/current/reference/html/features.html#features.testing"
-                        target="_blank">Spring Boot Testing</a></li>
-                <li><a href="https://www.jacoco.org/jacoco/" target="_blank">JaCoCo</a></li>
-            </ul>
-            <aside class="special">
-                <p><strong>Production Ready!</strong> You now have comprehensive testing, debugging skills, and
-                    confidence to deploy quality Spring Boot applications to production!</p>
-            </aside>
+<h2 is-upgraded>Section 3 Complete!</h2>
+<p>All 8 Spring Boot codelabs finished:</p>
+<ul>
+<li>✅ 3.1: Spring Core &amp; Boot basics</li>
+<li>✅ 3.2: REST APIs &amp; Swagger</li>
+<li>✅ 3.3: ORM &amp; Spring Data JPA</li>
+<li>✅ 3.4: JPA Locking &amp; Spring Security</li>
+<li>✅ 3.5: JWT &amp; Spring Cloud Config</li>
+<li>✅ 3.6: Reactive Programming &amp; R2DBC</li>
+<li>✅ 3.7: Spring JMS &amp; Event-Driven</li>
+<li>✅ 3.8: Testing &amp; Remote Debugging</li>
+</ul>
+<h2 is-upgraded>Next Steps</h2>
+<ul>
+<li><strong>Section 4:</strong> Microservices Architecture</li>
+</ul>
+<h2 is-upgraded>Additional Resources</h2>
+<ul>
+<li><a href="https://junit.org/junit5/docs/current/user-guide/" target="_blank">JUnit 5 User Guide</a></li>
+<li><a href="https://javadoc.io/doc/org.mockito/mockito-core/latest/org/mockito/Mockito.html" target="_blank">Mockito Documentation</a></li>
+<li><a href="https://www.testcontainers.org/" target="_blank">Testcontainers</a></li>
+<li><a href="https://docs.spring.io/spring-boot/docs/current/reference/html/features.html#features.testing" target="_blank">Spring Boot Testing</a></li>
+<li><a href="https://www.jacoco.org/jacoco/" target="_blank">JaCoCo</a></li>
+</ul>
+<aside class="special"><p><strong>Production Ready!</strong> You now have comprehensive testing, debugging skills, and confidence to deploy quality Spring Boot applications to production!</p>
+</aside>
 
 
-        </google-codelab-step>
+      </google-codelab-step>
+    
+  </google-codelab>
 
-    </google-codelab>
-
-    <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
-    <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
-    <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
-    <script src="//support.google.com/inapp/api.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js"></script>
-    <script src="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.js"></script>
-    <script>
-        hljs.highlightAll();
-        hljs.addPlugin(new CopyButtonPlugin({ autohide: false }));
-
-    </script>
+  <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
+  <script src="//support.google.com/inapp/api.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js"></script>
+  <script src="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.js"></script>
+  <script>
+    hljs.highlightAll();
+    hljs.addPlugin(new CopyButtonPlugin({ autohide: false}));
+    
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      const homeUrl = "\/springboot_course\/";
+      const arrowBack = document.getElementById('arrow-back');
+      const doneBtn = document.getElementById('done');
+      if (arrowBack) arrowBack.href = homeUrl;
+      if (doneBtn) doneBtn.href = homeUrl;
+    });
+    
+  </script>
 
 </body>
-
 </html>

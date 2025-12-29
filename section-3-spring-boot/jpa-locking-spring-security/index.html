@@ -1,71 +1,71 @@
+
 <!doctype html>
 
 <html>
-
 <head>
-    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
-    <meta name="theme-color" content="#4F7DC9">
-    <meta charset="UTF-8">
-    <title>JPA Locking Mechanisms &amp; Spring Security</title>
-    <link rel="stylesheet"
-        href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
-    <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
-    <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
-    <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1  /build/styles/monokai.min.css">
-    <link rel="stylesheet" href="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.css">
-    <style>
-        .success {
-            color: #1e8e3e;
-        }
-
-        .error {
-            color: red;
-        }
-    </style>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <title>JPA Locking Mechanisms &amp; Spring Security</title>
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
+  <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1  /build/styles/monokai.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.css">
+  <style>
+    .success {
+      color: #1e8e3e;
+    }
+    .error {
+      color: red;
+    }
+  </style>
 </head>
-
 <body>
-    <google-codelab-analytics gaid="UA-49880327-14" ga4id=""></google-codelab-analytics>
-    <google-codelab codelab-gaid="" codelab-ga4id="" id="jpa-locking-spring-security"
-        title="JPA Locking Mechanisms &amp; Spring Security" environment="web" feedback-link="">
-
-        <google-codelab-step label="Introduction" duration="3">
-            <p>Add concurrency control with JPA locking and secure the application with Spring Security.</p>
-            <h2 class="checklist" is-upgraded>What You&#39;ll Learn</h2>
-            <ul class="checklist">
-                <li><strong>JPA Locking:</strong> Optimistic vs pessimistic locking</li>
-                <li><strong>@Version:</strong> Optimistic locking with version fields</li>
-                <li><strong>LockModeType:</strong> Pessimistic locking strategies</li>
-                <li><strong>Spring Security:</strong> Authentication and authorization</li>
-                <li><strong>Security Configuration:</strong> SecurityFilterChain setup</li>
-                <li><strong>User Authentication:</strong> UserDetailsService implementation</li>
-                <li><strong>Password Encoding:</strong> BCrypt password hashing</li>
-                <li><strong>Method Security:</strong> @PreAuthorize, @Secured annotations</li>
-                <li><strong>Role-Based Access:</strong> Admin, user, guest roles</li>
-                <li><strong>Security Context:</strong> Authentication principal access</li>
-            </ul>
-            <h2 is-upgraded>What You&#39;ll Build</h2>
-            <p>Secure Task Management API with:</p>
-            <ul>
-                <li><strong>Optimistic Locking</strong> on Task entity to prevent lost updates</li>
-                <li><strong>Version Conflict Handling</strong> with custom exception</li>
-                <li><strong>User Entity</strong> with password and roles</li>
-                <li><strong>Spring Security</strong> configuration with form and HTTP Basic auth</li>
-                <li><strong>Password Encoder</strong> for secure password storage</li>
-                <li><strong>Custom UserDetailsService</strong> for database authentication</li>
-                <li><strong>Role-Based Endpoints:</strong> Admin-only and user-specific access</li>
-                <li><strong>Method Security</strong> on service layer</li>
-                <li><strong>Security Integration</strong> with existing API</li>
-            </ul>
-            <h2 is-upgraded>Prerequisites</h2>
-            <ul>
-                <li>Completed Codelab 3.3 (ORM &amp; Spring Data JPA)</li>
-                <li>Understanding of JPA entities and repositories</li>
-            </ul>
-            <h2 is-upgraded>New Dependencies</h2>
-            <p>Add to <code>pom.xml</code>:</p>
-            <pre><code language="language-xml" class="language-xml">&lt;!-- Spring Security --&gt;
+  <google-codelab-analytics gaid="UA-49880327-14" ga4id=""></google-codelab-analytics>
+  <google-codelab codelab-gaid=""
+                  codelab-ga4id=""
+                  id="jpa-locking-spring-security"
+                  title="JPA Locking Mechanisms &amp; Spring Security"
+                  environment="web"
+                  feedback-link="">
+    
+      <google-codelab-step label="Introduction" duration="3">
+        <p>Add concurrency control with JPA locking and secure the application with Spring Security.</p>
+<h2 class="checklist" is-upgraded>What You&#39;ll Learn</h2>
+<ul class="checklist">
+<li><strong>JPA Locking:</strong> Optimistic vs pessimistic locking</li>
+<li><strong>@Version:</strong> Optimistic locking with version fields</li>
+<li><strong>LockModeType:</strong> Pessimistic locking strategies</li>
+<li><strong>Spring Security:</strong> Authentication and authorization</li>
+<li><strong>Security Configuration:</strong> SecurityFilterChain setup</li>
+<li><strong>User Authentication:</strong> UserDetailsService implementation</li>
+<li><strong>Password Encoding:</strong> BCrypt password hashing</li>
+<li><strong>Method Security:</strong> @PreAuthorize, @Secured annotations</li>
+<li><strong>Role-Based Access:</strong> Admin, user, guest roles</li>
+<li><strong>Security Context:</strong> Authentication principal access</li>
+</ul>
+<h2 is-upgraded>What You&#39;ll Build</h2>
+<p>Secure Task Management API with:</p>
+<ul>
+<li><strong>Optimistic Locking</strong> on Task entity to prevent lost updates</li>
+<li><strong>Version Conflict Handling</strong> with custom exception</li>
+<li><strong>User Entity</strong> with password and roles</li>
+<li><strong>Spring Security</strong> configuration with form and HTTP Basic auth</li>
+<li><strong>Password Encoder</strong> for secure password storage</li>
+<li><strong>Custom UserDetailsService</strong> for database authentication</li>
+<li><strong>Role-Based Endpoints:</strong> Admin-only and user-specific access</li>
+<li><strong>Method Security</strong> on service layer</li>
+<li><strong>Security Integration</strong> with existing API</li>
+</ul>
+<h2 is-upgraded>Prerequisites</h2>
+<ul>
+<li>Completed Codelab 3.3 (ORM &amp; Spring Data JPA)</li>
+<li>Understanding of JPA entities and repositories</li>
+</ul>
+<h2 is-upgraded>New Dependencies</h2>
+<p>Add to <code>pom.xml</code>:</p>
+<pre><code language="language-xml" class="language-xml">&lt;!-- Spring Security --&gt;
 &lt;dependency&gt;
     &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
     &lt;artifactId&gt;spring-boot-starter-security&lt;/artifactId&gt;
@@ -78,19 +78,17 @@
     &lt;scope&gt;test&lt;/scope&gt;
 &lt;/dependency&gt;
 </code></pre>
-            <aside class="special">
-                <p><strong>Git Branch:</strong> Start from <code>codelab-3.3</code> or continue. This codelab adds
-                    enterprise-grade security and concurrency control.</p>
-            </aside>
+<aside class="special"><p><strong>Git Branch:</strong> Start from <code>codelab-3.3</code> or continue. This codelab adds enterprise-grade security and concurrency control.</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Understanding Concurrency Problems" duration="8">
-            <p>Learn why locking is necessary in multi-user applications.</p>
-            <h2 is-upgraded>The Lost Update Problem</h2>
-            <p><strong>Scenario:</strong> Two users edit the same task simultaneously.</p>
-            <pre><code>Time  User A                    User B                    Database
+      </google-codelab-step>
+    
+      <google-codelab-step label="Understanding Concurrency Problems" duration="8">
+        <p>Learn why locking is necessary in multi-user applications.</p>
+<h2 is-upgraded>The Lost Update Problem</h2>
+<p><strong>Scenario:</strong> Two users edit the same task simultaneously.</p>
+<pre><code>Time  User A                    User B                    Database
 ----  ----------------------    ----------------------    -------------
 T1    Read task (status=TODO)                            status=TODO
 T2                               Read task (status=TODO)  status=TODO
@@ -99,39 +97,39 @@ T4                               Update status=DONE
 T5    Save (status=DOING)                                 status=DOING
 T6                               Save (status=DONE)       status=DONE ❌
 </code></pre>
-            <p><strong>Result:</strong> User A&#39;s update is lost! User B overwrote it.</p>
-            <h2 is-upgraded>Dirty Reads</h2>
-            <p><strong>Scenario:</strong> One transaction reads uncommitted changes from another.</p>
-            <pre><code>Time  Transaction A             Transaction B
+<p><strong>Result:</strong> User A&#39;s update is lost! User B overwrote it.</p>
+<h2 is-upgraded>Dirty Reads</h2>
+<p><strong>Scenario:</strong> One transaction reads uncommitted changes from another.</p>
+<pre><code>Time  Transaction A             Transaction B
 ----  ----------------------    ----------------------
 T1    Update task price=100
 T2                               Read task price=100
 T3    ROLLBACK
 T4                               Use price=100 ❌ (dirty)
 </code></pre>
-            <h2 is-upgraded>Non-Repeatable Reads</h2>
-            <p><strong>Scenario:</strong> Reading the same data twice in a transaction gives different results.</p>
-            <pre><code>Time  Transaction A             Transaction B
+<h2 is-upgraded>Non-Repeatable Reads</h2>
+<p><strong>Scenario:</strong> Reading the same data twice in a transaction gives different results.</p>
+<pre><code>Time  Transaction A             Transaction B
 ----  ----------------------    ----------------------
 T1    Read task (status=TODO)
 T2                               Update status=DONE
 T3                               COMMIT
 T4    Read task (status=DONE) ❌ Different value!
 </code></pre>
-            <h2 is-upgraded>Solution: Locking</h2>
-            <p>Two approaches to prevent these problems:</p>
-            <ol type="1">
-                <li><strong>Optimistic Locking:</strong> Assume conflicts are rare, detect them when saving</li>
-                <li><strong>Pessimistic Locking:</strong> Assume conflicts are common, lock data while reading</li>
-            </ol>
+<h2 is-upgraded>Solution: Locking</h2>
+<p>Two approaches to prevent these problems:</p>
+<ol type="1">
+<li><strong>Optimistic Locking:</strong> Assume conflicts are rare, detect them when saving</li>
+<li><strong>Pessimistic Locking:</strong> Assume conflicts are common, lock data while reading</li>
+</ol>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Optimistic Locking with @Version" duration="10">
-            <p>Add version field to detect concurrent modifications.</p>
-            <h2 is-upgraded>Update Task Entity</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.model;
+      </google-codelab-step>
+    
+      <google-codelab-step label="Optimistic Locking with @Version" duration="10">
+        <p>Add version field to detect concurrent modifications.</p>
+<h2 is-upgraded>Update Task Entity</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -196,8 +194,8 @@ public class Task {
     }
 }
 </code></pre>
-            <h2 is-upgraded>How @Version Works</h2>
-            <pre><code>Initial State: Task(id=1, title=&#34;Fix bug&#34;, version=0)
+<h2 is-upgraded>How @Version Works</h2>
+<pre><code>Initial State: Task(id=1, title=&#34;Fix bug&#34;, version=0)
 
 User A reads:  Task(id=1, version=0)
 User B reads:  Task(id=1, version=0)
@@ -214,10 +212,10 @@ User B updates:
 
   Throws: OptimisticLockException
 </code></pre>
-            <p><strong>Version increments automatically on each update.</strong></p>
-            <h2 is-upgraded>Version Conflict Exception</h2>
-            <p>Create custom exception:</p>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.exception;
+<p><strong>Version increments automatically on each update.</strong></p>
+<h2 is-upgraded>Version Conflict Exception</h2>
+<p>Create custom exception:</p>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.exception;
 
 public class TaskVersionConflictException extends RuntimeException {
 
@@ -242,9 +240,9 @@ public class TaskVersionConflictException extends RuntimeException {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Handle OptimisticLockException</h2>
-            <p>Update GlobalExceptionHandler:</p>
-            <pre><code language="language-java" class="language-java">import jakarta.persistence.OptimisticLockException;
+<h2 is-upgraded>Handle OptimisticLockException</h2>
+<p>Update GlobalExceptionHandler:</p>
+<pre><code language="language-java" class="language-java">import jakarta.persistence.OptimisticLockException;
 
 @RestControllerAdvice
 @Slf4j
@@ -292,9 +290,9 @@ public class GlobalExceptionHandler {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Update TaskService</h2>
-            <p>Add version checking in update method:</p>
-            <pre><code language="language-java" class="language-java">@Transactional
+<h2 is-upgraded>Update TaskService</h2>
+<p>Add version checking in update method:</p>
+<pre><code language="language-java" class="language-java">@Transactional
 public Task updateTask(Long id, Task taskDetails) {
     log.debug(&#34;Updating task with ID: {}&#34;, id);
 
@@ -314,8 +312,8 @@ public Task updateTask(Long id, Task taskDetails) {
     return taskRepository.save(task);
 }
 </code></pre>
-            <h2 is-upgraded>Testing Optimistic Locking</h2>
-            <pre><code language="language-bash" class="language-bash"># Create task
+<h2 is-upgraded>Testing Optimistic Locking</h2>
+<pre><code language="language-bash" class="language-bash"># Create task
 curl -X POST http://localhost:8080/api/tasks \
   -H &#34;Content-Type: application/json&#34; \
   -d &#39;{&#34;title&#34;: &#34;Test Locking&#34;, &#34;description&#34;: &#34;Version test&#34;}&#39;
@@ -337,18 +335,16 @@ curl -X PUT http://localhost:8080/api/tasks/1 \
 # Response: 409 Conflict
 # {&#34;error&#34;: &#34;Version Conflict&#34;, &#34;message&#34;: &#34;Task was modified...&#34;}
 </code></pre>
-            <aside class="special">
-                <p><strong>Best Practice:</strong> Optimistic locking is perfect for web applications where conflicts
-                    are rare. Include version in DTOs and UI to detect conflicts.</p>
-            </aside>
+<aside class="special"><p><strong>Best Practice:</strong> Optimistic locking is perfect for web applications where conflicts are rare. Include version in DTOs and UI to detect conflicts.</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Pessimistic Locking" duration="7">
-            <p>Lock records during read to prevent concurrent modifications.</p>
-            <h2 is-upgraded>Pessimistic Lock Modes</h2>
-            <pre><code language="language-java" class="language-java">// Shared lock (read lock) - allows other reads, blocks writes
+      </google-codelab-step>
+    
+      <google-codelab-step label="Pessimistic Locking" duration="7">
+        <p>Lock records during read to prevent concurrent modifications.</p>
+<h2 is-upgraded>Pessimistic Lock Modes</h2>
+<pre><code language="language-java" class="language-java">// Shared lock (read lock) - allows other reads, blocks writes
 LockModeType.PESSIMISTIC_READ
 
 // Exclusive lock (write lock) - blocks all other access
@@ -357,8 +353,8 @@ LockModeType.PESSIMISTIC_WRITE
 // Increment version without lock
 LockModeType.PESSIMISTIC_FORCE_INCREMENT
 </code></pre>
-            <h2 is-upgraded>Add Lock Support to Repository</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.repository;
+<h2 is-upgraded>Add Lock Support to Repository</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.repository;
 
 import com.example.taskmanager.model.Task;
 import com.example.taskmanager.model.TaskStatus;
@@ -385,8 +381,8 @@ public interface TaskRepository extends JpaRepository&lt;Task, Long&gt; {
     List&lt;Task&gt; findByStatusWithLock(@Param(&#34;status&#34;) TaskStatus status);
 }
 </code></pre>
-            <h2 is-upgraded>Use Pessimistic Locking in Service</h2>
-            <pre><code language="language-java" class="language-java">@Transactional
+<h2 is-upgraded>Use Pessimistic Locking in Service</h2>
+<pre><code language="language-java" class="language-java">@Transactional
 public Task updateTaskWithLock(Long id, Task taskDetails) {
     log.debug(&#34;Updating task {} with pessimistic lock&#34;, id);
 
@@ -403,8 +399,8 @@ public Task updateTaskWithLock(Long id, Task taskDetails) {
     // Lock released when transaction commits
 }
 </code></pre>
-            <h2 is-upgraded>Generated SQL</h2>
-            <pre><code language="language-sql" class="language-sql">-- PostgreSQL
+<h2 is-upgraded>Generated SQL</h2>
+<pre><code language="language-sql" class="language-sql">-- PostgreSQL
 SELECT * FROM tasks WHERE id = 1 FOR UPDATE;
 
 -- MySQL
@@ -413,109 +409,51 @@ SELECT * FROM tasks WHERE id = 1 FOR UPDATE;
 -- H2
 SELECT * FROM tasks WHERE id = 1 FOR UPDATE;
 </code></pre>
-            <h2 is-upgraded>Pessimistic vs Optimistic</h2>
-            <table>
-                <tr>
-                    <td colspan="1" rowspan="1">
-                        <p>Aspect</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>Optimistic</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>Pessimistic</p>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="1" rowspan="1">
-                        <p><strong>When to use</strong></p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>Low contention</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>High contention</p>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="1" rowspan="1">
-                        <p><strong>Performance</strong></p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>Better (no locks)</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>Slower (locks)</p>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="1" rowspan="1">
-                        <p><strong>Failures</strong></p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>At save time</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>At read time</p>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="1" rowspan="1">
-                        <p><strong>Scalability</strong></p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>Better</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>Limited</p>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="1" rowspan="1">
-                        <p><strong>Deadlocks</strong></p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>No</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>Possible</p>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="1" rowspan="1">
-                        <p><strong>User Experience</strong></p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>May need retry</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>Blocks/waits</p>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="1" rowspan="1">
-                        <p><strong>Use case</strong></p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>Web apps, REST APIs</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>Banking, inventory</p>
-                    </td>
-                </tr>
-            </table>
-            <aside class="warning">
-                <p><strong>Deadlock Warning:</strong> Pessimistic locking can cause deadlocks if two transactions lock
-                    resources in different orders. Always lock in consistent order!</p>
-            </aside>
+<h2 is-upgraded>Pessimistic vs Optimistic</h2>
+<table>
+<tr><td colspan="1" rowspan="1"><p>Aspect</p>
+</td><td colspan="1" rowspan="1"><p>Optimistic</p>
+</td><td colspan="1" rowspan="1"><p>Pessimistic</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>When to use</strong></p>
+</td><td colspan="1" rowspan="1"><p>Low contention</p>
+</td><td colspan="1" rowspan="1"><p>High contention</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Performance</strong></p>
+</td><td colspan="1" rowspan="1"><p>Better (no locks)</p>
+</td><td colspan="1" rowspan="1"><p>Slower (locks)</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Failures</strong></p>
+</td><td colspan="1" rowspan="1"><p>At save time</p>
+</td><td colspan="1" rowspan="1"><p>At read time</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Scalability</strong></p>
+</td><td colspan="1" rowspan="1"><p>Better</p>
+</td><td colspan="1" rowspan="1"><p>Limited</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Deadlocks</strong></p>
+</td><td colspan="1" rowspan="1"><p>No</p>
+</td><td colspan="1" rowspan="1"><p>Possible</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>User Experience</strong></p>
+</td><td colspan="1" rowspan="1"><p>May need retry</p>
+</td><td colspan="1" rowspan="1"><p>Blocks/waits</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Use case</strong></p>
+</td><td colspan="1" rowspan="1"><p>Web apps, REST APIs</p>
+</td><td colspan="1" rowspan="1"><p>Banking, inventory</p>
+</td></tr>
+</table>
+<aside class="warning"><p><strong>Deadlock Warning:</strong> Pessimistic locking can cause deadlocks if two transactions lock resources in different orders. Always lock in consistent order!</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Spring Security Setup" duration="10">
-            <p>Configure Spring Security for authentication and authorization.</p>
-            <h2 is-upgraded>Update User Entity</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.model;
+      </google-codelab-step>
+    
+      <google-codelab-step label="Spring Security Setup" duration="10">
+        <p>Configure Spring Security for authentication and authorization.</p>
+<h2 is-upgraded>Update User Entity</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -577,8 +515,8 @@ public class User {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Create UserDetailsService Implementation</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.security;
+<h2 is-upgraded>Create UserDetailsService Implementation</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.security;
 
 import com.example.taskmanager.model.User;
 import com.example.taskmanager.repository.UserRepository;
@@ -627,8 +565,8 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Security Configuration</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.config;
+<h2 is-upgraded>Security Configuration</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.config;
 
 import com.example.taskmanager.security.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
@@ -706,8 +644,8 @@ public class SecurityConfig {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Understanding Security Configuration</h2>
-            <pre><code language="language-java" class="language-java">// Public access (no authentication required)
+<h2 is-upgraded>Understanding Security Configuration</h2>
+<pre><code language="language-java" class="language-java">// Public access (no authentication required)
 .requestMatchers(&#34;/swagger-ui/**&#34;).permitAll()
 
 // Role-based access (requires specific role)
@@ -722,23 +660,21 @@ public class SecurityConfig {
 // Stateless sessions (for REST APIs)
 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 </code></pre>
-            <p><strong>Role Naming Convention:</strong></p>
-            <ul>
-                <li>Database: <code>ROLE_ADMIN</code>, <code>ROLE_USER</code></li>
-                <li>Code: <code>hasRole("ADMIN")</code> - Spring adds &#34;ROLE_&#34; prefix automatically</li>
-            </ul>
-            <aside class="special">
-                <p><strong>Security Note:</strong> We disabled CSRF for REST APIs using stateless sessions. Enable CSRF
-                    for traditional web apps with session-based authentication.</p>
-            </aside>
+<p><strong>Role Naming Convention:</strong></p>
+<ul>
+<li>Database: <code>ROLE_ADMIN</code>, <code>ROLE_USER</code></li>
+<li>Code: <code>hasRole("ADMIN")</code> - Spring adds &#34;ROLE_&#34; prefix automatically</li>
+</ul>
+<aside class="special"><p><strong>Security Note:</strong> We disabled CSRF for REST APIs using stateless sessions. Enable CSRF for traditional web apps with session-based authentication.</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Method Security" duration="8">
-            <p>Secure service methods with annotations.</p>
-            <h2 is-upgraded>Update UserService</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.service;
+      </google-codelab-step>
+    
+      <google-codelab-step label="Method Security" duration="8">
+        <p>Secure service methods with annotations.</p>
+<h2 is-upgraded>Update UserService</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.service;
 
 import com.example.taskmanager.model.User;
 import com.example.taskmanager.repository.UserRepository;
@@ -824,8 +760,8 @@ public class UserService {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Update TaskService</h2>
-            <pre><code language="language-java" class="language-java">@Service
+<h2 is-upgraded>Update TaskService</h2>
+<pre><code language="language-java" class="language-java">@Service
 @Slf4j
 @Transactional(readOnly = true)
 public class TaskService {
@@ -917,8 +853,8 @@ public class TaskService {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Method Security Annotations</h2>
-            <pre><code language="language-java" class="language-java">// @PreAuthorize - Check before method execution
+<h2 is-upgraded>Method Security Annotations</h2>
+<pre><code language="language-java" class="language-java">// @PreAuthorize - Check before method execution
 @PreAuthorize(&#34;hasRole(&#39;ADMIN&#39;)&#34;)
 public void adminMethod() { }
 
@@ -939,8 +875,8 @@ public void simpleAdminMethod() { }
 @Secured({&#34;ROLE_USER&#34;, &#34;ROLE_ADMIN&#34;})
 public void multiRoleMethod() { }
 </code></pre>
-            <h2 is-upgraded>SpEL Expressions in Security</h2>
-            <pre><code language="language-java" class="language-java">// Authentication principal
+<h2 is-upgraded>SpEL Expressions in Security</h2>
+<pre><code language="language-java" class="language-java">// Authentication principal
 authentication.principal.username
 principal.username  // shorthand
 
@@ -959,18 +895,16 @@ returnObject.owner == principal.username
 // Combine conditions
 hasRole(&#39;ADMIN&#39;) or #user.id == principal.id
 </code></pre>
-            <aside class="special">
-                <p><strong>Best Practice:</strong> Use method security to protect service layer. Never rely only on
-                    controller-level security - someone could call service methods directly.</p>
-            </aside>
+<aside class="special"><p><strong>Best Practice:</strong> Use method security to protect service layer. Never rely only on controller-level security - someone could call service methods directly.</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Update Controllers" duration="6">
-            <p>Add registration endpoint and update controllers for security.</p>
-            <h2 is-upgraded>Update UserController</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.controller;
+      </google-codelab-step>
+    
+      <google-codelab-step label="Update Controllers" duration="6">
+        <p>Add registration endpoint and update controllers for security.</p>
+<h2 is-upgraded>Update UserController</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.controller;
 
 import com.example.taskmanager.model.User;
 import com.example.taskmanager.service.UserService;
@@ -1047,8 +981,8 @@ public class UserController {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Update TaskController</h2>
-            <pre><code language="language-java" class="language-java">@RestController
+<h2 is-upgraded>Update TaskController</h2>
+<pre><code language="language-java" class="language-java">@RestController
 @RequestMapping(&#34;/api/tasks&#34;)
 @Tag(name = &#34;Task Management&#34;)
 @SecurityRequirement(name = &#34;basicAuth&#34;)
@@ -1068,8 +1002,8 @@ public class TaskController {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Update OpenAPIConfig</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.config;
+<h2 is-upgraded>Update OpenAPIConfig</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.config;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -1113,13 +1047,13 @@ public class OpenAPIConfig {
 </code></pre>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Testing Secured API" duration="5">
-            <p>Test authentication and authorization.</p>
-            <h2 is-upgraded>Create Test Users</h2>
-            <p>Add data initialization:</p>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager;
+      </google-codelab-step>
+    
+      <google-codelab-step label="Testing Secured API" duration="5">
+        <p>Test authentication and authorization.</p>
+<h2 is-upgraded>Create Test Users</h2>
+<p>Add data initialization:</p>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager;
 
 import com.example.taskmanager.model.User;
 import com.example.taskmanager.repository.UserRepository;
@@ -1163,9 +1097,9 @@ public class DataInitializer {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Test Authentication</h2>
-            <p><strong>1. Register new user:</strong></p>
-            <pre><code language="language-bash" class="language-bash">curl -X POST http://localhost:8080/api/users/register \
+<h2 is-upgraded>Test Authentication</h2>
+<p><strong>1. Register new user:</strong></p>
+<pre><code language="language-bash" class="language-bash">curl -X POST http://localhost:8080/api/users/register \
   -H &#34;Content-Type: application/json&#34; \
   -d &#39;{
     &#34;username&#34;: &#34;alice&#34;,
@@ -1174,121 +1108,123 @@ public class DataInitializer {
     &#34;password&#34;: &#34;password123&#34;
   }&#39;
 </code></pre>
-            <p><strong>2. Get current user (authenticated):</strong></p>
-            <pre><code language="language-bash" class="language-bash">curl -u john:user123 http://localhost:8080/api/users/me
+<p><strong>2. Get current user (authenticated):</strong></p>
+<pre><code language="language-bash" class="language-bash">curl -u john:user123 http://localhost:8080/api/users/me
 </code></pre>
-            <p><strong>3. Create task (auto-assigned):</strong></p>
-            <pre><code language="language-bash" class="language-bash">curl -u john:user123 -X POST http://localhost:8080/api/tasks \
+<p><strong>3. Create task (auto-assigned):</strong></p>
+<pre><code language="language-bash" class="language-bash">curl -u john:user123 -X POST http://localhost:8080/api/tasks \
   -H &#34;Content-Type: application/json&#34; \
   -d &#39;{
     &#34;title&#34;: &#34;My Secure Task&#34;,
     &#34;description&#34;: &#34;Testing Spring Security&#34;
   }&#39;
 </code></pre>
-            <p><strong>4. Get my tasks:</strong></p>
-            <pre><code language="language-bash" class="language-bash">curl -u john:user123 http://localhost:8080/api/tasks/my-tasks
+<p><strong>4. Get my tasks:</strong></p>
+<pre><code language="language-bash" class="language-bash">curl -u john:user123 http://localhost:8080/api/tasks/my-tasks
 </code></pre>
-            <p><strong>5. Try admin endpoint (should fail):</strong></p>
-            <pre><code language="language-bash" class="language-bash">curl -u john:user123 http://localhost:8080/api/users
+<p><strong>5. Try admin endpoint (should fail):</strong></p>
+<pre><code language="language-bash" class="language-bash">curl -u john:user123 http://localhost:8080/api/users
 # Response: 403 Forbidden
 </code></pre>
-            <p><strong>6. Admin endpoint (should succeed):</strong></p>
-            <pre><code language="language-bash" class="language-bash">curl -u admin:admin123 http://localhost:8080/api/users
+<p><strong>6. Admin endpoint (should succeed):</strong></p>
+<pre><code language="language-bash" class="language-bash">curl -u admin:admin123 http://localhost:8080/api/users
 </code></pre>
-            <p><strong>7. Delete task (admin only):</strong></p>
-            <pre><code language="language-bash" class="language-bash">curl -u admin:admin123 -X DELETE http://localhost:8080/api/tasks/1
+<p><strong>7. Delete task (admin only):</strong></p>
+<pre><code language="language-bash" class="language-bash">curl -u admin:admin123 -X DELETE http://localhost:8080/api/tasks/1
 </code></pre>
-            <h2 is-upgraded>Test in Swagger UI</h2>
-            <ol type="1">
-                <li>Visit: http://localhost:8080/swagger-ui.html</li>
-                <li>Click <strong>Authorize</strong> button</li>
-                <li>Enter credentials: <code>john</code> / <code>user123</code></li>
-                <li>Try endpoints with authentication</li>
-            </ol>
-            <aside class="special">
-                <p><strong>Production Note:</strong> In production, use JWT tokens instead of HTTP Basic auth for better
-                    security and stateless authentication.</p>
-            </aside>
+<h2 is-upgraded>Test in Swagger UI</h2>
+<ol type="1">
+<li>Visit: http://localhost:8080/swagger-ui.html</li>
+<li>Click <strong>Authorize</strong> button</li>
+<li>Enter credentials: <code>john</code> / <code>user123</code></li>
+<li>Try endpoints with authentication</li>
+</ol>
+<aside class="special"><p><strong>Production Note:</strong> In production, use JWT tokens instead of HTTP Basic auth for better security and stateless authentication.</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Conclusion" duration="2">
-            <p>Congratulations! 🎉 You&#39;ve secured your application with Spring Security and JPA locking!</p>
-            <h2 is-upgraded>What You&#39;ve Learned</h2>
-            <ul>
-                <li>✅ <strong>Optimistic Locking:</strong> @Version for conflict detection</li>
-                <li>✅ <strong>Pessimistic Locking:</strong> Database-level locks</li>
-                <li>✅ <strong>Spring Security:</strong> Authentication and authorization</li>
-                <li>✅ <strong>Password Encoding:</strong> BCrypt for secure passwords</li>
-                <li>✅ <strong>Role-Based Access:</strong> ADMIN and USER roles</li>
-                <li>✅ <strong>Method Security:</strong> @PreAuthorize annotations</li>
-                <li>✅ <strong>Security Context:</strong> Access current user</li>
-                <li>✅ <strong>HTTP Basic Auth:</strong> Simple authentication for REST</li>
-            </ul>
-            <h2 is-upgraded>Task Management API v1.3</h2>
-            <p>Security features:</p>
-            <ul>
-                <li>✅ Optimistic locking with @Version</li>
-                <li>✅ Pessimistic locking for critical operations</li>
-                <li>✅ Spring Security configuration</li>
-                <li>✅ User registration and authentication</li>
-                <li>✅ Role-based access control (RBAC)</li>
-                <li>✅ Method-level security</li>
-                <li>✅ Password encryption with BCrypt</li>
-                <li>✅ Public registration endpoint</li>
-                <li>✅ Protected task operations</li>
-                <li>✅ Admin-only user management</li>
-            </ul>
-            <h2 is-upgraded>Key Security Principles</h2>
-            <ol type="1">
-                <li><strong>Defense in Depth:</strong> Multiple layers of security</li>
-                <li><strong>Least Privilege:</strong> Users get minimum required access</li>
-                <li><strong>Password Security:</strong> Never store plain passwords</li>
-                <li><strong>Stateless Sessions:</strong> Better for REST APIs</li>
-                <li><strong>Method Security:</strong> Protect service layer</li>
-                <li><strong>Ownership Checks:</strong> Users access only their resources</li>
-                <li><strong>Role-Based Access:</strong> Organize permissions by roles</li>
-            </ol>
-            <h2 is-upgraded>Git Branching</h2>
-            <pre><code language="language-bash" class="language-bash">git add .
+      </google-codelab-step>
+    
+      <google-codelab-step label="Conclusion" duration="2">
+        <p>Congratulations! 🎉 You&#39;ve secured your application with Spring Security and JPA locking!</p>
+<h2 is-upgraded>What You&#39;ve Learned</h2>
+<ul>
+<li>✅ <strong>Optimistic Locking:</strong> @Version for conflict detection</li>
+<li>✅ <strong>Pessimistic Locking:</strong> Database-level locks</li>
+<li>✅ <strong>Spring Security:</strong> Authentication and authorization</li>
+<li>✅ <strong>Password Encoding:</strong> BCrypt for secure passwords</li>
+<li>✅ <strong>Role-Based Access:</strong> ADMIN and USER roles</li>
+<li>✅ <strong>Method Security:</strong> @PreAuthorize annotations</li>
+<li>✅ <strong>Security Context:</strong> Access current user</li>
+<li>✅ <strong>HTTP Basic Auth:</strong> Simple authentication for REST</li>
+</ul>
+<h2 is-upgraded>Task Management API v1.3</h2>
+<p>Security features:</p>
+<ul>
+<li>✅ Optimistic locking with @Version</li>
+<li>✅ Pessimistic locking for critical operations</li>
+<li>✅ Spring Security configuration</li>
+<li>✅ User registration and authentication</li>
+<li>✅ Role-based access control (RBAC)</li>
+<li>✅ Method-level security</li>
+<li>✅ Password encryption with BCrypt</li>
+<li>✅ Public registration endpoint</li>
+<li>✅ Protected task operations</li>
+<li>✅ Admin-only user management</li>
+</ul>
+<h2 is-upgraded>Key Security Principles</h2>
+<ol type="1">
+<li><strong>Defense in Depth:</strong> Multiple layers of security</li>
+<li><strong>Least Privilege:</strong> Users get minimum required access</li>
+<li><strong>Password Security:</strong> Never store plain passwords</li>
+<li><strong>Stateless Sessions:</strong> Better for REST APIs</li>
+<li><strong>Method Security:</strong> Protect service layer</li>
+<li><strong>Ownership Checks:</strong> Users access only their resources</li>
+<li><strong>Role-Based Access:</strong> Organize permissions by roles</li>
+</ol>
+<h2 is-upgraded>Git Branching</h2>
+<pre><code language="language-bash" class="language-bash">git add .
 git commit -m &#34;Codelab 3.4: JPA Locking &amp; Spring Security complete&#34;
 git tag codelab-3.4
 </code></pre>
-            <h2 is-upgraded>Next Steps</h2>
-            <ul>
-                <li><strong>Codelab 3.5:</strong> JWT Authentication &amp; Spring Cloud</li>
-            </ul>
-            <h2 is-upgraded>Additional Resources</h2>
-            <ul>
-                <li><a href="https://docs.spring.io/spring-security/reference/" target="_blank">Spring Security
-                        Reference</a></li>
-                <li><a href="https://docs.oracle.com/javaee/7/tutorial/persistence-locking.htm" target="_blank">JPA
-                        Locking</a></li>
-                <li><a href="https://owasp.org/www-project-top-ten/" target="_blank">OWASP Security Guidelines</a></li>
-            </ul>
-            <aside class="special">
-                <p><strong>Enterprise Ready!</strong> Your API now has proper security and concurrency control, ready
-                    for multi-user production environments!</p>
-            </aside>
+<h2 is-upgraded>Next Steps</h2>
+<ul>
+<li><strong>Codelab 3.5:</strong> JWT Authentication &amp; Spring Cloud</li>
+</ul>
+<h2 is-upgraded>Additional Resources</h2>
+<ul>
+<li><a href="https://docs.spring.io/spring-security/reference/" target="_blank">Spring Security Reference</a></li>
+<li><a href="https://docs.oracle.com/javaee/7/tutorial/persistence-locking.htm" target="_blank">JPA Locking</a></li>
+<li><a href="https://owasp.org/www-project-top-ten/" target="_blank">OWASP Security Guidelines</a></li>
+</ul>
+<aside class="special"><p><strong>Enterprise Ready!</strong> Your API now has proper security and concurrency control, ready for multi-user production environments!</p>
+</aside>
 
 
-        </google-codelab-step>
+      </google-codelab-step>
+    
+  </google-codelab>
 
-    </google-codelab>
-
-    <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
-    <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
-    <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
-    <script src="//support.google.com/inapp/api.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js"></script>
-    <script src="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.js"></script>
-    <script>
-        hljs.highlightAll();
-        hljs.addPlugin(new CopyButtonPlugin({ autohide: false }));
-
-    </script>
+  <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
+  <script src="//support.google.com/inapp/api.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js"></script>
+  <script src="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.js"></script>
+  <script>
+    hljs.highlightAll();
+    hljs.addPlugin(new CopyButtonPlugin({ autohide: false}));
+    
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      const homeUrl = "\/springboot_course\/";
+      const arrowBack = document.getElementById('arrow-back');
+      const doneBtn = document.getElementById('done');
+      if (arrowBack) arrowBack.href = homeUrl;
+      if (doneBtn) doneBtn.href = homeUrl;
+    });
+    
+  </script>
 
 </body>
-
 </html>

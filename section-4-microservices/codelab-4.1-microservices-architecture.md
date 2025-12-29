@@ -3,6 +3,7 @@ id: microservices-architecture
 categories: Spring Boot, Microservices, Spring Cloud, Eureka, API Gateway
 environments: Web
 status: Published
+home url: /springboot_course/
 
 # Microservices Architecture & Implementation
 

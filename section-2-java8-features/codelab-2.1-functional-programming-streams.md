@@ -3,6 +3,7 @@ id: functional-programming-streams
 categories: Java, Java 8, Functional Programming, Streams API
 environments: Web
 status: Published
+home url: /springboot_course/
 
 # Functional Programming & Streams API
 

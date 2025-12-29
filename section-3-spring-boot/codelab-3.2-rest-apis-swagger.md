@@ -3,6 +3,7 @@ id: rest-apis-swagger
 categories: Spring Boot, REST API, Swagger, OpenAPI, Validation
 environments: Web
 status: Published
+home url: /springboot_course/
 
 # RESTful APIs, Swagger & Exception Handling
 

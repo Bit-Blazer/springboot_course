@@ -1,84 +1,83 @@
+
 <!doctype html>
 
 <html>
-
 <head>
-    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
-    <meta name="theme-color" content="#4F7DC9">
-    <meta charset="UTF-8">
-    <title>Spring JMS &amp; Event-Driven Architecture</title>
-    <link rel="stylesheet"
-        href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
-    <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
-    <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
-    <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1  /build/styles/monokai.min.css">
-    <link rel="stylesheet" href="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.css">
-    <style>
-        .success {
-            color: #1e8e3e;
-        }
-
-        .error {
-            color: red;
-        }
-    </style>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <title>Spring JMS &amp; Event-Driven Architecture</title>
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
+  <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1  /build/styles/monokai.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.css">
+  <style>
+    .success {
+      color: #1e8e3e;
+    }
+    .error {
+      color: red;
+    }
+  </style>
 </head>
-
 <body>
-    <google-codelab-analytics gaid="UA-49880327-14" ga4id=""></google-codelab-analytics>
-    <google-codelab codelab-gaid="" codelab-ga4id="" id="spring-jms-event-driven"
-        title="Spring JMS &amp; Event-Driven Architecture" environment="web" feedback-link="">
-
-        <google-codelab-step label="Introduction" duration="3">
-            <p>Add asynchronous messaging and event-driven architecture to the Task Management API using Spring JMS and
-                ActiveMQ Artemis.</p>
-            <h2 class="checklist" is-upgraded>What You&#39;ll Learn</h2>
-            <ul class="checklist">
-                <li><strong>JMS Basics:</strong> Java Message Service fundamentals</li>
-                <li><strong>Message Brokers:</strong> ActiveMQ Artemis embedded server</li>
-                <li><strong>Queue vs Topic:</strong> Point-to-point and publish-subscribe</li>
-                <li><strong>Spring JMS:</strong> JmsTemplate and @JmsListener</li>
-                <li><strong>Event-Driven Design:</strong> Domain events and event handlers</li>
-                <li><strong>Async Messaging:</strong> Non-blocking message sending</li>
-                <li><strong>Message Patterns:</strong> Request-reply, fire-and-forget</li>
-                <li><strong>Error Handling:</strong> Dead letter queues and retry</li>
-                <li><strong>Transaction Management:</strong> Message transactions</li>
-                <li><strong>Event Sourcing:</strong> Audit trail with events</li>
-            </ul>
-            <h2 is-upgraded>What You&#39;ll Build</h2>
-            <p>Event-driven Task Management API with:</p>
-            <ul>
-                <li><strong>Task Events:</strong> TaskCreated, TaskUpdated, TaskDeleted</li>
-                <li><strong>Email Notifications:</strong> Async email on task events</li>
-                <li><strong>Audit Log:</strong> Event sourcing for task history</li>
-                <li><strong>JMS Queues:</strong> Task events, notifications, audit</li>
-                <li><strong>Event Publishers:</strong> Domain event publishing</li>
-                <li><strong>Event Listeners:</strong> Async event processing</li>
-                <li><strong>Dead Letter Queue:</strong> Failed message handling</li>
-                <li><strong>Embedded Artemis:</strong> No external broker needed (dev)</li>
-                <li><strong>Message Priority:</strong> Urgent vs normal notifications</li>
-                <li><strong>Scheduled Messages:</strong> Delayed task reminders</li>
-            </ul>
-            <h2 is-upgraded>Prerequisites</h2>
-            <ul>
-                <li>Completed Codelab 3.6 (Reactive &amp; R2DBC)</li>
-                <li>Understanding of async programming</li>
-            </ul>
-            <h2 is-upgraded>Messaging Patterns</h2>
-            <p><strong>Queue (Point-to-Point):</strong></p>
-            <pre><code>Producer → [Queue] → Consumer
+  <google-codelab-analytics gaid="UA-49880327-14" ga4id=""></google-codelab-analytics>
+  <google-codelab codelab-gaid=""
+                  codelab-ga4id=""
+                  id="spring-jms-event-driven"
+                  title="Spring JMS &amp; Event-Driven Architecture"
+                  environment="web"
+                  feedback-link="">
+    
+      <google-codelab-step label="Introduction" duration="3">
+        <p>Add asynchronous messaging and event-driven architecture to the Task Management API using Spring JMS and ActiveMQ Artemis.</p>
+<h2 class="checklist" is-upgraded>What You&#39;ll Learn</h2>
+<ul class="checklist">
+<li><strong>JMS Basics:</strong> Java Message Service fundamentals</li>
+<li><strong>Message Brokers:</strong> ActiveMQ Artemis embedded server</li>
+<li><strong>Queue vs Topic:</strong> Point-to-point and publish-subscribe</li>
+<li><strong>Spring JMS:</strong> JmsTemplate and @JmsListener</li>
+<li><strong>Event-Driven Design:</strong> Domain events and event handlers</li>
+<li><strong>Async Messaging:</strong> Non-blocking message sending</li>
+<li><strong>Message Patterns:</strong> Request-reply, fire-and-forget</li>
+<li><strong>Error Handling:</strong> Dead letter queues and retry</li>
+<li><strong>Transaction Management:</strong> Message transactions</li>
+<li><strong>Event Sourcing:</strong> Audit trail with events</li>
+</ul>
+<h2 is-upgraded>What You&#39;ll Build</h2>
+<p>Event-driven Task Management API with:</p>
+<ul>
+<li><strong>Task Events:</strong> TaskCreated, TaskUpdated, TaskDeleted</li>
+<li><strong>Email Notifications:</strong> Async email on task events</li>
+<li><strong>Audit Log:</strong> Event sourcing for task history</li>
+<li><strong>JMS Queues:</strong> Task events, notifications, audit</li>
+<li><strong>Event Publishers:</strong> Domain event publishing</li>
+<li><strong>Event Listeners:</strong> Async event processing</li>
+<li><strong>Dead Letter Queue:</strong> Failed message handling</li>
+<li><strong>Embedded Artemis:</strong> No external broker needed (dev)</li>
+<li><strong>Message Priority:</strong> Urgent vs normal notifications</li>
+<li><strong>Scheduled Messages:</strong> Delayed task reminders</li>
+</ul>
+<h2 is-upgraded>Prerequisites</h2>
+<ul>
+<li>Completed Codelab 3.6 (Reactive &amp; R2DBC)</li>
+<li>Understanding of async programming</li>
+</ul>
+<h2 is-upgraded>Messaging Patterns</h2>
+<p><strong>Queue (Point-to-Point):</strong></p>
+<pre><code>Producer → [Queue] → Consumer
            1 message = 1 consumer
 </code></pre>
-            <p><strong>Topic (Publish-Subscribe):</strong></p>
-            <pre><code>Publisher → [Topic] → Subscriber 1
+<p><strong>Topic (Publish-Subscribe):</strong></p>
+<pre><code>Publisher → [Topic] → Subscriber 1
                    → Subscriber 2
                    → Subscriber 3
            1 message = N subscribers
 </code></pre>
-            <h2 is-upgraded>New Dependencies</h2>
-            <p>Add to <code>pom.xml</code>:</p>
-            <pre><code language="language-xml" class="language-xml">&lt;!-- Spring JMS --&gt;
+<h2 is-upgraded>New Dependencies</h2>
+<p>Add to <code>pom.xml</code>:</p>
+<pre><code language="language-xml" class="language-xml">&lt;!-- Spring JMS --&gt;
 &lt;dependency&gt;
     &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
     &lt;artifactId&gt;spring-boot-starter-artemis&lt;/artifactId&gt;
@@ -102,19 +101,17 @@
     &lt;artifactId&gt;spring-boot-starter-mail&lt;/artifactId&gt;
 &lt;/dependency&gt;
 </code></pre>
-            <aside class="special">
-                <p><strong>Event-Driven Benefits:</strong> Loose coupling, async processing, better scalability,
-                    resilience to failures, and audit trail out of the box!</p>
-            </aside>
+<aside class="special"><p><strong>Event-Driven Benefits:</strong> Loose coupling, async processing, better scalability, resilience to failures, and audit trail out of the box!</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Understanding Event-Driven Architecture" duration="8">
-            <p>Learn event-driven design principles and messaging patterns.</p>
-            <h2 is-upgraded>Traditional vs Event-Driven</h2>
-            <p><strong>Traditional (Synchronous):</strong></p>
-            <pre><code language="language-java" class="language-java">@Transactional
+      </google-codelab-step>
+    
+      <google-codelab-step label="Understanding Event-Driven Architecture" duration="8">
+        <p>Learn event-driven design principles and messaging patterns.</p>
+<h2 is-upgraded>Traditional vs Event-Driven</h2>
+<p><strong>Traditional (Synchronous):</strong></p>
+<pre><code language="language-java" class="language-java">@Transactional
 public Task createTask(Task task) {
     Task saved = taskRepository.save(task);
     emailService.sendEmail(saved);        // Blocks
@@ -128,8 +125,8 @@ public Task createTask(Task task) {
 // - Tight coupling (task creation knows about email, audit)
 // - Single point of failure (email down = task creation fails)
 </code></pre>
-            <p><strong>Event-Driven (Asynchronous):</strong></p>
-            <pre><code language="language-java" class="language-java">@Transactional
+<p><strong>Event-Driven (Asynchronous):</strong></p>
+<pre><code language="language-java" class="language-java">@Transactional
 public Task createTask(Task task) {
     Task saved = taskRepository.save(task);
     eventPublisher.publish(new TaskCreatedEvent(saved));  // Fire and forget
@@ -151,8 +148,8 @@ public void handleAudit(TaskCreatedEvent event) {
 // ✅ Loose coupling (task doesn&#39;t know about email)
 // ✅ Resilient (email down = task still created)
 </code></pre>
-            <h2 is-upgraded>Domain Events</h2>
-            <pre><code language="language-java" class="language-java">// Event = Something that happened in the past
+<h2 is-upgraded>Domain Events</h2>
+<pre><code language="language-java" class="language-java">// Event = Something that happened in the past
 public class TaskCreatedEvent {
     private Long taskId;
     private String title;
@@ -174,23 +171,23 @@ public class TaskAssignedEvent {
     private LocalDateTime assignedAt;
 }
 </code></pre>
-            <h2 is-upgraded>Event-Driven Patterns</h2>
-            <p><strong>1. Event Notification:</strong></p>
-            <pre><code>Service A → Event → Service B (reacts)
+<h2 is-upgraded>Event-Driven Patterns</h2>
+<p><strong>1. Event Notification:</strong></p>
+<pre><code>Service A → Event → Service B (reacts)
 </code></pre>
-            <p><strong>2. Event-Carried State Transfer:</strong></p>
-            <pre><code>Service A → Event (with full state) → Service B (stores copy)
+<p><strong>2. Event-Carried State Transfer:</strong></p>
+<pre><code>Service A → Event (with full state) → Service B (stores copy)
 </code></pre>
-            <p><strong>3. Event Sourcing:</strong></p>
-            <pre><code>All changes stored as events
+<p><strong>3. Event Sourcing:</strong></p>
+<pre><code>All changes stored as events
 Current state = replay all events
 </code></pre>
-            <p><strong>4. CQRS (Command Query Responsibility Segregation):</strong></p>
-            <pre><code>Write Model → Events → Read Model
+<p><strong>4. CQRS (Command Query Responsibility Segregation):</strong></p>
+<pre><code>Write Model → Events → Read Model
 (Commands)            (Queries)
 </code></pre>
-            <h2 is-upgraded>JMS Components</h2>
-            <pre><code>Producer                     Broker                    Consumer
+<h2 is-upgraded>JMS Components</h2>
+<pre><code>Producer                     Broker                    Consumer
   |                            |                         |
   |---(1) Send Message--------&gt;|                         |
   |                            |                         |
@@ -200,9 +197,9 @@ Current state = replay all events
   |                            |                         |
   |&lt;--(4) Ack (optional)-------|&lt;--(4) Acknowledge------|
 </code></pre>
-            <h2 is-upgraded>Queue vs Topic</h2>
-            <p><strong>Queue (Task Distribution):</strong></p>
-            <pre><code>Producer → [Queue: task.processing]
+<h2 is-upgraded>Queue vs Topic</h2>
+<p><strong>Queue (Task Distribution):</strong></p>
+<pre><code>Producer → [Queue: task.processing]
               ↓
           Consumer 1 ✓ (processes)
           Consumer 2 (idle)
@@ -210,8 +207,8 @@ Current state = replay all events
 
 Use for: Work distribution, load balancing
 </code></pre>
-            <p><strong>Topic (Event Broadcasting):</strong></p>
-            <pre><code>Publisher → [Topic: task.created]
+<p><strong>Topic (Event Broadcasting):</strong></p>
+<pre><code>Publisher → [Topic: task.created]
                ↓
           Subscriber 1: Email ✓
           Subscriber 2: Audit ✓
@@ -219,8 +216,8 @@ Use for: Work distribution, load balancing
 
 Use for: Notifications, event broadcasting
 </code></pre>
-            <h2 is-upgraded>Message Properties</h2>
-            <pre><code language="language-java" class="language-java">// Priority: 0-9 (0=lowest, 9=highest)
+<h2 is-upgraded>Message Properties</h2>
+<pre><code language="language-java" class="language-java">// Priority: 0-9 (0=lowest, 9=highest)
 jmsTemplate.setPriority(9);
 
 // Time-to-live: Message expiration
@@ -235,18 +232,16 @@ String messageId = message.getJMSMessageID();
 // Correlation ID: Link request-reply
 message.setJMSCorrelationID(requestId);
 </code></pre>
-            <aside class="special">
-                <p><strong>Best Practice:</strong> Use events for inter-service communication in microservices. Events
-                    provide loose coupling and enable independent evolution.</p>
-            </aside>
+<aside class="special"><p><strong>Best Practice:</strong> Use events for inter-service communication in microservices. Events provide loose coupling and enable independent evolution.</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Configure ActiveMQ Artemis" duration="5">
-            <p>Set up embedded ActiveMQ Artemis message broker.</p>
-            <h2 is-upgraded>Update application.yml</h2>
-            <pre><code language="language-yaml" class="language-yaml">spring:
+      </google-codelab-step>
+    
+      <google-codelab-step label="Configure ActiveMQ Artemis" duration="5">
+        <p>Set up embedded ActiveMQ Artemis message broker.</p>
+<h2 is-upgraded>Update application.yml</h2>
+<pre><code language="language-yaml" class="language-yaml">spring:
   application:
     name: task-manager
 
@@ -288,9 +283,9 @@ logging:
     org.springframework.jms: DEBUG
     com.example.taskmanager: DEBUG
 </code></pre>
-            <h2 is-upgraded>Production Configuration</h2>
-            <p><strong>application-prod.yml:</strong></p>
-            <pre><code language="language-yaml" class="language-yaml">spring:
+<h2 is-upgraded>Production Configuration</h2>
+<p><strong>application-prod.yml:</strong></p>
+<pre><code language="language-yaml" class="language-yaml">spring:
   artemis:
     mode: native
     host: localhost
@@ -304,8 +299,8 @@ logging:
     listener:
       concurrency: 5-20
 </code></pre>
-            <h2 is-upgraded>JMS Configuration Class</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.config;
+<h2 is-upgraded>JMS Configuration Class</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -327,8 +322,8 @@ public class JmsConfig {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Queue Constants</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.messaging;
+<h2 is-upgraded>Queue Constants</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.messaging;
 
 public class QueueConstants {
 
@@ -348,18 +343,16 @@ public class QueueConstants {
     private QueueConstants() {}
 }
 </code></pre>
-            <aside class="warning">
-                <p><strong>Production Note:</strong> Use external Artemis broker in production for reliability and
-                    clustering. Embedded mode is for development only!</p>
-            </aside>
+<aside class="warning"><p><strong>Production Note:</strong> Use external Artemis broker in production for reliability and clustering. Embedded mode is for development only!</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Create Domain Events" duration="8">
-            <p>Define events for task lifecycle.</p>
-            <h2 is-upgraded>Base Event</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.event;
+      </google-codelab-step>
+    
+      <google-codelab-step label="Create Domain Events" duration="8">
+        <p>Define events for task lifecycle.</p>
+<h2 is-upgraded>Base Event</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.event;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -385,8 +378,8 @@ public abstract class DomainEvent implements Serializable {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Task Events</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.event;
+<h2 is-upgraded>Task Events</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.event;
 
 import com.example.taskmanager.model.TaskStatus;
 import lombok.AllArgsConstructor;
@@ -417,7 +410,7 @@ public class TaskCreatedEvent extends DomainEvent {
     }
 }
 </code></pre>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.event;
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.event;
 
 import com.example.taskmanager.model.TaskStatus;
 import lombok.AllArgsConstructor;
@@ -448,7 +441,7 @@ public class TaskUpdatedEvent extends DomainEvent {
     }
 }
 </code></pre>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.event;
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.event;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -473,7 +466,7 @@ public class TaskDeletedEvent extends DomainEvent {
     }
 }
 </code></pre>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.event;
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.event;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -500,7 +493,7 @@ public class TaskAssignedEvent extends DomainEvent {
     }
 }
 </code></pre>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.event;
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.event;
 
 import com.example.taskmanager.model.TaskStatus;
 import lombok.AllArgsConstructor;
@@ -531,8 +524,8 @@ public class TaskStatusChangedEvent extends DomainEvent {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Notification Event</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.event;
+<h2 is-upgraded>Notification Event</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.event;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -558,18 +551,16 @@ public class NotificationEvent implements Serializable {
     }
 }
 </code></pre>
-            <aside class="special">
-                <p><strong>Event Design:</strong> Events are immutable, past tense (TaskCreated not CreateTask), and
-                    contain all data needed by subscribers.</p>
-            </aside>
+<aside class="special"><p><strong>Event Design:</strong> Events are immutable, past tense (TaskCreated not CreateTask), and contain all data needed by subscribers.</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Event Publisher Service" duration="8">
-            <p>Create service to publish events to JMS queues.</p>
-            <h2 is-upgraded>EventPublisher</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.messaging;
+      </google-codelab-step>
+    
+      <google-codelab-step label="Event Publisher Service" duration="8">
+        <p>Create service to publish events to JMS queues.</p>
+<h2 is-upgraded>EventPublisher</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.messaging;
 
 import com.example.taskmanager.event.DomainEvent;
 import com.example.taskmanager.event.NotificationEvent;
@@ -651,8 +642,8 @@ public class EventPublisher {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Update TaskService</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.service;
+<h2 is-upgraded>Update TaskService</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.service;
 
 import com.example.taskmanager.event.*;
 import com.example.taskmanager.exception.TaskNotFoundException;
@@ -798,12 +789,12 @@ public class TaskService {
 </code></pre>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Event Listeners" duration="10">
-            <p>Create listeners to handle events asynchronously.</p>
-            <h2 is-upgraded>Audit Event Listener</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.messaging.listener;
+      </google-codelab-step>
+    
+      <google-codelab-step label="Event Listeners" duration="10">
+        <p>Create listeners to handle events asynchronously.</p>
+<h2 is-upgraded>Audit Event Listener</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.messaging.listener;
 
 import com.example.taskmanager.event.*;
 import com.example.taskmanager.model.AuditLog;
@@ -892,8 +883,8 @@ public class AuditEventListener {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Notification Event Listener</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.messaging.listener;
+<h2 is-upgraded>Notification Event Listener</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.messaging.listener;
 
 import com.example.taskmanager.event.*;
 import com.example.taskmanager.messaging.EventPublisher;
@@ -979,8 +970,8 @@ public class NotificationEventListener {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Email Event Listener</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.messaging.listener;
+<h2 is-upgraded>Email Event Listener</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.messaging.listener;
 
 import com.example.taskmanager.event.NotificationEvent;
 import lombok.extern.slf4j.Slf4j;
@@ -1010,8 +1001,8 @@ public class EmailEventListener {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Dead Letter Queue Listener</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.messaging.listener;
+<h2 is-upgraded>Dead Letter Queue Listener</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.messaging.listener;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jms.annotation.JmsListener;
@@ -1039,8 +1030,8 @@ public class DeadLetterQueueListener {
     }
 }
 </code></pre>
-            <h2 is-upgraded>AuditLog Entity</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.model;
+<h2 is-upgraded>AuditLog Entity</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -1063,8 +1054,8 @@ public class AuditLog {
     private LocalDateTime createdAt;
 }
 </code></pre>
-            <h2 is-upgraded>AuditLogRepository</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.repository;
+<h2 is-upgraded>AuditLogRepository</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.repository;
 
 import com.example.taskmanager.model.AuditLog;
 import org.springframework.stereotype.Repository;
@@ -1099,19 +1090,17 @@ public class AuditLogRepository {
     }
 }
 </code></pre>
-            <aside class="special">
-                <p><strong>Listener Patterns:</strong> @JmsListener methods run asynchronously. Multiple listeners can
-                    subscribe to same queue (load balancing) or topic (broadcasting).</p>
-            </aside>
+<aside class="special"><p><strong>Listener Patterns:</strong> @JmsListener methods run asynchronously. Multiple listeners can subscribe to same queue (load balancing) or topic (broadcasting).</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Testing Event-Driven System" duration="5">
-            <p>Test async messaging and event handling.</p>
-            <h2 is-upgraded>Manual Testing</h2>
-            <p><strong>1. Create a task:</strong></p>
-            <pre><code language="language-bash" class="language-bash">curl -X POST http://localhost:8080/api/tasks \
+      </google-codelab-step>
+    
+      <google-codelab-step label="Testing Event-Driven System" duration="5">
+        <p>Test async messaging and event handling.</p>
+<h2 is-upgraded>Manual Testing</h2>
+<p><strong>1. Create a task:</strong></p>
+<pre><code language="language-bash" class="language-bash">curl -X POST http://localhost:8080/api/tasks \
   -H &#34;Content-Type: application/json&#34; \
   -H &#34;Authorization: Bearer &lt;token&gt;&#34; \
   -d &#39;{
@@ -1119,29 +1108,29 @@ public class AuditLogRepository {
     &#34;description&#34;: &#34;Testing JMS events&#34;
   }&#39;
 </code></pre>
-            <p><strong>Check logs:</strong></p>
-            <pre><code>Publishing TaskCreated event: &lt;uuid&gt;
+<p><strong>Check logs:</strong></p>
+<pre><code>Publishing TaskCreated event: &lt;uuid&gt;
 Audit: Task created - ID: 1, Title: Event-Driven Task
 Notification: Task created - sending notification to user: 1
 📧 Sending email to: user@example.com
 ✅ Email sent successfully
 </code></pre>
-            <p><strong>2. Assign task:</strong></p>
-            <pre><code language="language-bash" class="language-bash">curl -X PUT http://localhost:8080/api/tasks/1/assign/2 \
+<p><strong>2. Assign task:</strong></p>
+<pre><code language="language-bash" class="language-bash">curl -X PUT http://localhost:8080/api/tasks/1/assign/2 \
   -H &#34;Authorization: Bearer &lt;token&gt;&#34;
 </code></pre>
-            <p><strong>Check logs:</strong></p>
-            <pre><code>Publishing TaskAssigned event: &lt;uuid&gt;
+<p><strong>Check logs:</strong></p>
+<pre><code>Publishing TaskAssigned event: &lt;uuid&gt;
 Audit: Task assigned - ID: 1 to User: 2
 Notification: Task assigned - notifying user: 2
 📧 Sending email to: user2@example.com (URGENT)
 </code></pre>
-            <p><strong>3. View audit logs:</strong></p>
-            <pre><code language="language-bash" class="language-bash">curl http://localhost:8080/api/audit/task/1 \
+<p><strong>3. View audit logs:</strong></p>
+<pre><code language="language-bash" class="language-bash">curl http://localhost:8080/api/audit/task/1 \
   -H &#34;Authorization: Bearer &lt;token&gt;&#34;
 </code></pre>
-            <h2 is-upgraded>Integration Test</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.messaging;
+<h2 is-upgraded>Integration Test</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.messaging;
 
 import com.example.taskmanager.event.TaskCreatedEvent;
 import com.example.taskmanager.model.TaskStatus;
@@ -1178,120 +1167,122 @@ public class EventPublisherIntegrationTest {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Add Awaitility Dependency</h2>
-            <pre><code language="language-xml" class="language-xml">&lt;dependency&gt;
+<h2 is-upgraded>Add Awaitility Dependency</h2>
+<pre><code language="language-xml" class="language-xml">&lt;dependency&gt;
     &lt;groupId&gt;org.awaitility&lt;/groupId&gt;
     &lt;artifactId&gt;awaitility&lt;/artifactId&gt;
     &lt;version&gt;4.2.0&lt;/version&gt;
     &lt;scope&gt;test&lt;/scope&gt;
 &lt;/dependency&gt;
 </code></pre>
-            <h2 is-upgraded>Monitor Artemis Console</h2>
-            <p>Access embedded Artemis console:</p>
-            <ul>
-                <li>URL: http://localhost:8161/console</li>
-                <li>Default credentials: admin/admin</li>
-            </ul>
-            <p>View:</p>
-            <ul>
-                <li>Queue depths</li>
-                <li>Message rates</li>
-                <li>Active consumers</li>
-                <li>DLQ messages</li>
-            </ul>
-            <aside class="special">
-                <p><strong>Testing Async:</strong> Use Awaitility to test async operations with timeouts. Never use
-                    Thread.sleep() in tests!</p>
-            </aside>
+<h2 is-upgraded>Monitor Artemis Console</h2>
+<p>Access embedded Artemis console:</p>
+<ul>
+<li>URL: http://localhost:8161/console</li>
+<li>Default credentials: admin/admin</li>
+</ul>
+<p>View:</p>
+<ul>
+<li>Queue depths</li>
+<li>Message rates</li>
+<li>Active consumers</li>
+<li>DLQ messages</li>
+</ul>
+<aside class="special"><p><strong>Testing Async:</strong> Use Awaitility to test async operations with timeouts. Never use Thread.sleep() in tests!</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Conclusion" duration="2">
-            <p>Congratulations! 🎉 You&#39;ve built an event-driven architecture with Spring JMS!</p>
-            <h2 is-upgraded>What You&#39;ve Learned</h2>
-            <ul>
-                <li>✅ <strong>JMS Basics:</strong> Queues, topics, message brokers</li>
-                <li>✅ <strong>ActiveMQ Artemis:</strong> Embedded broker configuration</li>
-                <li>✅ <strong>Event-Driven Design:</strong> Domain events and handlers</li>
-                <li>✅ <strong>Spring JMS:</strong> JmsTemplate and @JmsListener</li>
-                <li>✅ <strong>Async Processing:</strong> Non-blocking event handling</li>
-                <li>✅ <strong>Event Publishing:</strong> Fire-and-forget messaging</li>
-                <li>✅ <strong>Event Listeners:</strong> Decoupled event subscribers</li>
-                <li>✅ <strong>Audit Trail:</strong> Event sourcing for history</li>
-                <li>✅ <strong>Notifications:</strong> Email notifications via events</li>
-                <li>✅ <strong>DLQ:</strong> Dead letter queue for failures</li>
-            </ul>
-            <h2 is-upgraded>Task Management API v1.6</h2>
-            <p>Event-driven features:</p>
-            <ul>
-                <li>✅ Domain events for task lifecycle</li>
-                <li>✅ Async event publishing</li>
-                <li>✅ Audit log via event sourcing</li>
-                <li>✅ Email notifications</li>
-                <li>✅ Decoupled event handlers</li>
-                <li>✅ JMS queues and topics</li>
-                <li>✅ Message priority support</li>
-                <li>✅ Dead letter queue handling</li>
-                <li>✅ Embedded Artemis broker</li>
-                <li>✅ Production-ready messaging</li>
-            </ul>
-            <h2 is-upgraded>Event-Driven Benefits</h2>
-            <p><strong>Before (Synchronous):</strong></p>
-            <ul>
-                <li>🔴 Slow response times</li>
-                <li>🔴 Tight coupling</li>
-                <li>🔴 Single point of failure</li>
-                <li>🔴 Hard to scale</li>
-            </ul>
-            <p><strong>After (Event-Driven):</strong></p>
-            <ul>
-                <li>✅ Fast response times</li>
-                <li>✅ Loose coupling</li>
-                <li>✅ Resilient to failures</li>
-                <li>✅ Easy horizontal scaling</li>
-                <li>✅ Audit trail included</li>
-                <li>✅ Async processing</li>
-            </ul>
-            <h2 is-upgraded>Git Branching</h2>
-            <pre><code language="language-bash" class="language-bash">git add .
+      </google-codelab-step>
+    
+      <google-codelab-step label="Conclusion" duration="2">
+        <p>Congratulations! 🎉 You&#39;ve built an event-driven architecture with Spring JMS!</p>
+<h2 is-upgraded>What You&#39;ve Learned</h2>
+<ul>
+<li>✅ <strong>JMS Basics:</strong> Queues, topics, message brokers</li>
+<li>✅ <strong>ActiveMQ Artemis:</strong> Embedded broker configuration</li>
+<li>✅ <strong>Event-Driven Design:</strong> Domain events and handlers</li>
+<li>✅ <strong>Spring JMS:</strong> JmsTemplate and @JmsListener</li>
+<li>✅ <strong>Async Processing:</strong> Non-blocking event handling</li>
+<li>✅ <strong>Event Publishing:</strong> Fire-and-forget messaging</li>
+<li>✅ <strong>Event Listeners:</strong> Decoupled event subscribers</li>
+<li>✅ <strong>Audit Trail:</strong> Event sourcing for history</li>
+<li>✅ <strong>Notifications:</strong> Email notifications via events</li>
+<li>✅ <strong>DLQ:</strong> Dead letter queue for failures</li>
+</ul>
+<h2 is-upgraded>Task Management API v1.6</h2>
+<p>Event-driven features:</p>
+<ul>
+<li>✅ Domain events for task lifecycle</li>
+<li>✅ Async event publishing</li>
+<li>✅ Audit log via event sourcing</li>
+<li>✅ Email notifications</li>
+<li>✅ Decoupled event handlers</li>
+<li>✅ JMS queues and topics</li>
+<li>✅ Message priority support</li>
+<li>✅ Dead letter queue handling</li>
+<li>✅ Embedded Artemis broker</li>
+<li>✅ Production-ready messaging</li>
+</ul>
+<h2 is-upgraded>Event-Driven Benefits</h2>
+<p><strong>Before (Synchronous):</strong></p>
+<ul>
+<li>🔴 Slow response times</li>
+<li>🔴 Tight coupling</li>
+<li>🔴 Single point of failure</li>
+<li>🔴 Hard to scale</li>
+</ul>
+<p><strong>After (Event-Driven):</strong></p>
+<ul>
+<li>✅ Fast response times</li>
+<li>✅ Loose coupling</li>
+<li>✅ Resilient to failures</li>
+<li>✅ Easy horizontal scaling</li>
+<li>✅ Audit trail included</li>
+<li>✅ Async processing</li>
+</ul>
+<h2 is-upgraded>Git Branching</h2>
+<pre><code language="language-bash" class="language-bash">git add .
 git commit -m &#34;Codelab 3.7: Spring JMS &amp; Event-Driven Architecture complete&#34;
 git tag codelab-3.7
 </code></pre>
-            <h2 is-upgraded>Next Steps</h2>
-            <ul>
-                <li><strong>Codelab 3.8:</strong> Testing &amp; Remote Debugging</li>
-            </ul>
-            <h2 is-upgraded>Additional Resources</h2>
-            <ul>
-                <li><a href="https://docs.spring.io/spring-framework/reference/integration/jms.html"
-                        target="_blank">Spring JMS Documentation</a></li>
-                <li><a href="https://activemq.apache.org/components/artemis/" target="_blank">ActiveMQ Artemis</a></li>
-                <li><a href="https://martinfowler.com/articles/201701-event-driven.html" target="_blank">Event-Driven
-                        Architecture</a></li>
-            </ul>
-            <aside class="special">
-                <p><strong>Microservices Ready!</strong> Your API now uses event-driven architecture - the foundation
-                    for scalable, loosely-coupled microservices!</p>
-            </aside>
+<h2 is-upgraded>Next Steps</h2>
+<ul>
+<li><strong>Codelab 3.8:</strong> Testing &amp; Remote Debugging</li>
+</ul>
+<h2 is-upgraded>Additional Resources</h2>
+<ul>
+<li><a href="https://docs.spring.io/spring-framework/reference/integration/jms.html" target="_blank">Spring JMS Documentation</a></li>
+<li><a href="https://activemq.apache.org/components/artemis/" target="_blank">ActiveMQ Artemis</a></li>
+<li><a href="https://martinfowler.com/articles/201701-event-driven.html" target="_blank">Event-Driven Architecture</a></li>
+</ul>
+<aside class="special"><p><strong>Microservices Ready!</strong> Your API now uses event-driven architecture - the foundation for scalable, loosely-coupled microservices!</p>
+</aside>
 
 
-        </google-codelab-step>
+      </google-codelab-step>
+    
+  </google-codelab>
 
-    </google-codelab>
-
-    <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
-    <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
-    <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
-    <script src="//support.google.com/inapp/api.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js"></script>
-    <script src="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.js"></script>
-    <script>
-        hljs.highlightAll();
-        hljs.addPlugin(new CopyButtonPlugin({ autohide: false }));
-
-    </script>
+  <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
+  <script src="//support.google.com/inapp/api.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js"></script>
+  <script src="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.js"></script>
+  <script>
+    hljs.highlightAll();
+    hljs.addPlugin(new CopyButtonPlugin({ autohide: false}));
+    
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      const homeUrl = "\/springboot_course\/";
+      const arrowBack = document.getElementById('arrow-back');
+      const doneBtn = document.getElementById('done');
+      if (arrowBack) arrowBack.href = homeUrl;
+      if (doneBtn) doneBtn.href = homeUrl;
+    });
+    
+  </script>
 
 </body>
-
 </html>

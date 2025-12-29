@@ -1,77 +1,74 @@
+
 <!doctype html>
 
 <html>
-
 <head>
-    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
-    <meta name="theme-color" content="#4F7DC9">
-    <meta charset="UTF-8">
-    <title>Functional Programming &amp; Streams API</title>
-    <link rel="stylesheet"
-        href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
-    <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
-    <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
-    <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1  /build/styles/monokai.min.css">
-    <link rel="stylesheet" href="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.css">
-    <style>
-        .success {
-            color: #1e8e3e;
-        }
-
-        .error {
-            color: red;
-        }
-    </style>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <title>Functional Programming &amp; Streams API</title>
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
+  <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1  /build/styles/monokai.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.css">
+  <style>
+    .success {
+      color: #1e8e3e;
+    }
+    .error {
+      color: red;
+    }
+  </style>
 </head>
-
 <body>
-    <google-codelab-analytics gaid="UA-49880327-14" ga4id=""></google-codelab-analytics>
-    <google-codelab codelab-gaid="" codelab-ga4id="" id="functional-programming-streams"
-        title="Functional Programming &amp; Streams API" environment="web" feedback-link="">
+  <google-codelab-analytics gaid="UA-49880327-14" ga4id=""></google-codelab-analytics>
+  <google-codelab codelab-gaid=""
+                  codelab-ga4id=""
+                  id="functional-programming-streams"
+                  title="Functional Programming &amp; Streams API"
+                  environment="web"
+                  feedback-link="">
+    
+      <google-codelab-step label="Introduction" duration="5">
+        <p>Welcome to the world of functional programming in Java! Java 8 introduced a paradigm shift with lambda expressions and the Stream API, enabling you to write more concise, expressive, and maintainable code.</p>
+<h2 class="checklist" is-upgraded>What You&#39;ll Learn</h2>
+<ul class="checklist">
+<li>Functional programming concepts and paradigm shift</li>
+<li>Lambda expressions syntax and best practices</li>
+<li>Functional interfaces (Predicate, Function, Consumer, Supplier, BiFunction)</li>
+<li>Method references (static, instance, constructor)</li>
+<li>Stream API creation and pipeline operations</li>
+<li>Intermediate operations (filter, map, flatMap, sorted, distinct)</li>
+<li>Terminal operations (collect, forEach, reduce, count)</li>
+<li>Collectors (toList, toSet, toMap, groupingBy, partitioningBy)</li>
+<li>Parallel streams and performance considerations</li>
+</ul>
+<h2 is-upgraded>What You&#39;ll Build</h2>
+<p>A comprehensive <strong>Sales Analytics Application</strong> featuring:</p>
+<ul>
+<li>Sales data processing with functional style</li>
+<li>Complex filtering and transformations</li>
+<li>Statistical analysis using collectors</li>
+<li>Revenue calculations and grouping</li>
+<li>Performance comparison: imperative vs functional</li>
+<li>Parallel stream processing demonstration</li>
+</ul>
+<h2 is-upgraded>Prerequisites</h2>
+<ul>
+<li>Completed Codelab 1.4 (Collections &amp; Generics)</li>
+<li>Understanding of interfaces and anonymous classes</li>
+<li>Basic knowledge of data structures</li>
+</ul>
 
-        <google-codelab-step label="Introduction" duration="5">
-            <p>Welcome to the world of functional programming in Java! Java 8 introduced a paradigm shift with lambda
-                expressions and the Stream API, enabling you to write more concise, expressive, and maintainable code.
-            </p>
-            <h2 class="checklist" is-upgraded>What You&#39;ll Learn</h2>
-            <ul class="checklist">
-                <li>Functional programming concepts and paradigm shift</li>
-                <li>Lambda expressions syntax and best practices</li>
-                <li>Functional interfaces (Predicate, Function, Consumer, Supplier, BiFunction)</li>
-                <li>Method references (static, instance, constructor)</li>
-                <li>Stream API creation and pipeline operations</li>
-                <li>Intermediate operations (filter, map, flatMap, sorted, distinct)</li>
-                <li>Terminal operations (collect, forEach, reduce, count)</li>
-                <li>Collectors (toList, toSet, toMap, groupingBy, partitioningBy)</li>
-                <li>Parallel streams and performance considerations</li>
-            </ul>
-            <h2 is-upgraded>What You&#39;ll Build</h2>
-            <p>A comprehensive <strong>Sales Analytics Application</strong> featuring:</p>
-            <ul>
-                <li>Sales data processing with functional style</li>
-                <li>Complex filtering and transformations</li>
-                <li>Statistical analysis using collectors</li>
-                <li>Revenue calculations and grouping</li>
-                <li>Performance comparison: imperative vs functional</li>
-                <li>Parallel stream processing demonstration</li>
-            </ul>
-            <h2 is-upgraded>Prerequisites</h2>
-            <ul>
-                <li>Completed Codelab 1.4 (Collections &amp; Generics)</li>
-                <li>Understanding of interfaces and anonymous classes</li>
-                <li>Basic knowledge of data structures</li>
-            </ul>
 
-
-        </google-codelab-step>
-
-        <google-codelab-step label="Understanding Functional Programming" duration="8">
-            <p>Functional programming treats computation as the evaluation of mathematical functions, avoiding changing
-                state and mutable data.</p>
-            <h2 is-upgraded>Imperative vs Functional Style</h2>
-            <p><strong>Imperative Approach (Traditional Java):</strong></p>
-            <pre><code language="language-java" class="language-java">List&lt;String&gt; names = Arrays.asList(&#34;Alice&#34;, &#34;Bob&#34;, &#34;Charlie&#34;, &#34;David&#34;);
+      </google-codelab-step>
+    
+      <google-codelab-step label="Understanding Functional Programming" duration="8">
+        <p>Functional programming treats computation as the evaluation of mathematical functions, avoiding changing state and mutable data.</p>
+<h2 is-upgraded>Imperative vs Functional Style</h2>
+<p><strong>Imperative Approach (Traditional Java):</strong></p>
+<pre><code language="language-java" class="language-java">List&lt;String&gt; names = Arrays.asList(&#34;Alice&#34;, &#34;Bob&#34;, &#34;Charlie&#34;, &#34;David&#34;);
 List&lt;String&gt; result = new ArrayList&lt;&gt;();
 
 for (String name : names) {
@@ -83,8 +80,8 @@ for (String name : names) {
 Collections.sort(result);
 System.out.println(result);
 </code></pre>
-            <p><strong>Functional Approach (Java 8+):</strong></p>
-            <pre><code language="language-java" class="language-java">List&lt;String&gt; names = Arrays.asList(&#34;Alice&#34;, &#34;Bob&#34;, &#34;Charlie&#34;, &#34;David&#34;);
+<p><strong>Functional Approach (Java 8+):</strong></p>
+<pre><code language="language-java" class="language-java">List&lt;String&gt; names = Arrays.asList(&#34;Alice&#34;, &#34;Bob&#34;, &#34;Charlie&#34;, &#34;David&#34;);
 
 List&lt;String&gt; result = names.stream()
     .filter(name -&gt; name.length() &gt; 3)
@@ -94,27 +91,24 @@ List&lt;String&gt; result = names.stream()
 
 System.out.println(result);
 </code></pre>
-            <aside class="special">
-                <p><strong>Key Difference:</strong> Functional style describes <strong>what</strong> you want, not
-                    <strong>how</strong> to do it. It&#39;s declarative, not imperative.
-                </p>
-            </aside>
-            <h2 is-upgraded>Core Principles</h2>
-            <p><strong>1. Immutability:</strong></p>
-            <pre><code language="language-java" class="language-java">// Immutable approach
+<aside class="special"><p><strong>Key Difference:</strong> Functional style describes <strong>what</strong> you want, not <strong>how</strong> to do it. It&#39;s declarative, not imperative.</p>
+</aside>
+<h2 is-upgraded>Core Principles</h2>
+<p><strong>1. Immutability:</strong></p>
+<pre><code language="language-java" class="language-java">// Immutable approach
 List&lt;Integer&gt; numbers = List.of(1, 2, 3, 4, 5);
 List&lt;Integer&gt; doubled = numbers.stream()
     .map(n -&gt; n * 2)
     .collect(Collectors.toList());
 // Original list unchanged
 </code></pre>
-            <p><strong>2. Pure Functions:</strong></p>
-            <pre><code language="language-java" class="language-java">// Pure function - no side effects, same input = same output
+<p><strong>2. Pure Functions:</strong></p>
+<pre><code language="language-java" class="language-java">// Pure function - no side effects, same input = same output
 Function&lt;Integer, Integer&gt; square = x -&gt; x * x;
 System.out.println(square.apply(5));  // Always 25
 </code></pre>
-            <p><strong>3. First-Class Functions:</strong></p>
-            <pre><code language="language-java" class="language-java">// Functions as arguments
+<p><strong>3. First-Class Functions:</strong></p>
+<pre><code language="language-java" class="language-java">// Functions as arguments
 public static void processData(List&lt;Integer&gt; data, Function&lt;Integer, Integer&gt; operation) {
     data.forEach(item -&gt; System.out.println(operation.apply(item)));
 }
@@ -122,32 +116,29 @@ public static void processData(List&lt;Integer&gt; data, Function&lt;Integer, In
 // Pass function as argument
 processData(Arrays.asList(1, 2, 3), x -&gt; x * 2);
 </code></pre>
-            <h2 is-upgraded>Benefits</h2>
-            <ul>
-                <li><strong>Conciseness:</strong> Less boilerplate code</li>
-                <li><strong>Readability:</strong> Clear intent, self-documenting</li>
-                <li><strong>Testability:</strong> Pure functions are easy to test</li>
-                <li><strong>Parallelization:</strong> Easy to run operations in parallel</li>
-                <li><strong>Maintainability:</strong> Fewer bugs from mutable state</li>
-            </ul>
-            <aside class="warning">
-                <p><strong>Learning Curve:</strong> Functional style requires a mindset shift. It may feel unfamiliar at
-                    first, but becomes natural with practice.</p>
-            </aside>
+<h2 is-upgraded>Benefits</h2>
+<ul>
+<li><strong>Conciseness:</strong> Less boilerplate code</li>
+<li><strong>Readability:</strong> Clear intent, self-documenting</li>
+<li><strong>Testability:</strong> Pure functions are easy to test</li>
+<li><strong>Parallelization:</strong> Easy to run operations in parallel</li>
+<li><strong>Maintainability:</strong> Fewer bugs from mutable state</li>
+</ul>
+<aside class="warning"><p><strong>Learning Curve:</strong> Functional style requires a mindset shift. It may feel unfamiliar at first, but becomes natural with practice.</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Lambda Expressions" duration="10">
-            <p>Lambda expressions provide a clear and concise way to represent a method interface using an expression.
-            </p>
-            <h2 is-upgraded>Syntax</h2>
-            <p><strong>Basic Structure:</strong></p>
-            <pre><code language="language-java" class="language-java">(parameters) -&gt; expression
+      </google-codelab-step>
+    
+      <google-codelab-step label="Lambda Expressions" duration="10">
+        <p>Lambda expressions provide a clear and concise way to represent a method interface using an expression.</p>
+<h2 is-upgraded>Syntax</h2>
+<p><strong>Basic Structure:</strong></p>
+<pre><code language="language-java" class="language-java">(parameters) -&gt; expression
 (parameters) -&gt; { statements; }
 </code></pre>
-            <p><strong>Examples:</strong></p>
-            <pre><code language="language-java" class="language-java">// No parameters
+<p><strong>Examples:</strong></p>
+<pre><code language="language-java" class="language-java">// No parameters
 () -&gt; System.out.println(&#34;Hello&#34;)
 () -&gt; 42
 
@@ -166,20 +157,20 @@ x -&gt; x * x
 (int x, int y) -&gt; x + y
 (String s) -&gt; s.length()
 </code></pre>
-            <h2 is-upgraded>Lambda vs Anonymous Class</h2>
-            <p><strong>Anonymous Class (Old Way):</strong></p>
-            <pre><code language="language-java" class="language-java">Runnable runnable = new Runnable() {
+<h2 is-upgraded>Lambda vs Anonymous Class</h2>
+<p><strong>Anonymous Class (Old Way):</strong></p>
+<pre><code language="language-java" class="language-java">Runnable runnable = new Runnable() {
     @Override
     public void run() {
         System.out.println(&#34;Running...&#34;);
     }
 };
 </code></pre>
-            <p><strong>Lambda Expression (Modern Way):</strong></p>
-            <pre><code language="language-java" class="language-java">Runnable runnable = () -&gt; System.out.println(&#34;Running...&#34;);
+<p><strong>Lambda Expression (Modern Way):</strong></p>
+<pre><code language="language-java" class="language-java">Runnable runnable = () -&gt; System.out.println(&#34;Running...&#34;);
 </code></pre>
-            <h2 is-upgraded>Practical Examples</h2>
-            <pre><code language="language-java" class="language-java">import java.util.*;
+<h2 is-upgraded>Practical Examples</h2>
+<pre><code language="language-java" class="language-java">import java.util.*;
 import java.util.function.*;
 
 public class LambdaExamples {
@@ -212,19 +203,17 @@ public class LambdaExamples {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Variable Capture</h2>
-            <p>Lambdas can access variables from the enclosing scope:</p>
-            <pre><code language="language-java" class="language-java">String prefix = &#34;Message: &#34;;
+<h2 is-upgraded>Variable Capture</h2>
+<p>Lambdas can access variables from the enclosing scope:</p>
+<pre><code language="language-java" class="language-java">String prefix = &#34;Message: &#34;;
 List&lt;String&gt; messages = Arrays.asList(&#34;Hello&#34;, &#34;World&#34;);
 
 messages.forEach(msg -&gt; System.out.println(prefix + msg));
 // Outputs: Message: Hello, Message: World
 </code></pre>
-            <aside class="warning">
-                <p><strong>Important:</strong> Captured variables must be <strong>effectively final</strong> (never
-                    reassigned after initialization).</p>
-            </aside>
-            <pre><code language="language-java" class="language-java">int count = 0;
+<aside class="warning"><p><strong>Important:</strong> Captured variables must be <strong>effectively final</strong> (never reassigned after initialization).</p>
+</aside>
+<pre><code language="language-java" class="language-java">int count = 0;
 messages.forEach(msg -&gt; {
     // count++;  // ERROR! Cannot modify captured variable
     System.out.println(msg);
@@ -232,15 +221,14 @@ messages.forEach(msg -&gt; {
 </code></pre>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Functional Interfaces" duration="12">
-            <p>A functional interface has exactly one abstract method and can be used as the target for lambda
-                expressions.</p>
-            <h2 is-upgraded>Built-in Functional Interfaces</h2>
-            <p>Java provides many functional interfaces in <code>java.util.function</code>:</p>
-            <p><strong>1. Predicate&lt;T&gt; - Boolean Test</strong></p>
-            <pre><code language="language-java" class="language-java">import java.util.function.Predicate;
+      </google-codelab-step>
+    
+      <google-codelab-step label="Functional Interfaces" duration="12">
+        <p>A functional interface has exactly one abstract method and can be used as the target for lambda expressions.</p>
+<h2 is-upgraded>Built-in Functional Interfaces</h2>
+<p>Java provides many functional interfaces in <code>java.util.function</code>:</p>
+<p><strong>1. Predicate&lt;T&gt; - Boolean Test</strong></p>
+<pre><code language="language-java" class="language-java">import java.util.function.Predicate;
 
 Predicate&lt;Integer&gt; isEven = n -&gt; n % 2 == 0;
 Predicate&lt;String&gt; isLong = s -&gt; s.length() &gt; 5;
@@ -255,8 +243,8 @@ Predicate&lt;Integer&gt; isPositiveEven = isEven.and(isPositive);
 System.out.println(isPositiveEven.test(4));   // true
 System.out.println(isPositiveEven.test(-4));  // false
 </code></pre>
-            <p><strong>2. Function&lt;T, R&gt; - Transform Input to Output</strong></p>
-            <pre><code language="language-java" class="language-java">import java.util.function.Function;
+<p><strong>2. Function&lt;T, R&gt; - Transform Input to Output</strong></p>
+<pre><code language="language-java" class="language-java">import java.util.function.Function;
 
 Function&lt;String, Integer&gt; strLength = s -&gt; s.length();
 Function&lt;Integer, Integer&gt; square = n -&gt; n * n;
@@ -268,8 +256,8 @@ System.out.println(square.apply(5));           // 25
 Function&lt;String, Integer&gt; strLengthSquared = strLength.andThen(square);
 System.out.println(strLengthSquared.apply(&#34;Hi&#34;));  // 4 (length=2, squared=4)
 </code></pre>
-            <p><strong>3. Consumer&lt;T&gt; - Accept Input, No Return</strong></p>
-            <pre><code language="language-java" class="language-java">import java.util.function.Consumer;
+<p><strong>3. Consumer&lt;T&gt; - Accept Input, No Return</strong></p>
+<pre><code language="language-java" class="language-java">import java.util.function.Consumer;
 
 Consumer&lt;String&gt; printer = s -&gt; System.out.println(s);
 Consumer&lt;String&gt; upperPrinter = s -&gt; System.out.println(s.toUpperCase());
@@ -284,8 +272,8 @@ combined.accept(&#34;test&#34;);
 // test
 // TEST
 </code></pre>
-            <p><strong>4. Supplier&lt;T&gt; - Provide Value, No Input</strong></p>
-            <pre><code language="language-java" class="language-java">import java.util.function.Supplier;
+<p><strong>4. Supplier&lt;T&gt; - Provide Value, No Input</strong></p>
+<pre><code language="language-java" class="language-java">import java.util.function.Supplier;
 
 Supplier&lt;Double&gt; randomValue = () -&gt; Math.random();
 Supplier&lt;String&gt; greeting = () -&gt; &#34;Hello, World!&#34;;
@@ -302,8 +290,8 @@ Supplier&lt;List&lt;String&gt;&gt; expensiveOperation = () -&gt; {
 // Not computed yet
 List&lt;String&gt; result = expensiveOperation.get();  // Now computed
 </code></pre>
-            <p><strong>5. BiFunction&lt;T, U, R&gt; - Two Inputs, One Output</strong></p>
-            <pre><code language="language-java" class="language-java">import java.util.function.BiFunction;
+<p><strong>5. BiFunction&lt;T, U, R&gt; - Two Inputs, One Output</strong></p>
+<pre><code language="language-java" class="language-java">import java.util.function.BiFunction;
 
 BiFunction&lt;Integer, Integer, Integer&gt; add = (a, b) -&gt; a + b;
 BiFunction&lt;String, String, String&gt; concat = (s1, s2) -&gt; s1 + s2;
@@ -311,8 +299,8 @@ BiFunction&lt;String, String, String&gt; concat = (s1, s2) -&gt; s1 + s2;
 System.out.println(add.apply(5, 3));           // 8
 System.out.println(concat.apply(&#34;Hi&#34;, &#34;!&#34;));   // Hi!
 </code></pre>
-            <h2 is-upgraded>Custom Functional Interface</h2>
-            <pre><code language="language-java" class="language-java">@FunctionalInterface
+<h2 is-upgraded>Custom Functional Interface</h2>
+<pre><code language="language-java" class="language-java">@FunctionalInterface
 public interface Calculator {
     int calculate(int a, int b);
 
@@ -334,111 +322,53 @@ public class FunctionalInterfaceDemo {
     }
 }
 </code></pre>
-            <aside class="special">
-                <p><strong>@FunctionalInterface:</strong> This annotation is optional but recommended. It ensures the
-                    interface has exactly one abstract method.</p>
-            </aside>
-            <h2 is-upgraded>Functional Interface Reference Table</h2>
-            <table>
-                <tr>
-                    <td colspan="1" rowspan="1">
-                        <p>Interface</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>Method Signature</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>Use Case</p>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="1" rowspan="1">
-                        <p><code>Predicate<T></code></p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p><code>boolean test(T t)</code></p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>Testing conditions</p>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="1" rowspan="1">
-                        <p><code>Function<T,R></code></p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p><code>R apply(T t)</code></p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>Transforming data</p>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="1" rowspan="1">
-                        <p><code>Consumer<T></code></p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p><code>void accept(T t)</code></p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>Processing/printing</p>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="1" rowspan="1">
-                        <p><code>Supplier<T></code></p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p><code>T get()</code></p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>Generating/providing</p>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="1" rowspan="1">
-                        <p><code>BiFunction<T,U,R></code></p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p><code>R apply(T t, U u)</code></p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>Two-arg operations</p>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="1" rowspan="1">
-                        <p><code>UnaryOperator<T></code></p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p><code>T apply(T t)</code></p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>Same type transform</p>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="1" rowspan="1">
-                        <p><code>BinaryOperator<T></code></p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p><code>T apply(T t1, T t2)</code></p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>Combining same types</p>
-                    </td>
-                </tr>
-            </table>
+<aside class="special"><p><strong>@FunctionalInterface:</strong> This annotation is optional but recommended. It ensures the interface has exactly one abstract method.</p>
+</aside>
+<h2 is-upgraded>Functional Interface Reference Table</h2>
+<table>
+<tr><td colspan="1" rowspan="1"><p>Interface</p>
+</td><td colspan="1" rowspan="1"><p>Method Signature</p>
+</td><td colspan="1" rowspan="1"><p>Use Case</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><code>Predicate<T></code></p>
+</td><td colspan="1" rowspan="1"><p><code>boolean test(T t)</code></p>
+</td><td colspan="1" rowspan="1"><p>Testing conditions</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><code>Function<T,R></code></p>
+</td><td colspan="1" rowspan="1"><p><code>R apply(T t)</code></p>
+</td><td colspan="1" rowspan="1"><p>Transforming data</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><code>Consumer<T></code></p>
+</td><td colspan="1" rowspan="1"><p><code>void accept(T t)</code></p>
+</td><td colspan="1" rowspan="1"><p>Processing/printing</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><code>Supplier<T></code></p>
+</td><td colspan="1" rowspan="1"><p><code>T get()</code></p>
+</td><td colspan="1" rowspan="1"><p>Generating/providing</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><code>BiFunction<T,U,R></code></p>
+</td><td colspan="1" rowspan="1"><p><code>R apply(T t, U u)</code></p>
+</td><td colspan="1" rowspan="1"><p>Two-arg operations</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><code>UnaryOperator<T></code></p>
+</td><td colspan="1" rowspan="1"><p><code>T apply(T t)</code></p>
+</td><td colspan="1" rowspan="1"><p>Same type transform</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><code>BinaryOperator<T></code></p>
+</td><td colspan="1" rowspan="1"><p><code>T apply(T t1, T t2)</code></p>
+</td><td colspan="1" rowspan="1"><p>Combining same types</p>
+</td></tr>
+</table>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Method References" duration="8">
-            <p>Method references are shorthand notation for lambda expressions that call a specific method.</p>
-            <h2 is-upgraded>Syntax: <code>::</code></h2>
-            <p><strong>Four Types of Method References:</strong></p>
-            <h2 is-upgraded>1. Static Method Reference</h2>
-            <pre><code language="language-java" class="language-java">// Lambda
+      </google-codelab-step>
+    
+      <google-codelab-step label="Method References" duration="8">
+        <p>Method references are shorthand notation for lambda expressions that call a specific method.</p>
+<h2 is-upgraded>Syntax: <code>::</code></h2>
+<p><strong>Four Types of Method References:</strong></p>
+<h2 is-upgraded>1. Static Method Reference</h2>
+<pre><code language="language-java" class="language-java">// Lambda
 Function&lt;String, Integer&gt; parser1 = s -&gt; Integer.parseInt(s);
 
 // Method reference
@@ -446,8 +376,8 @@ Function&lt;String, Integer&gt; parser2 = Integer::parseInt;
 
 System.out.println(parser2.apply(&#34;123&#34;));  // 123
 </code></pre>
-            <p><strong>More Examples:</strong></p>
-            <pre><code language="language-java" class="language-java">// Math static methods
+<p><strong>More Examples:</strong></p>
+<pre><code language="language-java" class="language-java">// Math static methods
 List&lt;Double&gt; numbers = Arrays.asList(-1.5, 2.3, -3.7);
 numbers.stream()
     .map(Math::abs)  // Static method reference
@@ -465,8 +395,8 @@ long count = strings.stream()
     .filter(StringUtils::isNotEmpty)
     .count();
 </code></pre>
-            <h2 is-upgraded>2. Instance Method Reference (Specific Object)</h2>
-            <pre><code language="language-java" class="language-java">String prefix = &#34;Item: &#34;;
+<h2 is-upgraded>2. Instance Method Reference (Specific Object)</h2>
+<pre><code language="language-java" class="language-java">String prefix = &#34;Item: &#34;;
 
 // Lambda
 Consumer&lt;String&gt; printer1 = s -&gt; System.out.println(prefix + s);
@@ -478,8 +408,8 @@ Consumer&lt;String&gt; printer2 = System.out::println;
 List&lt;String&gt; items = Arrays.asList(&#34;Apple&#34;, &#34;Banana&#34;, &#34;Cherry&#34;);
 items.forEach(System.out::println);
 </code></pre>
-            <h2 is-upgraded>3. Instance Method Reference (Arbitrary Object)</h2>
-            <pre><code language="language-java" class="language-java">// Lambda
+<h2 is-upgraded>3. Instance Method Reference (Arbitrary Object)</h2>
+<pre><code language="language-java" class="language-java">// Lambda
 Function&lt;String, String&gt; upper1 = s -&gt; s.toUpperCase();
 
 // Method reference
@@ -490,8 +420,8 @@ words.stream()
     .map(String::toUpperCase)  // Called on each element
     .forEach(System.out::println);
 </code></pre>
-            <p><strong>Comparison Method:</strong></p>
-            <pre><code language="language-java" class="language-java">List&lt;String&gt; names = Arrays.asList(&#34;Charlie&#34;, &#34;Alice&#34;, &#34;Bob&#34;);
+<p><strong>Comparison Method:</strong></p>
+<pre><code language="language-java" class="language-java">List&lt;String&gt; names = Arrays.asList(&#34;Charlie&#34;, &#34;Alice&#34;, &#34;Bob&#34;);
 
 // Lambda
 names.sort((a, b) -&gt; a.compareToIgnoreCase(b));
@@ -499,8 +429,8 @@ names.sort((a, b) -&gt; a.compareToIgnoreCase(b));
 // Method reference
 names.sort(String::compareToIgnoreCase);
 </code></pre>
-            <h2 is-upgraded>4. Constructor Reference</h2>
-            <pre><code language="language-java" class="language-java">// Lambda
+<h2 is-upgraded>4. Constructor Reference</h2>
+<pre><code language="language-java" class="language-java">// Lambda
 Supplier&lt;List&lt;String&gt;&gt; listSupplier1 = () -&gt; new ArrayList&lt;&gt;();
 
 // Constructor reference
@@ -508,8 +438,8 @@ Supplier&lt;List&lt;String&gt;&gt; listSupplier2 = ArrayList::new;
 
 List&lt;String&gt; list = listSupplier2.get();
 </code></pre>
-            <p><strong>With Parameters:</strong></p>
-            <pre><code language="language-java" class="language-java">// Single parameter constructor
+<p><strong>With Parameters:</strong></p>
+<pre><code language="language-java" class="language-java">// Single parameter constructor
 Function&lt;String, Integer&gt; intCreator = Integer::new;
 Integer num = intCreator.apply(&#34;123&#34;);  // Creates Integer from String
 
@@ -517,8 +447,8 @@ Integer num = intCreator.apply(&#34;123&#34;);  // Creates Integer from String
 IntFunction&lt;int[]&gt; arrayCreator = int[]::new;
 int[] array = arrayCreator.apply(10);  // Creates int[10]
 </code></pre>
-            <h2 is-upgraded>Practical Examples</h2>
-            <pre><code language="language-java" class="language-java">import java.util.*;
+<h2 is-upgraded>Practical Examples</h2>
+<pre><code language="language-java" class="language-java">import java.util.*;
 import java.util.stream.*;
 
 public class MethodReferenceDemo {
@@ -548,19 +478,16 @@ public class MethodReferenceDemo {
     }
 }
 </code></pre>
-            <aside class="special">
-                <p><strong>When to Use:</strong> Method references make code more readable when the lambda simply calls
-                    an existing method. Use lambdas for more complex logic.</p>
-            </aside>
+<aside class="special"><p><strong>When to Use:</strong> Method references make code more readable when the lambda simply calls an existing method. Use lambdas for more complex logic.</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Stream API Basics" duration="12">
-            <p>Streams represent a sequence of elements and support various operations to process data in a functional
-                style.</p>
-            <h2 is-upgraded>Stream Creation</h2>
-            <pre><code language="language-java" class="language-java">import java.util.stream.*;
+      </google-codelab-step>
+    
+      <google-codelab-step label="Stream API Basics" duration="12">
+        <p>Streams represent a sequence of elements and support various operations to process data in a functional style.</p>
+<h2 is-upgraded>Stream Creation</h2>
+<pre><code language="language-java" class="language-java">import java.util.stream.*;
 import java.util.*;
 
 // From collection
@@ -589,18 +516,18 @@ DoubleStream doubleStream = DoubleStream.of(1.0, 2.0, 3.0);
 // From string
 IntStream charStream = &#34;Hello&#34;.chars();  // Stream of char codes
 </code></pre>
-            <h2 is-upgraded>Stream Pipeline</h2>
-            <p>A stream pipeline consists of:</p>
-            <ol type="1">
-                <li><strong>Source</strong> - Where data comes from</li>
-                <li><strong>Intermediate Operations</strong> - Transform the stream (lazy)</li>
-                <li><strong>Terminal Operation</strong> - Produces result (triggers execution)</li>
-            </ol>
-            <pre><code>Source → filter → map → sorted → collect
+<h2 is-upgraded>Stream Pipeline</h2>
+<p>A stream pipeline consists of:</p>
+<ol type="1">
+<li><strong>Source</strong> - Where data comes from</li>
+<li><strong>Intermediate Operations</strong> - Transform the stream (lazy)</li>
+<li><strong>Terminal Operation</strong> - Produces result (triggers execution)</li>
+</ol>
+<pre><code>Source → filter → map → sorted → collect
          (intermediate ops)      (terminal)
 </code></pre>
-            <h2 is-upgraded>Basic Stream Operations</h2>
-            <pre><code language="language-java" class="language-java">import java.util.*;
+<h2 is-upgraded>Basic Stream Operations</h2>
+<pre><code language="language-java" class="language-java">import java.util.*;
 import java.util.stream.*;
 
 public class StreamBasics {
@@ -654,8 +581,8 @@ public class StreamBasics {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Peek - Debugging</h2>
-            <pre><code language="language-java" class="language-java">List&lt;Integer&gt; result = numbers.stream()
+<h2 is-upgraded>Peek - Debugging</h2>
+<pre><code language="language-java" class="language-java">List&lt;Integer&gt; result = numbers.stream()
     .peek(n -&gt; System.out.println(&#34;Original: &#34; + n))
     .filter(n -&gt; n % 2 == 0)
     .peek(n -&gt; System.out.println(&#34;After filter: &#34; + n))
@@ -663,14 +590,11 @@ public class StreamBasics {
     .peek(n -&gt; System.out.println(&#34;After map: &#34; + n))
     .collect(Collectors.toList());
 </code></pre>
-            <aside class="special">
-                <p><strong>Peek vs forEach:</strong> Use <code>peek()</code> for debugging (intermediate),
-                    <code>forEach()</code> for final actions (terminal).
-                </p>
-            </aside>
-            <h2 is-upgraded>Lazy Evaluation</h2>
-            <p>Intermediate operations are lazy - they don&#39;t execute until a terminal operation is called:</p>
-            <pre><code language="language-java" class="language-java">Stream&lt;Integer&gt; stream = numbers.stream()
+<aside class="special"><p><strong>Peek vs forEach:</strong> Use <code>peek()</code> for debugging (intermediate), <code>forEach()</code> for final actions (terminal).</p>
+</aside>
+<h2 is-upgraded>Lazy Evaluation</h2>
+<p>Intermediate operations are lazy - they don&#39;t execute until a terminal operation is called:</p>
+<pre><code language="language-java" class="language-java">Stream&lt;Integer&gt; stream = numbers.stream()
     .filter(n -&gt; {
         System.out.println(&#34;Filtering: &#34; + n);
         return n % 2 == 0;
@@ -685,19 +609,17 @@ System.out.println(&#34;Stream created, but nothing printed yet!&#34;);
 // Terminal operation triggers execution
 List&lt;Integer&gt; result = stream.collect(Collectors.toList());
 </code></pre>
-            <aside class="warning">
-                <p><strong>One-Time Use:</strong> Streams can only be used once. After a terminal operation, the stream
-                    is consumed and cannot be reused.</p>
-            </aside>
+<aside class="warning"><p><strong>One-Time Use:</strong> Streams can only be used once. After a terminal operation, the stream is consumed and cannot be reused.</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Intermediate Operations" duration="10">
-            <p>Intermediate operations transform a stream and return another stream, allowing chaining.</p>
-            <h2 is-upgraded>filter()</h2>
-            <p>Keep elements matching a predicate:</p>
-            <pre><code language="language-java" class="language-java">List&lt;String&gt; names = Arrays.asList(&#34;Alice&#34;, &#34;Bob&#34;, &#34;Charlie&#34;, &#34;David&#34;);
+      </google-codelab-step>
+    
+      <google-codelab-step label="Intermediate Operations" duration="10">
+        <p>Intermediate operations transform a stream and return another stream, allowing chaining.</p>
+<h2 is-upgraded>filter()</h2>
+<p>Keep elements matching a predicate:</p>
+<pre><code language="language-java" class="language-java">List&lt;String&gt; names = Arrays.asList(&#34;Alice&#34;, &#34;Bob&#34;, &#34;Charlie&#34;, &#34;David&#34;);
 
 // Single condition
 List&lt;String&gt; longNames = names.stream()
@@ -711,9 +633,9 @@ List&lt;String&gt; filtered = names.stream()
     .collect(Collectors.toList());
 // Result: [Charlie]
 </code></pre>
-            <h2 is-upgraded>map()</h2>
-            <p>Transform each element:</p>
-            <pre><code language="language-java" class="language-java">List&lt;String&gt; names = Arrays.asList(&#34;Alice&#34;, &#34;Bob&#34;, &#34;Charlie&#34;);
+<h2 is-upgraded>map()</h2>
+<p>Transform each element:</p>
+<pre><code language="language-java" class="language-java">List&lt;String&gt; names = Arrays.asList(&#34;Alice&#34;, &#34;Bob&#34;, &#34;Charlie&#34;);
 
 // String to Integer
 List&lt;Integer&gt; lengths = names.stream()
@@ -740,9 +662,9 @@ List&lt;String&gt; personNames = people.stream()
     .map(p -&gt; p.name)  // or Person::getName if using getter
     .collect(Collectors.toList());
 </code></pre>
-            <h2 is-upgraded>flatMap()</h2>
-            <p>Flatten nested structures:</p>
-            <pre><code language="language-java" class="language-java">// List of lists
+<h2 is-upgraded>flatMap()</h2>
+<p>Flatten nested structures:</p>
+<pre><code language="language-java" class="language-java">// List of lists
 List&lt;List&lt;Integer&gt;&gt; nested = Arrays.asList(
     Arrays.asList(1, 2, 3),
     Arrays.asList(4, 5),
@@ -786,8 +708,8 @@ List&lt;String&gt; allEmployees = departments.stream()
     .flatMap(dept -&gt; dept.employees.stream())
     .collect(Collectors.toList());
 </code></pre>
-            <h2 is-upgraded>sorted()</h2>
-            <pre><code language="language-java" class="language-java">List&lt;Integer&gt; numbers = Arrays.asList(5, 2, 8, 1, 9);
+<h2 is-upgraded>sorted()</h2>
+<pre><code language="language-java" class="language-java">List&lt;Integer&gt; numbers = Arrays.asList(5, 2, 8, 1, 9);
 
 // Natural order
 List&lt;Integer&gt; sorted = numbers.stream()
@@ -829,8 +751,8 @@ List&lt;Product&gt; sorted = products.stream()
                       .thenComparing(p -&gt; p.name))
     .collect(Collectors.toList());
 </code></pre>
-            <h2 is-upgraded>distinct() and limit()</h2>
-            <pre><code language="language-java" class="language-java">List&lt;Integer&gt; numbers = Arrays.asList(1, 2, 2, 3, 3, 3, 4, 5, 5);
+<h2 is-upgraded>distinct() and limit()</h2>
+<pre><code language="language-java" class="language-java">List&lt;Integer&gt; numbers = Arrays.asList(1, 2, 2, 3, 3, 3, 4, 5, 5);
 
 // Remove duplicates
 List&lt;Integer&gt; unique = numbers.stream()
@@ -856,13 +778,13 @@ List&lt;Integer&gt; paginatedResults = largeList.stream()
 </code></pre>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Terminal Operations" duration="10">
-            <p>Terminal operations produce a result or side effect and close the stream.</p>
-            <h2 is-upgraded>collect()</h2>
-            <p>Most versatile terminal operation:</p>
-            <pre><code language="language-java" class="language-java">List&lt;String&gt; names = Arrays.asList(&#34;Alice&#34;, &#34;Bob&#34;, &#34;Charlie&#34;);
+      </google-codelab-step>
+    
+      <google-codelab-step label="Terminal Operations" duration="10">
+        <p>Terminal operations produce a result or side effect and close the stream.</p>
+<h2 is-upgraded>collect()</h2>
+<p>Most versatile terminal operation:</p>
+<pre><code language="language-java" class="language-java">List&lt;String&gt; names = Arrays.asList(&#34;Alice&#34;, &#34;Bob&#34;, &#34;Charlie&#34;);
 
 // To List
 List&lt;String&gt; list = names.stream()
@@ -893,8 +815,8 @@ String withPrefixSuffix = names.stream()
     .collect(Collectors.joining(&#34;, &#34;, &#34;[&#34;, &#34;]&#34;));
 // &#34;[Alice, Bob, Charlie]&#34;
 </code></pre>
-            <h2 is-upgraded>forEach() and forEachOrdered()</h2>
-            <pre><code language="language-java" class="language-java">List&lt;String&gt; names = Arrays.asList(&#34;Alice&#34;, &#34;Bob&#34;, &#34;Charlie&#34;);
+<h2 is-upgraded>forEach() and forEachOrdered()</h2>
+<pre><code language="language-java" class="language-java">List&lt;String&gt; names = Arrays.asList(&#34;Alice&#34;, &#34;Bob&#34;, &#34;Charlie&#34;);
 
 // Process each element
 names.stream()
@@ -908,13 +830,10 @@ names.stream()
 names.parallelStream()
     .forEachOrdered(System.out::println);
 </code></pre>
-            <aside class="warning">
-                <p><strong>Warning: </strong><code>forEach()</code> order is not guaranteed in parallel streams. Use
-                    <code>forEachOrdered()</code> when order matters.
-                </p>
-            </aside>
-            <h2 is-upgraded>count(), min(), max()</h2>
-            <pre><code language="language-java" class="language-java">List&lt;Integer&gt; numbers = Arrays.asList(1, 2, 3, 4, 5);
+<aside class="warning"><p><strong>Warning: </strong><code>forEach()</code> order is not guaranteed in parallel streams. Use <code>forEachOrdered()</code> when order matters.</p>
+</aside>
+<h2 is-upgraded>count(), min(), max()</h2>
+<pre><code language="language-java" class="language-java">List&lt;Integer&gt; numbers = Arrays.asList(1, 2, 3, 4, 5);
 
 // Count elements
 long count = numbers.stream()
@@ -938,9 +857,9 @@ Optional&lt;String&gt; longest = words.stream()
     .max(Comparator.comparingInt(String::length));
 System.out.println(longest.get());  // &#34;abc&#34;
 </code></pre>
-            <h2 is-upgraded>reduce()</h2>
-            <p>Combine elements into a single result:</p>
-            <pre><code language="language-java" class="language-java">List&lt;Integer&gt; numbers = Arrays.asList(1, 2, 3, 4, 5);
+<h2 is-upgraded>reduce()</h2>
+<p>Combine elements into a single result:</p>
+<pre><code language="language-java" class="language-java">List&lt;Integer&gt; numbers = Arrays.asList(1, 2, 3, 4, 5);
 
 // Sum
 Optional&lt;Integer&gt; sum = numbers.stream()
@@ -985,8 +904,8 @@ double total = transactions.stream()
     .map(t -&gt; t.amount)
     .reduce(0.0, Double::sum);
 </code></pre>
-            <h2 is-upgraded>anyMatch(), allMatch(), noneMatch()</h2>
-            <pre><code language="language-java" class="language-java">List&lt;Integer&gt; numbers = Arrays.asList(1, 2, 3, 4, 5);
+<h2 is-upgraded>anyMatch(), allMatch(), noneMatch()</h2>
+<pre><code language="language-java" class="language-java">List&lt;Integer&gt; numbers = Arrays.asList(1, 2, 3, 4, 5);
 
 // Check if any element matches
 boolean hasEven = numbers.stream()
@@ -1008,8 +927,8 @@ boolean found = largeList.stream()
     .anyMatch(item -&gt; expensiveCheck(item));
 // Stops as soon as one match is found
 </code></pre>
-            <h2 is-upgraded>findFirst() and findAny()</h2>
-            <pre><code language="language-java" class="language-java">List&lt;String&gt; names = Arrays.asList(&#34;Alice&#34;, &#34;Bob&#34;, &#34;Charlie&#34;);
+<h2 is-upgraded>findFirst() and findAny()</h2>
+<pre><code language="language-java" class="language-java">List&lt;String&gt; names = Arrays.asList(&#34;Alice&#34;, &#34;Bob&#34;, &#34;Charlie&#34;);
 
 // Find first element
 Optional&lt;String&gt; first = names.stream()
@@ -1025,14 +944,13 @@ System.out.println(any.get());  // Any matching name
 </code></pre>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Advanced Collectors" duration="15">
-            <p>Collectors provide powerful ways to accumulate stream elements into collections and perform complex
-                aggregations.</p>
-            <h2 is-upgraded>Grouping Operations</h2>
-            <p><strong>groupingBy() - Group by Property:</strong></p>
-            <pre><code language="language-java" class="language-java">class Employee {
+      </google-codelab-step>
+    
+      <google-codelab-step label="Advanced Collectors" duration="15">
+        <p>Collectors provide powerful ways to accumulate stream elements into collections and perform complex aggregations.</p>
+<h2 is-upgraded>Grouping Operations</h2>
+<p><strong>groupingBy() - Group by Property:</strong></p>
+<pre><code language="language-java" class="language-java">class Employee {
     String name;
     String department;
     double salary;
@@ -1104,9 +1022,9 @@ Map&lt;String, Map&lt;String, List&lt;Employee&gt;&gt;&gt; multiLevel = employee
         Collectors.groupingBy(Employee::getLevel)
     ));
 </code></pre>
-            <h2 is-upgraded>Partitioning</h2>
-            <p>Split stream into two groups based on a predicate:</p>
-            <pre><code language="language-java" class="language-java">List&lt;Employee&gt; employees = /* ... */;
+<h2 is-upgraded>Partitioning</h2>
+<p>Split stream into two groups based on a predicate:</p>
+<pre><code language="language-java" class="language-java">List&lt;Employee&gt; employees = /* ... */;
 
 // Partition by salary threshold
 Map&lt;Boolean, List&lt;Employee&gt;&gt; partitioned = employees.stream()
@@ -1124,8 +1042,8 @@ Map&lt;Boolean, Long&gt; counts = employees.stream()
 System.out.println(&#34;High paid: &#34; + counts.get(true));
 System.out.println(&#34;Low paid: &#34; + counts.get(false));
 </code></pre>
-            <h2 is-upgraded>Statistical Collectors</h2>
-            <pre><code language="language-java" class="language-java">List&lt;Integer&gt; numbers = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+<h2 is-upgraded>Statistical Collectors</h2>
+<pre><code language="language-java" class="language-java">List&lt;Integer&gt; numbers = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
 
 // Summarizing statistics
 IntSummaryStatistics stats = numbers.stream()
@@ -1145,8 +1063,8 @@ DoubleSummaryStatistics salaryStats = employees.stream()
 System.out.println(&#34;Avg Salary: &#34; + salaryStats.getAverage());
 System.out.println(&#34;Total Payroll: &#34; + salaryStats.getSum());
 </code></pre>
-            <h2 is-upgraded>Custom Collectors</h2>
-            <pre><code language="language-java" class="language-java">// Joining with custom formatting
+<h2 is-upgraded>Custom Collectors</h2>
+<pre><code language="language-java" class="language-java">// Joining with custom formatting
 String formatted = employees.stream()
     .map(Employee::getName)
     .collect(Collectors.joining(
@@ -1185,13 +1103,13 @@ List&lt;String&gt; upperNames = employees.stream()
 </code></pre>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Build Sales Analytics Application" duration="20">
-            <p>Now let&#39;s build a comprehensive sales analytics system using everything we&#39;ve learned!</p>
-            <h2 is-upgraded>Project Structure</h2>
-            <p>Create <code>SalesAnalytics.java</code>:</p>
-            <pre><code language="language-java" class="language-java">import java.time.LocalDate;
+      </google-codelab-step>
+    
+      <google-codelab-step label="Build Sales Analytics Application" duration="20">
+        <p>Now let&#39;s build a comprehensive sales analytics system using everything we&#39;ve learned!</p>
+<h2 is-upgraded>Project Structure</h2>
+<p>Create <code>SalesAnalytics.java</code>:</p>
+<pre><code language="language-java" class="language-java">import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.*;
 
@@ -1462,12 +1380,12 @@ public class SalesAnalytics {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Run the Application</h2>
-            <pre>$ javac SalesAnalytics.java
+<h2 is-upgraded>Run the Application</h2>
+<pre>$ javac SalesAnalytics.java
 $ java SalesAnalytics
 </pre>
-            <p><strong>Expected Output:</strong></p>
-            <pre><code>=== SALES ANALYTICS DASHBOARD ===
+<p><strong>Expected Output:</strong></p>
+<pre><code>=== SALES ANALYTICS DASHBOARD ===
 
 Total Revenue: $4120.00
 
@@ -1488,18 +1406,16 @@ Sales Count by Region:
 
 ...
 </code></pre>
-            <aside class="special">
-                <p><strong>Great Job!</strong> You&#39;ve built a production-quality analytics engine using pure
-                    functional programming!</p>
-            </aside>
+<aside class="special"><p><strong>Great Job!</strong> You&#39;ve built a production-quality analytics engine using pure functional programming!</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Parallel Streams" duration="8">
-            <p>Parallel streams split data into multiple chunks and process them concurrently on multiple CPU cores.</p>
-            <h2 is-upgraded>Creating Parallel Streams</h2>
-            <pre><code language="language-java" class="language-java">List&lt;Integer&gt; numbers = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+      </google-codelab-step>
+    
+      <google-codelab-step label="Parallel Streams" duration="8">
+        <p>Parallel streams split data into multiple chunks and process them concurrently on multiple CPU cores.</p>
+<h2 is-upgraded>Creating Parallel Streams</h2>
+<pre><code language="language-java" class="language-java">List&lt;Integer&gt; numbers = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
 
 // Method 1: From sequential stream
 Stream&lt;Integer&gt; parallelStream = numbers.stream().parallel();
@@ -1510,8 +1426,8 @@ Stream&lt;Integer&gt; parallelStream2 = numbers.parallelStream();
 // Convert back to sequential
 Stream&lt;Integer&gt; sequential = parallelStream.sequential();
 </code></pre>
-            <h2 is-upgraded>Performance Comparison</h2>
-            <pre><code language="language-java" class="language-java">import java.util.*;
+<h2 is-upgraded>Performance Comparison</h2>
+<pre><code language="language-java" class="language-java">import java.util.*;
 import java.util.stream.*;
 
 public class ParallelStreamDemo {
@@ -1547,15 +1463,15 @@ public class ParallelStreamDemo {
     }
 }
 </code></pre>
-            <h2 is-upgraded>When to Use Parallel Streams</h2>
-            <p><strong>Good Candidates:</strong></p>
-            <ul>
-                <li>Large datasets (thousands+ elements)</li>
-                <li>CPU-intensive operations</li>
-                <li>Independent operations (no shared state)</li>
-                <li>Operations that benefit from parallelization</li>
-            </ul>
-            <pre><code language="language-java" class="language-java">// Good: CPU-intensive, large dataset
+<h2 is-upgraded>When to Use Parallel Streams</h2>
+<p><strong>Good Candidates:</strong></p>
+<ul>
+<li>Large datasets (thousands+ elements)</li>
+<li>CPU-intensive operations</li>
+<li>Independent operations (no shared state)</li>
+<li>Operations that benefit from parallelization</li>
+</ul>
+<pre><code language="language-java" class="language-java">// Good: CPU-intensive, large dataset
 List&lt;ComplexObject&gt; results = hugeList.parallelStream()
     .map(obj -&gt; expensiveComputation(obj))
     .collect(Collectors.toList());
@@ -1565,14 +1481,14 @@ long sum = largeList.parallelStream()
     .mapToLong(Integer::longValue)
     .sum();
 </code></pre>
-            <p><strong>Poor Candidates:</strong></p>
-            <ul>
-                <li>Small datasets (overhead &gt; benefit)</li>
-                <li>I/O operations (thread contention)</li>
-                <li>Order-dependent operations</li>
-                <li>Shared mutable state</li>
-            </ul>
-            <pre><code language="language-java" class="language-java">// Bad: Small dataset
+<p><strong>Poor Candidates:</strong></p>
+<ul>
+<li>Small datasets (overhead &gt; benefit)</li>
+<li>I/O operations (thread contention)</li>
+<li>Order-dependent operations</li>
+<li>Shared mutable state</li>
+</ul>
+<pre><code language="language-java" class="language-java">// Bad: Small dataset
 List&lt;Integer&gt; small = Arrays.asList(1, 2, 3, 4, 5);
 small.parallelStream().forEach(System.out::println);  // Overkill
 
@@ -1586,12 +1502,10 @@ List&lt;Integer&gt; result = new ArrayList&lt;&gt;();  // Not thread-safe!
 numbers.parallelStream()
     .forEach(n -&gt; result.add(n * 2));  // WRONG! Race condition
 </code></pre>
-            <aside class="warning">
-                <p><strong>Warning:</strong> Parallel streams use the common ForkJoinPool. Blocking operations can
-                    starve other parallel streams in your application.</p>
-            </aside>
-            <h2 is-upgraded>Thread-Safe Operations</h2>
-            <pre><code language="language-java" class="language-java">// Safe: Collectors are thread-safe
+<aside class="warning"><p><strong>Warning:</strong> Parallel streams use the common ForkJoinPool. Blocking operations can starve other parallel streams in your application.</p>
+</aside>
+<h2 is-upgraded>Thread-Safe Operations</h2>
+<pre><code language="language-java" class="language-java">// Safe: Collectors are thread-safe
 List&lt;Integer&gt; safe = numbers.parallelStream()
     .map(n -&gt; n * 2)
     .collect(Collectors.toList());
@@ -1616,90 +1530,89 @@ List&lt;Integer&gt; best = numbers.parallelStream()
 </code></pre>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Conclusion" duration="2">
-            <p>Congratulations! 🎉 You&#39;ve mastered functional programming and the Stream API!</p>
-            <h2 is-upgraded>What You&#39;ve Learned</h2>
-            <ul>
-                <li>✅ <strong>Functional Programming:</strong> Paradigm shift from imperative to declarative</li>
-                <li>✅ <strong>Lambda Expressions:</strong> Concise syntax for functional interfaces</li>
-                <li>✅ <strong>Functional Interfaces:</strong> Predicate, Function, Consumer, Supplier, BiFunction</li>
-                <li>✅ <strong>Method References:</strong> Shorthand for lambdas (::)</li>
-                <li>✅ <strong>Stream API:</strong> Powerful data processing pipelines</li>
-                <li>✅ <strong>Intermediate Operations:</strong> filter, map, flatMap, sorted, distinct</li>
-                <li>✅ <strong>Terminal Operations:</strong> collect, forEach, reduce, count, min, max</li>
-                <li>✅ <strong>Advanced Collectors:</strong> groupingBy, partitioningBy, statistics</li>
-                <li>✅ <strong>Parallel Streams:</strong> Multi-core processing for performance</li>
-            </ul>
-            <h2 is-upgraded>Key Takeaways</h2>
-            <ol type="1">
-                <li><strong>Functional style</strong> is declarative - describe <strong>what</strong>, not
-                    <strong>how</strong>
-                </li>
-                <li><strong>Lambdas</strong> make code concise and expressive</li>
-                <li><strong>Streams</strong> enable powerful data transformations</li>
-                <li><strong>Collectors</strong> provide sophisticated aggregation capabilities</li>
-                <li><strong>Parallel streams</strong> can boost performance but require careful use</li>
-                <li><strong>Immutability</strong> prevents bugs and enables safe parallelization</li>
-            </ol>
-            <h2 is-upgraded>Best Practices</h2>
-            <ul>
-                <li>Use method references when lambdas just call existing methods</li>
-                <li>Chain stream operations for readability</li>
-                <li>Avoid side effects in stream operations</li>
-                <li>Use parallel streams only for large datasets and CPU-intensive tasks</li>
-                <li>Prefer collectors over manual accumulation</li>
-                <li>Keep lambda expressions short and focused</li>
-            </ul>
-            <h2 is-upgraded>Next Steps</h2>
-            <p>Ready for more modern Java? Continue to:</p>
-            <ul>
-                <li><strong>Codelab 2.2:</strong> Optional, Date/Time &amp; Modern Java Features</li>
-                <li><strong>Codelab 2.3:</strong> Asynchronous Programming with CompletableFuture</li>
-                <li><strong>Codelab 2.4:</strong> Logging with Log4j</li>
-            </ul>
-            <h2 is-upgraded>Practice Exercises</h2>
-            <ol type="1">
-                <li><strong>Order Processing:</strong> Process orders with discounts, tax calculations, and grouping
-                </li>
-                <li><strong>Log Analyzer:</strong> Parse log files and generate statistics by severity</li>
-                <li><strong>Student Grading:</strong> Calculate grades, averages, and rankings</li>
-                <li><strong>E-commerce Reports:</strong> Product recommendations based on purchase history</li>
-                <li><strong>Performance Benchmark:</strong> Compare sequential vs parallel for various datasets</li>
-            </ol>
-            <h2 is-upgraded>Additional Resources</h2>
-            <ul>
-                <li><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/stream/package-summary.html"
-                        target="_blank">Java Stream API Documentation</a></li>
-                <li><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/package-summary.html"
-                        target="_blank">Java Functional Interfaces</a></li>
-                <li><a href="https://www.oreilly.com/library/view/effective-java/9780134686097/"
-                        target="_blank">Effective Java by Joshua Bloch</a> - Chapter on Lambdas and Streams</li>
-            </ul>
-            <aside class="special">
-                <p><strong>Excellent Work!</strong> You now have the skills to write modern, efficient Java code. The
-                    functional programming techniques you learned are used extensively in Spring Boot and microservices!
-                </p>
-            </aside>
+      </google-codelab-step>
+    
+      <google-codelab-step label="Conclusion" duration="2">
+        <p>Congratulations! 🎉 You&#39;ve mastered functional programming and the Stream API!</p>
+<h2 is-upgraded>What You&#39;ve Learned</h2>
+<ul>
+<li>✅ <strong>Functional Programming:</strong> Paradigm shift from imperative to declarative</li>
+<li>✅ <strong>Lambda Expressions:</strong> Concise syntax for functional interfaces</li>
+<li>✅ <strong>Functional Interfaces:</strong> Predicate, Function, Consumer, Supplier, BiFunction</li>
+<li>✅ <strong>Method References:</strong> Shorthand for lambdas (::)</li>
+<li>✅ <strong>Stream API:</strong> Powerful data processing pipelines</li>
+<li>✅ <strong>Intermediate Operations:</strong> filter, map, flatMap, sorted, distinct</li>
+<li>✅ <strong>Terminal Operations:</strong> collect, forEach, reduce, count, min, max</li>
+<li>✅ <strong>Advanced Collectors:</strong> groupingBy, partitioningBy, statistics</li>
+<li>✅ <strong>Parallel Streams:</strong> Multi-core processing for performance</li>
+</ul>
+<h2 is-upgraded>Key Takeaways</h2>
+<ol type="1">
+<li><strong>Functional style</strong> is declarative - describe <strong>what</strong>, not <strong>how</strong></li>
+<li><strong>Lambdas</strong> make code concise and expressive</li>
+<li><strong>Streams</strong> enable powerful data transformations</li>
+<li><strong>Collectors</strong> provide sophisticated aggregation capabilities</li>
+<li><strong>Parallel streams</strong> can boost performance but require careful use</li>
+<li><strong>Immutability</strong> prevents bugs and enables safe parallelization</li>
+</ol>
+<h2 is-upgraded>Best Practices</h2>
+<ul>
+<li>Use method references when lambdas just call existing methods</li>
+<li>Chain stream operations for readability</li>
+<li>Avoid side effects in stream operations</li>
+<li>Use parallel streams only for large datasets and CPU-intensive tasks</li>
+<li>Prefer collectors over manual accumulation</li>
+<li>Keep lambda expressions short and focused</li>
+</ul>
+<h2 is-upgraded>Next Steps</h2>
+<p>Ready for more modern Java? Continue to:</p>
+<ul>
+<li><strong>Codelab 2.2:</strong> Optional, Date/Time &amp; Modern Java Features</li>
+<li><strong>Codelab 2.3:</strong> Asynchronous Programming with CompletableFuture</li>
+<li><strong>Codelab 2.4:</strong> Logging with Log4j</li>
+</ul>
+<h2 is-upgraded>Practice Exercises</h2>
+<ol type="1">
+<li><strong>Order Processing:</strong> Process orders with discounts, tax calculations, and grouping</li>
+<li><strong>Log Analyzer:</strong> Parse log files and generate statistics by severity</li>
+<li><strong>Student Grading:</strong> Calculate grades, averages, and rankings</li>
+<li><strong>E-commerce Reports:</strong> Product recommendations based on purchase history</li>
+<li><strong>Performance Benchmark:</strong> Compare sequential vs parallel for various datasets</li>
+</ol>
+<h2 is-upgraded>Additional Resources</h2>
+<ul>
+<li><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/stream/package-summary.html" target="_blank">Java Stream API Documentation</a></li>
+<li><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/package-summary.html" target="_blank">Java Functional Interfaces</a></li>
+<li><a href="https://www.oreilly.com/library/view/effective-java/9780134686097/" target="_blank">Effective Java by Joshua Bloch</a> - Chapter on Lambdas and Streams</li>
+</ul>
+<aside class="special"><p><strong>Excellent Work!</strong> You now have the skills to write modern, efficient Java code. The functional programming techniques you learned are used extensively in Spring Boot and microservices!</p>
+</aside>
 
 
-        </google-codelab-step>
+      </google-codelab-step>
+    
+  </google-codelab>
 
-    </google-codelab>
-
-    <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
-    <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
-    <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
-    <script src="//support.google.com/inapp/api.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js"></script>
-    <script src="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.js"></script>
-    <script>
-        hljs.highlightAll();
-        hljs.addPlugin(new CopyButtonPlugin({ autohide: false }));
-
-    </script>
+  <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
+  <script src="//support.google.com/inapp/api.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js"></script>
+  <script src="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.js"></script>
+  <script>
+    hljs.highlightAll();
+    hljs.addPlugin(new CopyButtonPlugin({ autohide: false}));
+    
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      const homeUrl = "\/springboot_course\/";
+      const arrowBack = document.getElementById('arrow-back');
+      const doneBtn = document.getElementById('done');
+      if (arrowBack) arrowBack.href = homeUrl;
+      if (doneBtn) doneBtn.href = homeUrl;
+    });
+    
+  </script>
 
 </body>
-
 </html>

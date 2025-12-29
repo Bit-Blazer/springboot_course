@@ -3,7 +3,7 @@
   "format": "html",
   "prefix": "https://storage.googleapis.com",
   "mainga": "UA-49880327-14",
-  "updated": "2025-12-29T14:50:08+05:30",
+  "updated": "2025-12-29T15:21:21+05:30",
   "id": "testing-remote-debugging",
   "duration": 64,
   "title": "Testing \u0026 Remote Debugging Spring Boot Apps",
@@ -24,5 +24,6 @@
   "tags": [
     "web"
   ],
+  "home_url": "/springboot_course/",
   "url": "testing-remote-debugging"
 }

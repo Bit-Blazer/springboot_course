@@ -3,6 +3,7 @@ id: memory-management
 categories: Java, JVM, Memory Management, Performance
 environments: Web
 status: Published
+home url: /springboot_course/
 
 # Memory Management & Garbage Collection
 

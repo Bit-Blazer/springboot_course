@@ -1,75 +1,74 @@
+
 <!doctype html>
 
 <html>
-
 <head>
-    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
-    <meta name="theme-color" content="#4F7DC9">
-    <meta charset="UTF-8">
-    <title>Asynchronous Programming Complete</title>
-    <link rel="stylesheet"
-        href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
-    <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
-    <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
-    <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1  /build/styles/monokai.min.css">
-    <link rel="stylesheet" href="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.css">
-    <style>
-        .success {
-            color: #1e8e3e;
-        }
-
-        .error {
-            color: red;
-        }
-    </style>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <title>Asynchronous Programming Complete</title>
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
+  <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1  /build/styles/monokai.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.css">
+  <style>
+    .success {
+      color: #1e8e3e;
+    }
+    .error {
+      color: red;
+    }
+  </style>
 </head>
-
 <body>
-    <google-codelab-analytics gaid="UA-49880327-14" ga4id=""></google-codelab-analytics>
-    <google-codelab codelab-gaid="" codelab-ga4id="" id="async-programming-complete"
-        title="Asynchronous Programming Complete" environment="web" feedback-link="">
+  <google-codelab-analytics gaid="UA-49880327-14" ga4id=""></google-codelab-analytics>
+  <google-codelab codelab-gaid=""
+                  codelab-ga4id=""
+                  id="async-programming-complete"
+                  title="Asynchronous Programming Complete"
+                  environment="web"
+                  feedback-link="">
+    
+      <google-codelab-step label="Introduction" duration="5">
+        <p>Asynchronous programming enables efficient use of system resources by allowing tasks to run concurrently without blocking. Modern Java provides powerful tools for writing non-blocking, reactive code.</p>
+<h2 class="checklist" is-upgraded>What You&#39;ll Learn</h2>
+<ul class="checklist">
+<li><strong>Threading Basics:</strong> Runnable vs Callable</li>
+<li><strong>Future Interface:</strong> get(), isDone(), cancel()</li>
+<li><strong>ExecutorService:</strong> Thread pools and management</li>
+<li><strong>CompletableFuture:</strong> Modern async programming</li>
+<li><strong>Chaining Operations:</strong> thenApply, thenAccept, thenCompose</li>
+<li><strong>Combining Futures:</strong> thenCombine, allOf, anyOf</li>
+<li><strong>Error Handling:</strong> exceptionally, handle, whenComplete</li>
+<li><strong>Timeouts:</strong> orTimeout, completeOnTimeout</li>
+<li><strong>Best Practices:</strong> Thread safety and performance</li>
+</ul>
+<h2 is-upgraded>What You&#39;ll Build</h2>
+<p>A comprehensive <strong>Multi-threaded Data Processing System</strong> featuring:</p>
+<ul>
+<li>Parallel data fetching from multiple sources</li>
+<li>Async API calls with CompletableFuture</li>
+<li>Chained transformations and aggregations</li>
+<li>Error handling and fallback strategies</li>
+<li>Performance comparison: blocking vs async</li>
+<li>Real-world microservice orchestration example</li>
+</ul>
+<h2 is-upgraded>Prerequisites</h2>
+<ul>
+<li>Completed Codelab 2.1 (Functional Programming &amp; Streams)</li>
+<li>Understanding of lambdas and functional interfaces</li>
+<li>Basic knowledge of threads</li>
+</ul>
 
-        <google-codelab-step label="Introduction" duration="5">
-            <p>Asynchronous programming enables efficient use of system resources by allowing tasks to run concurrently
-                without blocking. Modern Java provides powerful tools for writing non-blocking, reactive code.</p>
-            <h2 class="checklist" is-upgraded>What You&#39;ll Learn</h2>
-            <ul class="checklist">
-                <li><strong>Threading Basics:</strong> Runnable vs Callable</li>
-                <li><strong>Future Interface:</strong> get(), isDone(), cancel()</li>
-                <li><strong>ExecutorService:</strong> Thread pools and management</li>
-                <li><strong>CompletableFuture:</strong> Modern async programming</li>
-                <li><strong>Chaining Operations:</strong> thenApply, thenAccept, thenCompose</li>
-                <li><strong>Combining Futures:</strong> thenCombine, allOf, anyOf</li>
-                <li><strong>Error Handling:</strong> exceptionally, handle, whenComplete</li>
-                <li><strong>Timeouts:</strong> orTimeout, completeOnTimeout</li>
-                <li><strong>Best Practices:</strong> Thread safety and performance</li>
-            </ul>
-            <h2 is-upgraded>What You&#39;ll Build</h2>
-            <p>A comprehensive <strong>Multi-threaded Data Processing System</strong> featuring:</p>
-            <ul>
-                <li>Parallel data fetching from multiple sources</li>
-                <li>Async API calls with CompletableFuture</li>
-                <li>Chained transformations and aggregations</li>
-                <li>Error handling and fallback strategies</li>
-                <li>Performance comparison: blocking vs async</li>
-                <li>Real-world microservice orchestration example</li>
-            </ul>
-            <h2 is-upgraded>Prerequisites</h2>
-            <ul>
-                <li>Completed Codelab 2.1 (Functional Programming &amp; Streams)</li>
-                <li>Understanding of lambdas and functional interfaces</li>
-                <li>Basic knowledge of threads</li>
-            </ul>
 
-
-        </google-codelab-step>
-
-        <google-codelab-step label="Threading Basics" duration="10">
-            <p>Before diving into async programming, let&#39;s understand the foundation: threads and executors.</p>
-            <h2 is-upgraded>Runnable vs Callable</h2>
-            <p><strong>Runnable - No Return Value:</strong></p>
-            <pre><code language="language-java" class="language-java">// Old way: Anonymous class
+      </google-codelab-step>
+    
+      <google-codelab-step label="Threading Basics" duration="10">
+        <p>Before diving into async programming, let&#39;s understand the foundation: threads and executors.</p>
+<h2 is-upgraded>Runnable vs Callable</h2>
+<p><strong>Runnable - No Return Value:</strong></p>
+<pre><code language="language-java" class="language-java">// Old way: Anonymous class
 Runnable task1 = new Runnable() {
     @Override
     public void run() {
@@ -88,8 +87,8 @@ Runnable task2 = () -&gt; {
 Thread thread = new Thread(task2);
 thread.start();
 </code></pre>
-            <p><strong>Callable - Returns Value, Can Throw Exception:</strong></p>
-            <pre><code language="language-java" class="language-java">import java.util.concurrent.Callable;
+<p><strong>Callable - Returns Value, Can Throw Exception:</strong></p>
+<pre><code language="language-java" class="language-java">import java.util.concurrent.Callable;
 
 // Callable returns a value
 Callable&lt;Integer&gt; task = () -&gt; {
@@ -105,12 +104,10 @@ Callable&lt;String&gt; fetchData = () -&gt; {
     return &#34;Data fetched&#34;;
 };
 </code></pre>
-            <aside class="special">
-                <p><strong>Key Difference:</strong> Use Runnable for fire-and-forget tasks. Use Callable when you need a
-                    result or might throw exceptions.</p>
-            </aside>
-            <h2 is-upgraded>Creating and Managing Threads</h2>
-            <pre><code language="language-java" class="language-java">public class ThreadBasics {
+<aside class="special"><p><strong>Key Difference:</strong> Use Runnable for fire-and-forget tasks. Use Callable when you need a result or might throw exceptions.</p>
+</aside>
+<h2 is-upgraded>Creating and Managing Threads</h2>
+<pre><code language="language-java" class="language-java">public class ThreadBasics {
     public static void main(String[] args) throws InterruptedException {
         // Method 1: Extend Thread
         Thread t1 = new Thread() {
@@ -136,8 +133,8 @@ Callable&lt;String&gt; fetchData = () -&gt; {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Thread States</h2>
-            <pre><code language="language-java" class="language-java">public class ThreadStates {
+<h2 is-upgraded>Thread States</h2>
+<pre><code language="language-java" class="language-java">public class ThreadStates {
     public static void main(String[] args) throws InterruptedException {
         Thread thread = new Thread(() -&gt; {
             try {
@@ -160,18 +157,16 @@ Callable&lt;String&gt; fetchData = () -&gt; {
     }
 }
 </code></pre>
-            <aside class="warning">
-                <p><strong>Warning:</strong> Creating threads directly is expensive and doesn&#39;t scale. Use thread
-                    pools (ExecutorService) for production code.</p>
-            </aside>
+<aside class="warning"><p><strong>Warning:</strong> Creating threads directly is expensive and doesn&#39;t scale. Use thread pools (ExecutorService) for production code.</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="ExecutorService and Thread Pools" duration="12">
-            <p>ExecutorService manages a pool of threads, reusing them efficiently.</p>
-            <h2 is-upgraded>Creating Executors</h2>
-            <pre><code language="language-java" class="language-java">import java.util.concurrent.*;
+      </google-codelab-step>
+    
+      <google-codelab-step label="ExecutorService and Thread Pools" duration="12">
+        <p>ExecutorService manages a pool of threads, reusing them efficiently.</p>
+<h2 is-upgraded>Creating Executors</h2>
+<pre><code language="language-java" class="language-java">import java.util.concurrent.*;
 
 // Fixed thread pool (n threads)
 ExecutorService executor1 = Executors.newFixedThreadPool(4);
@@ -188,8 +183,8 @@ ScheduledExecutorService executor4 = Executors.newScheduledThreadPool(2);
 // Always shutdown when done!
 executor1.shutdown();
 </code></pre>
-            <h2 is-upgraded>Submitting Tasks</h2>
-            <pre><code language="language-java" class="language-java">import java.util.concurrent.*;
+<h2 is-upgraded>Submitting Tasks</h2>
+<pre><code language="language-java" class="language-java">import java.util.concurrent.*;
 
 public class ExecutorDemo {
     public static void main(String[] args) throws Exception {
@@ -224,8 +219,8 @@ public class ExecutorDemo {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Future Interface</h2>
-            <pre><code language="language-java" class="language-java">import java.util.concurrent.*;
+<h2 is-upgraded>Future Interface</h2>
+<pre><code language="language-java" class="language-java">import java.util.concurrent.*;
 
 public class FutureExample {
     public static void main(String[] args) throws Exception {
@@ -269,8 +264,8 @@ public class FutureExample {
     }
 }
 </code></pre>
-            <h2 is-upgraded>InvokeAll and InvokeAny</h2>
-            <pre><code language="language-java" class="language-java">import java.util.*;
+<h2 is-upgraded>InvokeAll and InvokeAny</h2>
+<pre><code language="language-java" class="language-java">import java.util.*;
 import java.util.concurrent.*;
 
 public class BulkOperations {
@@ -298,8 +293,8 @@ public class BulkOperations {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Practical Example: Parallel Processing</h2>
-            <pre><code language="language-java" class="language-java">import java.util.*;
+<h2 is-upgraded>Practical Example: Parallel Processing</h2>
+<pre><code language="language-java" class="language-java">import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.*;
 
@@ -342,13 +337,12 @@ public class ParallelProcessor {
 </code></pre>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="CompletableFuture Basics" duration="15">
-            <p>CompletableFuture is a powerful async programming tool introduced in Java 8, enhanced in later versions.
-            </p>
-            <h2 is-upgraded>Creating CompletableFuture</h2>
-            <pre><code language="language-java" class="language-java">import java.util.concurrent.CompletableFuture;
+      </google-codelab-step>
+    
+      <google-codelab-step label="CompletableFuture Basics" duration="15">
+        <p>CompletableFuture is a powerful async programming tool introduced in Java 8, enhanced in later versions.</p>
+<h2 is-upgraded>Creating CompletableFuture</h2>
+<pre><code language="language-java" class="language-java">import java.util.concurrent.CompletableFuture;
 
 // 1. Already completed future
 CompletableFuture&lt;String&gt; completed = CompletableFuture.completedFuture(&#34;Hello&#34;);
@@ -373,8 +367,8 @@ CompletableFuture&lt;String&gt; async3 = CompletableFuture.supplyAsync(() -&gt; 
     return &#34;Custom executor result&#34;;
 }, executor);
 </code></pre>
-            <h2 is-upgraded>Basic Chaining</h2>
-            <pre><code language="language-java" class="language-java">import java.util.concurrent.CompletableFuture;
+<h2 is-upgraded>Basic Chaining</h2>
+<pre><code language="language-java" class="language-java">import java.util.concurrent.CompletableFuture;
 
 public class ChainingDemo {
     public static void main(String[] args) {
@@ -401,8 +395,8 @@ public class ChainingDemo {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Combining CompletableFutures</h2>
-            <pre><code language="language-java" class="language-java">import java.util.concurrent.CompletableFuture;
+<h2 is-upgraded>Combining CompletableFutures</h2>
+<pre><code language="language-java" class="language-java">import java.util.concurrent.CompletableFuture;
 
 public class CombiningFutures {
     public static void main(String[] args) {
@@ -446,8 +440,8 @@ public class CombiningFutures {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Error Handling</h2>
-            <pre><code language="language-java" class="language-java">import java.util.concurrent.CompletableFuture;
+<h2 is-upgraded>Error Handling</h2>
+<pre><code language="language-java" class="language-java">import java.util.concurrent.CompletableFuture;
 
 public class ErrorHandling {
     public static void main(String[] args) {
@@ -491,8 +485,8 @@ public class ErrorHandling {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Timeouts (Java 9+)</h2>
-            <pre><code language="language-java" class="language-java">import java.util.concurrent.*;
+<h2 is-upgraded>Timeouts (Java 9+)</h2>
+<pre><code language="language-java" class="language-java">import java.util.concurrent.*;
 
 public class TimeoutDemo {
     public static void main(String[] args) {
@@ -525,12 +519,12 @@ public class TimeoutDemo {
 </code></pre>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Advanced CompletableFuture Patterns" duration="15">
-            <p>Let&#39;s explore advanced patterns for real-world async programming.</p>
-            <h2 is-upgraded>Async API Calls</h2>
-            <pre><code language="language-java" class="language-java">import java.util.concurrent.CompletableFuture;
+      </google-codelab-step>
+    
+      <google-codelab-step label="Advanced CompletableFuture Patterns" duration="15">
+        <p>Let&#39;s explore advanced patterns for real-world async programming.</p>
+<h2 is-upgraded>Async API Calls</h2>
+<pre><code language="language-java" class="language-java">import java.util.concurrent.CompletableFuture;
 import java.net.http.*;
 import java.net.URI;
 
@@ -594,8 +588,8 @@ public class AsyncApiCalls {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Retry Pattern</h2>
-            <pre><code language="language-java" class="language-java">import java.util.concurrent.CompletableFuture;
+<h2 is-upgraded>Retry Pattern</h2>
+<pre><code language="language-java" class="language-java">import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
 public class RetryPattern {
@@ -638,8 +632,8 @@ public class RetryPattern {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Fallback Pattern</h2>
-            <pre><code language="language-java" class="language-java">import java.util.concurrent.CompletableFuture;
+<h2 is-upgraded>Fallback Pattern</h2>
+<pre><code language="language-java" class="language-java">import java.util.concurrent.CompletableFuture;
 
 public class FallbackPattern {
     public static CompletableFuture&lt;String&gt; fetchFromPrimary() {
@@ -683,8 +677,8 @@ public class FallbackPattern {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Parallel Aggregation</h2>
-            <pre><code language="language-java" class="language-java">import java.util.*;
+<h2 is-upgraded>Parallel Aggregation</h2>
+<pre><code language="language-java" class="language-java">import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -748,12 +742,12 @@ public class ParallelAggregation {
 </code></pre>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Build Data Processing System" duration="25">
-            <p>Let&#39;s build a comprehensive async data processing system!</p>
-            <p>Create <code>DataProcessingSystem.java</code>:</p>
-            <pre><code language="language-java" class="language-java">import java.util.*;
+      </google-codelab-step>
+    
+      <google-codelab-step label="Build Data Processing System" duration="25">
+        <p>Let&#39;s build a comprehensive async data processing system!</p>
+<p>Create <code>DataProcessingSystem.java</code>:</p>
+<pre><code language="language-java" class="language-java">import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
 import java.time.*;
@@ -1086,11 +1080,11 @@ public class DataProcessingSystem {
 </code></pre>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Best Practices" duration="8">
-            <h2 is-upgraded>Thread Safety</h2>
-            <pre><code language="language-java" class="language-java">import java.util.concurrent.*;
+      </google-codelab-step>
+    
+      <google-codelab-step label="Best Practices" duration="8">
+        <h2 is-upgraded>Thread Safety</h2>
+<pre><code language="language-java" class="language-java">import java.util.concurrent.*;
 import java.util.concurrent.atomic.*;
 
 // Bad: Not thread-safe
@@ -1120,8 +1114,8 @@ class SynchronizedCounter {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Executor Management</h2>
-            <pre><code language="language-java" class="language-java">// Bad: Not shutting down executor
+<h2 is-upgraded>Executor Management</h2>
+<pre><code language="language-java" class="language-java">// Bad: Not shutting down executor
 ExecutorService bad = Executors.newFixedThreadPool(10);
 bad.submit(() -&gt; System.out.println(&#34;Task&#34;));
 // Executor never shuts down!
@@ -1144,8 +1138,8 @@ try {
 // Better: Try-with-resources (Java 19+)
 // ExecutorService will auto-close
 </code></pre>
-            <h2 is-upgraded>Exception Handling</h2>
-            <pre><code language="language-java" class="language-java">// Always handle exceptions in CompletableFuture
+<h2 is-upgraded>Exception Handling</h2>
+<pre><code language="language-java" class="language-java">// Always handle exceptions in CompletableFuture
 CompletableFuture.supplyAsync(() -&gt; {
     if (Math.random() &gt; 0.5) {
         throw new RuntimeException(&#34;Error!&#34;);
@@ -1158,8 +1152,8 @@ CompletableFuture.supplyAsync(() -&gt; {
 })
 .thenAccept(System.out::println);
 </code></pre>
-            <h2 is-upgraded>Performance Tips</h2>
-            <pre><code language="language-java" class="language-java">// 1. Choose appropriate executor size
+<h2 is-upgraded>Performance Tips</h2>
+<pre><code language="language-java" class="language-java">// 1. Choose appropriate executor size
 int cores = Runtime.getRuntime().availableProcessors();
 
 // CPU-bound tasks: cores or cores + 1
@@ -1180,77 +1174,83 @@ CompletableFuture&lt;String&gt; future = CompletableFuture.supplyAsync(() -&gt; 
 </code></pre>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Conclusion" duration="2">
-            <p>Congratulations! 🎉 You&#39;ve mastered asynchronous programming in Java!</p>
-            <h2 is-upgraded>What You&#39;ve Learned</h2>
-            <ul>
-                <li>✅ <strong>Threading Basics:</strong> Runnable, Callable, Thread management</li>
-                <li>✅ <strong>ExecutorService:</strong> Thread pools and task submission</li>
-                <li>✅ <strong>Future Interface:</strong> Blocking async operations</li>
-                <li>✅ <strong>CompletableFuture:</strong> Modern non-blocking async</li>
-                <li>✅ <strong>Chaining:</strong> thenApply, thenAccept, thenCompose</li>
-                <li>✅ <strong>Combining:</strong> thenCombine, allOf, anyOf</li>
-                <li>✅ <strong>Error Handling:</strong> exceptionally, handle, whenComplete</li>
-                <li>✅ <strong>Timeouts:</strong> orTimeout, completeOnTimeout</li>
-                <li>✅ <strong>Advanced Patterns:</strong> Retry, fallback, aggregation</li>
-            </ul>
-            <h2 is-upgraded>Key Takeaways</h2>
-            <ol type="1">
-                <li><strong>CompletableFuture</strong> is more powerful and flexible than Future</li>
-                <li><strong>Async operations</strong> improve performance by not blocking threads</li>
-                <li><strong>Always handle exceptions</strong> in async code</li>
-                <li><strong>Use thread pools</strong> instead of creating threads directly</li>
-                <li><strong>Shutdown executors</strong> properly to prevent resource leaks</li>
-                <li><strong>Choose appropriate parallelism</strong> based on task type</li>
-            </ol>
-            <h2 is-upgraded>Best Practices</h2>
-            <ul>
-                <li>Use CompletableFuture for async operations</li>
-                <li>Always provide error handlers (exceptionally, handle)</li>
-                <li>Shutdown executors in finally blocks</li>
-                <li>Use timeouts for external calls</li>
-                <li>Prefer async variants when operations are independent</li>
-                <li>Monitor thread pool sizes and adjust as needed</li>
-            </ul>
-            <h2 is-upgraded>Next Steps</h2>
-            <p>Continue to:</p>
-            <ul>
-                <li><strong>Codelab 2.4:</strong> Logging with Log4j</li>
-                <li><strong>Codelab 2.5:</strong> IDE Debugging Mastery</li>
-                <li><strong>Codelab 3.1:</strong> Spring Boot (which uses async extensively)</li>
-            </ul>
-            <h2 is-upgraded>Practice Exercises</h2>
-            <ol type="1">
-                <li><strong>Async Web Scraper:</strong> Fetch and parse multiple URLs in parallel</li>
-                <li><strong>Order Processing:</strong> Async order validation, payment, and fulfillment</li>
-                <li><strong>Batch Processor:</strong> Process large files using parallel streams</li>
-                <li><strong>API Gateway:</strong> Aggregate data from multiple microservices</li>
-                <li><strong>Cache Warmer:</strong> Pre-load cache asynchronously on startup</li>
-            </ol>
-            <aside class="special">
-                <p><strong>Excellent Work!</strong> Async programming is crucial for building high-performance, scalable
-                    applications. These skills are essential for modern Spring Boot and microservices development!</p>
-            </aside>
+      </google-codelab-step>
+    
+      <google-codelab-step label="Conclusion" duration="2">
+        <p>Congratulations! 🎉 You&#39;ve mastered asynchronous programming in Java!</p>
+<h2 is-upgraded>What You&#39;ve Learned</h2>
+<ul>
+<li>✅ <strong>Threading Basics:</strong> Runnable, Callable, Thread management</li>
+<li>✅ <strong>ExecutorService:</strong> Thread pools and task submission</li>
+<li>✅ <strong>Future Interface:</strong> Blocking async operations</li>
+<li>✅ <strong>CompletableFuture:</strong> Modern non-blocking async</li>
+<li>✅ <strong>Chaining:</strong> thenApply, thenAccept, thenCompose</li>
+<li>✅ <strong>Combining:</strong> thenCombine, allOf, anyOf</li>
+<li>✅ <strong>Error Handling:</strong> exceptionally, handle, whenComplete</li>
+<li>✅ <strong>Timeouts:</strong> orTimeout, completeOnTimeout</li>
+<li>✅ <strong>Advanced Patterns:</strong> Retry, fallback, aggregation</li>
+</ul>
+<h2 is-upgraded>Key Takeaways</h2>
+<ol type="1">
+<li><strong>CompletableFuture</strong> is more powerful and flexible than Future</li>
+<li><strong>Async operations</strong> improve performance by not blocking threads</li>
+<li><strong>Always handle exceptions</strong> in async code</li>
+<li><strong>Use thread pools</strong> instead of creating threads directly</li>
+<li><strong>Shutdown executors</strong> properly to prevent resource leaks</li>
+<li><strong>Choose appropriate parallelism</strong> based on task type</li>
+</ol>
+<h2 is-upgraded>Best Practices</h2>
+<ul>
+<li>Use CompletableFuture for async operations</li>
+<li>Always provide error handlers (exceptionally, handle)</li>
+<li>Shutdown executors in finally blocks</li>
+<li>Use timeouts for external calls</li>
+<li>Prefer async variants when operations are independent</li>
+<li>Monitor thread pool sizes and adjust as needed</li>
+</ul>
+<h2 is-upgraded>Next Steps</h2>
+<p>Continue to:</p>
+<ul>
+<li><strong>Codelab 2.4:</strong> Logging with Log4j</li>
+<li><strong>Codelab 2.5:</strong> IDE Debugging Mastery</li>
+<li><strong>Codelab 3.1:</strong> Spring Boot (which uses async extensively)</li>
+</ul>
+<h2 is-upgraded>Practice Exercises</h2>
+<ol type="1">
+<li><strong>Async Web Scraper:</strong> Fetch and parse multiple URLs in parallel</li>
+<li><strong>Order Processing:</strong> Async order validation, payment, and fulfillment</li>
+<li><strong>Batch Processor:</strong> Process large files using parallel streams</li>
+<li><strong>API Gateway:</strong> Aggregate data from multiple microservices</li>
+<li><strong>Cache Warmer:</strong> Pre-load cache asynchronously on startup</li>
+</ol>
+<aside class="special"><p><strong>Excellent Work!</strong> Async programming is crucial for building high-performance, scalable applications. These skills are essential for modern Spring Boot and microservices development!</p>
+</aside>
 
 
-        </google-codelab-step>
+      </google-codelab-step>
+    
+  </google-codelab>
 
-    </google-codelab>
-
-    <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
-    <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
-    <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
-    <script src="//support.google.com/inapp/api.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js"></script>
-    <script src="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.js"></script>
-    <script>
-        hljs.highlightAll();
-        hljs.addPlugin(new CopyButtonPlugin({ autohide: false }));
-
-    </script>
+  <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
+  <script src="//support.google.com/inapp/api.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js"></script>
+  <script src="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.js"></script>
+  <script>
+    hljs.highlightAll();
+    hljs.addPlugin(new CopyButtonPlugin({ autohide: false}));
+    
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      const homeUrl = "\/springboot_course\/";
+      const arrowBack = document.getElementById('arrow-back');
+      const doneBtn = document.getElementById('done');
+      if (arrowBack) arrowBack.href = homeUrl;
+      if (doneBtn) doneBtn.href = homeUrl;
+    });
+    
+  </script>
 
 </body>
-
 </html>

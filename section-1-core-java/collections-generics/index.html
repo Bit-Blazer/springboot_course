@@ -1,78 +1,74 @@
+
 <!doctype html>
 
 <html>
-
 <head>
-    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
-    <meta name="theme-color" content="#4F7DC9">
-    <meta charset="UTF-8">
-    <title>Collections Framework &amp; Generics</title>
-    <link rel="stylesheet"
-        href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
-    <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
-    <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
-    <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1  /build/styles/monokai.min.css">
-    <link rel="stylesheet" href="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.css">
-    <style>
-        .success {
-            color: #1e8e3e;
-        }
-
-        .error {
-            color: red;
-        }
-    </style>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <title>Collections Framework &amp; Generics</title>
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
+  <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1  /build/styles/monokai.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.css">
+  <style>
+    .success {
+      color: #1e8e3e;
+    }
+    .error {
+      color: red;
+    }
+  </style>
 </head>
-
 <body>
-    <google-codelab-analytics gaid="UA-49880327-14" ga4id=""></google-codelab-analytics>
-    <google-codelab codelab-gaid="" codelab-ga4id="" id="collections-generics"
-        title="Collections Framework &amp; Generics" environment="web" feedback-link="">
+  <google-codelab-analytics gaid="UA-49880327-14" ga4id=""></google-codelab-analytics>
+  <google-codelab codelab-gaid=""
+                  codelab-ga4id=""
+                  id="collections-generics"
+                  title="Collections Framework &amp; Generics"
+                  environment="web"
+                  feedback-link="">
+    
+      <google-codelab-step label="Introduction" duration="2">
+        <p>Java&#39;s Collections Framework provides powerful data structures for storing and manipulating groups of objects. Combined with Generics for type safety, you can build robust, efficient applications. In this codelab, you&#39;ll master all major collection types while building a complete inventory management system.</p>
+<h2 class="checklist" is-upgraded>What You&#39;ll Learn</h2>
+<ul class="checklist">
+<li>Collections Framework architecture and interfaces</li>
+<li>List implementations (ArrayList, LinkedList)</li>
+<li>Set implementations (HashSet, TreeSet, LinkedHashSet)</li>
+<li>Map implementations (HashMap, TreeMap, LinkedHashMap)</li>
+<li>Queue and Deque interfaces (PriorityQueue, ArrayDeque)</li>
+<li>Generics: type parameters, bounded types, wildcards</li>
+<li>Comparable and Comparator for custom sorting</li>
+<li>Iterator and enhanced for-loop</li>
+<li>Collections utility class methods</li>
+<li>Performance characteristics of each collection type</li>
+</ul>
+<h2 is-upgraded>What You&#39;ll Build</h2>
+<p>An <strong>Inventory Management System</strong> featuring:</p>
+<ul>
+<li>Product catalog with multiple collection types</li>
+<li>Generic utility classes for common operations</li>
+<li>Custom sorting with Comparable and Comparator</li>
+<li>Priority-based order processing with Queue</li>
+<li>Search and filtering capabilities</li>
+<li>Performance comparisons between collection types</li>
+</ul>
+<h2 is-upgraded>Prerequisites</h2>
+<ul>
+<li>Completed Codelabs 1.1, 1.2, and 1.3</li>
+<li>Understanding of OOP, interfaces, and exceptions</li>
+<li>Java JDK 17+ installed</li>
+</ul>
 
-        <google-codelab-step label="Introduction" duration="2">
-            <p>Java&#39;s Collections Framework provides powerful data structures for storing and manipulating groups of
-                objects. Combined with Generics for type safety, you can build robust, efficient applications. In this
-                codelab, you&#39;ll master all major collection types while building a complete inventory management
-                system.</p>
-            <h2 class="checklist" is-upgraded>What You&#39;ll Learn</h2>
-            <ul class="checklist">
-                <li>Collections Framework architecture and interfaces</li>
-                <li>List implementations (ArrayList, LinkedList)</li>
-                <li>Set implementations (HashSet, TreeSet, LinkedHashSet)</li>
-                <li>Map implementations (HashMap, TreeMap, LinkedHashMap)</li>
-                <li>Queue and Deque interfaces (PriorityQueue, ArrayDeque)</li>
-                <li>Generics: type parameters, bounded types, wildcards</li>
-                <li>Comparable and Comparator for custom sorting</li>
-                <li>Iterator and enhanced for-loop</li>
-                <li>Collections utility class methods</li>
-                <li>Performance characteristics of each collection type</li>
-            </ul>
-            <h2 is-upgraded>What You&#39;ll Build</h2>
-            <p>An <strong>Inventory Management System</strong> featuring:</p>
-            <ul>
-                <li>Product catalog with multiple collection types</li>
-                <li>Generic utility classes for common operations</li>
-                <li>Custom sorting with Comparable and Comparator</li>
-                <li>Priority-based order processing with Queue</li>
-                <li>Search and filtering capabilities</li>
-                <li>Performance comparisons between collection types</li>
-            </ul>
-            <h2 is-upgraded>Prerequisites</h2>
-            <ul>
-                <li>Completed Codelabs 1.1, 1.2, and 1.3</li>
-                <li>Understanding of OOP, interfaces, and exceptions</li>
-                <li>Java JDK 17+ installed</li>
-            </ul>
 
-
-        </google-codelab-step>
-
-        <google-codelab-step label="Collections Framework Overview" duration="10">
-            <p>The Collections Framework provides a unified architecture for representing and manipulating collections.
-            </p>
-            <h2 is-upgraded>Collection Hierarchy</h2>
-            <pre><code>Collection Interface
+      </google-codelab-step>
+    
+      <google-codelab-step label="Collections Framework Overview" duration="10">
+        <p>The Collections Framework provides a unified architecture for representing and manipulating collections.</p>
+<h2 is-upgraded>Collection Hierarchy</h2>
+<pre><code>Collection Interface
 ├── List (ordered, allows duplicates)
 │   ├── ArrayList
 │   ├── LinkedList
@@ -91,9 +87,9 @@ Map Interface (key-value pairs, separate hierarchy)
 ├── LinkedHashMap (maintains insertion order)
 └── TreeMap (sorted by keys)
 </code></pre>
-            <h2 is-upgraded>Core Interfaces</h2>
-            <p><strong>Collection Interface:</strong></p>
-            <pre><code language="language-java" class="language-java">public interface Collection&lt;E&gt; {
+<h2 is-upgraded>Core Interfaces</h2>
+<p><strong>Collection Interface:</strong></p>
+<pre><code language="language-java" class="language-java">public interface Collection&lt;E&gt; {
     boolean add(E element);
     boolean remove(Object element);
     boolean contains(Object element);
@@ -104,8 +100,8 @@ Map Interface (key-value pairs, separate hierarchy)
     Object[] toArray();
 }
 </code></pre>
-            <p><strong>List Interface (extends Collection):</strong></p>
-            <pre><code language="language-java" class="language-java">public interface List&lt;E&gt; extends Collection&lt;E&gt; {
+<p><strong>List Interface (extends Collection):</strong></p>
+<pre><code language="language-java" class="language-java">public interface List&lt;E&gt; extends Collection&lt;E&gt; {
     E get(int index);
     E set(int index, E element);
     void add(int index, E element);
@@ -114,14 +110,14 @@ Map Interface (key-value pairs, separate hierarchy)
     int lastIndexOf(Object element);
 }
 </code></pre>
-            <p><strong>Set Interface (extends Collection):</strong></p>
-            <pre><code language="language-java" class="language-java">public interface Set&lt;E&gt; extends Collection&lt;E&gt; {
+<p><strong>Set Interface (extends Collection):</strong></p>
+<pre><code language="language-java" class="language-java">public interface Set&lt;E&gt; extends Collection&lt;E&gt; {
     // Same methods as Collection
     // But ensures no duplicates
 }
 </code></pre>
-            <p><strong>Map Interface (separate hierarchy):</strong></p>
-            <pre><code language="language-java" class="language-java">public interface Map&lt;K, V&gt; {
+<p><strong>Map Interface (separate hierarchy):</strong></p>
+<pre><code language="language-java" class="language-java">public interface Map&lt;K, V&gt; {
     V put(K key, V value);
     V get(Object key);
     V remove(Object key);
@@ -132,116 +128,58 @@ Map Interface (key-value pairs, separate hierarchy)
     Set&lt;Map.Entry&lt;K, V&gt;&gt; entrySet();
 }
 </code></pre>
-            <aside class="special">
-                <p><strong>Key Insight:</strong> List maintains order and allows duplicates. Set guarantees uniqueness.
-                    Map stores key-value pairs. Choose based on your needs!</p>
-            </aside>
-            <h2 is-upgraded>When to Use Each Collection</h2>
-            <table>
-                <tr>
-                    <td colspan="1" rowspan="1">
-                        <p>Collection</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>Use When</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>Performance</p>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="1" rowspan="1">
-                        <p><strong>ArrayList</strong></p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>Frequent reads, rare insertions/deletions</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>O(1) get, O(n) add/remove</p>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="1" rowspan="1">
-                        <p><strong>LinkedList</strong></p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>Frequent insertions/deletions at ends</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>O(n) get, O(1) add/remove at ends</p>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="1" rowspan="1">
-                        <p><strong>HashSet</strong></p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>Need uniqueness, order doesn&#39;t matter</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>O(1) add/remove/contains (average)</p>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="1" rowspan="1">
-                        <p><strong>TreeSet</strong></p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>Need uniqueness AND sorted order</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>O(log n) add/remove/contains</p>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="1" rowspan="1">
-                        <p><strong>HashMap</strong></p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>Fast key-value lookups</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>O(1) get/put (average)</p>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="1" rowspan="1">
-                        <p><strong>TreeMap</strong></p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>Key-value pairs in sorted key order</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>O(log n) get/put</p>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="1" rowspan="1">
-                        <p><strong>PriorityQueue</strong></p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>Process elements by priority</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>O(log n) add/remove</p>
-                    </td>
-                </tr>
-            </table>
+<aside class="special"><p><strong>Key Insight:</strong> List maintains order and allows duplicates. Set guarantees uniqueness. Map stores key-value pairs. Choose based on your needs!</p>
+</aside>
+<h2 is-upgraded>When to Use Each Collection</h2>
+<table>
+<tr><td colspan="1" rowspan="1"><p>Collection</p>
+</td><td colspan="1" rowspan="1"><p>Use When</p>
+</td><td colspan="1" rowspan="1"><p>Performance</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>ArrayList</strong></p>
+</td><td colspan="1" rowspan="1"><p>Frequent reads, rare insertions/deletions</p>
+</td><td colspan="1" rowspan="1"><p>O(1) get, O(n) add/remove</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>LinkedList</strong></p>
+</td><td colspan="1" rowspan="1"><p>Frequent insertions/deletions at ends</p>
+</td><td colspan="1" rowspan="1"><p>O(n) get, O(1) add/remove at ends</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>HashSet</strong></p>
+</td><td colspan="1" rowspan="1"><p>Need uniqueness, order doesn&#39;t matter</p>
+</td><td colspan="1" rowspan="1"><p>O(1) add/remove/contains (average)</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>TreeSet</strong></p>
+</td><td colspan="1" rowspan="1"><p>Need uniqueness AND sorted order</p>
+</td><td colspan="1" rowspan="1"><p>O(log n) add/remove/contains</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>HashMap</strong></p>
+</td><td colspan="1" rowspan="1"><p>Fast key-value lookups</p>
+</td><td colspan="1" rowspan="1"><p>O(1) get/put (average)</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>TreeMap</strong></p>
+</td><td colspan="1" rowspan="1"><p>Key-value pairs in sorted key order</p>
+</td><td colspan="1" rowspan="1"><p>O(log n) get/put</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>PriorityQueue</strong></p>
+</td><td colspan="1" rowspan="1"><p>Process elements by priority</p>
+</td><td colspan="1" rowspan="1"><p>O(log n) add/remove</p>
+</td></tr>
+</table>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="List Collections" duration="15">
-            <p>Lists are ordered collections that allow duplicate elements.</p>
-            <h2 is-upgraded>ArrayList - Dynamic Array</h2>
-            <p><strong>Characteristics:</strong></p>
-            <ul>
-                <li>Resizable array implementation</li>
-                <li>Fast random access: O(1)</li>
-                <li>Slow insertions/deletions in middle: O(n)</li>
-                <li>Best for: Reading more than writing</li>
-            </ul>
-            <pre><code language="language-java" class="language-java">import java.util.*;
+      </google-codelab-step>
+    
+      <google-codelab-step label="List Collections" duration="15">
+        <p>Lists are ordered collections that allow duplicate elements.</p>
+<h2 is-upgraded>ArrayList - Dynamic Array</h2>
+<p><strong>Characteristics:</strong></p>
+<ul>
+<li>Resizable array implementation</li>
+<li>Fast random access: O(1)</li>
+<li>Slow insertions/deletions in middle: O(n)</li>
+<li>Best for: Reading more than writing</li>
+</ul>
+<pre><code language="language-java" class="language-java">import java.util.*;
 
 public class ArrayListDemo {
     public static void main(String[] args) {
@@ -292,16 +230,16 @@ public class ArrayListDemo {
     }
 }
 </code></pre>
-            <h2 is-upgraded>LinkedList - Doubly Linked List</h2>
-            <p><strong>Characteristics:</strong></p>
-            <ul>
-                <li>Doubly-linked list implementation</li>
-                <li>Slow random access: O(n)</li>
-                <li>Fast insertions/deletions at ends: O(1)</li>
-                <li>Best for: Frequent insertions/deletions</li>
-                <li>Also implements Deque interface</li>
-            </ul>
-            <pre><code language="language-java" class="language-java">import java.util.*;
+<h2 is-upgraded>LinkedList - Doubly Linked List</h2>
+<p><strong>Characteristics:</strong></p>
+<ul>
+<li>Doubly-linked list implementation</li>
+<li>Slow random access: O(n)</li>
+<li>Fast insertions/deletions at ends: O(1)</li>
+<li>Best for: Frequent insertions/deletions</li>
+<li>Also implements Deque interface</li>
+</ul>
+<pre><code language="language-java" class="language-java">import java.util.*;
 
 public class LinkedListDemo {
     public static void main(String[] args) {
@@ -351,8 +289,8 @@ public class LinkedListDemo {
     }
 }
 </code></pre>
-            <h2 is-upgraded>ArrayList vs LinkedList Performance</h2>
-            <pre><code language="language-java" class="language-java">import java.util.*;
+<h2 is-upgraded>ArrayList vs LinkedList Performance</h2>
+<pre><code language="language-java" class="language-java">import java.util.*;
 
 public class ListPerformanceComparison {
     public static void main(String[] args) {
@@ -392,25 +330,23 @@ public class ListPerformanceComparison {
     }
 }
 </code></pre>
-            <aside class="warning">
-                <p><strong>Performance Warning:</strong> ArrayList.get(i) is O(1), LinkedList.get(i) is O(n). For random
-                    access, ArrayList is much faster!</p>
-            </aside>
+<aside class="warning"><p><strong>Performance Warning:</strong> ArrayList.get(i) is O(1), LinkedList.get(i) is O(n). For random access, ArrayList is much faster!</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Set Collections" duration="15">
-            <p>Sets store unique elements with no duplicates.</p>
-            <h2 is-upgraded>HashSet - Hash Table Based</h2>
-            <p><strong>Characteristics:</strong></p>
-            <ul>
-                <li>No duplicates, no ordering</li>
-                <li>Very fast: O(1) average for add/remove/contains</li>
-                <li>Uses hashCode() and equals() methods</li>
-                <li>Best for: Fast uniqueness checking</li>
-            </ul>
-            <pre><code language="language-java" class="language-java">import java.util.*;
+      </google-codelab-step>
+    
+      <google-codelab-step label="Set Collections" duration="15">
+        <p>Sets store unique elements with no duplicates.</p>
+<h2 is-upgraded>HashSet - Hash Table Based</h2>
+<p><strong>Characteristics:</strong></p>
+<ul>
+<li>No duplicates, no ordering</li>
+<li>Very fast: O(1) average for add/remove/contains</li>
+<li>Uses hashCode() and equals() methods</li>
+<li>Best for: Fast uniqueness checking</li>
+</ul>
+<pre><code language="language-java" class="language-java">import java.util.*;
 
 public class HashSetDemo {
     public static void main(String[] args) {
@@ -460,15 +396,15 @@ public class HashSetDemo {
     }
 }
 </code></pre>
-            <h2 is-upgraded>TreeSet - Red-Black Tree (Sorted)</h2>
-            <p><strong>Characteristics:</strong></p>
-            <ul>
-                <li>No duplicates, sorted order</li>
-                <li>O(log n) for add/remove/contains</li>
-                <li>Elements must implement Comparable or provide Comparator</li>
-                <li>Best for: Maintaining sorted unique elements</li>
-            </ul>
-            <pre><code language="language-java" class="language-java">import java.util.*;
+<h2 is-upgraded>TreeSet - Red-Black Tree (Sorted)</h2>
+<p><strong>Characteristics:</strong></p>
+<ul>
+<li>No duplicates, sorted order</li>
+<li>O(log n) for add/remove/contains</li>
+<li>Elements must implement Comparable or provide Comparator</li>
+<li>Best for: Maintaining sorted unique elements</li>
+</ul>
+<pre><code language="language-java" class="language-java">import java.util.*;
 
 public class TreeSetDemo {
     public static void main(String[] args) {
@@ -517,14 +453,14 @@ public class TreeSetDemo {
     }
 }
 </code></pre>
-            <h2 is-upgraded>LinkedHashSet - Maintains Insertion Order</h2>
-            <p><strong>Characteristics:</strong></p>
-            <ul>
-                <li>No duplicates, maintains insertion order</li>
-                <li>Slightly slower than HashSet</li>
-                <li>Best for: Unique elements with predictable iteration order</li>
-            </ul>
-            <pre><code language="language-java" class="language-java">import java.util.*;
+<h2 is-upgraded>LinkedHashSet - Maintains Insertion Order</h2>
+<p><strong>Characteristics:</strong></p>
+<ul>
+<li>No duplicates, maintains insertion order</li>
+<li>Slightly slower than HashSet</li>
+<li>Best for: Unique elements with predictable iteration order</li>
+</ul>
+<pre><code language="language-java" class="language-java">import java.util.*;
 
 public class LinkedHashSetDemo {
     public static void main(String[] args) {
@@ -548,25 +484,23 @@ public class LinkedHashSetDemo {
     }
 }
 </code></pre>
-            <aside class="special">
-                <p><strong>Choosing a Set:</strong> Use HashSet for best performance, TreeSet for sorted elements,
-                    LinkedHashSet for insertion order.</p>
-            </aside>
+<aside class="special"><p><strong>Choosing a Set:</strong> Use HashSet for best performance, TreeSet for sorted elements, LinkedHashSet for insertion order.</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Map Collections" duration="15">
-            <p>Maps store key-value pairs with unique keys.</p>
-            <h2 is-upgraded>HashMap - Hash Table Based</h2>
-            <p><strong>Characteristics:</strong></p>
-            <ul>
-                <li>Key-value pairs, unique keys</li>
-                <li>Very fast: O(1) average for get/put</li>
-                <li>No ordering of keys</li>
-                <li>Best for: Fast lookups by key</li>
-            </ul>
-            <pre><code language="language-java" class="language-java">import java.util.*;
+      </google-codelab-step>
+    
+      <google-codelab-step label="Map Collections" duration="15">
+        <p>Maps store key-value pairs with unique keys.</p>
+<h2 is-upgraded>HashMap - Hash Table Based</h2>
+<p><strong>Characteristics:</strong></p>
+<ul>
+<li>Key-value pairs, unique keys</li>
+<li>Very fast: O(1) average for get/put</li>
+<li>No ordering of keys</li>
+<li>Best for: Fast lookups by key</li>
+</ul>
+<pre><code language="language-java" class="language-java">import java.util.*;
 
 public class HashMapDemo {
     public static void main(String[] args) {
@@ -639,15 +573,15 @@ public class HashMapDemo {
     }
 }
 </code></pre>
-            <h2 is-upgraded>TreeMap - Red-Black Tree (Sorted Keys)</h2>
-            <p><strong>Characteristics:</strong></p>
-            <ul>
-                <li>Key-value pairs, sorted by keys</li>
-                <li>O(log n) for get/put</li>
-                <li>Keys must implement Comparable or provide Comparator</li>
-                <li>Best for: Sorted key-value pairs</li>
-            </ul>
-            <pre><code language="language-java" class="language-java">import java.util.*;
+<h2 is-upgraded>TreeMap - Red-Black Tree (Sorted Keys)</h2>
+<p><strong>Characteristics:</strong></p>
+<ul>
+<li>Key-value pairs, sorted by keys</li>
+<li>O(log n) for get/put</li>
+<li>Keys must implement Comparable or provide Comparator</li>
+<li>Best for: Sorted key-value pairs</li>
+</ul>
+<pre><code language="language-java" class="language-java">import java.util.*;
 
 public class TreeMapDemo {
     public static void main(String[] args) {
@@ -682,15 +616,15 @@ public class TreeMapDemo {
     }
 }
 </code></pre>
-            <h2 is-upgraded>LinkedHashMap - Maintains Insertion Order</h2>
-            <p><strong>Characteristics:</strong></p>
-            <ul>
-                <li>Key-value pairs, maintains insertion order</li>
-                <li>Slightly slower than HashMap</li>
-                <li>Can also maintain access order (LRU cache)</li>
-                <li>Best for: Predictable iteration order</li>
-            </ul>
-            <pre><code language="language-java" class="language-java">import java.util.*;
+<h2 is-upgraded>LinkedHashMap - Maintains Insertion Order</h2>
+<p><strong>Characteristics:</strong></p>
+<ul>
+<li>Key-value pairs, maintains insertion order</li>
+<li>Slightly slower than HashMap</li>
+<li>Can also maintain access order (LRU cache)</li>
+<li>Best for: Predictable iteration order</li>
+</ul>
+<pre><code language="language-java" class="language-java">import java.util.*;
 
 public class LinkedHashMapDemo {
     public static void main(String[] args) {
@@ -721,25 +655,23 @@ public class LinkedHashMapDemo {
     }
 }
 </code></pre>
-            <aside class="special">
-                <p><strong>Map Selection:</strong> HashMap for speed, TreeMap for sorted keys, LinkedHashMap for
-                    insertion order. Most common: HashMap!</p>
-            </aside>
+<aside class="special"><p><strong>Map Selection:</strong> HashMap for speed, TreeMap for sorted keys, LinkedHashMap for insertion order. Most common: HashMap!</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Queue and Deque" duration="10">
-            <p>Queues process elements in specific orders.</p>
-            <h2 is-upgraded>PriorityQueue - Heap Based Priority Queue</h2>
-            <p><strong>Characteristics:</strong></p>
-            <ul>
-                <li>Elements ordered by priority (natural order or Comparator)</li>
-                <li>O(log n) for add/remove</li>
-                <li>Not thread-safe</li>
-                <li>Best for: Processing by priority</li>
-            </ul>
-            <pre><code language="language-java" class="language-java">import java.util.*;
+      </google-codelab-step>
+    
+      <google-codelab-step label="Queue and Deque" duration="10">
+        <p>Queues process elements in specific orders.</p>
+<h2 is-upgraded>PriorityQueue - Heap Based Priority Queue</h2>
+<p><strong>Characteristics:</strong></p>
+<ul>
+<li>Elements ordered by priority (natural order or Comparator)</li>
+<li>O(log n) for add/remove</li>
+<li>Not thread-safe</li>
+<li>Best for: Processing by priority</li>
+</ul>
+<pre><code language="language-java" class="language-java">import java.util.*;
 
 public class PriorityQueueDemo {
     public static void main(String[] args) {
@@ -798,15 +730,15 @@ class Task {
     public int getPriority() { return priority; }
 }
 </code></pre>
-            <h2 is-upgraded>ArrayDeque - Resizable Array Double-Ended Queue</h2>
-            <p><strong>Characteristics:</strong></p>
-            <ul>
-                <li>Fast add/remove at both ends</li>
-                <li>No capacity restrictions</li>
-                <li>Faster than LinkedList for queue/stack operations</li>
-                <li>Best for: General-purpose queue/stack</li>
-            </ul>
-            <pre><code language="language-java" class="language-java">import java.util.*;
+<h2 is-upgraded>ArrayDeque - Resizable Array Double-Ended Queue</h2>
+<p><strong>Characteristics:</strong></p>
+<ul>
+<li>Fast add/remove at both ends</li>
+<li>No capacity restrictions</li>
+<li>Faster than LinkedList for queue/stack operations</li>
+<li>Best for: General-purpose queue/stack</li>
+</ul>
+<pre><code language="language-java" class="language-java">import java.util.*;
 
 public class ArrayDequeDemo {
     public static void main(String[] args) {
@@ -849,31 +781,30 @@ public class ArrayDequeDemo {
 </code></pre>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Generics Fundamentals" duration="12">
-            <p>Generics provide type safety and eliminate casting.</p>
-            <h2 is-upgraded>Why Generics?</h2>
-            <p><strong>Before Generics (Java 4 and earlier):</strong></p>
-            <pre><code language="language-java" class="language-java">List list = new ArrayList();
+      </google-codelab-step>
+    
+      <google-codelab-step label="Generics Fundamentals" duration="12">
+        <p>Generics provide type safety and eliminate casting.</p>
+<h2 is-upgraded>Why Generics?</h2>
+<p><strong>Before Generics (Java 4 and earlier):</strong></p>
+<pre><code language="language-java" class="language-java">List list = new ArrayList();
 list.add(&#34;Hello&#34;);
 list.add(123);  // No compile error!
 
 String s = (String) list.get(0);  // Casting required
 String s2 = (String) list.get(1);  // Runtime ClassCastException!
 </code></pre>
-            <p><strong>With Generics (Java 5+):</strong></p>
-            <pre><code language="language-java" class="language-java">List&lt;String&gt; list = new ArrayList&lt;&gt;();
+<p><strong>With Generics (Java 5+):</strong></p>
+<pre><code language="language-java" class="language-java">List&lt;String&gt; list = new ArrayList&lt;&gt;();
 list.add(&#34;Hello&#34;);
 // list.add(123);  // Compile error - type safety!
 
 String s = list.get(0);  // No casting needed
 </code></pre>
-            <aside class="special">
-                <p><strong>Key Benefit:</strong> Generics catch type errors at compile-time instead of runtime!</p>
-            </aside>
-            <h2 is-upgraded>Generic Classes</h2>
-            <pre><code language="language-java" class="language-java">// Generic Box class
+<aside class="special"><p><strong>Key Benefit:</strong> Generics catch type errors at compile-time instead of runtime!</p>
+</aside>
+<h2 is-upgraded>Generic Classes</h2>
+<pre><code language="language-java" class="language-java">// Generic Box class
 public class Box&lt;T&gt; {
     private T content;
 
@@ -899,8 +830,8 @@ Box&lt;Integer&gt; intBox = new Box&lt;&gt;();
 intBox.set(123);
 Integer num = intBox.get();
 </code></pre>
-            <h2 is-upgraded>Multiple Type Parameters</h2>
-            <pre><code language="language-java" class="language-java">public class Pair&lt;K, V&gt; {
+<h2 is-upgraded>Multiple Type Parameters</h2>
+<pre><code language="language-java" class="language-java">public class Pair&lt;K, V&gt; {
     private K key;
     private V value;
 
@@ -925,8 +856,8 @@ Pair&lt;Integer, String&gt; idName = new Pair&lt;&gt;(101, &#34;Bob&#34;);
 System.out.println(age);      // (Alice, 25)
 System.out.println(idName);   // (101, Bob)
 </code></pre>
-            <h2 is-upgraded>Generic Methods</h2>
-            <pre><code language="language-java" class="language-java">public class GenericMethods {
+<h2 is-upgraded>Generic Methods</h2>
+<pre><code language="language-java" class="language-java">public class GenericMethods {
 
     // Generic method
     public static &lt;T&gt; void printArray(T[] array) {
@@ -962,9 +893,9 @@ System.out.println(idName);   // (101, Bob)
     }
 }
 </code></pre>
-            <h2 is-upgraded>Bounded Type Parameters</h2>
-            <p>Restrict type parameters to specific types or subclasses:</p>
-            <pre><code language="language-java" class="language-java">// Upper bound - T must be Number or subclass
+<h2 is-upgraded>Bounded Type Parameters</h2>
+<p>Restrict type parameters to specific types or subclasses:</p>
+<pre><code language="language-java" class="language-java">// Upper bound - T must be Number or subclass
 public class NumberBox&lt;T extends Number&gt; {
     private T number;
 
@@ -995,8 +926,8 @@ public class ComparableBox&lt;T extends Number &amp; Comparable&lt;T&gt;&gt; {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Wildcards</h2>
-            <pre><code language="language-java" class="language-java">public class WildcardDemo {
+<h2 is-upgraded>Wildcards</h2>
+<pre><code language="language-java" class="language-java">public class WildcardDemo {
 
     // Upper bounded wildcard - read only
     public static double sumNumbers(List&lt;? extends Number&gt; list) {
@@ -1037,19 +968,17 @@ public class ComparableBox&lt;T extends Number &amp; Comparable&lt;T&gt;&gt; {
     }
 }
 </code></pre>
-            <aside class="special">
-                <p><strong>PECS Principle:</strong> Producer Extends, Consumer Super. Use <code><? extends T></code> for
-                    reading, <code><? super T></code> for writing.</p>
-            </aside>
+<aside class="special"><p><strong>PECS Principle:</strong> Producer Extends, Consumer Super. Use <code><? extends T></code> for reading, <code><? super T></code> for writing.</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Comparable and Comparator" duration="12">
-            <p>Sort custom objects using natural ordering or custom comparisons.</p>
-            <h2 is-upgraded>Comparable Interface</h2>
-            <p>Define natural ordering for a class:</p>
-            <pre><code language="language-java" class="language-java">public class Product implements Comparable&lt;Product&gt; {
+      </google-codelab-step>
+    
+      <google-codelab-step label="Comparable and Comparator" duration="12">
+        <p>Sort custom objects using natural ordering or custom comparisons.</p>
+<h2 is-upgraded>Comparable Interface</h2>
+<p>Define natural ordering for a class:</p>
+<pre><code language="language-java" class="language-java">public class Product implements Comparable&lt;Product&gt; {
     private String name;
     private double price;
     private int quantity;
@@ -1086,9 +1015,9 @@ products.add(new Product(&#34;Keyboard&#34;, 79.99, 20));
 Collections.sort(products);  // Sorts by price (natural ordering)
 System.out.println(&#34;Sorted by price: &#34; + products);
 </code></pre>
-            <h2 is-upgraded>Comparator Interface</h2>
-            <p>Define alternative orderings:</p>
-            <pre><code language="language-java" class="language-java">import java.util.*;
+<h2 is-upgraded>Comparator Interface</h2>
+<p>Define alternative orderings:</p>
+<pre><code language="language-java" class="language-java">import java.util.*;
 
 public class ComparatorDemo {
     public static void main(String[] args) {
@@ -1134,18 +1063,16 @@ public class ComparatorDemo {
     }
 }
 </code></pre>
-            <aside class="special">
-                <p><strong>Modern Java:</strong> Use Comparator static methods and lambdas instead of anonymous classes.
-                    Much cleaner!</p>
-            </aside>
+<aside class="special"><p><strong>Modern Java:</strong> Use Comparator static methods and lambdas instead of anonymous classes. Much cleaner!</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Build Inventory Management System" duration="20">
-            <p>Now let&#39;s build a complete inventory system using all collection types!</p>
-            <h2 is-upgraded>Complete Product Class</h2>
-            <pre><code language="language-java" class="language-java">public class Product implements Comparable&lt;Product&gt; {
+      </google-codelab-step>
+    
+      <google-codelab-step label="Build Inventory Management System" duration="20">
+        <p>Now let&#39;s build a complete inventory system using all collection types!</p>
+<h2 is-upgraded>Complete Product Class</h2>
+<pre><code language="language-java" class="language-java">public class Product implements Comparable&lt;Product&gt; {
     private String id;
     private String name;
     private String category;
@@ -1193,9 +1120,9 @@ public class ComparatorDemo {
     public void setQuantity(int quantity) { this.quantity = quantity; }
 }
 </code></pre>
-            <h2 is-upgraded>Inventory Manager</h2>
-            <p><strong>InventoryManager.java:</strong></p>
-            <pre><code language="language-java" class="language-java">import java.util.*;
+<h2 is-upgraded>Inventory Manager</h2>
+<p><strong>InventoryManager.java:</strong></p>
+<pre><code language="language-java" class="language-java">import java.util.*;
 
 public class InventoryManager {
     // Primary storage - fast lookups by ID
@@ -1408,8 +1335,8 @@ class Order {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Main Application</h2>
-            <pre><code language="language-java" class="language-java">import java.util.*;
+<h2 is-upgraded>Main Application</h2>
+<pre><code language="language-java" class="language-java">import java.util.*;
 
 public class InventoryApp {
     public static void main(String[] args) {
@@ -1478,202 +1405,129 @@ public class InventoryApp {
 </code></pre>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Conclusion" duration="2">
-            <p>Congratulations! 🎉 You&#39;ve mastered the Java Collections Framework and Generics!</p>
-            <h2 is-upgraded>What You&#39;ve Learned</h2>
-            <ul>
-                <li>✅ <strong>Collections Framework:</strong> Complete understanding of List, Set, Map, Queue</li>
-                <li>✅ <strong>ArrayList vs LinkedList:</strong> Performance trade-offs and use cases</li>
-                <li>✅ <strong>HashSet vs TreeSet:</strong> Uniqueness with and without ordering</li>
-                <li>✅ <strong>HashMap vs TreeMap:</strong> Fast lookups vs sorted keys</li>
-                <li>✅ <strong>PriorityQueue:</strong> Processing elements by priority</li>
-                <li>✅ <strong>Generics:</strong> Type-safe collections and methods</li>
-                <li>✅ <strong>Bounded Types:</strong> Restricting generic type parameters</li>
-                <li>✅ <strong>Wildcards:</strong> Flexible generic APIs (PECS principle)</li>
-                <li>✅ <strong>Comparable/Comparator:</strong> Natural and custom sorting</li>
-                <li>✅ <strong>Real-World Application:</strong> Complete inventory management system</li>
-            </ul>
-            <h2 is-upgraded>Key Takeaways</h2>
-            <ol type="1">
-                <li><strong>Choose the right collection</strong> - Performance matters</li>
-                <li><strong>Use Generics</strong> - Type safety eliminates runtime errors</li>
-                <li><strong>Prefer interfaces</strong> - Code to interfaces (List, Set, Map), not implementations</li>
-                <li><strong>ArrayList is default</strong> - Unless you have specific needs</li>
-                <li><strong>HashMap is default</strong> - Fast lookups for key-value pairs</li>
-                <li><strong>TreeSet/TreeMap for sorting</strong> - When you need ordered elements</li>
-                <li><strong>PriorityQueue for priorities</strong> - Process most important first</li>
-                <li><strong>Comparator for flexibility</strong> - Multiple sorting strategies</li>
-            </ol>
-            <h2 is-upgraded>Performance Summary</h2>
-            <table>
-                <tr>
-                    <td colspan="1" rowspan="1">
-                        <p>Operation</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>ArrayList</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>LinkedList</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>HashSet</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>TreeSet</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>HashMap</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>TreeMap</p>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="1" rowspan="1">
-                        <p>Add</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>O(1)*</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>O(1)</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>O(1)</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>O(log n)</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>O(1)</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>O(log n)</p>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="1" rowspan="1">
-                        <p>Remove</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>O(n)</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>O(1)**</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>O(1)</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>O(log n)</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>O(1)</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>O(log n)</p>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="1" rowspan="1">
-                        <p>Get</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>O(1)</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>O(n)</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>N/A</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>N/A</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>O(1)</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>O(log n)</p>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="1" rowspan="1">
-                        <p>Contains</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>O(n)</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>O(n)</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>O(1)</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>O(log n)</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>O(1)</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>O(log n)</p>
-                    </td>
-                </tr>
-            </table>
-            <p>*Amortized, **At ends</p>
-            <h2 is-upgraded>Next Steps</h2>
-            <ul>
-                <li><strong>Codelab 1.5:</strong> Memory Management &amp; Garbage Collection</li>
-                <li><strong>Section 2:</strong> Java 8+ Features (Streams, Lambdas, Optional)</li>
-            </ul>
-            <h2 is-upgraded>Practice Exercises</h2>
-            <p>Enhance the Inventory System:</p>
-            <ol type="1">
-                <li><strong>Supplier Management:</strong> Add Supplier class with products</li>
-                <li><strong>Order Analytics:</strong> Calculate total sales, most popular products</li>
-                <li><strong>Price History:</strong> Track price changes over time (TreeMap with dates)</li>
-                <li><strong>Bulk Operations:</strong> Import/export from CSV files</li>
-                <li><strong>Recommendations:</strong> Suggest products based on order history</li>
-                <li><strong>Generic Repository:</strong> Create generic CRUD repository pattern</li>
-                <li><strong>Cache Implementation:</strong> Build LRU cache using LinkedHashMap</li>
-            </ol>
-            <h2 is-upgraded>Additional Resources</h2>
-            <ul>
-                <li><a href="https://docs.oracle.com/javase/tutorial/collections/" target="_blank">Java Collections
-                        Tutorial</a></li>
-                <li><a href="http://www.angelikalanger.com/GenericsFAQ/JavaGenericsFAQ.html" target="_blank">Java
-                        Generics FAQ</a></li>
-                <li><a href="https://www.oreilly.com/library/view/effective-java/9780134686097/"
-                        target="_blank">Effective Java - Chapter on Generics</a></li>
-                <li><a href="https://www.baeldung.com/java-collections-complexity" target="_blank">Java Collections
-                        Performance</a></li>
-            </ul>
-            <aside class="special">
-                <p><strong>Outstanding!</strong> Collections and Generics are fundamental to Java programming. You now
-                    have the tools to build efficient, type-safe applications!</p>
-            </aside>
+      </google-codelab-step>
+    
+      <google-codelab-step label="Conclusion" duration="2">
+        <p>Congratulations! 🎉 You&#39;ve mastered the Java Collections Framework and Generics!</p>
+<h2 is-upgraded>What You&#39;ve Learned</h2>
+<ul>
+<li>✅ <strong>Collections Framework:</strong> Complete understanding of List, Set, Map, Queue</li>
+<li>✅ <strong>ArrayList vs LinkedList:</strong> Performance trade-offs and use cases</li>
+<li>✅ <strong>HashSet vs TreeSet:</strong> Uniqueness with and without ordering</li>
+<li>✅ <strong>HashMap vs TreeMap:</strong> Fast lookups vs sorted keys</li>
+<li>✅ <strong>PriorityQueue:</strong> Processing elements by priority</li>
+<li>✅ <strong>Generics:</strong> Type-safe collections and methods</li>
+<li>✅ <strong>Bounded Types:</strong> Restricting generic type parameters</li>
+<li>✅ <strong>Wildcards:</strong> Flexible generic APIs (PECS principle)</li>
+<li>✅ <strong>Comparable/Comparator:</strong> Natural and custom sorting</li>
+<li>✅ <strong>Real-World Application:</strong> Complete inventory management system</li>
+</ul>
+<h2 is-upgraded>Key Takeaways</h2>
+<ol type="1">
+<li><strong>Choose the right collection</strong> - Performance matters</li>
+<li><strong>Use Generics</strong> - Type safety eliminates runtime errors</li>
+<li><strong>Prefer interfaces</strong> - Code to interfaces (List, Set, Map), not implementations</li>
+<li><strong>ArrayList is default</strong> - Unless you have specific needs</li>
+<li><strong>HashMap is default</strong> - Fast lookups for key-value pairs</li>
+<li><strong>TreeSet/TreeMap for sorting</strong> - When you need ordered elements</li>
+<li><strong>PriorityQueue for priorities</strong> - Process most important first</li>
+<li><strong>Comparator for flexibility</strong> - Multiple sorting strategies</li>
+</ol>
+<h2 is-upgraded>Performance Summary</h2>
+<table>
+<tr><td colspan="1" rowspan="1"><p>Operation</p>
+</td><td colspan="1" rowspan="1"><p>ArrayList</p>
+</td><td colspan="1" rowspan="1"><p>LinkedList</p>
+</td><td colspan="1" rowspan="1"><p>HashSet</p>
+</td><td colspan="1" rowspan="1"><p>TreeSet</p>
+</td><td colspan="1" rowspan="1"><p>HashMap</p>
+</td><td colspan="1" rowspan="1"><p>TreeMap</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Add</p>
+</td><td colspan="1" rowspan="1"><p>O(1)*</p>
+</td><td colspan="1" rowspan="1"><p>O(1)</p>
+</td><td colspan="1" rowspan="1"><p>O(1)</p>
+</td><td colspan="1" rowspan="1"><p>O(log n)</p>
+</td><td colspan="1" rowspan="1"><p>O(1)</p>
+</td><td colspan="1" rowspan="1"><p>O(log n)</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Remove</p>
+</td><td colspan="1" rowspan="1"><p>O(n)</p>
+</td><td colspan="1" rowspan="1"><p>O(1)**</p>
+</td><td colspan="1" rowspan="1"><p>O(1)</p>
+</td><td colspan="1" rowspan="1"><p>O(log n)</p>
+</td><td colspan="1" rowspan="1"><p>O(1)</p>
+</td><td colspan="1" rowspan="1"><p>O(log n)</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Get</p>
+</td><td colspan="1" rowspan="1"><p>O(1)</p>
+</td><td colspan="1" rowspan="1"><p>O(n)</p>
+</td><td colspan="1" rowspan="1"><p>N/A</p>
+</td><td colspan="1" rowspan="1"><p>N/A</p>
+</td><td colspan="1" rowspan="1"><p>O(1)</p>
+</td><td colspan="1" rowspan="1"><p>O(log n)</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Contains</p>
+</td><td colspan="1" rowspan="1"><p>O(n)</p>
+</td><td colspan="1" rowspan="1"><p>O(n)</p>
+</td><td colspan="1" rowspan="1"><p>O(1)</p>
+</td><td colspan="1" rowspan="1"><p>O(log n)</p>
+</td><td colspan="1" rowspan="1"><p>O(1)</p>
+</td><td colspan="1" rowspan="1"><p>O(log n)</p>
+</td></tr>
+</table>
+<p>*Amortized, **At ends</p>
+<h2 is-upgraded>Next Steps</h2>
+<ul>
+<li><strong>Codelab 1.5:</strong> Memory Management &amp; Garbage Collection</li>
+<li><strong>Section 2:</strong> Java 8+ Features (Streams, Lambdas, Optional)</li>
+</ul>
+<h2 is-upgraded>Practice Exercises</h2>
+<p>Enhance the Inventory System:</p>
+<ol type="1">
+<li><strong>Supplier Management:</strong> Add Supplier class with products</li>
+<li><strong>Order Analytics:</strong> Calculate total sales, most popular products</li>
+<li><strong>Price History:</strong> Track price changes over time (TreeMap with dates)</li>
+<li><strong>Bulk Operations:</strong> Import/export from CSV files</li>
+<li><strong>Recommendations:</strong> Suggest products based on order history</li>
+<li><strong>Generic Repository:</strong> Create generic CRUD repository pattern</li>
+<li><strong>Cache Implementation:</strong> Build LRU cache using LinkedHashMap</li>
+</ol>
+<h2 is-upgraded>Additional Resources</h2>
+<ul>
+<li><a href="https://docs.oracle.com/javase/tutorial/collections/" target="_blank">Java Collections Tutorial</a></li>
+<li><a href="http://www.angelikalanger.com/GenericsFAQ/JavaGenericsFAQ.html" target="_blank">Java Generics FAQ</a></li>
+<li><a href="https://www.oreilly.com/library/view/effective-java/9780134686097/" target="_blank">Effective Java - Chapter on Generics</a></li>
+<li><a href="https://www.baeldung.com/java-collections-complexity" target="_blank">Java Collections Performance</a></li>
+</ul>
+<aside class="special"><p><strong>Outstanding!</strong> Collections and Generics are fundamental to Java programming. You now have the tools to build efficient, type-safe applications!</p>
+</aside>
 
 
-        </google-codelab-step>
+      </google-codelab-step>
+    
+  </google-codelab>
 
-    </google-codelab>
-
-    <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
-    <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
-    <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
-    <script src="//support.google.com/inapp/api.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js"></script>
-    <script src="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.js"></script>
-    <script>
-        hljs.highlightAll();
-        hljs.addPlugin(new CopyButtonPlugin({ autohide: false }));
-
-    </script>
+  <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
+  <script src="//support.google.com/inapp/api.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js"></script>
+  <script src="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.js"></script>
+  <script>
+    hljs.highlightAll();
+    hljs.addPlugin(new CopyButtonPlugin({ autohide: false}));
+    
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      const homeUrl = "\/springboot_course\/";
+      const arrowBack = document.getElementById('arrow-back');
+      const doneBtn = document.getElementById('done');
+      if (arrowBack) arrowBack.href = homeUrl;
+      if (doneBtn) doneBtn.href = homeUrl;
+    });
+    
+  </script>
 
 </body>
-
 </html>

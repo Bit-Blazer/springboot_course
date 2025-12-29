@@ -1,101 +1,97 @@
+
 <!doctype html>
 
 <html>
-
 <head>
-    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
-    <meta name="theme-color" content="#4F7DC9">
-    <meta charset="UTF-8">
-    <title>IDE Debugging Mastery</title>
-    <link rel="stylesheet"
-        href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
-    <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
-    <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
-    <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1  /build/styles/monokai.min.css">
-    <link rel="stylesheet" href="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.css">
-    <style>
-        .success {
-            color: #1e8e3e;
-        }
-
-        .error {
-            color: red;
-        }
-    </style>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <title>IDE Debugging Mastery</title>
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
+  <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1  /build/styles/monokai.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.css">
+  <style>
+    .success {
+      color: #1e8e3e;
+    }
+    .error {
+      color: red;
+    }
+  </style>
 </head>
-
 <body>
-    <google-codelab-analytics gaid="UA-49880327-14" ga4id=""></google-codelab-analytics>
-    <google-codelab codelab-gaid="" codelab-ga4id="" id="ide-debugging-mastery" title="IDE Debugging Mastery"
-        environment="web" feedback-link="">
+  <google-codelab-analytics gaid="UA-49880327-14" ga4id=""></google-codelab-analytics>
+  <google-codelab codelab-gaid=""
+                  codelab-ga4id=""
+                  id="ide-debugging-mastery"
+                  title="IDE Debugging Mastery"
+                  environment="web"
+                  feedback-link="">
+    
+      <google-codelab-step label="Introduction" duration="3">
+        <p>Debugging is one of the most critical skills for any developer. While logging helps in production, interactive debugging during development allows you to inspect program state in real-time, understand complex logic, and quickly identify bugs.</p>
+<h2 class="checklist" is-upgraded>What You&#39;ll Learn</h2>
+<ul class="checklist">
+<li><strong>Breakpoint Types:</strong> Line, method, conditional, exception breakpoints</li>
+<li><strong>Logpoints:</strong> Non-intrusive logging without code changes</li>
+<li><strong>Step Debugging:</strong> Step Into, Step Over, Step Out, Run to Cursor</li>
+<li><strong>Variables Inspection:</strong> Watch expressions, evaluate expressions</li>
+<li><strong>Call Stacks:</strong> Navigate execution flow</li>
+<li><strong>Thread Debugging:</strong> Multi-threaded application debugging</li>
+<li><strong>Debug Console:</strong> Interactive expression evaluation</li>
+<li><strong>Hot Code Replace:</strong> Modify code while debugging</li>
+<li><strong>Remote Debugging:</strong> Debug applications running on other JVMs</li>
+<li><strong>Performance Debugging:</strong> Identify bottlenecks</li>
+</ul>
+<h2 is-upgraded>What You&#39;ll Build</h2>
+<p>Debug and fix a buggy e-commerce application with:</p>
+<ul>
+<li>Cart calculation errors</li>
+<li>Concurrency bugs in inventory management</li>
+<li>Exception handling issues</li>
+<li>Performance bottlenecks</li>
+<li>Logic errors in discount calculations</li>
+</ul>
+<h2 is-upgraded>Prerequisites</h2>
+<ul>
+<li>Completed Codelab 1.3 (Exception Handling)</li>
+<li>IDE installed (IntelliJ IDEA recommended, Eclipse also covered)</li>
+<li>Basic understanding of Java applications</li>
+</ul>
+<h2 is-upgraded>IDE Shortcuts Reference</h2>
+<p><strong>IntelliJ IDEA:</strong></p>
+<ul>
+<li>Debug: <code>Shift + F9</code> (Windows/Linux), <code>Ctrl + D</code> (Mac)</li>
+<li>Toggle Breakpoint: <code>Ctrl + F8</code> (Windows/Linux), <code>Cmd + F8</code> (Mac)</li>
+<li>Step Over: <code>F8</code></li>
+<li>Step Into: <code>F7</code></li>
+<li>Step Out: <code>Shift + F8</code></li>
+<li>Resume: <code>F9</code></li>
+<li>Evaluate Expression: <code>Alt + F8</code> (Windows/Linux), <code>Opt + F8</code> (Mac)</li>
+</ul>
+<p><strong>Eclipse:</strong></p>
+<ul>
+<li>Debug: <code>F11</code></li>
+<li>Toggle Breakpoint: <code>Ctrl + Shift + B</code></li>
+<li>Step Over: <code>F6</code></li>
+<li>Step Into: <code>F5</code></li>
+<li>Step Out: <code>F7</code></li>
+<li>Resume: <code>F8</code></li>
+<li>Inspect: <code>Ctrl + Shift + I</code></li>
+</ul>
+<aside class="special"><p><strong>Practice Makes Perfect:</strong> The best way to master debugging is to actually debug code. This codelab provides intentionally buggy code for you to fix!</p>
+</aside>
 
-        <google-codelab-step label="Introduction" duration="3">
-            <p>Debugging is one of the most critical skills for any developer. While logging helps in production,
-                interactive debugging during development allows you to inspect program state in real-time, understand
-                complex logic, and quickly identify bugs.</p>
-            <h2 class="checklist" is-upgraded>What You&#39;ll Learn</h2>
-            <ul class="checklist">
-                <li><strong>Breakpoint Types:</strong> Line, method, conditional, exception breakpoints</li>
-                <li><strong>Logpoints:</strong> Non-intrusive logging without code changes</li>
-                <li><strong>Step Debugging:</strong> Step Into, Step Over, Step Out, Run to Cursor</li>
-                <li><strong>Variables Inspection:</strong> Watch expressions, evaluate expressions</li>
-                <li><strong>Call Stacks:</strong> Navigate execution flow</li>
-                <li><strong>Thread Debugging:</strong> Multi-threaded application debugging</li>
-                <li><strong>Debug Console:</strong> Interactive expression evaluation</li>
-                <li><strong>Hot Code Replace:</strong> Modify code while debugging</li>
-                <li><strong>Remote Debugging:</strong> Debug applications running on other JVMs</li>
-                <li><strong>Performance Debugging:</strong> Identify bottlenecks</li>
-            </ul>
-            <h2 is-upgraded>What You&#39;ll Build</h2>
-            <p>Debug and fix a buggy e-commerce application with:</p>
-            <ul>
-                <li>Cart calculation errors</li>
-                <li>Concurrency bugs in inventory management</li>
-                <li>Exception handling issues</li>
-                <li>Performance bottlenecks</li>
-                <li>Logic errors in discount calculations</li>
-            </ul>
-            <h2 is-upgraded>Prerequisites</h2>
-            <ul>
-                <li>Completed Codelab 1.3 (Exception Handling)</li>
-                <li>IDE installed (IntelliJ IDEA recommended, Eclipse also covered)</li>
-                <li>Basic understanding of Java applications</li>
-            </ul>
-            <h2 is-upgraded>IDE Shortcuts Reference</h2>
-            <p><strong>IntelliJ IDEA:</strong></p>
-            <ul>
-                <li>Debug: <code>Shift + F9</code> (Windows/Linux), <code>Ctrl + D</code> (Mac)</li>
-                <li>Toggle Breakpoint: <code>Ctrl + F8</code> (Windows/Linux), <code>Cmd + F8</code> (Mac)</li>
-                <li>Step Over: <code>F8</code></li>
-                <li>Step Into: <code>F7</code></li>
-                <li>Step Out: <code>Shift + F8</code></li>
-                <li>Resume: <code>F9</code></li>
-                <li>Evaluate Expression: <code>Alt + F8</code> (Windows/Linux), <code>Opt + F8</code> (Mac)</li>
-            </ul>
-            <p><strong>Eclipse:</strong></p>
-            <ul>
-                <li>Debug: <code>F11</code></li>
-                <li>Toggle Breakpoint: <code>Ctrl + Shift + B</code></li>
-                <li>Step Over: <code>F6</code></li>
-                <li>Step Into: <code>F5</code></li>
-                <li>Step Out: <code>F7</code></li>
-                <li>Resume: <code>F8</code></li>
-                <li>Inspect: <code>Ctrl + Shift + I</code></li>
-            </ul>
-            <aside class="special">
-                <p><strong>Practice Makes Perfect:</strong> The best way to master debugging is to actually debug code.
-                    This codelab provides intentionally buggy code for you to fix!</p>
-            </aside>
 
-
-        </google-codelab-step>
-
-        <google-codelab-step label="Understanding Breakpoints" duration="10">
-            <p>Breakpoints pause program execution, allowing you to inspect the current state.</p>
-            <h2 is-upgraded>Line Breakpoints</h2>
-            <p>The most common type - pause execution at a specific line.</p>
-            <pre><code language="language-java" class="language-java">public class Calculator {
+      </google-codelab-step>
+    
+      <google-codelab-step label="Understanding Breakpoints" duration="10">
+        <p>Breakpoints pause program execution, allowing you to inspect the current state.</p>
+<h2 is-upgraded>Line Breakpoints</h2>
+<p>The most common type - pause execution at a specific line.</p>
+<pre><code language="language-java" class="language-java">public class Calculator {
     public int add(int a, int b) {
         int result = a + b;  // ← Set breakpoint here
         return result;
@@ -108,14 +104,14 @@
     }
 }
 </code></pre>
-            <p><strong>How to set:</strong></p>
-            <ul>
-                <li>IntelliJ: Click in the gutter (left margin) or press <code>Ctrl + F8</code></li>
-                <li>Eclipse: Double-click in the margin or press <code>Ctrl + Shift + B</code></li>
-            </ul>
-            <h2 is-upgraded>Method Breakpoints</h2>
-            <p>Pause when entering or exiting a method.</p>
-            <pre><code language="language-java" class="language-java">public class UserService {
+<p><strong>How to set:</strong></p>
+<ul>
+<li>IntelliJ: Click in the gutter (left margin) or press <code>Ctrl + F8</code></li>
+<li>Eclipse: Double-click in the margin or press <code>Ctrl + Shift + B</code></li>
+</ul>
+<h2 is-upgraded>Method Breakpoints</h2>
+<p>Pause when entering or exiting a method.</p>
+<pre><code language="language-java" class="language-java">public class UserService {
     // Set method breakpoint on the method declaration
     public User findUser(String id) {
         // Pauses when method is called
@@ -123,29 +119,29 @@
     }
 }
 </code></pre>
-            <p><strong>How to set:</strong></p>
-            <ul>
-                <li>IntelliJ: Click on the method line number, right-click → &#34;Method Breakpoint&#34;</li>
-                <li>Eclipse: Place breakpoint on method declaration line</li>
-            </ul>
-            <h2 is-upgraded>Conditional Breakpoints</h2>
-            <p>Only pause when a condition is true.</p>
-            <pre><code language="language-java" class="language-java">public void processOrders(List&lt;Order&gt; orders) {
+<p><strong>How to set:</strong></p>
+<ul>
+<li>IntelliJ: Click on the method line number, right-click → &#34;Method Breakpoint&#34;</li>
+<li>Eclipse: Place breakpoint on method declaration line</li>
+</ul>
+<h2 is-upgraded>Conditional Breakpoints</h2>
+<p>Only pause when a condition is true.</p>
+<pre><code language="language-java" class="language-java">public void processOrders(List&lt;Order&gt; orders) {
     for (Order order : orders) {
         // Breakpoint condition: order.getId().equals(&#34;12345&#34;)
         processOrder(order);  // Only pauses for order 12345
     }
 }
 </code></pre>
-            <p><strong>How to set:</strong></p>
-            <ul>
-                <li>Right-click on breakpoint → Edit</li>
-                <li>Enter condition: <code>order.getId().equals("12345")</code></li>
-                <li>Or: <code>order.getAmount() > 1000</code></li>
-            </ul>
-            <h2 is-upgraded>Exception Breakpoints</h2>
-            <p>Pause when any exception is thrown (even if caught).</p>
-            <pre><code language="language-java" class="language-java">public void riskyOperation() {
+<p><strong>How to set:</strong></p>
+<ul>
+<li>Right-click on breakpoint → Edit</li>
+<li>Enter condition: <code>order.getId().equals("12345")</code></li>
+<li>Or: <code>order.getAmount() > 1000</code></li>
+</ul>
+<h2 is-upgraded>Exception Breakpoints</h2>
+<p>Pause when any exception is thrown (even if caught).</p>
+<pre><code language="language-java" class="language-java">public void riskyOperation() {
     try {
         int result = 10 / 0;  // ArithmeticException thrown here
         // Debugger can pause even though exception is caught
@@ -154,18 +150,17 @@
     }
 }
 </code></pre>
-            <p><strong>How to set:</strong></p>
-            <ul>
-                <li>IntelliJ: Run → View Breakpoints → + → Java Exception Breakpoints</li>
-                <li>Eclipse: Run → Add Java Exception Breakpoint</li>
-                <li>Choose exception type (e.g., <code>NullPointerException</code>)</li>
-            </ul>
-            <h2 is-upgraded>Temporary Breakpoints</h2>
-            <p>Breakpoint that removes itself after first hit.</p>
-            <p><strong>IntelliJ: </strong><code>Ctrl + Alt + Shift + F8</code> or right-click breakpoint → &#34;Remove
-                once hit&#34;</p>
-            <h2 is-upgraded>Practical Example</h2>
-            <pre><code language="language-java" class="language-java">public class BreakpointDemo {
+<p><strong>How to set:</strong></p>
+<ul>
+<li>IntelliJ: Run → View Breakpoints → + → Java Exception Breakpoints</li>
+<li>Eclipse: Run → Add Java Exception Breakpoint</li>
+<li>Choose exception type (e.g., <code>NullPointerException</code>)</li>
+</ul>
+<h2 is-upgraded>Temporary Breakpoints</h2>
+<p>Breakpoint that removes itself after first hit.</p>
+<p><strong>IntelliJ: </strong><code>Ctrl + Alt + Shift + F8</code> or right-click breakpoint → &#34;Remove once hit&#34;</p>
+<h2 is-upgraded>Practical Example</h2>
+<pre><code language="language-java" class="language-java">public class BreakpointDemo {
     public static void main(String[] args) {
         // 1. Set line breakpoint here
         int x = 10;
@@ -191,36 +186,33 @@
     }
 }
 </code></pre>
-            <p><strong>Exercise:</strong></p>
-            <ol type="1">
-                <li>Run the code above in debug mode</li>
-                <li>Set different types of breakpoints</li>
-                <li>Observe when each breakpoint triggers</li>
-                <li>Remove and re-add breakpoints during debugging</li>
-            </ol>
-            <aside class="special">
-                <p><strong>Pro Tip:</strong> Use conditional breakpoints to debug issues that only occur with specific
-                    data, like <code>userId.equals("problematic-user")</code>.</p>
-            </aside>
+<p><strong>Exercise:</strong></p>
+<ol type="1">
+<li>Run the code above in debug mode</li>
+<li>Set different types of breakpoints</li>
+<li>Observe when each breakpoint triggers</li>
+<li>Remove and re-add breakpoints during debugging</li>
+</ol>
+<aside class="special"><p><strong>Pro Tip:</strong> Use conditional breakpoints to debug issues that only occur with specific data, like <code>userId.equals("problematic-user")</code>.</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Step Debugging Techniques" duration="12">
-            <p>Step commands control execution flow during debugging.</p>
-            <h2 is-upgraded>Step Over (F8)</h2>
-            <p>Execute the current line and move to the next line in the same method.</p>
-            <pre><code language="language-java" class="language-java">public void processOrder(Order order) {
+      </google-codelab-step>
+    
+      <google-codelab-step label="Step Debugging Techniques" duration="12">
+        <p>Step commands control execution flow during debugging.</p>
+<h2 is-upgraded>Step Over (F8)</h2>
+<p>Execute the current line and move to the next line in the same method.</p>
+<pre><code language="language-java" class="language-java">public void processOrder(Order order) {
     validateOrder(order);      // Line 1: Step Over executes entire method
     calculateTotal(order);     // → Moves here (doesn&#39;t enter calculateTotal)
     saveOrder(order);
 }
 </code></pre>
-            <p><strong>Use when:</strong> You trust the method works correctly and don&#39;t need to see its internals.
-            </p>
-            <h2 is-upgraded>Step Into (F7)</h2>
-            <p>Step into the method call to see its implementation.</p>
-            <pre><code language="language-java" class="language-java">public void processOrder(Order order) {
+<p><strong>Use when:</strong> You trust the method works correctly and don&#39;t need to see its internals.</p>
+<h2 is-upgraded>Step Into (F7)</h2>
+<p>Step into the method call to see its implementation.</p>
+<pre><code language="language-java" class="language-java">public void processOrder(Order order) {
     calculateTotal(order);  // Step Into goes inside calculateTotal()
 }
 
@@ -233,10 +225,10 @@ private double calculateTotal(Order order) {
     return total;
 }
 </code></pre>
-            <p><strong>Use when:</strong> You want to debug the method being called.</p>
-            <h2 is-upgraded>Step Out (Shift + F8)</h2>
-            <p>Complete the current method and return to the caller.</p>
-            <pre><code language="language-java" class="language-java">private double calculateTotal(Order order) {
+<p><strong>Use when:</strong> You want to debug the method being called.</p>
+<h2 is-upgraded>Step Out (Shift + F8)</h2>
+<p>Complete the current method and return to the caller.</p>
+<pre><code language="language-java" class="language-java">private double calculateTotal(Order order) {
     double total = 0;
     for (Item item : order.getItems()) {
         total += item.getPrice();  // Step Out from here
@@ -249,11 +241,10 @@ public void processOrder(Order order) {
     System.out.println(total);
 }
 </code></pre>
-            <p><strong>Use when:</strong> You&#39;ve seen enough of the current method and want to return to the caller.
-            </p>
-            <h2 is-upgraded>Run to Cursor (Alt + F9)</h2>
-            <p>Run until reaching the line where your cursor is positioned.</p>
-            <pre><code language="language-java" class="language-java">public void longMethod() {
+<p><strong>Use when:</strong> You&#39;ve seen enough of the current method and want to return to the caller.</p>
+<h2 is-upgraded>Run to Cursor (Alt + F9)</h2>
+<p>Run until reaching the line where your cursor is positioned.</p>
+<pre><code language="language-java" class="language-java">public void longMethod() {
     int step1 = doSomething();
     int step2 = doSomethingElse();
     int step3 = moreWork();
@@ -261,22 +252,20 @@ public void processOrder(Order order) {
     // Execution runs from current position to this line
 }
 </code></pre>
-            <p><strong>Use when:</strong> You want to skip multiple lines without setting a breakpoint.</p>
-            <h2 is-upgraded>Force Step Into (Alt + Shift + F7)</h2>
-            <p>Step into methods you normally can&#39;t (like library code).</p>
-            <pre><code language="language-java" class="language-java">public void example() {
+<p><strong>Use when:</strong> You want to skip multiple lines without setting a breakpoint.</p>
+<h2 is-upgraded>Force Step Into (Alt + Shift + F7)</h2>
+<p>Step into methods you normally can&#39;t (like library code).</p>
+<pre><code language="language-java" class="language-java">public void example() {
     String text = &#34;hello&#34;;
     String upper = text.toUpperCase();  // Force Step Into goes into String.toUpperCase()
 }
 </code></pre>
-            <h2 is-upgraded>Drop Frame</h2>
-            <p>Go back in the call stack (undo execution).</p>
-            <aside class="warning">
-                <p><strong>Warning:</strong> Drop Frame doesn&#39;t undo side effects (database writes, file changes,
-                    etc.). It only resets the call stack.</p>
-            </aside>
-            <h2 is-upgraded>Practical Debugging Scenario</h2>
-            <pre><code language="language-java" class="language-java">public class OrderProcessor {
+<h2 is-upgraded>Drop Frame</h2>
+<p>Go back in the call stack (undo execution).</p>
+<aside class="warning"><p><strong>Warning:</strong> Drop Frame doesn&#39;t undo side effects (database writes, file changes, etc.). It only resets the call stack.</p>
+</aside>
+<h2 is-upgraded>Practical Debugging Scenario</h2>
+<pre><code language="language-java" class="language-java">public class OrderProcessor {
     public static void main(String[] args) {
         OrderProcessor processor = new OrderProcessor();
         Order order = new Order();
@@ -349,31 +338,29 @@ class Item {
     public double getPrice() { return price; }
 }
 </code></pre>
-            <p><strong>Exercise:</strong></p>
-            <ol type="1">
-                <li>Set breakpoint on <code>processor.processOrder(order)</code></li>
-                <li><strong>Step Into </strong><code>processOrder()</code></li>
-                <li><strong>Step Into </strong><code>validateOrder()</code> - observe validation</li>
-                <li><strong>Step Out</strong> back to <code>processOrder()</code></li>
-                <li><strong>Step Into </strong><code>calculateTotal()</code></li>
-                <li><strong>Step Over</strong> through the loop - watch <code>total</code> variable</li>
-                <li><strong>Step Out</strong> when you&#39;ve seen enough</li>
-                <li><strong>Step Over </strong><code>applyDiscount()</code> (trust it works)</li>
-                <li><strong>Run to Cursor</strong> on the last line</li>
-            </ol>
-            <aside class="special">
-                <p><strong>Keyboard Shortcuts:</strong> Master F7 (Step Into), F8 (Step Over), Shift+F8 (Step Out).
-                    These will become second nature!</p>
-            </aside>
+<p><strong>Exercise:</strong></p>
+<ol type="1">
+<li>Set breakpoint on <code>processor.processOrder(order)</code></li>
+<li><strong>Step Into </strong><code>processOrder()</code></li>
+<li><strong>Step Into </strong><code>validateOrder()</code> - observe validation</li>
+<li><strong>Step Out</strong> back to <code>processOrder()</code></li>
+<li><strong>Step Into </strong><code>calculateTotal()</code></li>
+<li><strong>Step Over</strong> through the loop - watch <code>total</code> variable</li>
+<li><strong>Step Out</strong> when you&#39;ve seen enough</li>
+<li><strong>Step Over </strong><code>applyDiscount()</code> (trust it works)</li>
+<li><strong>Run to Cursor</strong> on the last line</li>
+</ol>
+<aside class="special"><p><strong>Keyboard Shortcuts:</strong> Master F7 (Step Into), F8 (Step Over), Shift+F8 (Step Out). These will become second nature!</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Variables and Expressions" duration="10">
-            <p>Inspecting and modifying variables during debugging.</p>
-            <h2 is-upgraded>Variables View</h2>
-            <p>The Variables view shows all variables in the current scope.</p>
-            <pre><code language="language-java" class="language-java">public void calculateDiscount(Order order) {
+      </google-codelab-step>
+    
+      <google-codelab-step label="Variables and Expressions" duration="10">
+        <p>Inspecting and modifying variables during debugging.</p>
+<h2 is-upgraded>Variables View</h2>
+<p>The Variables view shows all variables in the current scope.</p>
+<pre><code language="language-java" class="language-java">public void calculateDiscount(Order order) {
     double subtotal = order.getSubtotal();     // Visible in Variables
     double taxRate = 0.08;                      // Visible in Variables
     double tax = subtotal * taxRate;            // Visible in Variables
@@ -388,15 +375,15 @@ class Item {
     double total = subtotal + tax - discount;   // All visible
 }
 </code></pre>
-            <p><strong>Features:</strong></p>
-            <ul>
-                <li>Expand objects to see fields</li>
-                <li>Right-click → &#34;Set Value&#34; to change variables</li>
-                <li>See primitive values, object references, collections</li>
-            </ul>
-            <h2 is-upgraded>Watches</h2>
-            <p>Monitor specific expressions throughout debugging.</p>
-            <pre><code language="language-java" class="language-java">public void processItems(List&lt;Item&gt; items) {
+<p><strong>Features:</strong></p>
+<ul>
+<li>Expand objects to see fields</li>
+<li>Right-click → &#34;Set Value&#34; to change variables</li>
+<li>See primitive values, object references, collections</li>
+</ul>
+<h2 is-upgraded>Watches</h2>
+<p>Monitor specific expressions throughout debugging.</p>
+<pre><code language="language-java" class="language-java">public void processItems(List&lt;Item&gt; items) {
     double total = 0;
     int count = 0;
 
@@ -410,13 +397,13 @@ class Item {
     }
 }
 </code></pre>
-            <p><strong>How to add watch:</strong></p>
-            <ul>
-                <li>IntelliJ: Debugger → Watches → + → Enter expression</li>
-                <li>Eclipse: Expressions view → Add → Enter expression</li>
-            </ul>
-            <p><strong>Useful watches:</strong></p>
-            <pre><code language="language-java" class="language-java">// Calculations
+<p><strong>How to add watch:</strong></p>
+<ul>
+<li>IntelliJ: Debugger → Watches → + → Enter expression</li>
+<li>Eclipse: Expressions view → Add → Enter expression</li>
+</ul>
+<p><strong>Useful watches:</strong></p>
+<pre><code language="language-java" class="language-java">// Calculations
 total / items.size()
 order.getSubtotal() * 1.08
 
@@ -428,9 +415,9 @@ items.stream().filter(i -&gt; i.getPrice() &gt; 100).count()
 order.getItems().size()
 Math.max(price1, price2)
 </code></pre>
-            <h2 is-upgraded>Evaluate Expression</h2>
-            <p>Evaluate any Java expression in the current context.</p>
-            <pre><code language="language-java" class="language-java">public void complexCalculation(int a, int b, int c) {
+<h2 is-upgraded>Evaluate Expression</h2>
+<p>Evaluate any Java expression in the current context.</p>
+<pre><code language="language-java" class="language-java">public void complexCalculation(int a, int b, int c) {
     int result = a + b * c;  // ← Set breakpoint here
 
     // Press Alt + F8 (IntelliJ) or Ctrl + Shift + I (Eclipse)
@@ -441,18 +428,18 @@ Math.max(price1, price2)
     // - Arrays.asList(a, b, c).stream().sum()
 }
 </code></pre>
-            <p><strong>What you can evaluate:</strong></p>
-            <ul>
-                <li>✅ Arithmetic: <code>a + b * 2</code></li>
-                <li>✅ Method calls: <code>list.size()</code>, <code>user.getName()</code></li>
-                <li>✅ New objects: <code>new ArrayList<>(items)</code></li>
-                <li>✅ Streams: <code>items.stream().filter(i -> i.getPrice() > 100).count()</code></li>
-                <li>✅ Static methods: <code>Math.max(a, b)</code></li>
-                <li>⚠️ Avoid side effects: Don&#39;t call methods that modify state</li>
-            </ul>
-            <h2 is-upgraded>Set Value</h2>
-            <p>Change variable values during debugging.</p>
-            <pre><code language="language-java" class="language-java">public void applyDiscount(Order order) {
+<p><strong>What you can evaluate:</strong></p>
+<ul>
+<li>✅ Arithmetic: <code>a + b * 2</code></li>
+<li>✅ Method calls: <code>list.size()</code>, <code>user.getName()</code></li>
+<li>✅ New objects: <code>new ArrayList<>(items)</code></li>
+<li>✅ Streams: <code>items.stream().filter(i -> i.getPrice() > 100).count()</code></li>
+<li>✅ Static methods: <code>Math.max(a, b)</code></li>
+<li>⚠️ Avoid side effects: Don&#39;t call methods that modify state</li>
+</ul>
+<h2 is-upgraded>Set Value</h2>
+<p>Change variable values during debugging.</p>
+<pre><code language="language-java" class="language-java">public void applyDiscount(Order order) {
     double discount = 0.10;  // ← Breakpoint here
     // Right-click on &#39;discount&#39; in Variables view
     // Set Value → Enter: 0.20
@@ -462,14 +449,14 @@ Math.max(price1, price2)
     order.setTotal(total);
 }
 </code></pre>
-            <p><strong>Use cases:</strong></p>
-            <ul>
-                <li>Test different scenarios without restarting</li>
-                <li>Fix incorrect values to continue debugging</li>
-                <li>Simulate edge cases</li>
-            </ul>
-            <h2 is-upgraded>View Object Internals</h2>
-            <pre><code language="language-java" class="language-java">public void processUser(User user) {
+<p><strong>Use cases:</strong></p>
+<ul>
+<li>Test different scenarios without restarting</li>
+<li>Fix incorrect values to continue debugging</li>
+<li>Simulate edge cases</li>
+</ul>
+<h2 is-upgraded>View Object Internals</h2>
+<pre><code language="language-java" class="language-java">public void processUser(User user) {
     // Breakpoint here, expand &#39;user&#39; in Variables view
     String name = user.getName();
 
@@ -485,8 +472,8 @@ Math.max(price1, price2)
     //   └─ createdAt = &#34;2025-12-24T10:30:00&#34;
 }
 </code></pre>
-            <h2 is-upgraded>Practical Example</h2>
-            <pre><code language="language-java" class="language-java">import java.util.*;
+<h2 is-upgraded>Practical Example</h2>
+<pre><code language="language-java" class="language-java">import java.util.*;
 
 public class ShoppingCart {
     public static void main(String[] args) {
@@ -538,28 +525,26 @@ public class ShoppingCart {
     }
 }
 </code></pre>
-            <p><strong>Exercise:</strong></p>
-            <ol type="1">
-                <li>Set breakpoint in <code>calculateTotal()</code> loop</li>
-                <li>Observe all variables in Variables view</li>
-                <li>Add watch: <code>total / items.size()</code></li>
-                <li>Evaluate expression: <code>item.price * item.quantity * 1.08</code></li>
-                <li>Set Value: Change <code>item.quantity</code> to 10</li>
-                <li>Continue and observe the effect</li>
-            </ol>
-            <aside class="special">
-                <p><strong>Pro Tip:</strong> Use &#34;Set Value&#34; to test edge cases like null, empty collections, or
-                    extreme values without modifying code!</p>
-            </aside>
+<p><strong>Exercise:</strong></p>
+<ol type="1">
+<li>Set breakpoint in <code>calculateTotal()</code> loop</li>
+<li>Observe all variables in Variables view</li>
+<li>Add watch: <code>total / items.size()</code></li>
+<li>Evaluate expression: <code>item.price * item.quantity * 1.08</code></li>
+<li>Set Value: Change <code>item.quantity</code> to 10</li>
+<li>Continue and observe the effect</li>
+</ol>
+<aside class="special"><p><strong>Pro Tip:</strong> Use &#34;Set Value&#34; to test edge cases like null, empty collections, or extreme values without modifying code!</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Debugging Multi-threaded Code" duration="12">
-            <p>Debugging concurrent code requires special techniques.</p>
-            <h2 is-upgraded>Thread View</h2>
-            <p>See all threads and their current state.</p>
-            <pre><code language="language-java" class="language-java">import java.util.concurrent.*;
+      </google-codelab-step>
+    
+      <google-codelab-step label="Debugging Multi-threaded Code" duration="12">
+        <p>Debugging concurrent code requires special techniques.</p>
+<h2 is-upgraded>Thread View</h2>
+<p>See all threads and their current state.</p>
+<pre><code language="language-java" class="language-java">import java.util.concurrent.*;
 
 public class MultiThreadedApp {
     public static void main(String[] args) {
@@ -586,26 +571,26 @@ public class MultiThreadedApp {
     }
 }
 </code></pre>
-            <p><strong>Thread States in Debugger:</strong></p>
-            <ul>
-                <li><strong>RUNNING:</strong> Currently executing</li>
-                <li><strong>SUSPENDED:</strong> Paused at breakpoint</li>
-                <li><strong>WAITING:</strong> Waiting for monitor/condition</li>
-                <li><strong>SLEEPING:</strong> Thread.sleep()</li>
-                <li><strong>BLOCKED:</strong> Waiting for lock</li>
-            </ul>
-            <h2 is-upgraded>Suspend Policy</h2>
-            <p>Control what happens when a breakpoint is hit in multi-threaded code.</p>
-            <p><strong>Options:</strong></p>
-            <ol type="1">
-                <li><strong>Suspend All:</strong> All threads pause (default, safest)</li>
-                <li><strong>Suspend Thread:</strong> Only the hitting thread pauses</li>
-            </ol>
-            <p><strong>How to set:</strong></p>
-            <ul>
-                <li>Right-click breakpoint → Edit → Suspend: All/Thread</li>
-            </ul>
-            <pre><code language="language-java" class="language-java">public class ConcurrentCounter {
+<p><strong>Thread States in Debugger:</strong></p>
+<ul>
+<li><strong>RUNNING:</strong> Currently executing</li>
+<li><strong>SUSPENDED:</strong> Paused at breakpoint</li>
+<li><strong>WAITING:</strong> Waiting for monitor/condition</li>
+<li><strong>SLEEPING:</strong> Thread.sleep()</li>
+<li><strong>BLOCKED:</strong> Waiting for lock</li>
+</ul>
+<h2 is-upgraded>Suspend Policy</h2>
+<p>Control what happens when a breakpoint is hit in multi-threaded code.</p>
+<p><strong>Options:</strong></p>
+<ol type="1">
+<li><strong>Suspend All:</strong> All threads pause (default, safest)</li>
+<li><strong>Suspend Thread:</strong> Only the hitting thread pauses</li>
+</ol>
+<p><strong>How to set:</strong></p>
+<ul>
+<li>Right-click breakpoint → Edit → Suspend: All/Thread</li>
+</ul>
+<pre><code language="language-java" class="language-java">public class ConcurrentCounter {
     private int count = 0;
 
     public void increment() {
@@ -619,8 +604,8 @@ public class MultiThreadedApp {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Deadlock Detection</h2>
-            <pre><code language="language-java" class="language-java">public class DeadlockExample {
+<h2 is-upgraded>Deadlock Detection</h2>
+<pre><code language="language-java" class="language-java">public class DeadlockExample {
     private final Object lock1 = new Object();
     private final Object lock2 = new Object();
 
@@ -661,14 +646,14 @@ public class MultiThreadedApp {
     }
 }
 </code></pre>
-            <p><strong>Detecting deadlocks:</strong></p>
-            <ul>
-                <li>IntelliJ: Threads view → Right-click → &#34;Detect Deadlock&#34;</li>
-                <li>Eclipse: Debug view shows blocked threads</li>
-                <li>Look for circular dependencies in lock acquisition</li>
-            </ul>
-            <h2 is-upgraded>Race Condition Debugging</h2>
-            <pre><code language="language-java" class="language-java">public class RaceConditionExample {
+<p><strong>Detecting deadlocks:</strong></p>
+<ul>
+<li>IntelliJ: Threads view → Right-click → &#34;Detect Deadlock&#34;</li>
+<li>Eclipse: Debug view shows blocked threads</li>
+<li>Look for circular dependencies in lock acquisition</li>
+</ul>
+<h2 is-upgraded>Race Condition Debugging</h2>
+<pre><code language="language-java" class="language-java">public class RaceConditionExample {
     private int balance = 1000;
 
     public void withdraw(int amount) {
@@ -696,15 +681,15 @@ public class MultiThreadedApp {
     }
 }
 </code></pre>
-            <p><strong>Debug strategy:</strong></p>
-            <ol type="1">
-                <li>Set breakpoint with &#34;Suspend Thread&#34; (not all)</li>
-                <li>Use conditional breakpoints for specific threads</li>
-                <li>Watch the shared variable (<code>balance</code>)</li>
-                <li>Step through to see interleaving</li>
-            </ol>
-            <h2 is-upgraded>Practical Multi-threaded Example</h2>
-            <pre><code language="language-java" class="language-java">import java.util.concurrent.*;
+<p><strong>Debug strategy:</strong></p>
+<ol type="1">
+<li>Set breakpoint with &#34;Suspend Thread&#34; (not all)</li>
+<li>Use conditional breakpoints for specific threads</li>
+<li>Watch the shared variable (<code>balance</code>)</li>
+<li>Step through to see interleaving</li>
+</ol>
+<h2 is-upgraded>Practical Multi-threaded Example</h2>
+<pre><code language="language-java" class="language-java">import java.util.concurrent.*;
 import java.util.*;
 
 public class InventoryManager {
@@ -762,33 +747,30 @@ public class InventoryManager {
     }
 }
 </code></pre>
-            <p><strong>Debugging steps:</strong></p>
-            <ol type="1">
-                <li>Set breakpoint at <code>Integer available = inventory.get(productId)</code></li>
-                <li>Suspend policy: &#34;Thread&#34; (not &#34;All&#34;)</li>
-                <li>Run and hit breakpoint multiple times</li>
-                <li>Switch between threads in Threads view</li>
-                <li>Observe that multiple threads pass the <code>if (available >= quantity)</code> check</li>
-                <li>See negative inventory (the bug!)</li>
-            </ol>
-            <p><strong>Fix:</strong></p>
-            <pre><code language="language-java" class="language-java">public synchronized boolean reserveItem(String productId, int quantity) {
+<p><strong>Debugging steps:</strong></p>
+<ol type="1">
+<li>Set breakpoint at <code>Integer available = inventory.get(productId)</code></li>
+<li>Suspend policy: &#34;Thread&#34; (not &#34;All&#34;)</li>
+<li>Run and hit breakpoint multiple times</li>
+<li>Switch between threads in Threads view</li>
+<li>Observe that multiple threads pass the <code>if (available >= quantity)</code> check</li>
+<li>See negative inventory (the bug!)</li>
+</ol>
+<p><strong>Fix:</strong></p>
+<pre><code language="language-java" class="language-java">public synchronized boolean reserveItem(String productId, int quantity) {
     // Now thread-safe
 }
 </code></pre>
-            <aside class="warning">
-                <p><strong>Common Mistake:</strong> Using &#34;Suspend All&#34; hides race conditions because threads
-                    don&#39;t actually run concurrently. Use &#34;Suspend Thread&#34; to see real concurrency issues.
-                </p>
-            </aside>
+<aside class="warning"><p><strong>Common Mistake:</strong> Using &#34;Suspend All&#34; hides race conditions because threads don&#39;t actually run concurrently. Use &#34;Suspend Thread&#34; to see real concurrency issues.</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Debug Console and Hot Reload" duration="10">
-            <h2 is-upgraded>Debug Console</h2>
-            <p>Execute code in the context of the current breakpoint.</p>
-            <pre><code language="language-java" class="language-java">public class DebugConsoleExample {
+      </google-codelab-step>
+    
+      <google-codelab-step label="Debug Console and Hot Reload" duration="10">
+        <h2 is-upgraded>Debug Console</h2>
+<p>Execute code in the context of the current breakpoint.</p>
+<pre><code language="language-java" class="language-java">public class DebugConsoleExample {
     public static void main(String[] args) {
         List&lt;Integer&gt; numbers = Arrays.asList(5, 2, 8, 1, 9, 3);
         int threshold = 5;
@@ -802,8 +784,8 @@ public class InventoryManager {
     }
 }
 </code></pre>
-            <p><strong>In Debug Console (IntelliJ: Debugger → Console), you can:</strong></p>
-            <pre><code language="language-java" class="language-java">// Execute statements
+<p><strong>In Debug Console (IntelliJ: Debugger → Console), you can:</strong></p>
+<pre><code language="language-java" class="language-java">// Execute statements
 System.out.println(&#34;Numbers: &#34; + numbers);
 
 // Call methods
@@ -823,20 +805,20 @@ threshold = 7  // Changes the variable value!
 // Test fixes
 numbers.stream().filter(n -&gt; n &gt;= threshold).collect(Collectors.toList())
 </code></pre>
-            <h2 is-upgraded>Evaluate and Execute</h2>
-            <p><strong>Evaluate Expression (Alt + F8):</strong></p>
-            <ul>
-                <li>Returns a result</li>
-                <li>No side effects (usually)</li>
-                <li>Good for inspecting values</li>
-            </ul>
-            <p><strong>Execute Statement:</strong></p>
-            <ul>
-                <li>Runs code with side effects</li>
-                <li>Can modify variables</li>
-                <li>Can call void methods</li>
-            </ul>
-            <pre><code language="language-java" class="language-java">public void processOrder(Order order) {
+<h2 is-upgraded>Evaluate and Execute</h2>
+<p><strong>Evaluate Expression (Alt + F8):</strong></p>
+<ul>
+<li>Returns a result</li>
+<li>No side effects (usually)</li>
+<li>Good for inspecting values</li>
+</ul>
+<p><strong>Execute Statement:</strong></p>
+<ul>
+<li>Runs code with side effects</li>
+<li>Can modify variables</li>
+<li>Can call void methods</li>
+</ul>
+<pre><code language="language-java" class="language-java">public void processOrder(Order order) {
     double total = calculateTotal(order);
     double tax = total * 0.08;  // ← Breakpoint here
 
@@ -848,9 +830,9 @@ numbers.stream().filter(n -&gt; n &gt;= threshold).collect(Collectors.toList())
     // System.out.println(&#34;Tax: &#34; + tax)  // Prints to console
 }
 </code></pre>
-            <h2 is-upgraded>Hot Code Replace / Hot Swap</h2>
-            <p>Modify code while debugging without restarting.</p>
-            <pre><code language="language-java" class="language-java">public class HotSwapExample {
+<h2 is-upgraded>Hot Code Replace / Hot Swap</h2>
+<p>Modify code while debugging without restarting.</p>
+<pre><code language="language-java" class="language-java">public class HotSwapExample {
     public static void main(String[] args) {
         for (int i = 0; i &lt; 10; i++) {
             String message = getMessage(i);  // ← Breakpoint here
@@ -868,27 +850,27 @@ numbers.stream().filter(n -&gt; n &gt;= threshold).collect(Collectors.toList())
     }
 }
 </code></pre>
-            <p><strong>What you can hot reload:</strong></p>
-            <ul>
-                <li>✅ Method bodies</li>
-                <li>✅ Variable values</li>
-                <li>✅ Logic changes</li>
-                <li>❌ Method signatures (name, parameters, return type)</li>
-                <li>❌ Adding/removing methods</li>
-                <li>❌ Class structure changes</li>
-            </ul>
-            <p><strong>How to use:</strong></p>
-            <ol type="1">
-                <li>Pause at breakpoint</li>
-                <li>Modify the code</li>
-                <li>Save the file</li>
-                <li>IntelliJ: Automatically reloads (or Build → Recompile)</li>
-                <li>Eclipse: Automatically if &#34;Hot Code Replace&#34; enabled</li>
-                <li>Continue debugging with new code</li>
-            </ol>
-            <h2 is-upgraded>Rerun Frame / Drop Frame</h2>
-            <p>Go back to the beginning of the current method.</p>
-            <pre><code language="language-java" class="language-java">public void processItems(List&lt;Item&gt; items) {
+<p><strong>What you can hot reload:</strong></p>
+<ul>
+<li>✅ Method bodies</li>
+<li>✅ Variable values</li>
+<li>✅ Logic changes</li>
+<li>❌ Method signatures (name, parameters, return type)</li>
+<li>❌ Adding/removing methods</li>
+<li>❌ Class structure changes</li>
+</ul>
+<p><strong>How to use:</strong></p>
+<ol type="1">
+<li>Pause at breakpoint</li>
+<li>Modify the code</li>
+<li>Save the file</li>
+<li>IntelliJ: Automatically reloads (or Build → Recompile)</li>
+<li>Eclipse: Automatically if &#34;Hot Code Replace&#34; enabled</li>
+<li>Continue debugging with new code</li>
+</ol>
+<h2 is-upgraded>Rerun Frame / Drop Frame</h2>
+<p>Go back to the beginning of the current method.</p>
+<pre><code language="language-java" class="language-java">public void processItems(List&lt;Item&gt; items) {
     for (Item item : items) {
         processItem(item);  // ← Breakpoint here
     }
@@ -907,8 +889,8 @@ private void processItem(Item item) {
     // 4. Method runs again with new code
 }
 </code></pre>
-            <h2 is-upgraded>Practical Example</h2>
-            <pre><code language="language-java" class="language-java">import java.util.*;
+<h2 is-upgraded>Practical Example</h2>
+<pre><code language="language-java" class="language-java">import java.util.*;
 import java.util.stream.*;
 
 public class DataProcessor {
@@ -977,82 +959,77 @@ public class DataProcessor {
     }
 }
 </code></pre>
-            <p><strong>Exercise:</strong></p>
-            <ol type="1">
-                <li>Run in debug mode</li>
-                <li>Pause at breakpoint in <code>generateReport()</code></li>
-                <li>Open Debug Console</li>
-                <li>Execute: <code>transactions.size()</code></li>
-                <li>Execute: <code>transactions.get(0).amount</code></li>
-                <li>Execute complex expression:
-                    <code>transactions.stream().filter(t -> t.type.equals("SALE")).mapToDouble(t -> t.amount).sum()</code>
-                </li>
-                <li>Modify: <code>report.netSales = totalSales - totalReturns * 2</code> (apply double credit for
-                    returns)</li>
-                <li>Continue and see modified result</li>
-            </ol>
-            <aside class="special">
-                <p><strong>Power User:</strong> Debug Console lets you test fixes immediately without stopping and
-                    restarting the application!</p>
-            </aside>
+<p><strong>Exercise:</strong></p>
+<ol type="1">
+<li>Run in debug mode</li>
+<li>Pause at breakpoint in <code>generateReport()</code></li>
+<li>Open Debug Console</li>
+<li>Execute: <code>transactions.size()</code></li>
+<li>Execute: <code>transactions.get(0).amount</code></li>
+<li>Execute complex expression: <code>transactions.stream().filter(t -> t.type.equals("SALE")).mapToDouble(t -> t.amount).sum()</code></li>
+<li>Modify: <code>report.netSales = totalSales - totalReturns * 2</code> (apply double credit for returns)</li>
+<li>Continue and see modified result</li>
+</ol>
+<aside class="special"><p><strong>Power User:</strong> Debug Console lets you test fixes immediately without stopping and restarting the application!</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Remote Debugging" duration="8">
-            <p>Debug applications running on remote servers or in containers.</p>
-            <h2 is-upgraded>Why Remote Debugging?</h2>
-            <ul>
-                <li>Debug production issues (staging/QA environments)</li>
-                <li>Debug Docker containers</li>
-                <li>Debug server applications</li>
-                <li>Debug distributed systems</li>
-                <li>Investigate issues that only occur in specific environments</li>
-            </ul>
-            <h2 is-upgraded>Enable Remote Debugging</h2>
-            <p><strong>Start JVM with debug options:</strong></p>
-            <pre><code language="language-bash" class="language-bash"># Standard format (works for all JVMs)
+      </google-codelab-step>
+    
+      <google-codelab-step label="Remote Debugging" duration="8">
+        <p>Debug applications running on remote servers or in containers.</p>
+<h2 is-upgraded>Why Remote Debugging?</h2>
+<ul>
+<li>Debug production issues (staging/QA environments)</li>
+<li>Debug Docker containers</li>
+<li>Debug server applications</li>
+<li>Debug distributed systems</li>
+<li>Investigate issues that only occur in specific environments</li>
+</ul>
+<h2 is-upgraded>Enable Remote Debugging</h2>
+<p><strong>Start JVM with debug options:</strong></p>
+<pre><code language="language-bash" class="language-bash"># Standard format (works for all JVMs)
 java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar myapp.jar
 
 # Older format (Java 8 and earlier)
 java -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005 -jar myapp.jar
 </code></pre>
-            <p><strong>Parameters:</strong></p>
-            <ul>
-                <li><code>transport=dt_socket</code>: Use TCP/IP</li>
-                <li><code>server=y</code>: JVM waits for debugger to attach</li>
-                <li><code>suspend=n</code>: Start immediately (use <code>y</code> to wait for debugger)</li>
-                <li><code>address=*:5005</code>: Listen on all interfaces, port 5005</li>
-            </ul>
-            <p><strong>Maven:</strong></p>
-            <pre><code language="language-bash" class="language-bash">mvn spring-boot:run -Dagentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>transport=dt_socket</code>: Use TCP/IP</li>
+<li><code>server=y</code>: JVM waits for debugger to attach</li>
+<li><code>suspend=n</code>: Start immediately (use <code>y</code> to wait for debugger)</li>
+<li><code>address=*:5005</code>: Listen on all interfaces, port 5005</li>
+</ul>
+<p><strong>Maven:</strong></p>
+<pre><code language="language-bash" class="language-bash">mvn spring-boot:run -Dagentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
 </code></pre>
-            <p><strong>Gradle:</strong></p>
-            <pre><code language="language-bash" class="language-bash">./gradlew bootRun --debug-jvm
+<p><strong>Gradle:</strong></p>
+<pre><code language="language-bash" class="language-bash">./gradlew bootRun --debug-jvm
 </code></pre>
-            <h2 is-upgraded>Configure IDE</h2>
-            <p><strong>IntelliJ IDEA:</strong></p>
-            <ol type="1">
-                <li>Run → Edit Configurations</li>
-                <li>Add New → Remote JVM Debug</li>
-                <li>Name: &#34;Remote Debug&#34;</li>
-                <li>Host: <code>localhost</code> (or remote host IP)</li>
-                <li>Port: <code>5005</code></li>
-                <li>Use module classpath: Select your module</li>
-                <li>Click OK</li>
-            </ol>
-            <p><strong>Eclipse:</strong></p>
-            <ol type="1">
-                <li>Run → Debug Configurations</li>
-                <li>Remote Java Application → New</li>
-                <li>Project: Select your project</li>
-                <li>Host: <code>localhost</code> (or remote IP)</li>
-                <li>Port: <code>5005</code></li>
-                <li>Click Debug</li>
-            </ol>
-            <h2 is-upgraded>Remote Debugging Example</h2>
-            <p><strong>Application to debug:</strong></p>
-            <pre><code language="language-java" class="language-java">// RemoteApp.java
+<h2 is-upgraded>Configure IDE</h2>
+<p><strong>IntelliJ IDEA:</strong></p>
+<ol type="1">
+<li>Run → Edit Configurations</li>
+<li>Add New → Remote JVM Debug</li>
+<li>Name: &#34;Remote Debug&#34;</li>
+<li>Host: <code>localhost</code> (or remote host IP)</li>
+<li>Port: <code>5005</code></li>
+<li>Use module classpath: Select your module</li>
+<li>Click OK</li>
+</ol>
+<p><strong>Eclipse:</strong></p>
+<ol type="1">
+<li>Run → Debug Configurations</li>
+<li>Remote Java Application → New</li>
+<li>Project: Select your project</li>
+<li>Host: <code>localhost</code> (or remote IP)</li>
+<li>Port: <code>5005</code></li>
+<li>Click Debug</li>
+</ol>
+<h2 is-upgraded>Remote Debugging Example</h2>
+<p><strong>Application to debug:</strong></p>
+<pre><code language="language-java" class="language-java">// RemoteApp.java
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -1088,19 +1065,19 @@ public class RemoteApp {
     }
 }
 </code></pre>
-            <p><strong>Steps:</strong></p>
-            <ol type="1">
-                <li><strong>Compile the application:</strong></li>
-            </ol>
-            <pre><code language="language-bash" class="language-bash">javac RemoteApp.java
+<p><strong>Steps:</strong></p>
+<ol type="1">
+<li><strong>Compile the application:</strong></li>
+</ol>
+<pre><code language="language-bash" class="language-bash">javac RemoteApp.java
 </code></pre>
-            <ol type="1" start="2">
-                <li><strong>Run with debug enabled:</strong></li>
-            </ol>
-            <pre><code language="language-bash" class="language-bash">java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 RemoteApp
+<ol type="1" start="2">
+<li><strong>Run with debug enabled:</strong></li>
+</ol>
+<pre><code language="language-bash" class="language-bash">java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 RemoteApp
 </code></pre>
-            <p>Output:</p>
-            <pre><code>Listening for transport dt_socket at address: 5005
+<p>Output:</p>
+<pre><code>Listening for transport dt_socket at address: 5005
 Remote application started...
 Attach debugger to port 5005
 Processing... Count: 1
@@ -1109,26 +1086,24 @@ Processing... Count: 2
 Result: 14
 ...
 </code></pre>
-            <ol type="1" start="3">
-                <li><strong>Attach debugger from IDE:</strong>
-                    <ul>
-                        <li>Run your &#34;Remote Debug&#34; configuration</li>
-                        <li>Set breakpoints in <code>processData()</code> or <code>calculate()</code></li>
-                        <li>Debugger connects and pauses at breakpoints</li>
-                    </ul>
-                </li>
-                <li><strong>Debug as normal:</strong>
-                    <ul>
-                        <li>Step through code</li>
-                        <li>Inspect variables</li>
-                        <li>Evaluate expressions</li>
-                        <li>Modify values</li>
-                    </ul>
-                </li>
-            </ol>
-            <h2 is-upgraded>Docker Remote Debugging</h2>
-            <p><strong>Dockerfile:</strong></p>
-            <pre><code language="language-dockerfile" class="language-dockerfile">FROM openjdk:17-slim
+<ol type="1" start="3">
+<li><strong>Attach debugger from IDE:</strong><ul>
+<li>Run your &#34;Remote Debug&#34; configuration</li>
+<li>Set breakpoints in <code>processData()</code> or <code>calculate()</code></li>
+<li>Debugger connects and pauses at breakpoints</li>
+</ul>
+</li>
+<li><strong>Debug as normal:</strong><ul>
+<li>Step through code</li>
+<li>Inspect variables</li>
+<li>Evaluate expressions</li>
+<li>Modify values</li>
+</ul>
+</li>
+</ol>
+<h2 is-upgraded>Docker Remote Debugging</h2>
+<p><strong>Dockerfile:</strong></p>
+<pre><code language="language-dockerfile" class="language-dockerfile">FROM openjdk:17-slim
 COPY target/myapp.jar /app/myapp.jar
 WORKDIR /app
 
@@ -1138,8 +1113,8 @@ EXPOSE 5005
 # Run with debug enabled
 ENTRYPOINT [&#34;java&#34;, &#34;-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005&#34;, &#34;-jar&#34;, &#34;myapp.jar&#34;]
 </code></pre>
-            <p><strong>docker-compose.yml:</strong></p>
-            <pre><code language="language-yaml" class="language-yaml">version: &#34;3.8&#34;
+<p><strong>docker-compose.yml:</strong></p>
+<pre><code language="language-yaml" class="language-yaml">version: &#34;3.8&#34;
 services:
   app:
     build: .
@@ -1149,32 +1124,30 @@ services:
     environment:
       - JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
 </code></pre>
-            <p><strong>Run:</strong></p>
-            <pre><code language="language-bash" class="language-bash">docker-compose up
+<p><strong>Run:</strong></p>
+<pre><code language="language-bash" class="language-bash">docker-compose up
 </code></pre>
-            <p><strong>Connect debugger to localhost:5005</strong></p>
-            <h2 is-upgraded>Security Considerations</h2>
-            <aside class="warning">
-                <p><strong>Warning:</strong> Never enable remote debugging on production servers exposed to the
-                    internet! An attacker with debugger access can execute arbitrary code.</p>
-            </aside>
-            <p><strong>Best practices:</strong></p>
-            <ul>
-                <li>Only enable in dev/staging environments</li>
-                <li>Use SSH tunneling for remote servers</li>
-                <li>Restrict to localhost or internal networks</li>
-                <li>Disable in production</li>
-                <li>Use <code>suspend=y</code> only during development</li>
-            </ul>
-            <p><strong>SSH Tunnel (safe for remote servers):</strong></p>
-            <pre><code language="language-bash" class="language-bash"># On your local machine
+<p><strong>Connect debugger to localhost:5005</strong></p>
+<h2 is-upgraded>Security Considerations</h2>
+<aside class="warning"><p><strong>Warning:</strong> Never enable remote debugging on production servers exposed to the internet! An attacker with debugger access can execute arbitrary code.</p>
+</aside>
+<p><strong>Best practices:</strong></p>
+<ul>
+<li>Only enable in dev/staging environments</li>
+<li>Use SSH tunneling for remote servers</li>
+<li>Restrict to localhost or internal networks</li>
+<li>Disable in production</li>
+<li>Use <code>suspend=y</code> only during development</li>
+</ul>
+<p><strong>SSH Tunnel (safe for remote servers):</strong></p>
+<pre><code language="language-bash" class="language-bash"># On your local machine
 ssh -L 5005:localhost:5005 user@remote-server
 
 # Now connect debugger to localhost:5005
 # Traffic is encrypted through SSH
 </code></pre>
-            <h2 is-upgraded>Practical Remote Debugging</h2>
-            <pre><code language="language-java" class="language-java">// WebService.java
+<h2 is-upgraded>Practical Remote Debugging</h2>
+<pre><code language="language-java" class="language-java">// WebService.java
 import java.io.*;
 import java.net.*;
 
@@ -1220,29 +1193,24 @@ public class WebService {
     }
 }
 </code></pre>
-            <p><strong>Debug remotely:</strong></p>
-            <ol type="1">
-                <li>Run with debug:
-                    <code>java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 WebService</code>
-                </li>
-                <li>Attach debugger from IDE</li>
-                <li>Set breakpoints in <code>handleClient()</code> and <code>processRequest()</code></li>
-                <li>Make request: <code>curl http://localhost:8080</code></li>
-                <li>Debugger pauses, inspect request, step through</li>
-            </ol>
-            <aside class="special">
-                <p><strong>Pro Tip:</strong> Remote debugging is invaluable for investigating issues that only occur in
-                    specific environments (staging, QA, containers).</p>
-            </aside>
+<p><strong>Debug remotely:</strong></p>
+<ol type="1">
+<li>Run with debug: <code>java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 WebService</code></li>
+<li>Attach debugger from IDE</li>
+<li>Set breakpoints in <code>handleClient()</code> and <code>processRequest()</code></li>
+<li>Make request: <code>curl http://localhost:8080</code></li>
+<li>Debugger pauses, inspect request, step through</li>
+</ol>
+<aside class="special"><p><strong>Pro Tip:</strong> Remote debugging is invaluable for investigating issues that only occur in specific environments (staging, QA, containers).</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Debugging Challenge" duration="25">
-            <p>Time to practice! Here&#39;s a buggy e-commerce application. Find and fix all bugs using debugging
-                techniques.</p>
-            <h2 is-upgraded>The Buggy Application</h2>
-            <pre><code language="language-java" class="language-java">import java.util.*;
+      </google-codelab-step>
+    
+      <google-codelab-step label="Debugging Challenge" duration="25">
+        <p>Time to practice! Here&#39;s a buggy e-commerce application. Find and fix all bugs using debugging techniques.</p>
+<h2 is-upgraded>The Buggy Application</h2>
+<pre><code language="language-java" class="language-java">import java.util.*;
 import java.util.concurrent.*;
 
 class Product {
@@ -1475,61 +1443,56 @@ public class EcommerceApp {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Bugs to Find</h2>
-            <p><strong>BUG 1: Duplicate cart items</strong> (Line 48)</p>
-            <ul>
-                <li><strong>Symptom:</strong> Adding same product twice creates two cart items</li>
-                <li><strong>Debug technique:</strong> Breakpoint in <code>addItem()</code>, inspect <code>items</code>
-                    list</li>
-                <li><strong>Fix:</strong> Check if product already exists and update quantity</li>
-            </ul>
-            <p><strong>BUG 2: Tax calculation order</strong> (Line 62)</p>
-            <ul>
-                <li><strong>Symptom:</strong> Tax calculated on full subtotal instead of after discount</li>
-                <li><strong>Debug technique:</strong> Breakpoint in <code>calculateTotal()</code>, evaluate expressions
-                </li>
-                <li><strong>Fix:</strong> Calculate tax on (subtotal - discount)</li>
-            </ul>
-            <p><strong>BUG 3: Discount logic</strong> (Line 69-78)</p>
-            <ul>
-                <li><strong>Symptom:</strong> Multiple if-else blocks, unclear logic</li>
-                <li><strong>Debug technique:</strong> Step through with different coupons, watch discount value</li>
-                <li><strong>Fix:</strong> Simplify logic, ensure all cases covered</li>
-            </ul>
-            <p><strong>BUG 4: String comparison</strong> (Line 73)</p>
-            <ul>
-                <li><strong>Symptom:</strong> &#34;SAVE20&#34; coupon never works</li>
-                <li><strong>Debug technique:</strong> Conditional breakpoint <code>couponCode.equals("SAVE20")</code>
-                </li>
-                <li><strong>Fix:</strong> Use <code>.equals()</code> instead of <code>==</code></li>
-            </ul>
-            <p><strong>BUG 5: Race condition</strong> (Line 100-111)</p>
-            <ul>
-                <li><strong>Symptom:</strong> Negative stock in concurrent orders</li>
-                <li><strong>Debug technique:</strong> Multiple threads, watch <code>product.stock</code></li>
-                <li><strong>Fix:</strong> Synchronize the method or use atomic operations</li>
-            </ul>
-            <p><strong>BUG 6: Stock rollback</strong> (Line 135-143)</p>
-            <ul>
-                <li><strong>Symptom:</strong> Stock reserved but not restored on failure</li>
-                <li><strong>Debug technique:</strong> Set breakpoint on <code>return null</code>, check stock</li>
-                <li><strong>Fix:</strong> Track reserved items and restore on failure</li>
-            </ul>
-            <h2 is-upgraded>Debugging Steps</h2>
-            <ol type="1">
-                <li><strong>Setup:</strong>
-                    <pre><code language="language-bash" class="language-bash">javac EcommerceApp.java
+<h2 is-upgraded>Bugs to Find</h2>
+<p><strong>BUG 1: Duplicate cart items</strong> (Line 48)</p>
+<ul>
+<li><strong>Symptom:</strong> Adding same product twice creates two cart items</li>
+<li><strong>Debug technique:</strong> Breakpoint in <code>addItem()</code>, inspect <code>items</code> list</li>
+<li><strong>Fix:</strong> Check if product already exists and update quantity</li>
+</ul>
+<p><strong>BUG 2: Tax calculation order</strong> (Line 62)</p>
+<ul>
+<li><strong>Symptom:</strong> Tax calculated on full subtotal instead of after discount</li>
+<li><strong>Debug technique:</strong> Breakpoint in <code>calculateTotal()</code>, evaluate expressions</li>
+<li><strong>Fix:</strong> Calculate tax on (subtotal - discount)</li>
+</ul>
+<p><strong>BUG 3: Discount logic</strong> (Line 69-78)</p>
+<ul>
+<li><strong>Symptom:</strong> Multiple if-else blocks, unclear logic</li>
+<li><strong>Debug technique:</strong> Step through with different coupons, watch discount value</li>
+<li><strong>Fix:</strong> Simplify logic, ensure all cases covered</li>
+</ul>
+<p><strong>BUG 4: String comparison</strong> (Line 73)</p>
+<ul>
+<li><strong>Symptom:</strong> &#34;SAVE20&#34; coupon never works</li>
+<li><strong>Debug technique:</strong> Conditional breakpoint <code>couponCode.equals("SAVE20")</code></li>
+<li><strong>Fix:</strong> Use <code>.equals()</code> instead of <code>==</code></li>
+</ul>
+<p><strong>BUG 5: Race condition</strong> (Line 100-111)</p>
+<ul>
+<li><strong>Symptom:</strong> Negative stock in concurrent orders</li>
+<li><strong>Debug technique:</strong> Multiple threads, watch <code>product.stock</code></li>
+<li><strong>Fix:</strong> Synchronize the method or use atomic operations</li>
+</ul>
+<p><strong>BUG 6: Stock rollback</strong> (Line 135-143)</p>
+<ul>
+<li><strong>Symptom:</strong> Stock reserved but not restored on failure</li>
+<li><strong>Debug technique:</strong> Set breakpoint on <code>return null</code>, check stock</li>
+<li><strong>Fix:</strong> Track reserved items and restore on failure</li>
+</ul>
+<h2 is-upgraded>Debugging Steps</h2>
+<ol type="1">
+<li><strong>Setup:</strong><pre><code language="language-bash" class="language-bash">javac EcommerceApp.java
 java EcommerceApp
 </code></pre>
-                    Observe the incorrect output.
-                </li>
-                <li><strong>Fix BUG 1:</strong> Duplicate cart items<ul>
-                        <li>Set breakpoint in <code>ShoppingCart.addItem()</code></li>
-                        <li>Add same product twice</li>
-                        <li>Inspect <code>items</code> list - see two entries</li>
-                        <li><strong>Fix:</strong></li>
-                    </ul>
-                    <pre><code language="language-java" class="language-java">public void addItem(Product product, int quantity) {
+Observe the incorrect output.</li>
+<li><strong>Fix BUG 1:</strong> Duplicate cart items<ul>
+<li>Set breakpoint in <code>ShoppingCart.addItem()</code></li>
+<li>Add same product twice</li>
+<li>Inspect <code>items</code> list - see two entries</li>
+<li><strong>Fix:</strong></li>
+</ul>
+<pre><code language="language-java" class="language-java">public void addItem(Product product, int quantity) {
     for (CartItem item : items) {
         if (item.product.id.equals(product.id)) {
             item.quantity += quantity;
@@ -1539,14 +1502,14 @@ java EcommerceApp
     items.add(new CartItem(product, quantity));
 }
 </code></pre>
-                </li>
-                <li><strong>Fix BUG 2:</strong> Tax calculation<ul>
-                        <li>Breakpoint in <code>calculateTotal()</code></li>
-                        <li>Evaluate: <code>subtotal</code>, <code>discount</code>, <code>tax</code></li>
-                        <li>Notice tax is on full subtotal</li>
-                        <li><strong>Fix:</strong></li>
-                    </ul>
-                    <pre><code language="language-java" class="language-java">public double calculateTotal() {
+</li>
+<li><strong>Fix BUG 2:</strong> Tax calculation<ul>
+<li>Breakpoint in <code>calculateTotal()</code></li>
+<li>Evaluate: <code>subtotal</code>, <code>discount</code>, <code>tax</code></li>
+<li>Notice tax is on full subtotal</li>
+<li><strong>Fix:</strong></li>
+</ul>
+<pre><code language="language-java" class="language-java">public double calculateTotal() {
     double subtotal = 0;
     for (CartItem item : items) {
         subtotal += item.getSubtotal();
@@ -1559,36 +1522,35 @@ java EcommerceApp
     return discountedSubtotal + tax;
 }
 </code></pre>
-                </li>
-                <li><strong>Fix BUG 4:</strong> String comparison<ul>
-                        <li>Conditional breakpoint: <code>couponCode != null && couponCode.contains("SAVE20")</code>
-                        </li>
-                        <li>Step through, notice <code>==</code> comparison fails</li>
-                        <li><strong>Fix:</strong></li>
-                    </ul>
-                    <pre><code language="language-java" class="language-java">} else if (couponCode.equals(&#34;SAVE20&#34;)) {
+</li>
+<li><strong>Fix BUG 4:</strong> String comparison<ul>
+<li>Conditional breakpoint: <code>couponCode != null && couponCode.contains("SAVE20")</code></li>
+<li>Step through, notice <code>==</code> comparison fails</li>
+<li><strong>Fix:</strong></li>
+</ul>
+<pre><code language="language-java" class="language-java">} else if (couponCode.equals(&#34;SAVE20&#34;)) {
     return subtotal * 0.20;
 }
 </code></pre>
-                </li>
-                <li><strong>Fix BUG 5:</strong> Race condition<ul>
-                        <li>Set breakpoint in <code>reserveStock()</code> with &#34;Suspend Thread&#34;</li>
-                        <li>Run concurrent test</li>
-                        <li>Watch multiple threads in Variables view</li>
-                        <li>See multiple threads pass the <code>if (product.stock >= quantity)</code> check</li>
-                        <li><strong>Fix:</strong></li>
-                    </ul>
-                    <pre><code language="language-java" class="language-java">public synchronized boolean reserveStock(String productId, int quantity) {
+</li>
+<li><strong>Fix BUG 5:</strong> Race condition<ul>
+<li>Set breakpoint in <code>reserveStock()</code> with &#34;Suspend Thread&#34;</li>
+<li>Run concurrent test</li>
+<li>Watch multiple threads in Variables view</li>
+<li>See multiple threads pass the <code>if (product.stock >= quantity)</code> check</li>
+<li><strong>Fix:</strong></li>
+</ul>
+<pre><code language="language-java" class="language-java">public synchronized boolean reserveStock(String productId, int quantity) {
     // Now thread-safe
 }
 </code></pre>
-                </li>
-                <li><strong>Fix BUG 6:</strong> Stock rollback<ul>
-                        <li>Breakpoint when <code>reserved == false</code></li>
-                        <li>Inspect: previous items already reserved</li>
-                        <li><strong>Fix:</strong></li>
-                    </ul>
-                    <pre><code language="language-java" class="language-java">public Order processOrder(ShoppingCart cart) {
+</li>
+<li><strong>Fix BUG 6:</strong> Stock rollback<ul>
+<li>Breakpoint when <code>reserved == false</code></li>
+<li>Inspect: previous items already reserved</li>
+<li><strong>Fix:</strong></li>
+</ul>
+<pre><code language="language-java" class="language-java">public Order processOrder(ShoppingCart cart) {
     List&lt;CartItem&gt; reserved = new ArrayList&lt;&gt;();
 
     for (CartItem item : cart.getItems()) {
@@ -1614,11 +1576,11 @@ java EcommerceApp
     return order;
 }
 </code></pre>
-                </li>
-            </ol>
-            <h2 is-upgraded>Verify Fixes</h2>
-            <p>Run the corrected application:</p>
-            <pre><code>=== Test 1: Basic Order ===
+</li>
+</ol>
+<h2 is-upgraded>Verify Fixes</h2>
+<p>Run the corrected application:</p>
+<pre><code>=== Test 1: Basic Order ===
 Order total: $1058.0
 Expected: $1058.0 (1000 + 50 + 8% tax)
 ✓ PASS
@@ -1642,93 +1604,95 @@ Actual: OK
 </code></pre>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Conclusion" duration="2">
-            <p>Congratulations! 🎉 You&#39;ve mastered IDE debugging!</p>
-            <h2 is-upgraded>What You&#39;ve Learned</h2>
-            <ul>
-                <li>✅ <strong>Breakpoint Types:</strong> Line, method, conditional, exception</li>
-                <li>✅ <strong>Logpoints:</strong> Non-intrusive debugging</li>
-                <li>✅ <strong>Step Debugging:</strong> Into, Over, Out, Run to Cursor</li>
-                <li>✅ <strong>Variables:</strong> Inspection, watches, modification</li>
-                <li>✅ <strong>Multi-threading:</strong> Thread debugging, race conditions, deadlocks</li>
-                <li>✅ <strong>Debug Console:</strong> Interactive expression evaluation</li>
-                <li>✅ <strong>Hot Reload:</strong> Modify code without restarting</li>
-                <li>✅ <strong>Remote Debugging:</strong> Debug applications on remote servers</li>
-                <li>✅ <strong>Real Bugs:</strong> Fixed 6 bugs in e-commerce app</li>
-            </ul>
-            <h2 is-upgraded>Key Takeaways</h2>
-            <ol type="1">
-                <li><strong>Breakpoints are powerful</strong> - use conditional and exception breakpoints</li>
-                <li><strong>Step debugging reveals flow</strong> - understand execution path</li>
-                <li><strong>Inspect everything</strong> - variables, expressions, watches</li>
-                <li><strong>Thread debugging is tricky</strong> - use &#34;Suspend Thread&#34; for race conditions</li>
-                <li><strong>Debug Console is your friend</strong> - test fixes interactively</li>
-                <li><strong>Remote debugging saves time</strong> - debug in real environments</li>
-                <li><strong>Practice makes perfect</strong> - debug often to master the tools</li>
-            </ol>
-            <h2 is-upgraded>Debugging Strategy</h2>
-            <ol type="1">
-                <li><strong>Reproduce the bug</strong> consistently</li>
-                <li><strong>Set breakpoints</strong> near the problem area</li>
-                <li><strong>Step through</strong> to understand flow</li>
-                <li><strong>Inspect variables</strong> to find incorrect values</li>
-                <li><strong>Evaluate expressions</strong> to test hypotheses</li>
-                <li><strong>Fix and verify</strong> using hot reload</li>
-                <li><strong>Test edge cases</strong> to ensure complete fix</li>
-            </ol>
-            <h2 is-upgraded>IDE Shortcuts Mastery</h2>
-            <p><strong>Essential shortcuts:</strong></p>
-            <ul>
-                <li><code>F7</code> - Step Into</li>
-                <li><code>F8</code> - Step Over</li>
-                <li><code>Shift + F8</code> - Step Out</li>
-                <li><code>F9</code> - Resume</li>
-                <li><code>Alt + F8</code> - Evaluate Expression</li>
-                <li><code>Ctrl + F8</code> - Toggle Breakpoint</li>
-            </ul>
-            <p>Practice these until they&#39;re muscle memory!</p>
-            <h2 is-upgraded>Next Steps</h2>
-            <p>Continue to:</p>
-            <ul>
-                <li><strong>Codelab 3.1:</strong> Spring Core &amp; Boot Basics</li>
-                <li><strong>Codelab 3.2:</strong> REST APIs &amp; Swagger Documentation</li>
-                <li><strong>Codelab 3.8:</strong> Testing &amp; Remote Debugging (advanced)</li>
-            </ul>
-            <h2 is-upgraded>Additional Resources</h2>
-            <ul>
-                <li><a href="https://www.jetbrains.com/help/idea/debugging-code.html" target="_blank">IntelliJ IDEA
-                        Debugging Guide</a></li>
-                <li><a href="https://www.eclipse.org/community/eclipse_newsletter/2017/june/article1.php"
-                        target="_blank">Eclipse Debugging Tutorial</a></li>
-                <li><a href="https://www.baeldung.com/java-debugging" target="_blank">Java Debugging Best Practices</a>
-                </li>
-                <li><a href="https://www.oracle.com/technical-resources/articles/java/debug-threads.html"
-                        target="_blank">Debugging Multi-threaded Applications</a></li>
-            </ul>
-            <aside class="special">
-                <p><strong>Debug Like a Pro!</strong> Mastering debugging techniques will make you 10x more productive
-                    as a developer. These skills transfer across all IDEs and languages!</p>
-            </aside>
+      </google-codelab-step>
+    
+      <google-codelab-step label="Conclusion" duration="2">
+        <p>Congratulations! 🎉 You&#39;ve mastered IDE debugging!</p>
+<h2 is-upgraded>What You&#39;ve Learned</h2>
+<ul>
+<li>✅ <strong>Breakpoint Types:</strong> Line, method, conditional, exception</li>
+<li>✅ <strong>Logpoints:</strong> Non-intrusive debugging</li>
+<li>✅ <strong>Step Debugging:</strong> Into, Over, Out, Run to Cursor</li>
+<li>✅ <strong>Variables:</strong> Inspection, watches, modification</li>
+<li>✅ <strong>Multi-threading:</strong> Thread debugging, race conditions, deadlocks</li>
+<li>✅ <strong>Debug Console:</strong> Interactive expression evaluation</li>
+<li>✅ <strong>Hot Reload:</strong> Modify code without restarting</li>
+<li>✅ <strong>Remote Debugging:</strong> Debug applications on remote servers</li>
+<li>✅ <strong>Real Bugs:</strong> Fixed 6 bugs in e-commerce app</li>
+</ul>
+<h2 is-upgraded>Key Takeaways</h2>
+<ol type="1">
+<li><strong>Breakpoints are powerful</strong> - use conditional and exception breakpoints</li>
+<li><strong>Step debugging reveals flow</strong> - understand execution path</li>
+<li><strong>Inspect everything</strong> - variables, expressions, watches</li>
+<li><strong>Thread debugging is tricky</strong> - use &#34;Suspend Thread&#34; for race conditions</li>
+<li><strong>Debug Console is your friend</strong> - test fixes interactively</li>
+<li><strong>Remote debugging saves time</strong> - debug in real environments</li>
+<li><strong>Practice makes perfect</strong> - debug often to master the tools</li>
+</ol>
+<h2 is-upgraded>Debugging Strategy</h2>
+<ol type="1">
+<li><strong>Reproduce the bug</strong> consistently</li>
+<li><strong>Set breakpoints</strong> near the problem area</li>
+<li><strong>Step through</strong> to understand flow</li>
+<li><strong>Inspect variables</strong> to find incorrect values</li>
+<li><strong>Evaluate expressions</strong> to test hypotheses</li>
+<li><strong>Fix and verify</strong> using hot reload</li>
+<li><strong>Test edge cases</strong> to ensure complete fix</li>
+</ol>
+<h2 is-upgraded>IDE Shortcuts Mastery</h2>
+<p><strong>Essential shortcuts:</strong></p>
+<ul>
+<li><code>F7</code> - Step Into</li>
+<li><code>F8</code> - Step Over</li>
+<li><code>Shift + F8</code> - Step Out</li>
+<li><code>F9</code> - Resume</li>
+<li><code>Alt + F8</code> - Evaluate Expression</li>
+<li><code>Ctrl + F8</code> - Toggle Breakpoint</li>
+</ul>
+<p>Practice these until they&#39;re muscle memory!</p>
+<h2 is-upgraded>Next Steps</h2>
+<p>Continue to:</p>
+<ul>
+<li><strong>Codelab 3.1:</strong> Spring Core &amp; Boot Basics</li>
+<li><strong>Codelab 3.2:</strong> REST APIs &amp; Swagger Documentation</li>
+<li><strong>Codelab 3.8:</strong> Testing &amp; Remote Debugging (advanced)</li>
+</ul>
+<h2 is-upgraded>Additional Resources</h2>
+<ul>
+<li><a href="https://www.jetbrains.com/help/idea/debugging-code.html" target="_blank">IntelliJ IDEA Debugging Guide</a></li>
+<li><a href="https://www.eclipse.org/community/eclipse_newsletter/2017/june/article1.php" target="_blank">Eclipse Debugging Tutorial</a></li>
+<li><a href="https://www.baeldung.com/java-debugging" target="_blank">Java Debugging Best Practices</a></li>
+<li><a href="https://www.oracle.com/technical-resources/articles/java/debug-threads.html" target="_blank">Debugging Multi-threaded Applications</a></li>
+</ul>
+<aside class="special"><p><strong>Debug Like a Pro!</strong> Mastering debugging techniques will make you 10x more productive as a developer. These skills transfer across all IDEs and languages!</p>
+</aside>
 
 
-        </google-codelab-step>
+      </google-codelab-step>
+    
+  </google-codelab>
 
-    </google-codelab>
-
-    <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
-    <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
-    <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
-    <script src="//support.google.com/inapp/api.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js"></script>
-    <script src="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.js"></script>
-    <script>
-        hljs.highlightAll();
-        hljs.addPlugin(new CopyButtonPlugin({ autohide: false }));
-
-    </script>
+  <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
+  <script src="//support.google.com/inapp/api.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js"></script>
+  <script src="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.js"></script>
+  <script>
+    hljs.highlightAll();
+    hljs.addPlugin(new CopyButtonPlugin({ autohide: false}));
+    
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      const homeUrl = "\/springboot_course\/";
+      const arrowBack = document.getElementById('arrow-back');
+      const doneBtn = document.getElementById('done');
+      if (arrowBack) arrowBack.href = homeUrl;
+      if (doneBtn) doneBtn.href = homeUrl;
+    });
+    
+  </script>
 
 </body>
-
 </html>

@@ -1,67 +1,66 @@
+
 <!doctype html>
 
 <html>
-
 <head>
-    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
-    <meta name="theme-color" content="#4F7DC9">
-    <meta charset="UTF-8">
-    <title>RESTful APIs, Swagger &amp; Exception Handling</title>
-    <link rel="stylesheet"
-        href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
-    <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
-    <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
-    <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1  /build/styles/monokai.min.css">
-    <link rel="stylesheet" href="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.css">
-    <style>
-        .success {
-            color: #1e8e3e;
-        }
-
-        .error {
-            color: red;
-        }
-    </style>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <title>RESTful APIs, Swagger &amp; Exception Handling</title>
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
+  <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1  /build/styles/monokai.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.css">
+  <style>
+    .success {
+      color: #1e8e3e;
+    }
+    .error {
+      color: red;
+    }
+  </style>
 </head>
-
 <body>
-    <google-codelab-analytics gaid="UA-49880327-14" ga4id=""></google-codelab-analytics>
-    <google-codelab codelab-gaid="" codelab-ga4id="" id="rest-apis-swagger"
-        title="RESTful APIs, Swagger &amp; Exception Handling" environment="web" feedback-link="">
-
-        <google-codelab-step label="Introduction" duration="3">
-            <p>Building on Codelab 3.1, we&#39;ll transform our basic Task API into a production-ready RESTful service
-                with proper validation, error handling, and API documentation.</p>
-            <h2 class="checklist" is-upgraded>What You&#39;ll Learn</h2>
-            <ul class="checklist">
-                <li><strong>REST Best Practices:</strong> Richardson Maturity Model, HATEOAS concepts</li>
-                <li><strong>Request Validation:</strong> Bean Validation (JSR-380) annotations</li>
-                <li><strong>Exception Handling:</strong> @ControllerAdvice, custom exceptions, error responses</li>
-                <li><strong>Swagger/OpenAPI:</strong> Interactive API documentation with SpringDoc</li>
-                <li><strong>API Versioning:</strong> Strategies for evolving APIs</li>
-                <li><strong>Content Negotiation:</strong> JSON and XML responses</li>
-                <li><strong>Response DTOs:</strong> Separating internal and external models</li>
-                <li><strong>HTTP Status Codes:</strong> Proper usage for different scenarios</li>
-            </ul>
-            <h2 is-upgraded>What You&#39;ll Build</h2>
-            <p>Enhanced Task Management API with:</p>
-            <ul>
-                <li><strong>Validation:</strong> Input validation with detailed error messages</li>
-                <li><strong>Exception Handling:</strong> Global exception handler with custom exceptions</li>
-                <li><strong>Swagger UI:</strong> Interactive API documentation at <code>/swagger-ui.html</code></li>
-                <li><strong>DTOs:</strong> Request/response data transfer objects</li>
-                <li><strong>Error Responses:</strong> Standardized error format</li>
-                <li><strong>API Documentation:</strong> Complete OpenAPI 3.0 specification</li>
-            </ul>
-            <h2 is-upgraded>Prerequisites</h2>
-            <ul>
-                <li>Completed Codelab 3.1 (Spring Core &amp; Boot)</li>
-                <li>Task Management API running from 3.1</li>
-            </ul>
-            <h2 is-upgraded>New Dependencies</h2>
-            <p>Add to <code>pom.xml</code>:</p>
-            <pre><code language="language-xml" class="language-xml">&lt;!-- SpringDoc OpenAPI (Swagger) --&gt;
+  <google-codelab-analytics gaid="UA-49880327-14" ga4id=""></google-codelab-analytics>
+  <google-codelab codelab-gaid=""
+                  codelab-ga4id=""
+                  id="rest-apis-swagger"
+                  title="RESTful APIs, Swagger &amp; Exception Handling"
+                  environment="web"
+                  feedback-link="">
+    
+      <google-codelab-step label="Introduction" duration="3">
+        <p>Building on Codelab 3.1, we&#39;ll transform our basic Task API into a production-ready RESTful service with proper validation, error handling, and API documentation.</p>
+<h2 class="checklist" is-upgraded>What You&#39;ll Learn</h2>
+<ul class="checklist">
+<li><strong>REST Best Practices:</strong> Richardson Maturity Model, HATEOAS concepts</li>
+<li><strong>Request Validation:</strong> Bean Validation (JSR-380) annotations</li>
+<li><strong>Exception Handling:</strong> @ControllerAdvice, custom exceptions, error responses</li>
+<li><strong>Swagger/OpenAPI:</strong> Interactive API documentation with SpringDoc</li>
+<li><strong>API Versioning:</strong> Strategies for evolving APIs</li>
+<li><strong>Content Negotiation:</strong> JSON and XML responses</li>
+<li><strong>Response DTOs:</strong> Separating internal and external models</li>
+<li><strong>HTTP Status Codes:</strong> Proper usage for different scenarios</li>
+</ul>
+<h2 is-upgraded>What You&#39;ll Build</h2>
+<p>Enhanced Task Management API with:</p>
+<ul>
+<li><strong>Validation:</strong> Input validation with detailed error messages</li>
+<li><strong>Exception Handling:</strong> Global exception handler with custom exceptions</li>
+<li><strong>Swagger UI:</strong> Interactive API documentation at <code>/swagger-ui.html</code></li>
+<li><strong>DTOs:</strong> Request/response data transfer objects</li>
+<li><strong>Error Responses:</strong> Standardized error format</li>
+<li><strong>API Documentation:</strong> Complete OpenAPI 3.0 specification</li>
+</ul>
+<h2 is-upgraded>Prerequisites</h2>
+<ul>
+<li>Completed Codelab 3.1 (Spring Core &amp; Boot)</li>
+<li>Task Management API running from 3.1</li>
+</ul>
+<h2 is-upgraded>New Dependencies</h2>
+<p>Add to <code>pom.xml</code>:</p>
+<pre><code language="language-xml" class="language-xml">&lt;!-- SpringDoc OpenAPI (Swagger) --&gt;
 &lt;dependency&gt;
     &lt;groupId&gt;org.springdoc&lt;/groupId&gt;
     &lt;artifactId&gt;springdoc-openapi-starter-webmvc-ui&lt;/artifactId&gt;
@@ -74,44 +73,41 @@
     &lt;artifactId&gt;spring-boot-starter-validation&lt;/artifactId&gt;
 &lt;/dependency&gt;
 </code></pre>
-            <aside class="special">
-                <p><strong>Git Branch:</strong> Check out <code>codelab-3.2</code> branch or continue from 3.1. This
-                    codelab builds incrementally on the previous foundation.</p>
-            </aside>
+<aside class="special"><p><strong>Git Branch:</strong> Check out <code>codelab-3.2</code> branch or continue from 3.1. This codelab builds incrementally on the previous foundation.</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="REST API Best Practices" duration="8">
-            <p>Before diving into code, let&#39;s understand REST principles and best practices.</p>
-            <h2 is-upgraded>REST Principles</h2>
-            <p><strong>REST (Representational State Transfer)</strong> is an architectural style with six constraints:
-            </p>
-            <ol type="1">
-                <li><strong>Client-Server:</strong> Separation of concerns</li>
-                <li><strong>Stateless:</strong> Each request contains all information needed</li>
-                <li><strong>Cacheable:</strong> Responses can be cached</li>
-                <li><strong>Uniform Interface:</strong> Consistent resource identification</li>
-                <li><strong>Layered System:</strong> Client doesn&#39;t know if connected directly to server</li>
-                <li><strong>Code on Demand (Optional):</strong> Server can extend client functionality</li>
-            </ol>
-            <h2 is-upgraded>Richardson Maturity Model</h2>
-            <p><strong>Level 0: The Swamp of POX</strong></p>
-            <pre><code>POST /api/endpoint
+      </google-codelab-step>
+    
+      <google-codelab-step label="REST API Best Practices" duration="8">
+        <p>Before diving into code, let&#39;s understand REST principles and best practices.</p>
+<h2 is-upgraded>REST Principles</h2>
+<p><strong>REST (Representational State Transfer)</strong> is an architectural style with six constraints:</p>
+<ol type="1">
+<li><strong>Client-Server:</strong> Separation of concerns</li>
+<li><strong>Stateless:</strong> Each request contains all information needed</li>
+<li><strong>Cacheable:</strong> Responses can be cached</li>
+<li><strong>Uniform Interface:</strong> Consistent resource identification</li>
+<li><strong>Layered System:</strong> Client doesn&#39;t know if connected directly to server</li>
+<li><strong>Code on Demand (Optional):</strong> Server can extend client functionality</li>
+</ol>
+<h2 is-upgraded>Richardson Maturity Model</h2>
+<p><strong>Level 0: The Swamp of POX</strong></p>
+<pre><code>POST /api/endpoint
 {&#34;action&#34;: &#34;getTask&#34;, &#34;id&#34;: 1}
 </code></pre>
-            <p><strong>Level 1: Resources</strong></p>
-            <pre><code>POST /api/tasks/1
+<p><strong>Level 1: Resources</strong></p>
+<pre><code>POST /api/tasks/1
 GET /api/tasks/1
 </code></pre>
-            <p><strong>Level 2: HTTP Verbs</strong> (Our target)</p>
-            <pre><code>GET    /api/tasks/1      - Retrieve
+<p><strong>Level 2: HTTP Verbs</strong> (Our target)</p>
+<pre><code>GET    /api/tasks/1      - Retrieve
 POST   /api/tasks        - Create
 PUT    /api/tasks/1      - Update
 DELETE /api/tasks/1      - Delete
 </code></pre>
-            <p><strong>Level 3: Hypermedia Controls (HATEOAS)</strong></p>
-            <pre><code language="language-json" class="language-json">{
+<p><strong>Level 3: Hypermedia Controls (HATEOAS)</strong></p>
+<pre><code language="language-json" class="language-json">{
   &#34;id&#34;: 1,
   &#34;title&#34;: &#34;Task&#34;,
   &#34;_links&#34;: {
@@ -121,131 +117,53 @@ DELETE /api/tasks/1      - Delete
   }
 }
 </code></pre>
-            <h2 is-upgraded>HTTP Methods Semantics</h2>
-            <table>
-                <tr>
-                    <td colspan="1" rowspan="1">
-                        <p>Method</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>Purpose</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>Idempotent</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>Safe</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>Request Body</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>Response Body</p>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="1" rowspan="1">
-                        <p>GET</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>Retrieve</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>Yes</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>Yes</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>No</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>Yes</p>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="1" rowspan="1">
-                        <p>POST</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>Create</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>No</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>No</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>Yes</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>Yes</p>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="1" rowspan="1">
-                        <p>PUT</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>Replace</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>Yes</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>No</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>Yes</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>Yes</p>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="1" rowspan="1">
-                        <p>PATCH</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>Update</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>No</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>No</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>Yes</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>Yes</p>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="1" rowspan="1">
-                        <p>DELETE</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>Remove</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>Yes</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>No</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>No</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>Optional</p>
-                    </td>
-                </tr>
-            </table>
-            <h2 is-upgraded>Proper Endpoint Design</h2>
-            <pre><code language="language-java" class="language-java">// Good: Resource-based URLs
+<h2 is-upgraded>HTTP Methods Semantics</h2>
+<table>
+<tr><td colspan="1" rowspan="1"><p>Method</p>
+</td><td colspan="1" rowspan="1"><p>Purpose</p>
+</td><td colspan="1" rowspan="1"><p>Idempotent</p>
+</td><td colspan="1" rowspan="1"><p>Safe</p>
+</td><td colspan="1" rowspan="1"><p>Request Body</p>
+</td><td colspan="1" rowspan="1"><p>Response Body</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>GET</p>
+</td><td colspan="1" rowspan="1"><p>Retrieve</p>
+</td><td colspan="1" rowspan="1"><p>Yes</p>
+</td><td colspan="1" rowspan="1"><p>Yes</p>
+</td><td colspan="1" rowspan="1"><p>No</p>
+</td><td colspan="1" rowspan="1"><p>Yes</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>POST</p>
+</td><td colspan="1" rowspan="1"><p>Create</p>
+</td><td colspan="1" rowspan="1"><p>No</p>
+</td><td colspan="1" rowspan="1"><p>No</p>
+</td><td colspan="1" rowspan="1"><p>Yes</p>
+</td><td colspan="1" rowspan="1"><p>Yes</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>PUT</p>
+</td><td colspan="1" rowspan="1"><p>Replace</p>
+</td><td colspan="1" rowspan="1"><p>Yes</p>
+</td><td colspan="1" rowspan="1"><p>No</p>
+</td><td colspan="1" rowspan="1"><p>Yes</p>
+</td><td colspan="1" rowspan="1"><p>Yes</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>PATCH</p>
+</td><td colspan="1" rowspan="1"><p>Update</p>
+</td><td colspan="1" rowspan="1"><p>No</p>
+</td><td colspan="1" rowspan="1"><p>No</p>
+</td><td colspan="1" rowspan="1"><p>Yes</p>
+</td><td colspan="1" rowspan="1"><p>Yes</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>DELETE</p>
+</td><td colspan="1" rowspan="1"><p>Remove</p>
+</td><td colspan="1" rowspan="1"><p>Yes</p>
+</td><td colspan="1" rowspan="1"><p>No</p>
+</td><td colspan="1" rowspan="1"><p>No</p>
+</td><td colspan="1" rowspan="1"><p>Optional</p>
+</td></tr>
+</table>
+<h2 is-upgraded>Proper Endpoint Design</h2>
+<pre><code language="language-java" class="language-java">// Good: Resource-based URLs
 GET    /api/tasks                    // List all tasks
 GET    /api/tasks/1                  // Get specific task
 POST   /api/tasks                    // Create task
@@ -264,30 +182,30 @@ POST   /api/deleteTask
 GET    /api/tasks/retrieve/1
 POST   /api/tasks/create
 </code></pre>
-            <h2 is-upgraded>HTTP Status Codes Reference</h2>
-            <p><strong>2xx Success</strong></p>
-            <ul>
-                <li><code>200 OK</code> - Request succeeded (GET, PUT, PATCH)</li>
-                <li><code>201 Created</code> - Resource created (POST)</li>
-                <li><code>204 No Content</code> - Success, no body (DELETE)</li>
-            </ul>
-            <p><strong>4xx Client Errors</strong></p>
-            <ul>
-                <li><code>400 Bad Request</code> - Invalid input</li>
-                <li><code>401 Unauthorized</code> - Authentication required</li>
-                <li><code>403 Forbidden</code> - Authenticated but not authorized</li>
-                <li><code>404 Not Found</code> - Resource doesn&#39;t exist</li>
-                <li><code>409 Conflict</code> - Resource conflict (duplicate)</li>
-                <li><code>422 Unprocessable Entity</code> - Validation failed</li>
-            </ul>
-            <p><strong>5xx Server Errors</strong></p>
-            <ul>
-                <li><code>500 Internal Server Error</code> - Unexpected server error</li>
-                <li><code>503 Service Unavailable</code> - Server temporarily down</li>
-            </ul>
-            <h2 is-upgraded>RESTful Response Examples</h2>
-            <p><strong>Successful GET:</strong></p>
-            <pre><code language="language-http" class="language-http">GET /api/tasks/1
+<h2 is-upgraded>HTTP Status Codes Reference</h2>
+<p><strong>2xx Success</strong></p>
+<ul>
+<li><code>200 OK</code> - Request succeeded (GET, PUT, PATCH)</li>
+<li><code>201 Created</code> - Resource created (POST)</li>
+<li><code>204 No Content</code> - Success, no body (DELETE)</li>
+</ul>
+<p><strong>4xx Client Errors</strong></p>
+<ul>
+<li><code>400 Bad Request</code> - Invalid input</li>
+<li><code>401 Unauthorized</code> - Authentication required</li>
+<li><code>403 Forbidden</code> - Authenticated but not authorized</li>
+<li><code>404 Not Found</code> - Resource doesn&#39;t exist</li>
+<li><code>409 Conflict</code> - Resource conflict (duplicate)</li>
+<li><code>422 Unprocessable Entity</code> - Validation failed</li>
+</ul>
+<p><strong>5xx Server Errors</strong></p>
+<ul>
+<li><code>500 Internal Server Error</code> - Unexpected server error</li>
+<li><code>503 Service Unavailable</code> - Server temporarily down</li>
+</ul>
+<h2 is-upgraded>RESTful Response Examples</h2>
+<p><strong>Successful GET:</strong></p>
+<pre><code language="language-http" class="language-http">GET /api/tasks/1
 200 OK
 Content-Type: application/json
 
@@ -297,8 +215,8 @@ Content-Type: application/json
   &#34;status&#34;: &#34;TODO&#34;
 }
 </code></pre>
-            <p><strong>Successful POST:</strong></p>
-            <pre><code language="language-http" class="language-http">POST /api/tasks
+<p><strong>Successful POST:</strong></p>
+<pre><code language="language-http" class="language-http">POST /api/tasks
 Content-Type: application/json
 
 {&#34;title&#34;: &#34;New task&#34;}
@@ -313,8 +231,8 @@ Content-Type: application/json
   &#34;status&#34;: &#34;TODO&#34;
 }
 </code></pre>
-            <p><strong>Not Found:</strong></p>
-            <pre><code language="language-http" class="language-http">GET /api/tasks/999
+<p><strong>Not Found:</strong></p>
+<pre><code language="language-http" class="language-http">GET /api/tasks/999
 404 Not Found
 Content-Type: application/json
 
@@ -326,19 +244,17 @@ Content-Type: application/json
   &#34;path&#34;: &#34;/api/tasks/999&#34;
 }
 </code></pre>
-            <aside class="special">
-                <p><strong>Best Practice:</strong> Follow REST conventions consistently. This makes your API intuitive
-                    for developers and enables tooling like Swagger to generate better documentation.</p>
-            </aside>
+<aside class="special"><p><strong>Best Practice:</strong> Follow REST conventions consistently. This makes your API intuitive for developers and enables tooling like Swagger to generate better documentation.</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Request Validation" duration="10">
-            <p>Add input validation to ensure data integrity using Bean Validation (JSR-380).</p>
-            <h2 is-upgraded>Create Request DTOs</h2>
-            <p><strong>CreateTaskRequest.java:</strong></p>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.dto;
+      </google-codelab-step>
+    
+      <google-codelab-step label="Request Validation" duration="10">
+        <p>Add input validation to ensure data integrity using Bean Validation (JSR-380).</p>
+<h2 is-upgraded>Create Request DTOs</h2>
+<p><strong>CreateTaskRequest.java:</strong></p>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.dto;
 
 import com.example.taskmanager.model.TaskStatus;
 import jakarta.validation.constraints.*;
@@ -361,8 +277,8 @@ public class CreateTaskRequest {
     private TaskStatus status;
 }
 </code></pre>
-            <p><strong>UpdateTaskRequest.java:</strong></p>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.dto;
+<p><strong>UpdateTaskRequest.java:</strong></p>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.dto;
 
 import com.example.taskmanager.model.TaskStatus;
 import jakarta.validation.constraints.NotBlank;
@@ -386,8 +302,8 @@ public class UpdateTaskRequest {
     private TaskStatus status;
 }
 </code></pre>
-            <p><strong>TaskResponse.java:</strong></p>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.dto;
+<p><strong>TaskResponse.java:</strong></p>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.dto;
 
 import com.example.taskmanager.model.Task;
 import com.example.taskmanager.model.TaskStatus;
@@ -424,8 +340,8 @@ public class TaskResponse {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Validation Annotations Reference</h2>
-            <pre><code language="language-java" class="language-java">// String validation
+<h2 is-upgraded>Validation Annotations Reference</h2>
+<pre><code language="language-java" class="language-java">// String validation
 @NotNull          // Must not be null
 @NotEmpty         // Must not be null or empty
 @NotBlank         // Must not be null, empty, or whitespace
@@ -452,8 +368,8 @@ public class TaskResponse {
 @AssertTrue       // Boolean must be true
 @AssertFalse      // Boolean must be false
 </code></pre>
-            <h2 is-upgraded>Update Controller with Validation</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.controller;
+<h2 is-upgraded>Update Controller with Validation</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.controller;
 
 import com.example.taskmanager.dto.*;
 import com.example.taskmanager.model.Task;
@@ -556,16 +472,16 @@ public class TaskController {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Understanding @Valid</h2>
-            <pre><code language="language-java" class="language-java">@PostMapping
+<h2 is-upgraded>Understanding @Valid</h2>
+<pre><code language="language-java" class="language-java">@PostMapping
 public ResponseEntity&lt;TaskResponse&gt; createTask(@Valid @RequestBody CreateTaskRequest request) {
     // @Valid triggers validation
     // If validation fails, throws MethodArgumentNotValidException
     // We&#39;ll handle this in @ControllerAdvice next
 }
 </code></pre>
-            <h2 is-upgraded>Test Validation</h2>
-            <pre><code language="language-bash" class="language-bash"># Valid request - succeeds
+<h2 is-upgraded>Test Validation</h2>
+<pre><code language="language-bash" class="language-bash"># Valid request - succeeds
 curl -X POST http://localhost:8080/api/tasks \
   -H &#34;Content-Type: application/json&#34; \
   -d &#39;{&#34;title&#34;: &#34;Valid Task&#34;, &#34;description&#34;: &#34;This is valid&#34;}&#39;
@@ -585,19 +501,17 @@ curl -X POST http://localhost:8080/api/tasks \
   -H &#34;Content-Type: application/json&#34; \
   -d &#39;{&#34;title&#34;: &#34;Task&#34;, &#34;description&#34;: &#34;&#39;$(python -c &#39;print(&#34;a&#34;*501)&#39;)&#39;&#34;}&#39;
 </code></pre>
-            <aside class="special">
-                <p><strong>Why DTOs?</strong> Separating request/response DTOs from entities gives you control over what
-                    data is exposed and allows entities to evolve independently.</p>
-            </aside>
+<aside class="special"><p><strong>Why DTOs?</strong> Separating request/response DTOs from entities gives you control over what data is exposed and allows entities to evolve independently.</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Exception Handling" duration="12">
-            <p>Implement global exception handling for consistent error responses.</p>
-            <h2 is-upgraded>Custom Exceptions</h2>
-            <p><strong>TaskNotFoundException.java:</strong></p>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.exception;
+      </google-codelab-step>
+    
+      <google-codelab-step label="Exception Handling" duration="12">
+        <p>Implement global exception handling for consistent error responses.</p>
+<h2 is-upgraded>Custom Exceptions</h2>
+<p><strong>TaskNotFoundException.java:</strong></p>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.exception;
 
 public class TaskNotFoundException extends RuntimeException {
     public TaskNotFoundException(Long id) {
@@ -605,8 +519,8 @@ public class TaskNotFoundException extends RuntimeException {
     }
 }
 </code></pre>
-            <p><strong>InvalidTaskException.java:</strong></p>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.exception;
+<p><strong>InvalidTaskException.java:</strong></p>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.exception;
 
 public class InvalidTaskException extends RuntimeException {
     public InvalidTaskException(String message) {
@@ -614,8 +528,8 @@ public class InvalidTaskException extends RuntimeException {
     }
 }
 </code></pre>
-            <p><strong>DuplicateTaskException.java:</strong></p>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.exception;
+<p><strong>DuplicateTaskException.java:</strong></p>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.exception;
 
 public class DuplicateTaskException extends RuntimeException {
     public DuplicateTaskException(String title) {
@@ -623,9 +537,9 @@ public class DuplicateTaskException extends RuntimeException {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Error Response DTO</h2>
-            <p><strong>ErrorResponse.java:</strong></p>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.dto;
+<h2 is-upgraded>Error Response DTO</h2>
+<p><strong>ErrorResponse.java:</strong></p>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
@@ -663,9 +577,9 @@ public class ErrorResponse {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Global Exception Handler</h2>
-            <p><strong>GlobalExceptionHandler.java:</strong></p>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.exception;
+<h2 is-upgraded>Global Exception Handler</h2>
+<p><strong>GlobalExceptionHandler.java:</strong></p>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.exception;
 
 import com.example.taskmanager.dto.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -770,8 +684,8 @@ public class GlobalExceptionHandler {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Update Service to Use Custom Exceptions</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.service;
+<h2 is-upgraded>Update Service to Use Custom Exceptions</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.service;
 
 import com.example.taskmanager.exception.InvalidTaskException;
 import com.example.taskmanager.exception.TaskNotFoundException;
@@ -875,8 +789,8 @@ public class TaskService {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Test Exception Handling</h2>
-            <pre><code language="language-bash" class="language-bash"># Test 1: Task not found (404)
+<h2 is-upgraded>Test Exception Handling</h2>
+<pre><code language="language-bash" class="language-bash"># Test 1: Task not found (404)
 curl -v http://localhost:8080/api/tasks/999
 # Response: 404 with ErrorResponse JSON
 
@@ -892,8 +806,8 @@ curl -X POST http://localhost:8080/api/tasks \
   -d &#39;{&#34;description&#34;: &#34;No title&#34;}&#39;
 # Response: 400 with validation error for title field
 </code></pre>
-            <p><strong>Expected Error Response:</strong></p>
-            <pre><code language="language-json" class="language-json">{
+<p><strong>Expected Error Response:</strong></p>
+<pre><code language="language-json" class="language-json">{
   &#34;timestamp&#34;: &#34;2025-12-24T14:30:00&#34;,
   &#34;status&#34;: 400,
   &#34;error&#34;: &#34;Validation Failed&#34;,
@@ -907,20 +821,17 @@ curl -X POST http://localhost:8080/api/tasks \
   ]
 }
 </code></pre>
-            <aside class="special">
-                <p><strong>@RestControllerAdvice:</strong> This annotation combines <code>@ControllerAdvice</code> and
-                    <code>@ResponseBody</code>, making exception handlers return JSON responses automatically.
-                </p>
-            </aside>
+<aside class="special"><p><strong>@RestControllerAdvice:</strong> This annotation combines <code>@ControllerAdvice</code> and <code>@ResponseBody</code>, making exception handlers return JSON responses automatically.</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Swagger/OpenAPI Documentation" duration="12">
-            <p>Add interactive API documentation using SpringDoc OpenAPI.</p>
-            <h2 is-upgraded>Configure Swagger</h2>
-            <p><strong>OpenAPIConfig.java:</strong></p>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.config;
+      </google-codelab-step>
+    
+      <google-codelab-step label="Swagger/OpenAPI Documentation" duration="12">
+        <p>Add interactive API documentation using SpringDoc OpenAPI.</p>
+<h2 is-upgraded>Configure Swagger</h2>
+<p><strong>OpenAPIConfig.java:</strong></p>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.config;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
@@ -960,8 +871,8 @@ public class OpenAPIConfig {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Add Swagger Annotations to Controller</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.controller;
+<h2 is-upgraded>Add Swagger Annotations to Controller</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.controller;
 
 import com.example.taskmanager.dto.*;
 import com.example.taskmanager.model.Task;
@@ -1188,40 +1099,38 @@ public class TaskController {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Configure application.properties</h2>
-            <pre><code language="language-properties" class="language-properties"># Swagger/OpenAPI Configuration
+<h2 is-upgraded>Configure application.properties</h2>
+<pre><code language="language-properties" class="language-properties"># Swagger/OpenAPI Configuration
 springdoc.api-docs.path=/api-docs
 springdoc.swagger-ui.path=/swagger-ui.html
 springdoc.swagger-ui.operationsSorter=method
 springdoc.swagger-ui.tagsSorter=alpha
 springdoc.swagger-ui.tryItOutEnabled=true
 </code></pre>
-            <h2 is-upgraded>Access Swagger UI</h2>
-            <p>Start the application and visit:</p>
-            <ul>
-                <li><strong>Swagger UI:</strong> http://localhost:8080/swagger-ui.html</li>
-                <li><strong>OpenAPI JSON:</strong> http://localhost:8080/api-docs</li>
-            </ul>
-            <p><strong>Swagger UI Features:</strong></p>
-            <ul>
-                <li>Interactive API documentation</li>
-                <li>Try out endpoints directly in browser</li>
-                <li>View request/response schemas</li>
-                <li>See all validation constraints</li>
-                <li>Test different scenarios</li>
-            </ul>
-            <aside class="special">
-                <p><strong>Interactive Testing:</strong> Swagger UI lets you test APIs without curl or Postman. Click
-                    &#34;Try it out&#34; on any endpoint to send requests directly!</p>
-            </aside>
+<h2 is-upgraded>Access Swagger UI</h2>
+<p>Start the application and visit:</p>
+<ul>
+<li><strong>Swagger UI:</strong> http://localhost:8080/swagger-ui.html</li>
+<li><strong>OpenAPI JSON:</strong> http://localhost:8080/api-docs</li>
+</ul>
+<p><strong>Swagger UI Features:</strong></p>
+<ul>
+<li>Interactive API documentation</li>
+<li>Try out endpoints directly in browser</li>
+<li>View request/response schemas</li>
+<li>See all validation constraints</li>
+<li>Test different scenarios</li>
+</ul>
+<aside class="special"><p><strong>Interactive Testing:</strong> Swagger UI lets you test APIs without curl or Postman. Click &#34;Try it out&#34; on any endpoint to send requests directly!</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Advanced Topics" duration="8">
-            <h2 is-upgraded>Pagination and Sorting</h2>
-            <p><strong>PagedResponse.java:</strong></p>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.dto;
+      </google-codelab-step>
+    
+      <google-codelab-step label="Advanced Topics" duration="8">
+        <h2 is-upgraded>Pagination and Sorting</h2>
+<p><strong>PagedResponse.java:</strong></p>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -1241,8 +1150,8 @@ public class PagedResponse&lt;T&gt; {
     private boolean last;
 }
 </code></pre>
-            <p><strong>Controller with pagination:</strong></p>
-            <pre><code language="language-java" class="language-java">@Operation(summary = &#34;Get all tasks with pagination&#34;)
+<p><strong>Controller with pagination:</strong></p>
+<pre><code language="language-java" class="language-java">@Operation(summary = &#34;Get all tasks with pagination&#34;)
 @GetMapping
 public ResponseEntity&lt;PagedResponse&lt;TaskResponse&gt;&gt; getAllTasks(
         @Parameter(description = &#34;Page number (0-based)&#34;)
@@ -1274,38 +1183,38 @@ public ResponseEntity&lt;PagedResponse&lt;TaskResponse&gt;&gt; getAllTasks(
     return ResponseEntity.ok(response);
 }
 </code></pre>
-            <h2 is-upgraded>API Versioning</h2>
-            <p><strong>Strategy 1: URI Versioning</strong></p>
-            <pre><code language="language-java" class="language-java">@RequestMapping(&#34;/api/v1/tasks&#34;)
+<h2 is-upgraded>API Versioning</h2>
+<p><strong>Strategy 1: URI Versioning</strong></p>
+<pre><code language="language-java" class="language-java">@RequestMapping(&#34;/api/v1/tasks&#34;)
 public class TaskControllerV1 { }
 
 @RequestMapping(&#34;/api/v2/tasks&#34;)
 public class TaskControllerV2 { }
 </code></pre>
-            <p><strong>Strategy 2: Header Versioning</strong></p>
-            <pre><code language="language-java" class="language-java">@GetMapping(headers = &#34;X-API-VERSION=1&#34;)
+<p><strong>Strategy 2: Header Versioning</strong></p>
+<pre><code language="language-java" class="language-java">@GetMapping(headers = &#34;X-API-VERSION=1&#34;)
 public ResponseEntity&lt;TaskResponse&gt; getTaskV1(@PathVariable Long id) { }
 
 @GetMapping(headers = &#34;X-API-VERSION=2&#34;)
 public ResponseEntity&lt;TaskResponseV2&gt; getTaskV2(@PathVariable Long id) { }
 </code></pre>
-            <p><strong>Strategy 3: Accept Header Versioning</strong></p>
-            <pre><code language="language-java" class="language-java">@GetMapping(produces = &#34;application/vnd.taskmanager.v1+json&#34;)
+<p><strong>Strategy 3: Accept Header Versioning</strong></p>
+<pre><code language="language-java" class="language-java">@GetMapping(produces = &#34;application/vnd.taskmanager.v1+json&#34;)
 public ResponseEntity&lt;TaskResponse&gt; getTaskV1(@PathVariable Long id) { }
 
 @GetMapping(produces = &#34;application/vnd.taskmanager.v2+json&#34;)
 public ResponseEntity&lt;TaskResponseV2&gt; getTaskV2(@PathVariable Long id) { }
 </code></pre>
-            <h2 is-upgraded>Content Negotiation</h2>
-            <p><strong>Support JSON and XML:</strong></p>
-            <p>Add dependency:</p>
-            <pre><code language="language-xml" class="language-xml">&lt;dependency&gt;
+<h2 is-upgraded>Content Negotiation</h2>
+<p><strong>Support JSON and XML:</strong></p>
+<p>Add dependency:</p>
+<pre><code language="language-xml" class="language-xml">&lt;dependency&gt;
     &lt;groupId&gt;com.fasterxml.jackson.dataformat&lt;/groupId&gt;
     &lt;artifactId&gt;jackson-dataformat-xml&lt;/artifactId&gt;
 &lt;/dependency&gt;
 </code></pre>
-            <p>Controller:</p>
-            <pre><code language="language-java" class="language-java">@GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+<p>Controller:</p>
+<pre><code language="language-java" class="language-java">@GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
 public ResponseEntity&lt;TaskResponse&gt; getTask(@PathVariable Long id) {
     // Returns JSON or XML based on Accept header
     return taskService.getTaskById(id)
@@ -1314,16 +1223,16 @@ public ResponseEntity&lt;TaskResponse&gt; getTask(@PathVariable Long id) {
         .orElse(ResponseEntity.notFound().build());
 }
 </code></pre>
-            <p>Usage:</p>
-            <pre><code language="language-bash" class="language-bash"># Request JSON (default)
+<p>Usage:</p>
+<pre><code language="language-bash" class="language-bash"># Request JSON (default)
 curl -H &#34;Accept: application/json&#34; http://localhost:8080/api/tasks/1
 
 # Request XML
 curl -H &#34;Accept: application/xml&#34; http://localhost:8080/api/tasks/1
 </code></pre>
-            <h2 is-upgraded>CORS Configuration</h2>
-            <p><strong>CorsConfig.java:</strong></p>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.config;
+<h2 is-upgraded>CORS Configuration</h2>
+<p><strong>CorsConfig.java:</strong></p>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -1355,54 +1264,51 @@ public class CorsConfig {
     }
 }
 </code></pre>
-            <aside class="special">
-                <p><strong>Production Tip:</strong> Be specific with CORS origins in production. Never use
-                    <code>*</code> for <code>allowedOrigins</code> when <code>allowCredentials</code> is true.
-                </p>
-            </aside>
+<aside class="special"><p><strong>Production Tip:</strong> Be specific with CORS origins in production. Never use <code>*</code> for <code>allowedOrigins</code> when <code>allowCredentials</code> is true.</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Testing with Swagger UI" duration="5">
-            <p>Let&#39;s test all our enhancements using Swagger UI.</p>
-            <h2 is-upgraded>Navigate to Swagger UI</h2>
-            <ol type="1">
-                <li>Start application: <code>mvn spring-boot:run</code></li>
-                <li>Open browser: http://localhost:8080/swagger-ui.html</li>
-                <li>You&#39;ll see all endpoints organized by tags</li>
-            </ol>
-            <h2 is-upgraded>Test Scenarios</h2>
-            <p><strong>Scenario 1: Create Valid Task</strong></p>
-            <ol type="1">
-                <li>Expand &#34;POST /api/tasks&#34;</li>
-                <li>Click &#34;Try it out&#34;</li>
-                <li>Enter request body:</li>
-            </ol>
-            <pre><code language="language-json" class="language-json">{
+      </google-codelab-step>
+    
+      <google-codelab-step label="Testing with Swagger UI" duration="5">
+        <p>Let&#39;s test all our enhancements using Swagger UI.</p>
+<h2 is-upgraded>Navigate to Swagger UI</h2>
+<ol type="1">
+<li>Start application: <code>mvn spring-boot:run</code></li>
+<li>Open browser: http://localhost:8080/swagger-ui.html</li>
+<li>You&#39;ll see all endpoints organized by tags</li>
+</ol>
+<h2 is-upgraded>Test Scenarios</h2>
+<p><strong>Scenario 1: Create Valid Task</strong></p>
+<ol type="1">
+<li>Expand &#34;POST /api/tasks&#34;</li>
+<li>Click &#34;Try it out&#34;</li>
+<li>Enter request body:</li>
+</ol>
+<pre><code language="language-json" class="language-json">{
   &#34;title&#34;: &#34;Complete REST API Codelab&#34;,
   &#34;description&#34;: &#34;Learn validation and Swagger&#34;,
   &#34;status&#34;: &#34;TODO&#34;
 }
 </code></pre>
-            <ol type="1" start="4">
-                <li>Click &#34;Execute&#34;</li>
-                <li>See 201 Created response with Location header</li>
-            </ol>
-            <p><strong>Scenario 2: Validation Error</strong></p>
-            <ol type="1">
-                <li>Expand &#34;POST /api/tasks&#34;</li>
-                <li>Try with invalid data:</li>
-            </ol>
-            <pre><code language="language-json" class="language-json">{
+<ol type="1" start="4">
+<li>Click &#34;Execute&#34;</li>
+<li>See 201 Created response with Location header</li>
+</ol>
+<p><strong>Scenario 2: Validation Error</strong></p>
+<ol type="1">
+<li>Expand &#34;POST /api/tasks&#34;</li>
+<li>Try with invalid data:</li>
+</ol>
+<pre><code language="language-json" class="language-json">{
   &#34;title&#34;: &#34;AB&#34;,
   &#34;description&#34;: &#34;Title too short&#34;
 }
 </code></pre>
-            <ol type="1" start="3">
-                <li>See 400 Bad Request with validation errors:</li>
-            </ol>
-            <pre><code language="language-json" class="language-json">{
+<ol type="1" start="3">
+<li>See 400 Bad Request with validation errors:</li>
+</ol>
+<pre><code language="language-json" class="language-json">{
   &#34;timestamp&#34;: &#34;2025-12-24T14:30:00&#34;,
   &#34;status&#34;: 400,
   &#34;error&#34;: &#34;Validation Failed&#34;,
@@ -1414,124 +1320,128 @@ public class CorsConfig {
   ]
 }
 </code></pre>
-            <p><strong>Scenario 3: Not Found Error</strong></p>
-            <ol type="1">
-                <li>Expand &#34;GET /api/tasks/{id}&#34;</li>
-                <li>Enter non-existent ID: 999</li>
-                <li>Click &#34;Execute&#34;</li>
-                <li>See 404 Not Found with error response</li>
-            </ol>
-            <p><strong>Scenario 4: Update Task Status</strong></p>
-            <ol type="1">
-                <li>Create a task first (get its ID)</li>
-                <li>Expand &#34;PATCH /api/tasks/{id}/status&#34;</li>
-                <li>Enter task ID and status: &#34;IN_PROGRESS&#34;</li>
-                <li>Click &#34;Execute&#34;</li>
-                <li>See updated task with new status</li>
-            </ol>
-            <p><strong>Scenario 5: Get Tasks by Status</strong></p>
-            <ol type="1">
-                <li>Create several tasks with different statuses</li>
-                <li>Expand &#34;GET /api/tasks/status/{status}&#34;</li>
-                <li>Enter status: &#34;TODO&#34;</li>
-                <li>See filtered list</li>
-            </ol>
-            <h2 is-upgraded>Verify Error Responses</h2>
-            <p>All error scenarios should return consistent ErrorResponse format:</p>
-            <ul>
-                <li>Task not found: 404</li>
-                <li>Validation failure: 400 with field details</li>
-                <li>Invalid request: 400</li>
-                <li>Server error: 500</li>
-            </ul>
+<p><strong>Scenario 3: Not Found Error</strong></p>
+<ol type="1">
+<li>Expand &#34;GET /api/tasks/{id}&#34;</li>
+<li>Enter non-existent ID: 999</li>
+<li>Click &#34;Execute&#34;</li>
+<li>See 404 Not Found with error response</li>
+</ol>
+<p><strong>Scenario 4: Update Task Status</strong></p>
+<ol type="1">
+<li>Create a task first (get its ID)</li>
+<li>Expand &#34;PATCH /api/tasks/{id}/status&#34;</li>
+<li>Enter task ID and status: &#34;IN_PROGRESS&#34;</li>
+<li>Click &#34;Execute&#34;</li>
+<li>See updated task with new status</li>
+</ol>
+<p><strong>Scenario 5: Get Tasks by Status</strong></p>
+<ol type="1">
+<li>Create several tasks with different statuses</li>
+<li>Expand &#34;GET /api/tasks/status/{status}&#34;</li>
+<li>Enter status: &#34;TODO&#34;</li>
+<li>See filtered list</li>
+</ol>
+<h2 is-upgraded>Verify Error Responses</h2>
+<p>All error scenarios should return consistent ErrorResponse format:</p>
+<ul>
+<li>Task not found: 404</li>
+<li>Validation failure: 400 with field details</li>
+<li>Invalid request: 400</li>
+<li>Server error: 500</li>
+</ul>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Conclusion" duration="2">
-            <p>Congratulations! 🎉 You&#39;ve enhanced your Task API to production standards!</p>
-            <h2 is-upgraded>What You&#39;ve Learned</h2>
-            <ul>
-                <li>✅ <strong>REST Best Practices:</strong> Richardson Maturity Model, proper HTTP methods</li>
-                <li>✅ <strong>Request Validation:</strong> Bean Validation with <code>@Valid</code> and constraints</li>
-                <li>✅ <strong>Exception Handling:</strong> Global <code>@RestControllerAdvice</code> with custom
-                    exceptions</li>
-                <li>✅ <strong>DTOs:</strong> Separating request/response models from entities</li>
-                <li>✅ <strong>Swagger/OpenAPI:</strong> Interactive API documentation</li>
-                <li>✅ <strong>Error Responses:</strong> Standardized error format</li>
-                <li>✅ <strong>HTTP Status Codes:</strong> Proper usage for different scenarios</li>
-                <li>✅ <strong>Advanced Topics:</strong> Pagination, versioning, CORS, content negotiation</li>
-            </ul>
-            <h2 is-upgraded>Task Management API v1.1</h2>
-            <p>Enhanced features:</p>
-            <ul>
-                <li>✅ Input validation with detailed error messages</li>
-                <li>✅ Global exception handling</li>
-                <li>✅ Custom exceptions (TaskNotFoundException, etc.)</li>
-                <li>✅ Swagger UI at /swagger-ui.html</li>
-                <li>✅ Complete OpenAPI 3.0 documentation</li>
-                <li>✅ DTOs for clean API contracts</li>
-                <li>✅ Consistent error responses</li>
-                <li>✅ Production-ready REST API</li>
-            </ul>
-            <h2 is-upgraded>Key Takeaways</h2>
-            <ol type="1">
-                <li><strong>Validate all inputs</strong> to prevent bad data</li>
-                <li><strong>Use DTOs</strong> to control API surface</li>
-                <li><strong>Global exception handling</strong> ensures consistency</li>
-                <li><strong>Swagger</strong> is essential for API documentation</li>
-                <li><strong>HTTP status codes</strong> communicate intent clearly</li>
-                <li><strong>Custom exceptions</strong> make error handling semantic</li>
-                <li><strong>Richardson Level 2</strong> is the practical REST target</li>
-            </ol>
-            <h2 is-upgraded>Git Branching</h2>
-            <pre><code language="language-bash" class="language-bash">git add .
+      </google-codelab-step>
+    
+      <google-codelab-step label="Conclusion" duration="2">
+        <p>Congratulations! 🎉 You&#39;ve enhanced your Task API to production standards!</p>
+<h2 is-upgraded>What You&#39;ve Learned</h2>
+<ul>
+<li>✅ <strong>REST Best Practices:</strong> Richardson Maturity Model, proper HTTP methods</li>
+<li>✅ <strong>Request Validation:</strong> Bean Validation with <code>@Valid</code> and constraints</li>
+<li>✅ <strong>Exception Handling:</strong> Global <code>@RestControllerAdvice</code> with custom exceptions</li>
+<li>✅ <strong>DTOs:</strong> Separating request/response models from entities</li>
+<li>✅ <strong>Swagger/OpenAPI:</strong> Interactive API documentation</li>
+<li>✅ <strong>Error Responses:</strong> Standardized error format</li>
+<li>✅ <strong>HTTP Status Codes:</strong> Proper usage for different scenarios</li>
+<li>✅ <strong>Advanced Topics:</strong> Pagination, versioning, CORS, content negotiation</li>
+</ul>
+<h2 is-upgraded>Task Management API v1.1</h2>
+<p>Enhanced features:</p>
+<ul>
+<li>✅ Input validation with detailed error messages</li>
+<li>✅ Global exception handling</li>
+<li>✅ Custom exceptions (TaskNotFoundException, etc.)</li>
+<li>✅ Swagger UI at /swagger-ui.html</li>
+<li>✅ Complete OpenAPI 3.0 documentation</li>
+<li>✅ DTOs for clean API contracts</li>
+<li>✅ Consistent error responses</li>
+<li>✅ Production-ready REST API</li>
+</ul>
+<h2 is-upgraded>Key Takeaways</h2>
+<ol type="1">
+<li><strong>Validate all inputs</strong> to prevent bad data</li>
+<li><strong>Use DTOs</strong> to control API surface</li>
+<li><strong>Global exception handling</strong> ensures consistency</li>
+<li><strong>Swagger</strong> is essential for API documentation</li>
+<li><strong>HTTP status codes</strong> communicate intent clearly</li>
+<li><strong>Custom exceptions</strong> make error handling semantic</li>
+<li><strong>Richardson Level 2</strong> is the practical REST target</li>
+</ol>
+<h2 is-upgraded>Git Branching</h2>
+<pre><code language="language-bash" class="language-bash">git add .
 git commit -m &#34;Codelab 3.2: REST APIs, Swagger &amp; Exception Handling complete&#34;
 git tag codelab-3.2
 git push origin codelab-3.2
 </code></pre>
-            <h2 is-upgraded>Next Steps</h2>
-            <p>Continue to:</p>
-            <ul>
-                <li><strong>Codelab 3.3:</strong> ORM &amp; Spring Data JPA <ul>
-                        <li>Replace in-memory repository with database</li>
-                        <li>JPA entities and relationships</li>
-                        <li>Spring Data JPA repositories</li>
-                        <li>Query methods and JPQL</li>
-                    </ul>
-                </li>
-            </ul>
-            <h2 is-upgraded>Additional Resources</h2>
-            <ul>
-                <li><a href="https://spring.io/guides/gs/rest-service/" target="_blank">Spring REST Docs</a></li>
-                <li><a href="https://beanvalidation.org/" target="_blank">Bean Validation Spec</a></li>
-                <li><a href="https://springdoc.org/" target="_blank">SpringDoc OpenAPI</a></li>
-                <li><a href="https://www.baeldung.com/rest-api-best-practices" target="_blank">REST API Best
-                        Practices</a></li>
-                <li><a href="https://httpstatuses.com/" target="_blank">HTTP Status Codes</a></li>
-            </ul>
-            <aside class="special">
-                <p><strong>API Excellence!</strong> Your Task Management API now has validation, error handling, and
-                    documentation - essential for any production API. Next, we&#39;ll add database persistence!</p>
-            </aside>
+<h2 is-upgraded>Next Steps</h2>
+<p>Continue to:</p>
+<ul>
+<li><strong>Codelab 3.3:</strong> ORM &amp; Spring Data JPA <ul>
+<li>Replace in-memory repository with database</li>
+<li>JPA entities and relationships</li>
+<li>Spring Data JPA repositories</li>
+<li>Query methods and JPQL</li>
+</ul>
+</li>
+</ul>
+<h2 is-upgraded>Additional Resources</h2>
+<ul>
+<li><a href="https://spring.io/guides/gs/rest-service/" target="_blank">Spring REST Docs</a></li>
+<li><a href="https://beanvalidation.org/" target="_blank">Bean Validation Spec</a></li>
+<li><a href="https://springdoc.org/" target="_blank">SpringDoc OpenAPI</a></li>
+<li><a href="https://www.baeldung.com/rest-api-best-practices" target="_blank">REST API Best Practices</a></li>
+<li><a href="https://httpstatuses.com/" target="_blank">HTTP Status Codes</a></li>
+</ul>
+<aside class="special"><p><strong>API Excellence!</strong> Your Task Management API now has validation, error handling, and documentation - essential for any production API. Next, we&#39;ll add database persistence!</p>
+</aside>
 
 
-        </google-codelab-step>
+      </google-codelab-step>
+    
+  </google-codelab>
 
-    </google-codelab>
-
-    <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
-    <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
-    <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
-    <script src="//support.google.com/inapp/api.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js"></script>
-    <script src="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.js"></script>
-    <script>
-        hljs.highlightAll();
-        hljs.addPlugin(new CopyButtonPlugin({ autohide: false }));
-
-    </script>
+  <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
+  <script src="//support.google.com/inapp/api.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js"></script>
+  <script src="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.js"></script>
+  <script>
+    hljs.highlightAll();
+    hljs.addPlugin(new CopyButtonPlugin({ autohide: false}));
+    
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      const homeUrl = "\/springboot_course\/";
+      const arrowBack = document.getElementById('arrow-back');
+      const doneBtn = document.getElementById('done');
+      if (arrowBack) arrowBack.href = homeUrl;
+      if (doneBtn) doneBtn.href = homeUrl;
+    });
+    
+  </script>
 
 </body>
-
 </html>

@@ -3,6 +3,7 @@ id: collections-generics
 categories: Java, Collections, Generics, Data Structures
 environments: Web
 status: Published
+home url: /springboot_course/
 
 # Collections Framework & Generics
 

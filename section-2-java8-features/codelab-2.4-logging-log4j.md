@@ -3,6 +3,7 @@ id: logging-log4j
 categories: Java, Logging, Log4j, Best Practices
 environments: Web
 status: Published
+home url: /springboot_course/
 
 # Logging with Log4j 2
 

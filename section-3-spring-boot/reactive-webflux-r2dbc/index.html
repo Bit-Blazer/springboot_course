@@ -1,85 +1,84 @@
+
 <!doctype html>
 
 <html>
-
 <head>
-    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
-    <meta name="theme-color" content="#4F7DC9">
-    <meta charset="UTF-8">
-    <title>Reactive Programming with WebFlux &amp; R2DBC</title>
-    <link rel="stylesheet"
-        href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
-    <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
-    <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
-    <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1  /build/styles/monokai.min.css">
-    <link rel="stylesheet" href="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.css">
-    <style>
-        .success {
-            color: #1e8e3e;
-        }
-
-        .error {
-            color: red;
-        }
-    </style>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <title>Reactive Programming with WebFlux &amp; R2DBC</title>
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
+  <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1  /build/styles/monokai.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.css">
+  <style>
+    .success {
+      color: #1e8e3e;
+    }
+    .error {
+      color: red;
+    }
+  </style>
 </head>
-
 <body>
-    <google-codelab-analytics gaid="UA-49880327-14" ga4id=""></google-codelab-analytics>
-    <google-codelab codelab-gaid="" codelab-ga4id="" id="reactive-webflux-r2dbc"
-        title="Reactive Programming with WebFlux &amp; R2DBC" environment="web" feedback-link="">
-
-        <google-codelab-step label="Introduction" duration="3">
-            <p>Transform the blocking Task Management API into a fully reactive, non-blocking application using Spring
-                WebFlux and R2DBC.</p>
-            <h2 class="checklist" is-upgraded>What You&#39;ll Learn</h2>
-            <ul class="checklist">
-                <li><strong>Reactive Programming:</strong> Event-driven, non-blocking paradigm</li>
-                <li><strong>Project Reactor:</strong> Mono and Flux reactive types</li>
-                <li><strong>Spring WebFlux:</strong> Reactive web framework</li>
-                <li><strong>R2DBC:</strong> Reactive Relational Database Connectivity</li>
-                <li><strong>Reactive Repositories:</strong> Non-blocking database access</li>
-                <li><strong>Reactive Security:</strong> WebFlux security configuration</li>
-                <li><strong>Backpressure:</strong> Flow control in reactive streams</li>
-                <li><strong>Operators:</strong> map, flatMap, filter, zip, merge</li>
-                <li><strong>Error Handling:</strong> onErrorResume, onErrorReturn</li>
-                <li><strong>Testing:</strong> WebTestClient for reactive endpoints</li>
-            </ul>
-            <h2 is-upgraded>What You&#39;ll Build</h2>
-            <p>Reactive Task Management API with:</p>
-            <ul>
-                <li><strong>Reactive Controllers</strong> using Mono and Flux</li>
-                <li><strong>R2DBC Repositories</strong> for non-blocking DB access</li>
-                <li><strong>Reactive Security</strong> with JWT</li>
-                <li><strong>Non-blocking Operations</strong> throughout the stack</li>
-                <li><strong>H2 R2DBC</strong> for development</li>
-                <li><strong>PostgreSQL R2DBC</strong> ready for production</li>
-                <li><strong>Reactive Validation</strong> and error handling</li>
-                <li><strong>WebTestClient</strong> integration tests</li>
-                <li><strong>Server-Sent Events</strong> for real-time updates</li>
-            </ul>
-            <h2 is-upgraded>Prerequisites</h2>
-            <ul>
-                <li>Completed Codelab 3.5 (JWT &amp; Spring Cloud Config)</li>
-                <li>Understanding of functional programming (lambdas, streams)</li>
-            </ul>
-            <h2 is-upgraded>Blocking vs Reactive</h2>
-            <p><strong>Blocking (Traditional):</strong></p>
-            <pre><code>Thread → DB Query → [WAIT] → Response
+  <google-codelab-analytics gaid="UA-49880327-14" ga4id=""></google-codelab-analytics>
+  <google-codelab codelab-gaid=""
+                  codelab-ga4id=""
+                  id="reactive-webflux-r2dbc"
+                  title="Reactive Programming with WebFlux &amp; R2DBC"
+                  environment="web"
+                  feedback-link="">
+    
+      <google-codelab-step label="Introduction" duration="3">
+        <p>Transform the blocking Task Management API into a fully reactive, non-blocking application using Spring WebFlux and R2DBC.</p>
+<h2 class="checklist" is-upgraded>What You&#39;ll Learn</h2>
+<ul class="checklist">
+<li><strong>Reactive Programming:</strong> Event-driven, non-blocking paradigm</li>
+<li><strong>Project Reactor:</strong> Mono and Flux reactive types</li>
+<li><strong>Spring WebFlux:</strong> Reactive web framework</li>
+<li><strong>R2DBC:</strong> Reactive Relational Database Connectivity</li>
+<li><strong>Reactive Repositories:</strong> Non-blocking database access</li>
+<li><strong>Reactive Security:</strong> WebFlux security configuration</li>
+<li><strong>Backpressure:</strong> Flow control in reactive streams</li>
+<li><strong>Operators:</strong> map, flatMap, filter, zip, merge</li>
+<li><strong>Error Handling:</strong> onErrorResume, onErrorReturn</li>
+<li><strong>Testing:</strong> WebTestClient for reactive endpoints</li>
+</ul>
+<h2 is-upgraded>What You&#39;ll Build</h2>
+<p>Reactive Task Management API with:</p>
+<ul>
+<li><strong>Reactive Controllers</strong> using Mono and Flux</li>
+<li><strong>R2DBC Repositories</strong> for non-blocking DB access</li>
+<li><strong>Reactive Security</strong> with JWT</li>
+<li><strong>Non-blocking Operations</strong> throughout the stack</li>
+<li><strong>H2 R2DBC</strong> for development</li>
+<li><strong>PostgreSQL R2DBC</strong> ready for production</li>
+<li><strong>Reactive Validation</strong> and error handling</li>
+<li><strong>WebTestClient</strong> integration tests</li>
+<li><strong>Server-Sent Events</strong> for real-time updates</li>
+</ul>
+<h2 is-upgraded>Prerequisites</h2>
+<ul>
+<li>Completed Codelab 3.5 (JWT &amp; Spring Cloud Config)</li>
+<li>Understanding of functional programming (lambdas, streams)</li>
+</ul>
+<h2 is-upgraded>Blocking vs Reactive</h2>
+<p><strong>Blocking (Traditional):</strong></p>
+<pre><code>Thread → DB Query → [WAIT] → Response
 (Thread blocked during I/O)
 </code></pre>
-            <p><strong>Reactive (Non-blocking):</strong></p>
-            <pre><code>Thread → DB Query → Release Thread
+<p><strong>Reactive (Non-blocking):</strong></p>
+<pre><code>Thread → DB Query → Release Thread
          ↓
       [I/O Happens]
          ↓
 Thread Pool → Response
 (Thread freed during I/O)
 </code></pre>
-            <h2 is-upgraded>New Dependencies</h2>
-            <p>Replace blocking dependencies with reactive ones in <code>pom.xml</code>:</p>
-            <pre><code language="language-xml" class="language-xml">&lt;!-- REMOVE these blocking dependencies --&gt;
+<h2 is-upgraded>New Dependencies</h2>
+<p>Replace blocking dependencies with reactive ones in <code>pom.xml</code>:</p>
+<pre><code language="language-xml" class="language-xml">&lt;!-- REMOVE these blocking dependencies --&gt;
 &lt;!--
 &lt;dependency&gt;
     &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
@@ -165,65 +164,63 @@ Thread Pool → Response
     &lt;scope&gt;test&lt;/scope&gt;
 &lt;/dependency&gt;
 </code></pre>
-            <aside class="special">
-                <p><strong>Paradigm Shift:</strong> We&#39;re moving from imperative blocking code to declarative
-                    reactive streams. This enables better scalability with fewer threads!</p>
-            </aside>
+<aside class="special"><p><strong>Paradigm Shift:</strong> We&#39;re moving from imperative blocking code to declarative reactive streams. This enables better scalability with fewer threads!</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Understanding Reactive Programming" duration="8">
-            <p>Learn the reactive programming paradigm and Project Reactor.</p>
-            <h2 is-upgraded>Reactive Manifesto</h2>
-            <p>Reactive systems are:</p>
-            <ol type="1">
-                <li><strong>Responsive:</strong> Quick and consistent response times</li>
-                <li><strong>Resilient:</strong> Responsive despite failures</li>
-                <li><strong>Elastic:</strong> Responsive under varying load</li>
-                <li><strong>Message-Driven:</strong> Async message passing with backpressure</li>
-            </ol>
-            <h2 is-upgraded>Reactive Streams</h2>
-            <pre><code>Publisher → Subscriber
+      </google-codelab-step>
+    
+      <google-codelab-step label="Understanding Reactive Programming" duration="8">
+        <p>Learn the reactive programming paradigm and Project Reactor.</p>
+<h2 is-upgraded>Reactive Manifesto</h2>
+<p>Reactive systems are:</p>
+<ol type="1">
+<li><strong>Responsive:</strong> Quick and consistent response times</li>
+<li><strong>Resilient:</strong> Responsive despite failures</li>
+<li><strong>Elastic:</strong> Responsive under varying load</li>
+<li><strong>Message-Driven:</strong> Async message passing with backpressure</li>
+</ol>
+<h2 is-upgraded>Reactive Streams</h2>
+<pre><code>Publisher → Subscriber
      ↓
   [Data Flow]
      ↓
 [Backpressure]
 </code></pre>
-            <p><strong>Key Interfaces:</strong></p>
-            <ul>
-                <li><code>Publisher<T></code>: Produces data</li>
-                <li><code>Subscriber<T></code>: Consumes data</li>
-                <li><code>Subscription</code>: Connection between them</li>
-                <li><code>Processor<T,R></code>: Both publisher and subscriber</li>
-            </ul>
-            <h2 is-upgraded>Project Reactor Types</h2>
-            <p><strong>Mono</strong>: 0 or 1 element</p>
-            <pre><code language="language-java" class="language-java">Mono&lt;Task&gt; mono = taskRepository.findById(1L);
+<p><strong>Key Interfaces:</strong></p>
+<ul>
+<li><code>Publisher<T></code>: Produces data</li>
+<li><code>Subscriber<T></code>: Consumes data</li>
+<li><code>Subscription</code>: Connection between them</li>
+<li><code>Processor<T,R></code>: Both publisher and subscriber</li>
+</ul>
+<h2 is-upgraded>Project Reactor Types</h2>
+<p><strong>Mono</strong>: 0 or 1 element</p>
+<pre><code language="language-java" class="language-java">Mono&lt;Task&gt; mono = taskRepository.findById(1L);
 // Emits: Task or empty
 </code></pre>
-            <p><strong>Flux</strong>: 0 to N elements</p>
-            <pre><code language="language-java" class="language-java">Flux&lt;Task&gt; flux = taskRepository.findAll();
+<p><strong>Flux</strong>: 0 to N elements</p>
+<pre><code language="language-java" class="language-java">Flux&lt;Task&gt; flux = taskRepository.findAll();
 // Emits: Task, Task, Task, ..., complete
 </code></pre>
-            <h2 is-upgraded>Marble Diagrams</h2>
-            <p><strong>Mono:</strong></p>
-            <pre><code>Time →
+<h2 is-upgraded>Marble Diagrams</h2>
+<p><strong>Mono:</strong></p>
+<pre><code>Time →
 ---(Task)---|→
    emit    complete
 </code></pre>
-            <p><strong>Flux:</strong></p>
-            <pre><code>Time →
+<p><strong>Flux:</strong></p>
+<pre><code>Time →
 ---(T1)---(T2)---(T3)---|→
    emit  emit  emit   complete
 </code></pre>
-            <p><strong>Error:</strong></p>
-            <pre><code>Time →
+<p><strong>Error:</strong></p>
+<pre><code>Time →
 ---(T1)---(T2)---X
    emit  emit  error
 </code></pre>
-            <h2 is-upgraded>Common Operators</h2>
-            <pre><code language="language-java" class="language-java">// map: Transform each element
+<h2 is-upgraded>Common Operators</h2>
+<pre><code language="language-java" class="language-java">// map: Transform each element
 Flux&lt;String&gt; titles = flux.map(Task::getTitle);
 
 // flatMap: Transform to Publisher and flatten
@@ -253,8 +250,8 @@ Flux&lt;Task&gt; tasks = userMono.flatMapMany(user -&gt;
     taskRepository.findByUserId(user.getId())
 );
 </code></pre>
-            <h2 is-upgraded>Error Handling</h2>
-            <pre><code language="language-java" class="language-java">// onErrorResume: Fallback to another publisher
+<h2 is-upgraded>Error Handling</h2>
+<pre><code language="language-java" class="language-java">// onErrorResume: Fallback to another publisher
 Mono&lt;Task&gt; result = taskRepository.findById(id)
     .onErrorResume(error -&gt; Mono.empty());
 
@@ -270,8 +267,8 @@ Mono&lt;Task&gt; result = taskRepository.findById(id)
 Mono&lt;Task&gt; result = taskRepository.findById(id)
     .doOnError(e -&gt; log.error(&#34;Error: {}&#34;, e.getMessage()));
 </code></pre>
-            <h2 is-upgraded>Subscription</h2>
-            <pre><code language="language-java" class="language-java">// Nothing happens until you subscribe!
+<h2 is-upgraded>Subscription</h2>
+<pre><code language="language-java" class="language-java">// Nothing happens until you subscribe!
 Mono&lt;Task&gt; mono = taskRepository.findById(1L);
 // ↑ No database query yet
 
@@ -282,9 +279,9 @@ mono.subscribe(
 );
 // ↑ Now the query executes
 </code></pre>
-            <h2 is-upgraded>Blocking vs Reactive Example</h2>
-            <p><strong>Blocking:</strong></p>
-            <pre><code language="language-java" class="language-java">@GetMapping(&#34;/tasks&#34;)
+<h2 is-upgraded>Blocking vs Reactive Example</h2>
+<p><strong>Blocking:</strong></p>
+<pre><code language="language-java" class="language-java">@GetMapping(&#34;/tasks&#34;)
 public List&lt;Task&gt; getTasks() {
     // Thread blocked until DB query completes
     return taskRepository.findAll();
@@ -292,8 +289,8 @@ public List&lt;Task&gt; getTasks() {
 
 // 1000 concurrent requests = 1000 threads needed
 </code></pre>
-            <p><strong>Reactive:</strong></p>
-            <pre><code language="language-java" class="language-java">@GetMapping(&#34;/tasks&#34;)
+<p><strong>Reactive:</strong></p>
+<pre><code language="language-java" class="language-java">@GetMapping(&#34;/tasks&#34;)
 public Flux&lt;Task&gt; getTasks() {
     // Thread released immediately
     return taskRepository.findAll();
@@ -301,9 +298,9 @@ public Flux&lt;Task&gt; getTasks() {
 
 // 1000 concurrent requests = Few threads (event loop)
 </code></pre>
-            <h2 is-upgraded>Backpressure</h2>
-            <p>Publisher produces faster than Subscriber can consume:</p>
-            <pre><code>Publisher: ████████████████ (fast)
+<h2 is-upgraded>Backpressure</h2>
+<p>Publisher produces faster than Subscriber can consume:</p>
+<pre><code>Publisher: ████████████████ (fast)
 Subscriber: ██ (slow)
 
 Problem: Memory overflow
@@ -314,23 +311,21 @@ Solution: Backpressure
 - LATEST: Keep only latest
 - ERROR: Fail fast
 </code></pre>
-            <pre><code language="language-java" class="language-java">Flux&lt;Task&gt; flux = taskRepository.findAll()
+<pre><code language="language-java" class="language-java">Flux&lt;Task&gt; flux = taskRepository.findAll()
     .onBackpressureBuffer(100)  // Buffer up to 100
     .onBackpressureDrop()       // Or drop excess
     .onBackpressureLatest();    // Or keep latest only
 </code></pre>
-            <aside class="special">
-                <p><strong>Key Insight:</strong> Reactive programming is about composing asynchronous, non-blocking
-                    operations using declarative code. Think &#34;what to do&#34; not &#34;how to do it&#34;!</p>
-            </aside>
+<aside class="special"><p><strong>Key Insight:</strong> Reactive programming is about composing asynchronous, non-blocking operations using declarative code. Think &#34;what to do&#34; not &#34;how to do it&#34;!</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Configure R2DBC Database" duration="5">
-            <p>Set up R2DBC for reactive database access.</p>
-            <h2 is-upgraded>Update application.yml</h2>
-            <pre><code language="language-yaml" class="language-yaml">spring:
+      </google-codelab-step>
+    
+      <google-codelab-step label="Configure R2DBC Database" duration="5">
+        <p>Set up R2DBC for reactive database access.</p>
+<h2 is-upgraded>Update application.yml</h2>
+<pre><code language="language-yaml" class="language-yaml">spring:
   application:
     name: task-manager-reactive
 
@@ -352,9 +347,9 @@ logging:
     io.r2dbc: DEBUG
     com.example.taskmanager: DEBUG
 </code></pre>
-            <h2 is-upgraded>PostgreSQL Configuration (Production)</h2>
-            <p><strong>application-prod.yml:</strong></p>
-            <pre><code language="language-yaml" class="language-yaml">spring:
+<h2 is-upgraded>PostgreSQL Configuration (Production)</h2>
+<p><strong>application-prod.yml:</strong></p>
+<pre><code language="language-yaml" class="language-yaml">spring:
   r2dbc:
     url: r2dbc:postgresql://localhost:5432/taskdb
     username: postgres
@@ -364,8 +359,8 @@ logging:
       max-size: 20
       max-idle-time: 30m
 </code></pre>
-            <h2 is-upgraded>R2DBC URL Format</h2>
-            <pre><code>r2dbc:&lt;driver&gt;://&lt;host&gt;:&lt;port&gt;/&lt;database&gt;[?options]
+<h2 is-upgraded>R2DBC URL Format</h2>
+<pre><code>r2dbc:&lt;driver&gt;://&lt;host&gt;:&lt;port&gt;/&lt;database&gt;[?options]
 
 Examples:
 r2dbc:h2:mem:///testdb
@@ -373,10 +368,10 @@ r2dbc:h2:file:///./data/taskdb
 r2dbc:postgresql://localhost:5432/taskdb
 r2dbc:mysql://localhost:3306/taskdb
 </code></pre>
-            <h2 is-upgraded>Initialize Database Schema</h2>
-            <p>R2DBC doesn&#39;t auto-create tables like JPA. Create schema initialization:</p>
-            <p><strong>resources/schema.sql:</strong></p>
-            <pre><code language="language-sql" class="language-sql">-- Drop tables if exist
+<h2 is-upgraded>Initialize Database Schema</h2>
+<p>R2DBC doesn&#39;t auto-create tables like JPA. Create schema initialization:</p>
+<p><strong>resources/schema.sql:</strong></p>
+<pre><code language="language-sql" class="language-sql">-- Drop tables if exist
 DROP TABLE IF EXISTS task_categories;
 DROP TABLE IF EXISTS user_roles;
 DROP TABLE IF EXISTS categories;
@@ -431,8 +426,8 @@ CREATE TABLE task_categories (
     FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
 );
 </code></pre>
-            <h2 is-upgraded>Schema Initialization Configuration</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.config;
+<h2 is-upgraded>Schema Initialization Configuration</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.config;
 
 import io.r2dbc.spi.ConnectionFactory;
 import org.springframework.context.annotation.Bean;
@@ -457,18 +452,16 @@ public class R2dbcConfig {
     }
 }
 </code></pre>
-            <aside class="warning">
-                <p><strong>Important:</strong> R2DBC doesn&#39;t support JPA annotations like @Entity, @OneToMany. Use
-                    plain POJOs with @Table and @Id from Spring Data R2DBC.</p>
-            </aside>
+<aside class="warning"><p><strong>Important:</strong> R2DBC doesn&#39;t support JPA annotations like @Entity, @OneToMany. Use plain POJOs with @Table and @Id from Spring Data R2DBC.</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Create Reactive Entities" duration="8">
-            <p>Transform entities for R2DBC (no JPA annotations).</p>
-            <h2 is-upgraded>Task Entity</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.model;
+      </google-codelab-step>
+    
+      <google-codelab-step label="Create Reactive Entities" duration="8">
+        <p>Transform entities for R2DBC (no JPA annotations).</p>
+<h2 is-upgraded>Task Entity</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Version;
@@ -519,8 +512,8 @@ public class Task {
     }
 }
 </code></pre>
-            <h2 is-upgraded>TaskStatus Enum</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.model;
+<h2 is-upgraded>TaskStatus Enum</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.model;
 
 public enum TaskStatus {
     TODO,
@@ -529,8 +522,8 @@ public enum TaskStatus {
     CANCELLED
 }
 </code></pre>
-            <h2 is-upgraded>User Entity</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.model;
+<h2 is-upgraded>User Entity</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
@@ -586,8 +579,8 @@ public class User {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Category Entity</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.model;
+<h2 is-upgraded>Category Entity</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
@@ -617,93 +610,46 @@ public class Category {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Key Differences from JPA</h2>
-            <table>
-                <tr>
-                    <td colspan="1" rowspan="1">
-                        <p>JPA</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>R2DBC</p>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="1" rowspan="1">
-                        <p><code>@Entity</code></p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p><code>@Table</code></p>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="1" rowspan="1">
-                        <p><code>@GeneratedValue</code></p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>Auto by DB</p>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="1" rowspan="1">
-                        <p><code>@OneToMany</code>, <code>@ManyToOne</code></p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>Manual join queries</p>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="1" rowspan="1">
-                        <p><code>@ManyToMany</code></p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>Junction table, manual</p>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="1" rowspan="1">
-                        <p><code>@Column(name)</code></p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p><code>@Column("name")</code></p>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="1" rowspan="1">
-                        <p>Lazy/Eager loading</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>Manual with <code>flatMap</code></p>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="1" rowspan="1">
-                        <p>Cascade operations</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>Manual</p>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="1" rowspan="1">
-                        <p>Relationships loaded automatically</p>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        <p>Load explicitly</p>
-                    </td>
-                </tr>
-            </table>
-            <aside class="special">
-                <p><strong>R2DBC Philosophy:</strong> Simple, lightweight mapping. Complex relationships handled in
-                    application code using reactive operators.</p>
-            </aside>
+<h2 is-upgraded>Key Differences from JPA</h2>
+<table>
+<tr><td colspan="1" rowspan="1"><p>JPA</p>
+</td><td colspan="1" rowspan="1"><p>R2DBC</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><code>@Entity</code></p>
+</td><td colspan="1" rowspan="1"><p><code>@Table</code></p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><code>@GeneratedValue</code></p>
+</td><td colspan="1" rowspan="1"><p>Auto by DB</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><code>@OneToMany</code>, <code>@ManyToOne</code></p>
+</td><td colspan="1" rowspan="1"><p>Manual join queries</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><code>@ManyToMany</code></p>
+</td><td colspan="1" rowspan="1"><p>Junction table, manual</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><code>@Column(name)</code></p>
+</td><td colspan="1" rowspan="1"><p><code>@Column("name")</code></p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Lazy/Eager loading</p>
+</td><td colspan="1" rowspan="1"><p>Manual with <code>flatMap</code></p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Cascade operations</p>
+</td><td colspan="1" rowspan="1"><p>Manual</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Relationships loaded automatically</p>
+</td><td colspan="1" rowspan="1"><p>Load explicitly</p>
+</td></tr>
+</table>
+<aside class="special"><p><strong>R2DBC Philosophy:</strong> Simple, lightweight mapping. Complex relationships handled in application code using reactive operators.</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Reactive Repositories" duration="10">
-            <p>Create reactive repositories using R2dbcRepository.</p>
-            <h2 is-upgraded>TaskRepository</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.repository;
+      </google-codelab-step>
+    
+      <google-codelab-step label="Reactive Repositories" duration="10">
+        <p>Create reactive repositories using R2dbcRepository.</p>
+<h2 is-upgraded>TaskRepository</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.repository;
 
 import com.example.taskmanager.model.Task;
 import com.example.taskmanager.model.TaskStatus;
@@ -738,8 +684,8 @@ public interface TaskRepository extends R2dbcRepository&lt;Task, Long&gt; {
     Mono&lt;Void&gt; deleteByStatus(TaskStatus status);
 }
 </code></pre>
-            <h2 is-upgraded>UserRepository</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.repository;
+<h2 is-upgraded>UserRepository</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.repository;
 
 import com.example.taskmanager.model.User;
 import org.springframework.data.r2dbc.repository.Query;
@@ -763,8 +709,8 @@ public interface UserRepository extends R2dbcRepository&lt;User, Long&gt; {
     Flux&lt;String&gt; findRolesByUserId(Long userId);
 }
 </code></pre>
-            <h2 is-upgraded>UserRoleRepository</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.repository;
+<h2 is-upgraded>UserRoleRepository</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.repository;
 
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
@@ -785,8 +731,8 @@ public interface UserRoleRepository extends ReactiveCrudRepository&lt;UserRole, 
     Flux&lt;String&gt; findRolesByUserId(Long userId);
 }
 </code></pre>
-            <h2 is-upgraded>CategoryRepository</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.repository;
+<h2 is-upgraded>CategoryRepository</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.repository;
 
 import com.example.taskmanager.model.Category;
 import org.springframework.data.r2dbc.repository.R2dbcRepository;
@@ -801,8 +747,8 @@ public interface CategoryRepository extends R2dbcRepository&lt;Category, Long&gt
     Mono&lt;Boolean&gt; existsByName(String name);
 }
 </code></pre>
-            <h2 is-upgraded>R2dbcRepository Methods</h2>
-            <pre><code language="language-java" class="language-java">// All methods return Mono or Flux
+<h2 is-upgraded>R2dbcRepository Methods</h2>
+<pre><code language="language-java" class="language-java">// All methods return Mono or Flux
 Mono&lt;Task&gt; save(Task task);               // Save or update
 Flux&lt;Task&gt; saveAll(Iterable&lt;Task&gt; tasks); // Batch save
 Mono&lt;Task&gt; findById(Long id);             // Find by ID
@@ -814,18 +760,16 @@ Mono&lt;Void&gt; deleteById(Long id);           // Delete by ID
 Mono&lt;Void&gt; delete(Task task);             // Delete entity
 Mono&lt;Void&gt; deleteAll();                   // Delete all
 </code></pre>
-            <aside class="special">
-                <p><strong>Reactive Repositories:</strong> All methods return Mono or Flux instead of blocking values.
-                    Queries execute only when subscribed!</p>
-            </aside>
+<aside class="special"><p><strong>Reactive Repositories:</strong> All methods return Mono or Flux instead of blocking values. Queries execute only when subscribed!</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Reactive Service Layer" duration="10">
-            <p>Transform services to use reactive operators.</p>
-            <h2 is-upgraded>TaskService</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.service;
+      </google-codelab-step>
+    
+      <google-codelab-step label="Reactive Service Layer" duration="10">
+        <p>Transform services to use reactive operators.</p>
+<h2 is-upgraded>TaskService</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.service;
 
 import com.example.taskmanager.exception.TaskNotFoundException;
 import com.example.taskmanager.model.Task;
@@ -969,8 +913,8 @@ public class TaskService {
     }
 }
 </code></pre>
-            <h2 is-upgraded>UserService</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.service;
+<h2 is-upgraded>UserService</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.service;
 
 import com.example.taskmanager.model.User;
 import com.example.taskmanager.repository.UserRepository;
@@ -1066,8 +1010,8 @@ public class UserService {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Reactive Patterns</h2>
-            <pre><code language="language-java" class="language-java">// Pattern 1: Chain operations
+<h2 is-upgraded>Reactive Patterns</h2>
+<pre><code language="language-java" class="language-java">// Pattern 1: Chain operations
 mono.flatMap(value -&gt; doSomething(value))
     .flatMap(result -&gt; doAnotherThing(result))
     .map(finalResult -&gt; transform(finalResult));
@@ -1094,18 +1038,16 @@ mono.doOnSuccess(v -&gt; log.info(&#34;Success: {}&#34;, v))
     .doOnError(e -&gt; log.error(&#34;Error: {}&#34;, e))
     .doFinally(signal -&gt; log.debug(&#34;Completed with signal: {}&#34;, signal));
 </code></pre>
-            <aside class="special">
-                <p><strong>Reactive Composition:</strong> Chain operations using flatMap, map, filter. Each operator
-                    returns a new Publisher, enabling functional composition!</p>
-            </aside>
+<aside class="special"><p><strong>Reactive Composition:</strong> Chain operations using flatMap, map, filter. Each operator returns a new Publisher, enabling functional composition!</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Reactive Controllers" duration="8">
-            <p>Create WebFlux controllers with Mono and Flux.</p>
-            <h2 is-upgraded>TaskController</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.controller;
+      </google-codelab-step>
+    
+      <google-codelab-step label="Reactive Controllers" duration="8">
+        <p>Create WebFlux controllers with Mono and Flux.</p>
+<h2 is-upgraded>TaskController</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.controller;
 
 import com.example.taskmanager.dto.CreateTaskRequest;
 import com.example.taskmanager.dto.TaskResponse;
@@ -1260,8 +1202,8 @@ public class TaskController {
     }
 }
 </code></pre>
-            <h2 is-upgraded>AuthController (Reactive)</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.controller;
+<h2 is-upgraded>AuthController (Reactive)</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.controller;
 
 import com.example.taskmanager.dto.AuthResponse;
 import com.example.taskmanager.dto.LoginRequest;
@@ -1308,8 +1250,8 @@ public class AuthController {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Server-Sent Events (SSE)</h2>
-            <pre><code language="language-java" class="language-java">// Real-time streaming example
+<h2 is-upgraded>Server-Sent Events (SSE)</h2>
+<pre><code language="language-java" class="language-java">// Real-time streaming example
 @GetMapping(value = &#34;/live-updates&#34;, produces = MediaType.TEXT_EVENT_STREAM_VALUE)
 public Flux&lt;TaskResponse&gt; liveTaskUpdates() {
     return Flux.interval(Duration.ofSeconds(5))
@@ -1317,18 +1259,16 @@ public Flux&lt;TaskResponse&gt; liveTaskUpdates() {
         .map(TaskResponse::new);
 }
 </code></pre>
-            <aside class="special">
-                <p><strong>SSE Advantage:</strong> With reactive streams, Server-Sent Events are trivial to implement.
-                    Just return Flux with TEXT_EVENT_STREAM_VALUE!</p>
-            </aside>
+<aside class="special"><p><strong>SSE Advantage:</strong> With reactive streams, Server-Sent Events are trivial to implement. Just return Flux with TEXT_EVENT_STREAM_VALUE!</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Testing Reactive API" duration="5">
-            <p>Test reactive endpoints with WebTestClient.</p>
-            <h2 is-upgraded>Integration Test</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager;
+      </google-codelab-step>
+    
+      <google-codelab-step label="Testing Reactive API" duration="5">
+        <p>Test reactive endpoints with WebTestClient.</p>
+<h2 is-upgraded>Integration Test</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager;
 
 import com.example.taskmanager.dto.CreateTaskRequest;
 import com.example.taskmanager.dto.TaskResponse;
@@ -1391,8 +1331,8 @@ public class TaskControllerIntegrationTest {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Unit Test with Reactor Test</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.service;
+<h2 is-upgraded>Unit Test with Reactor Test</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.service;
 
 import com.example.taskmanager.model.Task;
 import com.example.taskmanager.model.TaskStatus;
@@ -1448,97 +1388,100 @@ public class TaskServiceTest {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Run Tests</h2>
-            <pre><code language="language-bash" class="language-bash">mvn test
+<h2 is-upgraded>Run Tests</h2>
+<pre><code language="language-bash" class="language-bash">mvn test
 </code></pre>
-            <aside class="special">
-                <p><strong>Reactor Test:</strong> StepVerifier provides a fluent API for testing reactive streams.
-                    Verify emissions, errors, and completion!</p>
-            </aside>
+<aside class="special"><p><strong>Reactor Test:</strong> StepVerifier provides a fluent API for testing reactive streams. Verify emissions, errors, and completion!</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Conclusion" duration="2">
-            <p>Congratulations! 🎉 You&#39;ve transformed your API to fully reactive!</p>
-            <h2 is-upgraded>What You&#39;ve Learned</h2>
-            <ul>
-                <li>✅ <strong>Reactive Programming:</strong> Non-blocking, event-driven paradigm</li>
-                <li>✅ <strong>Project Reactor:</strong> Mono and Flux for reactive streams</li>
-                <li>✅ <strong>Spring WebFlux:</strong> Reactive web framework</li>
-                <li>✅ <strong>R2DBC:</strong> Reactive database connectivity</li>
-                <li>✅ <strong>Reactive Repositories:</strong> Non-blocking data access</li>
-                <li>✅ <strong>Reactive Operators:</strong> map, flatMap, filter, zip, merge</li>
-                <li>✅ <strong>Error Handling:</strong> onErrorResume, switchIfEmpty</li>
-                <li>✅ <strong>Server-Sent Events:</strong> Real-time streaming</li>
-                <li>✅ <strong>Testing:</strong> WebTestClient and StepVerifier</li>
-            </ul>
-            <h2 is-upgraded>Task Management API v1.5</h2>
-            <p>Reactive features:</p>
-            <ul>
-                <li>✅ Fully non-blocking architecture</li>
-                <li>✅ WebFlux controllers with Mono/Flux</li>
-                <li>✅ R2DBC for reactive database access</li>
-                <li>✅ Reactive repositories and services</li>
-                <li>✅ Server-Sent Events for real-time updates</li>
-                <li>✅ Better scalability with event loop</li>
-                <li>✅ Lower memory footprint</li>
-                <li>✅ Backpressure support</li>
-                <li>✅ Functional reactive composition</li>
-            </ul>
-            <h2 is-upgraded>Performance Benefits</h2>
-            <p><strong>Blocking (Web MVC):</strong></p>
-            <ul>
-                <li>1000 requests = 1000 threads</li>
-                <li>High memory usage</li>
-                <li>Context switching overhead</li>
-            </ul>
-            <p><strong>Reactive (WebFlux):</strong></p>
-            <ul>
-                <li>1000 requests = ~10 threads (event loop)</li>
-                <li>Low memory usage</li>
-                <li>No context switching</li>
-                <li>10x+ better throughput</li>
-            </ul>
-            <h2 is-upgraded>Git Branching</h2>
-            <pre><code language="language-bash" class="language-bash">git add .
+      </google-codelab-step>
+    
+      <google-codelab-step label="Conclusion" duration="2">
+        <p>Congratulations! 🎉 You&#39;ve transformed your API to fully reactive!</p>
+<h2 is-upgraded>What You&#39;ve Learned</h2>
+<ul>
+<li>✅ <strong>Reactive Programming:</strong> Non-blocking, event-driven paradigm</li>
+<li>✅ <strong>Project Reactor:</strong> Mono and Flux for reactive streams</li>
+<li>✅ <strong>Spring WebFlux:</strong> Reactive web framework</li>
+<li>✅ <strong>R2DBC:</strong> Reactive database connectivity</li>
+<li>✅ <strong>Reactive Repositories:</strong> Non-blocking data access</li>
+<li>✅ <strong>Reactive Operators:</strong> map, flatMap, filter, zip, merge</li>
+<li>✅ <strong>Error Handling:</strong> onErrorResume, switchIfEmpty</li>
+<li>✅ <strong>Server-Sent Events:</strong> Real-time streaming</li>
+<li>✅ <strong>Testing:</strong> WebTestClient and StepVerifier</li>
+</ul>
+<h2 is-upgraded>Task Management API v1.5</h2>
+<p>Reactive features:</p>
+<ul>
+<li>✅ Fully non-blocking architecture</li>
+<li>✅ WebFlux controllers with Mono/Flux</li>
+<li>✅ R2DBC for reactive database access</li>
+<li>✅ Reactive repositories and services</li>
+<li>✅ Server-Sent Events for real-time updates</li>
+<li>✅ Better scalability with event loop</li>
+<li>✅ Lower memory footprint</li>
+<li>✅ Backpressure support</li>
+<li>✅ Functional reactive composition</li>
+</ul>
+<h2 is-upgraded>Performance Benefits</h2>
+<p><strong>Blocking (Web MVC):</strong></p>
+<ul>
+<li>1000 requests = 1000 threads</li>
+<li>High memory usage</li>
+<li>Context switching overhead</li>
+</ul>
+<p><strong>Reactive (WebFlux):</strong></p>
+<ul>
+<li>1000 requests = ~10 threads (event loop)</li>
+<li>Low memory usage</li>
+<li>No context switching</li>
+<li>10x+ better throughput</li>
+</ul>
+<h2 is-upgraded>Git Branching</h2>
+<pre><code language="language-bash" class="language-bash">git add .
 git commit -m &#34;Codelab 3.6: Reactive WebFlux &amp; R2DBC complete&#34;
 git tag codelab-3.6
 </code></pre>
-            <h2 is-upgraded>Next Steps</h2>
-            <ul>
-                <li><strong>Codelab 3.7:</strong> Spring JMS &amp; Event-Driven Architecture</li>
-            </ul>
-            <h2 is-upgraded>Additional Resources</h2>
-            <ul>
-                <li><a href="https://projectreactor.io/docs" target="_blank">Project Reactor Documentation</a></li>
-                <li><a href="https://docs.spring.io/spring-framework/reference/web/webflux.html" target="_blank">Spring
-                        WebFlux Reference</a></li>
-                <li><a href="https://r2dbc.io/" target="_blank">R2DBC Documentation</a></li>
-                <li><a href="https://www.reactivemanifesto.org/" target="_blank">Reactive Manifesto</a></li>
-            </ul>
-            <aside class="special">
-                <p><strong>Cloud Native Ready!</strong> Your API now handles high concurrency with minimal resources -
-                    perfect for cloud deployments and microservices!</p>
-            </aside>
+<h2 is-upgraded>Next Steps</h2>
+<ul>
+<li><strong>Codelab 3.7:</strong> Spring JMS &amp; Event-Driven Architecture</li>
+</ul>
+<h2 is-upgraded>Additional Resources</h2>
+<ul>
+<li><a href="https://projectreactor.io/docs" target="_blank">Project Reactor Documentation</a></li>
+<li><a href="https://docs.spring.io/spring-framework/reference/web/webflux.html" target="_blank">Spring WebFlux Reference</a></li>
+<li><a href="https://r2dbc.io/" target="_blank">R2DBC Documentation</a></li>
+<li><a href="https://www.reactivemanifesto.org/" target="_blank">Reactive Manifesto</a></li>
+</ul>
+<aside class="special"><p><strong>Cloud Native Ready!</strong> Your API now handles high concurrency with minimal resources - perfect for cloud deployments and microservices!</p>
+</aside>
 
 
-        </google-codelab-step>
+      </google-codelab-step>
+    
+  </google-codelab>
 
-    </google-codelab>
-
-    <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
-    <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
-    <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
-    <script src="//support.google.com/inapp/api.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js"></script>
-    <script src="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.js"></script>
-    <script>
-        hljs.highlightAll();
-        hljs.addPlugin(new CopyButtonPlugin({ autohide: false }));
-
-    </script>
+  <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
+  <script src="//support.google.com/inapp/api.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js"></script>
+  <script src="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.js"></script>
+  <script>
+    hljs.highlightAll();
+    hljs.addPlugin(new CopyButtonPlugin({ autohide: false}));
+    
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      const homeUrl = "\/springboot_course\/";
+      const arrowBack = document.getElementById('arrow-back');
+      const doneBtn = document.getElementById('done');
+      if (arrowBack) arrowBack.href = homeUrl;
+      if (doneBtn) doneBtn.href = homeUrl;
+    });
+    
+  </script>
 
 </body>
-
 </html>

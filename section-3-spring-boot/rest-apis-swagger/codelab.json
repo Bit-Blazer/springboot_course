@@ -3,7 +3,7 @@
   "format": "html",
   "prefix": "https://storage.googleapis.com",
   "mainga": "UA-49880327-14",
-  "updated": "2025-12-29T14:50:16+05:30",
+  "updated": "2025-12-29T15:21:21+05:30",
   "id": "rest-apis-swagger",
   "duration": 60,
   "title": "RESTful APIs, Swagger \u0026 Exception Handling",
@@ -23,5 +23,6 @@
   "tags": [
     "web"
   ],
+  "home_url": "/springboot_course/",
   "url": "rest-apis-swagger"
 }

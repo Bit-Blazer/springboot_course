@@ -1,73 +1,72 @@
+
 <!doctype html>
 
 <html>
-
 <head>
   <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
   <meta name="theme-color" content="#4F7DC9">
   <meta charset="UTF-8">
   <title>JWT Authentication &amp; Spring Cloud Config</title>
-  <link rel="stylesheet"
-    href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
   <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
   <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
-  <link rel="stylesheet"
-    href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1  /build/styles/monokai.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1  /build/styles/monokai.min.css">
   <link rel="stylesheet" href="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.css">
   <style>
     .success {
       color: #1e8e3e;
     }
-
     .error {
       color: red;
     }
   </style>
 </head>
-
 <body>
   <google-codelab-analytics gaid="UA-49880327-14" ga4id=""></google-codelab-analytics>
-  <google-codelab codelab-gaid="" codelab-ga4id="" id="jwt-spring-cloud"
-    title="JWT Authentication &amp; Spring Cloud Config" environment="web" feedback-link="">
-
-    <google-codelab-step label="Introduction" duration="3">
-      <p>Replace HTTP Basic authentication with JWT tokens and introduce Spring Cloud Config for centralized
-        configuration.</p>
-      <h2 class="checklist" is-upgraded>What You&#39;ll Learn</h2>
-      <ul class="checklist">
-        <li><strong>JWT Basics:</strong> JSON Web Token structure and flow</li>
-        <li><strong>JWT Authentication:</strong> Token generation and validation</li>
-        <li><strong>Token Security:</strong> Signing, expiration, refresh tokens</li>
-        <li><strong>JWT Filter:</strong> Custom authentication filter</li>
-        <li><strong>Spring Cloud Config:</strong> Centralized configuration server</li>
-        <li><strong>Config Client:</strong> Connect applications to config server</li>
-        <li><strong>Git Backend:</strong> Store configs in Git repository</li>
-        <li><strong>Profiles:</strong> Environment-specific configurations</li>
-        <li><strong>Encryption:</strong> Secure sensitive properties</li>
-        <li><strong>Service Discovery:</strong> Introduction to Eureka</li>
-      </ul>
-      <h2 is-upgraded>What You&#39;ll Build</h2>
-      <p>JWT-secured Task Management API with:</p>
-      <ul>
-        <li><strong>JWT Token Generation</strong> on login</li>
-        <li><strong>Token Validation</strong> on each request</li>
-        <li><strong>Refresh Token</strong> mechanism</li>
-        <li><strong>Custom JWT Filter</strong> for Spring Security</li>
-        <li><strong>Login &amp; Signup</strong> endpoints</li>
-        <li><strong>Config Server</strong> for centralized properties</li>
-        <li><strong>Task API</strong> as config client</li>
-        <li><strong>Git-backed</strong> configuration storage</li>
-        <li><strong>Profile-specific</strong> configs (dev, prod)</li>
-        <li><strong>Encrypted</strong> database passwords</li>
-      </ul>
-      <h2 is-upgraded>Prerequisites</h2>
-      <ul>
-        <li>Completed Codelab 3.4 (JPA Locking &amp; Spring Security)</li>
-        <li>Understanding of Spring Security</li>
-      </ul>
-      <h2 is-upgraded>New Dependencies</h2>
-      <p><strong>Task API (pom.xml):</strong></p>
-      <pre><code language="language-xml" class="language-xml">&lt;!-- JWT --&gt;
+  <google-codelab codelab-gaid=""
+                  codelab-ga4id=""
+                  id="jwt-spring-cloud"
+                  title="JWT Authentication &amp; Spring Cloud Config"
+                  environment="web"
+                  feedback-link="">
+    
+      <google-codelab-step label="Introduction" duration="3">
+        <p>Replace HTTP Basic authentication with JWT tokens and introduce Spring Cloud Config for centralized configuration.</p>
+<h2 class="checklist" is-upgraded>What You&#39;ll Learn</h2>
+<ul class="checklist">
+<li><strong>JWT Basics:</strong> JSON Web Token structure and flow</li>
+<li><strong>JWT Authentication:</strong> Token generation and validation</li>
+<li><strong>Token Security:</strong> Signing, expiration, refresh tokens</li>
+<li><strong>JWT Filter:</strong> Custom authentication filter</li>
+<li><strong>Spring Cloud Config:</strong> Centralized configuration server</li>
+<li><strong>Config Client:</strong> Connect applications to config server</li>
+<li><strong>Git Backend:</strong> Store configs in Git repository</li>
+<li><strong>Profiles:</strong> Environment-specific configurations</li>
+<li><strong>Encryption:</strong> Secure sensitive properties</li>
+<li><strong>Service Discovery:</strong> Introduction to Eureka</li>
+</ul>
+<h2 is-upgraded>What You&#39;ll Build</h2>
+<p>JWT-secured Task Management API with:</p>
+<ul>
+<li><strong>JWT Token Generation</strong> on login</li>
+<li><strong>Token Validation</strong> on each request</li>
+<li><strong>Refresh Token</strong> mechanism</li>
+<li><strong>Custom JWT Filter</strong> for Spring Security</li>
+<li><strong>Login &amp; Signup</strong> endpoints</li>
+<li><strong>Config Server</strong> for centralized properties</li>
+<li><strong>Task API</strong> as config client</li>
+<li><strong>Git-backed</strong> configuration storage</li>
+<li><strong>Profile-specific</strong> configs (dev, prod)</li>
+<li><strong>Encrypted</strong> database passwords</li>
+</ul>
+<h2 is-upgraded>Prerequisites</h2>
+<ul>
+<li>Completed Codelab 3.4 (JPA Locking &amp; Spring Security)</li>
+<li>Understanding of Spring Security</li>
+</ul>
+<h2 is-upgraded>New Dependencies</h2>
+<p><strong>Task API (pom.xml):</strong></p>
+<pre><code language="language-xml" class="language-xml">&lt;!-- JWT --&gt;
 &lt;dependency&gt;
     &lt;groupId&gt;io.jsonwebtoken&lt;/groupId&gt;
     &lt;artifactId&gt;jjwt-api&lt;/artifactId&gt;
@@ -92,15 +91,15 @@
     &lt;artifactId&gt;spring-cloud-starter-config&lt;/artifactId&gt;
 &lt;/dependency&gt;
 </code></pre>
-      <p><strong>Config Server (separate project):</strong></p>
-      <pre><code language="language-xml" class="language-xml">&lt;!-- Spring Cloud Config Server --&gt;
+<p><strong>Config Server (separate project):</strong></p>
+<pre><code language="language-xml" class="language-xml">&lt;!-- Spring Cloud Config Server --&gt;
 &lt;dependency&gt;
     &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
     &lt;artifactId&gt;spring-cloud-config-server&lt;/artifactId&gt;
 &lt;/dependency&gt;
 </code></pre>
-      <p><strong>Add to both projects:</strong></p>
-      <pre><code language="language-xml" class="language-xml">&lt;dependencyManagement&gt;
+<p><strong>Add to both projects:</strong></p>
+<pre><code language="language-xml" class="language-xml">&lt;dependencyManagement&gt;
     &lt;dependencies&gt;
         &lt;dependency&gt;
             &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
@@ -112,47 +111,45 @@
     &lt;/dependencies&gt;
 &lt;/dependencyManagement&gt;
 </code></pre>
-      <aside class="special">
-        <p><strong>Architecture Shift:</strong> We&#39;re moving from monolithic configuration to distributed
-          configuration management - a key step toward microservices!</p>
-      </aside>
+<aside class="special"><p><strong>Architecture Shift:</strong> We&#39;re moving from monolithic configuration to distributed configuration management - a key step toward microservices!</p>
+</aside>
 
 
-    </google-codelab-step>
-
-    <google-codelab-step label="Understanding JWT" duration="8">
-      <p>Learn how JSON Web Tokens work for stateless authentication.</p>
-      <h2 is-upgraded>JWT Structure</h2>
-      <p>A JWT has three parts separated by dots:</p>
-      <pre><code>eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqb2huIiwiaWF0IjoxNjE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+      </google-codelab-step>
+    
+      <google-codelab-step label="Understanding JWT" duration="8">
+        <p>Learn how JSON Web Tokens work for stateless authentication.</p>
+<h2 is-upgraded>JWT Structure</h2>
+<p>A JWT has three parts separated by dots:</p>
+<pre><code>eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqb2huIiwiaWF0IjoxNjE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
 
 [Header].[Payload].[Signature]
 </code></pre>
-      <h2 is-upgraded>1. Header</h2>
-      <pre><code language="language-json" class="language-json">{
+<h2 is-upgraded>1. Header</h2>
+<pre><code language="language-json" class="language-json">{
   &#34;alg&#34;: &#34;HS256&#34;,
   &#34;typ&#34;: &#34;JWT&#34;
 }
 </code></pre>
-      <p>Base64URL encoded → <code>eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9</code></p>
-      <h2 is-upgraded>2. Payload (Claims)</h2>
-      <pre><code language="language-json" class="language-json">{
+<p>Base64URL encoded → <code>eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9</code></p>
+<h2 is-upgraded>2. Payload (Claims)</h2>
+<pre><code language="language-json" class="language-json">{
   &#34;sub&#34;: &#34;john&#34;, // Subject (username)
   &#34;iat&#34;: 1616239022, // Issued at
   &#34;exp&#34;: 1616242622, // Expiration (1 hour)
   &#34;roles&#34;: [&#34;ROLE_USER&#34;]
 }
 </code></pre>
-      <p>Base64URL encoded → <code>eyJzdWIiOiJqb2huIiwiaWF0IjoxNjE2MjM5MDIyfQ</code></p>
-      <h2 is-upgraded>3. Signature</h2>
-      <pre><code language="language-javascript" class="language-javascript">HMACSHA256(
+<p>Base64URL encoded → <code>eyJzdWIiOiJqb2huIiwiaWF0IjoxNjE2MjM5MDIyfQ</code></p>
+<h2 is-upgraded>3. Signature</h2>
+<pre><code language="language-javascript" class="language-javascript">HMACSHA256(
   base64UrlEncode(header) + &#34;.&#34; + base64UrlEncode(payload),
   secret_key
 );
 </code></pre>
-      <p>Result → <code>SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c</code></p>
-      <h2 is-upgraded>JWT Authentication Flow</h2>
-      <pre><code>Client                        Server
+<p>Result → <code>SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c</code></p>
+<h2 is-upgraded>JWT Authentication Flow</h2>
+<pre><code>Client                        Server
   |                              |
   |  POST /auth/login            |
   |  {username, password}        |
@@ -174,116 +171,65 @@
   |  [tasks...]                  |
   |&lt;-----------------------------|
 </code></pre>
-      <h2 is-upgraded>JWT vs Session-Based Auth</h2>
-      <table>
-        <tr>
-          <td colspan="1" rowspan="1">
-            <p>Aspect</p>
-          </td>
-          <td colspan="1" rowspan="1">
-            <p>JWT</p>
-          </td>
-          <td colspan="1" rowspan="1">
-            <p>Session</p>
-          </td>
-        </tr>
-        <tr>
-          <td colspan="1" rowspan="1">
-            <p><strong>Storage</strong></p>
-          </td>
-          <td colspan="1" rowspan="1">
-            <p>Client-side (localStorage)</p>
-          </td>
-          <td colspan="1" rowspan="1">
-            <p>Server-side (memory/DB)</p>
-          </td>
-        </tr>
-        <tr>
-          <td colspan="1" rowspan="1">
-            <p><strong>Scalability</strong></p>
-          </td>
-          <td colspan="1" rowspan="1">
-            <p>Excellent (stateless)</p>
-          </td>
-          <td colspan="1" rowspan="1">
-            <p>Limited (stateful)</p>
-          </td>
-        </tr>
-        <tr>
-          <td colspan="1" rowspan="1">
-            <p><strong>Performance</strong></p>
-          </td>
-          <td colspan="1" rowspan="1">
-            <p>No DB lookup per request</p>
-          </td>
-          <td colspan="1" rowspan="1">
-            <p>DB lookup needed</p>
-          </td>
-        </tr>
-        <tr>
-          <td colspan="1" rowspan="1">
-            <p><strong>Revocation</strong></p>
-          </td>
-          <td colspan="1" rowspan="1">
-            <p>Hard (until expiry)</p>
-          </td>
-          <td colspan="1" rowspan="1">
-            <p>Easy (delete session)</p>
-          </td>
-        </tr>
-        <tr>
-          <td colspan="1" rowspan="1">
-            <p><strong>Size</strong></p>
-          </td>
-          <td colspan="1" rowspan="1">
-            <p>Larger (sent in every request)</p>
-          </td>
-          <td colspan="1" rowspan="1">
-            <p>Smaller (session ID only)</p>
-          </td>
-        </tr>
-        <tr>
-          <td colspan="1" rowspan="1">
-            <p><strong>Best for</strong></p>
-          </td>
-          <td colspan="1" rowspan="1">
-            <p>Microservices, APIs</p>
-          </td>
-          <td colspan="1" rowspan="1">
-            <p>Traditional web apps</p>
-          </td>
-        </tr>
-      </table>
-      <h2 is-upgraded>JWT Security Considerations</h2>
-      <p>✅ <strong>Best Practices:</strong></p>
-      <ul>
-        <li>Use strong secret keys (256+ bits)</li>
-        <li>Set short expiration times (15-60 min)</li>
-        <li>Implement refresh tokens for long sessions</li>
-        <li>Use HTTPS to prevent token interception</li>
-        <li>Store tokens securely (HttpOnly cookies or secure storage)</li>
-        <li>Validate signature on every request</li>
-      </ul>
-      <p>❌ <strong>Don&#39;t:</strong></p>
-      <ul>
-        <li>Store sensitive data in JWT (it&#39;s base64, not encrypted!)</li>
-        <li>Use weak secrets</li>
-        <li>Set very long expiration</li>
-        <li>Store tokens in localStorage (XSS vulnerable)</li>
-        <li>Trust JWT without signature validation</li>
-      </ul>
-      <aside class="special">
-        <p><strong>JWT Advantage:</strong> Stateless authentication means no server-side session storage - perfect for
-          distributed systems and microservices!</p>
-      </aside>
+<h2 is-upgraded>JWT vs Session-Based Auth</h2>
+<table>
+<tr><td colspan="1" rowspan="1"><p>Aspect</p>
+</td><td colspan="1" rowspan="1"><p>JWT</p>
+</td><td colspan="1" rowspan="1"><p>Session</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Storage</strong></p>
+</td><td colspan="1" rowspan="1"><p>Client-side (localStorage)</p>
+</td><td colspan="1" rowspan="1"><p>Server-side (memory/DB)</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Scalability</strong></p>
+</td><td colspan="1" rowspan="1"><p>Excellent (stateless)</p>
+</td><td colspan="1" rowspan="1"><p>Limited (stateful)</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Performance</strong></p>
+</td><td colspan="1" rowspan="1"><p>No DB lookup per request</p>
+</td><td colspan="1" rowspan="1"><p>DB lookup needed</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Revocation</strong></p>
+</td><td colspan="1" rowspan="1"><p>Hard (until expiry)</p>
+</td><td colspan="1" rowspan="1"><p>Easy (delete session)</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Size</strong></p>
+</td><td colspan="1" rowspan="1"><p>Larger (sent in every request)</p>
+</td><td colspan="1" rowspan="1"><p>Smaller (session ID only)</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><strong>Best for</strong></p>
+</td><td colspan="1" rowspan="1"><p>Microservices, APIs</p>
+</td><td colspan="1" rowspan="1"><p>Traditional web apps</p>
+</td></tr>
+</table>
+<h2 is-upgraded>JWT Security Considerations</h2>
+<p>✅ <strong>Best Practices:</strong></p>
+<ul>
+<li>Use strong secret keys (256+ bits)</li>
+<li>Set short expiration times (15-60 min)</li>
+<li>Implement refresh tokens for long sessions</li>
+<li>Use HTTPS to prevent token interception</li>
+<li>Store tokens securely (HttpOnly cookies or secure storage)</li>
+<li>Validate signature on every request</li>
+</ul>
+<p>❌ <strong>Don&#39;t:</strong></p>
+<ul>
+<li>Store sensitive data in JWT (it&#39;s base64, not encrypted!)</li>
+<li>Use weak secrets</li>
+<li>Set very long expiration</li>
+<li>Store tokens in localStorage (XSS vulnerable)</li>
+<li>Trust JWT without signature validation</li>
+</ul>
+<aside class="special"><p><strong>JWT Advantage:</strong> Stateless authentication means no server-side session storage - perfect for distributed systems and microservices!</p>
+</aside>
 
 
-    </google-codelab-step>
-
-    <google-codelab-step label="Create JWT Utility" duration="10">
-      <p>Build JWT token generation and validation utility.</p>
-      <h2 is-upgraded>JWT Configuration Properties</h2>
-      <pre><code language="language-java" class="language-java">package com.example.taskmanager.config;
+      </google-codelab-step>
+    
+      <google-codelab-step label="Create JWT Utility" duration="10">
+        <p>Build JWT token generation and validation utility.</p>
+<h2 is-upgraded>JWT Configuration Properties</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -301,8 +247,8 @@ public class JwtProperties {
     private String headerString = &#34;Authorization&#34;;
 }
 </code></pre>
-      <h2 is-upgraded>JWT Utility Class</h2>
-      <pre><code language="language-java" class="language-java">package com.example.taskmanager.security.jwt;
+<h2 is-upgraded>JWT Utility Class</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.security.jwt;
 
 import com.example.taskmanager.config.JwtProperties;
 import io.jsonwebtoken.Claims;
@@ -412,8 +358,8 @@ public class JwtTokenUtil {
     }
 }
 </code></pre>
-      <h2 is-upgraded>Authentication Request/Response DTOs</h2>
-      <pre><code language="language-java" class="language-java">package com.example.taskmanager.dto;
+<h2 is-upgraded>Authentication Request/Response DTOs</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -433,7 +379,7 @@ public class LoginRequest {
     private String password;
 }
 </code></pre>
-      <pre><code language="language-java" class="language-java">package com.example.taskmanager.dto;
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -454,7 +400,7 @@ public class AuthResponse {
     private Set&lt;String&gt; roles;
 }
 </code></pre>
-      <pre><code language="language-java" class="language-java">package com.example.taskmanager.dto;
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -485,8 +431,8 @@ public class SignupRequest {
     private String password;
 }
 </code></pre>
-      <h2 is-upgraded>Update application.yml</h2>
-      <pre><code language="language-yaml" class="language-yaml"># JWT Configuration
+<h2 is-upgraded>Update application.yml</h2>
+<pre><code language="language-yaml" class="language-yaml"># JWT Configuration
 jwt:
   secret: ${JWT_SECRET:mySecretKeyForDevelopmentOnlyChangeInProduction1234567890}
   expiration: 3600000 # 1 hour
@@ -494,18 +440,16 @@ jwt:
   token-prefix: &#34;Bearer &#34;
   header-string: &#34;Authorization&#34;
 </code></pre>
-      <aside class="special">
-        <p><strong>Security Note:</strong> In production, use environment variables for JWT secret and generate a strong
-          random key (256+ bits).</p>
-      </aside>
+<aside class="special"><p><strong>Security Note:</strong> In production, use environment variables for JWT secret and generate a strong random key (256+ bits).</p>
+</aside>
 
 
-    </google-codelab-step>
-
-    <google-codelab-step label="JWT Authentication Filter" duration="10">
-      <p>Create custom filter to validate JWT tokens on each request.</p>
-      <h2 is-upgraded>JWT Authentication Filter</h2>
-      <pre><code language="language-java" class="language-java">package com.example.taskmanager.security.jwt;
+      </google-codelab-step>
+    
+      <google-codelab-step label="JWT Authentication Filter" duration="10">
+        <p>Create custom filter to validate JWT tokens on each request.</p>
+<h2 is-upgraded>JWT Authentication Filter</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.security.jwt;
 
 import com.example.taskmanager.config.JwtProperties;
 import com.example.taskmanager.security.CustomUserDetailsService;
@@ -584,8 +528,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 }
 </code></pre>
-      <h2 is-upgraded>JWT Authentication Entry Point</h2>
-      <pre><code language="language-java" class="language-java">package com.example.taskmanager.security.jwt;
+<h2 is-upgraded>JWT Authentication Entry Point</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.security.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
@@ -628,8 +572,8 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     }
 }
 </code></pre>
-      <h2 is-upgraded>Update Security Configuration</h2>
-      <pre><code language="language-java" class="language-java">package com.example.taskmanager.config;
+<h2 is-upgraded>Update Security Configuration</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.config;
 
 import com.example.taskmanager.security.CustomUserDetailsService;
 import com.example.taskmanager.security.jwt.JwtAuthenticationEntryPoint;
@@ -720,18 +664,16 @@ public class SecurityConfig {
     }
 }
 </code></pre>
-      <aside class="special">
-        <p><strong>Filter Order Matters:</strong> JWT filter runs before UsernamePasswordAuthenticationFilter to
-          intercept and validate tokens on every request.</p>
-      </aside>
+<aside class="special"><p><strong>Filter Order Matters:</strong> JWT filter runs before UsernamePasswordAuthenticationFilter to intercept and validate tokens on every request.</p>
+</aside>
 
 
-    </google-codelab-step>
-
-    <google-codelab-step label="Authentication Controller" duration="8">
-      <p>Create login, signup, and token refresh endpoints.</p>
-      <h2 is-upgraded>Authentication Service</h2>
-      <pre><code language="language-java" class="language-java">package com.example.taskmanager.service;
+      </google-codelab-step>
+    
+      <google-codelab-step label="Authentication Controller" duration="8">
+        <p>Create login, signup, and token refresh endpoints.</p>
+<h2 is-upgraded>Authentication Service</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.service;
 
 import com.example.taskmanager.dto.AuthResponse;
 import com.example.taskmanager.dto.LoginRequest;
@@ -859,8 +801,8 @@ public class AuthService {
     }
 }
 </code></pre>
-      <h2 is-upgraded>Authentication Controller</h2>
-      <pre><code language="language-java" class="language-java">package com.example.taskmanager.controller;
+<h2 is-upgraded>Authentication Controller</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.controller;
 
 import com.example.taskmanager.dto.AuthResponse;
 import com.example.taskmanager.dto.LoginRequest;
@@ -915,14 +857,14 @@ public class AuthController {
 </code></pre>
 
 
-    </google-codelab-step>
-
-    <google-codelab-step label="Spring Cloud Config Server" duration="10">
-      <p>Create centralized configuration server.</p>
-      <h2 is-upgraded>Create Config Server Project</h2>
-      <p>Create a new Spring Boot project:</p>
-      <p><strong>config-server/pom.xml:</strong></p>
-      <pre><code language="language-xml" class="language-xml">&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
+      </google-codelab-step>
+    
+      <google-codelab-step label="Spring Cloud Config Server" duration="10">
+        <p>Create centralized configuration server.</p>
+<h2 is-upgraded>Create Config Server Project</h2>
+<p>Create a new Spring Boot project:</p>
+<p><strong>config-server/pom.xml:</strong></p>
+<pre><code language="language-xml" class="language-xml">&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
 &lt;project xmlns=&#34;http://maven.apache.org/POM/4.0.0&#34;
          xmlns:xsi=&#34;http://www.w3.org/2001/XMLSchema-instance&#34;
          xsi:schemaLocation=&#34;http://maven.apache.org/POM/4.0.0
@@ -980,8 +922,8 @@ public class AuthController {
     &lt;/build&gt;
 &lt;/project&gt;
 </code></pre>
-      <h2 is-upgraded>Config Server Application</h2>
-      <pre><code language="language-java" class="language-java">package com.example.configserver;
+<h2 is-upgraded>Config Server Application</h2>
+<pre><code language="language-java" class="language-java">package com.example.configserver;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -996,9 +938,9 @@ public class ConfigServerApplication {
     }
 }
 </code></pre>
-      <h2 is-upgraded>Config Server Configuration</h2>
-      <p><strong>config-server/src/main/resources/application.yml:</strong></p>
-      <pre><code language="language-yaml" class="language-yaml">server:
+<h2 is-upgraded>Config Server Configuration</h2>
+<p><strong>config-server/src/main/resources/application.yml:</strong></p>
+<pre><code language="language-yaml" class="language-yaml">server:
   port: 8888
 
 spring:
@@ -1022,17 +964,17 @@ management:
       exposure:
         include: health,info,refresh
 </code></pre>
-      <h2 is-upgraded>Create Configuration Repository</h2>
-      <p>Create a Git repository for configurations:</p>
-      <pre><code language="language-bash" class="language-bash"># Create config repository
+<h2 is-upgraded>Create Configuration Repository</h2>
+<p>Create a Git repository for configurations:</p>
+<pre><code language="language-bash" class="language-bash"># Create config repository
 mkdir ~/config-repo
 cd ~/config-repo
 git init
 
 # Create configuration files
 </code></pre>
-      <p><strong>~/config-repo/task-manager.yml (default profile):</strong></p>
-      <pre><code language="language-yaml" class="language-yaml"># Default configuration for Task Manager
+<p><strong>~/config-repo/task-manager.yml (default profile):</strong></p>
+<pre><code language="language-yaml" class="language-yaml"># Default configuration for Task Manager
 spring:
   jpa:
     show-sql: true
@@ -1047,8 +989,8 @@ logging:
   level:
     com.example.taskmanager: INFO
 </code></pre>
-      <p><strong>~/config-repo/task-manager-dev.yml:</strong></p>
-      <pre><code language="language-yaml" class="language-yaml"># Development profile
+<p><strong>~/config-repo/task-manager-dev.yml:</strong></p>
+<pre><code language="language-yaml" class="language-yaml"># Development profile
 spring:
   datasource:
     url: jdbc:h2:mem:taskdb
@@ -1070,8 +1012,8 @@ logging:
     com.example.taskmanager: DEBUG
     org.hibernate.SQL: DEBUG
 </code></pre>
-      <p><strong>~/config-repo/task-manager-prod.yml:</strong></p>
-      <pre><code language="language-yaml" class="language-yaml"># Production profile
+<p><strong>~/config-repo/task-manager-prod.yml:</strong></p>
+<pre><code language="language-yaml" class="language-yaml"># Production profile
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/taskdb
@@ -1091,12 +1033,12 @@ logging:
   level:
     com.example.taskmanager: WARN
 </code></pre>
-      <p><strong>Commit configurations:</strong></p>
-      <pre><code language="language-bash" class="language-bash">git add .
+<p><strong>Commit configurations:</strong></p>
+<pre><code language="language-bash" class="language-bash">git add .
 git commit -m &#34;Initial configuration&#34;
 </code></pre>
-      <h2 is-upgraded>Directory Structure</h2>
-      <pre><code>config-repo/
+<h2 is-upgraded>Directory Structure</h2>
+<pre><code>config-repo/
 ├── task-manager.yml          # Default config
 ├── task-manager-dev.yml      # Dev profile
 ├── task-manager-prod.yml     # Prod profile
@@ -1104,20 +1046,20 @@ git commit -m &#34;Initial configuration&#34;
 </code></pre>
 
 
-    </google-codelab-step>
-
-    <google-codelab-step label="Configure Task API as Config Client" duration="6">
-      <p>Connect Task Manager API to Config Server.</p>
-      <h2 is-upgraded>Update Task API Dependencies</h2>
-      <p>Already added in earlier step:</p>
-      <pre><code language="language-xml" class="language-xml">&lt;dependency&gt;
+      </google-codelab-step>
+    
+      <google-codelab-step label="Configure Task API as Config Client" duration="6">
+        <p>Connect Task Manager API to Config Server.</p>
+<h2 is-upgraded>Update Task API Dependencies</h2>
+<p>Already added in earlier step:</p>
+<pre><code language="language-xml" class="language-xml">&lt;dependency&gt;
     &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
     &lt;artifactId&gt;spring-cloud-starter-config&lt;/artifactId&gt;
 &lt;/dependency&gt;
 </code></pre>
-      <h2 is-upgraded>Create bootstrap.yml</h2>
-      <p><strong>task-manager/src/main/resources/bootstrap.yml:</strong></p>
-      <pre><code language="language-yaml" class="language-yaml">spring:
+<h2 is-upgraded>Create bootstrap.yml</h2>
+<p><strong>task-manager/src/main/resources/bootstrap.yml:</strong></p>
+<pre><code language="language-yaml" class="language-yaml">spring:
   application:
     name: task-manager
 
@@ -1134,9 +1076,9 @@ git commit -m &#34;Initial configuration&#34;
   profiles:
     active: dev
 </code></pre>
-      <h2 is-upgraded>Update application.yml</h2>
-      <p><strong>task-manager/src/main/resources/application.yml:</strong></p>
-      <pre><code language="language-yaml" class="language-yaml"># Local overrides (will be overridden by config server)
+<h2 is-upgraded>Update application.yml</h2>
+<p><strong>task-manager/src/main/resources/application.yml:</strong></p>
+<pre><code language="language-yaml" class="language-yaml"># Local overrides (will be overridden by config server)
 server:
   port: 8080
 
@@ -1151,14 +1093,14 @@ management:
       exposure:
         include: health,info,refresh
 </code></pre>
-      <h2 is-upgraded>Configuration Priority</h2>
-      <pre><code>1. Config Server (highest priority)
+<h2 is-upgraded>Configuration Priority</h2>
+<pre><code>1. Config Server (highest priority)
 2. application.yml in project
 3. Default values in code
 </code></pre>
-      <h2 is-upgraded>Refresh Configuration at Runtime</h2>
-      <p>Add @RefreshScope to components that need dynamic config:</p>
-      <pre><code language="language-java" class="language-java">package com.example.taskmanager.config;
+<h2 is-upgraded>Refresh Configuration at Runtime</h2>
+<p>Add @RefreshScope to components that need dynamic config:</p>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -1177,8 +1119,8 @@ public class JwtProperties {
     private String headerString = &#34;Authorization&#34;;
 }
 </code></pre>
-      <h2 is-upgraded>Refresh Configuration</h2>
-      <pre><code language="language-bash" class="language-bash"># Update configuration in Git repo
+<h2 is-upgraded>Refresh Configuration</h2>
+<pre><code language="language-bash" class="language-bash"># Update configuration in Git repo
 cd ~/config-repo
 # Edit task-manager-dev.yml
 git add .
@@ -1187,32 +1129,30 @@ git commit -m &#34;Update JWT expiration&#34;
 # Refresh application configuration
 curl -X POST http://localhost:8080/actuator/refresh
 </code></pre>
-      <aside class="special">
-        <p><strong>Centralized Config Benefits:</strong> Change configurations for all microservices from one place
-          without redeploying applications!</p>
-      </aside>
+<aside class="special"><p><strong>Centralized Config Benefits:</strong> Change configurations for all microservices from one place without redeploying applications!</p>
+</aside>
 
 
-    </google-codelab-step>
-
-    <google-codelab-step label="Testing JWT &amp; Config" duration="5">
-      <p>Test JWT authentication and configuration management.</p>
-      <h2 is-upgraded>Start Config Server</h2>
-      <pre><code language="language-bash" class="language-bash">cd config-server
+      </google-codelab-step>
+    
+      <google-codelab-step label="Testing JWT &amp; Config" duration="5">
+        <p>Test JWT authentication and configuration management.</p>
+<h2 is-upgraded>Start Config Server</h2>
+<pre><code language="language-bash" class="language-bash">cd config-server
 mvn spring-boot:run
 </code></pre>
-      <p>Verify: http://localhost:8888/task-manager/dev</p>
-      <h2 is-upgraded>Start Task Manager</h2>
-      <pre><code language="language-bash" class="language-bash">cd task-manager
+<p>Verify: http://localhost:8888/task-manager/dev</p>
+<h2 is-upgraded>Start Task Manager</h2>
+<pre><code language="language-bash" class="language-bash">cd task-manager
 mvn spring-boot:run
 </code></pre>
-      <p>Check logs for:</p>
-      <pre><code>Fetching config from server at: http://localhost:8888
+<p>Check logs for:</p>
+<pre><code>Fetching config from server at: http://localhost:8888
 Located environment: name=task-manager, profiles=[dev], ...
 </code></pre>
-      <h2 is-upgraded>Test JWT Authentication</h2>
-      <p><strong>1. Signup:</strong></p>
-      <pre><code language="language-bash" class="language-bash">curl -X POST http://localhost:8080/api/auth/signup \
+<h2 is-upgraded>Test JWT Authentication</h2>
+<p><strong>1. Signup:</strong></p>
+<pre><code language="language-bash" class="language-bash">curl -X POST http://localhost:8080/api/auth/signup \
   -H &#34;Content-Type: application/json&#34; \
   -d &#39;{
     &#34;username&#34;: &#34;testuser&#34;,
@@ -1221,8 +1161,8 @@ Located environment: name=task-manager, profiles=[dev], ...
     &#34;password&#34;: &#34;password123&#34;
   }&#39;
 </code></pre>
-      <p><strong>Response:</strong></p>
-      <pre><code language="language-json" class="language-json">{
+<p><strong>Response:</strong></p>
+<pre><code language="language-json" class="language-json">{
   &#34;token&#34;: &#34;eyJhbGciOiJIUzI1NiJ9...&#34;,
   &#34;refreshToken&#34;: &#34;eyJhbGciOiJIUzI1NiJ9...&#34;,
   &#34;tokenType&#34;: &#34;Bearer&#34;,
@@ -1231,16 +1171,16 @@ Located environment: name=task-manager, profiles=[dev], ...
   &#34;roles&#34;: [&#34;ROLE_USER&#34;]
 }
 </code></pre>
-      <p><strong>2. Login:</strong></p>
-      <pre><code language="language-bash" class="language-bash">curl -X POST http://localhost:8080/api/auth/login \
+<p><strong>2. Login:</strong></p>
+<pre><code language="language-bash" class="language-bash">curl -X POST http://localhost:8080/api/auth/login \
   -H &#34;Content-Type: application/json&#34; \
   -d &#39;{
     &#34;username&#34;: &#34;testuser&#34;,
     &#34;password&#34;: &#34;password123&#34;
   }&#39;
 </code></pre>
-      <p><strong>3. Use Token:</strong></p>
-      <pre><code language="language-bash" class="language-bash">TOKEN=&#34;eyJhbGciOiJIUzI1NiJ9...&#34;
+<p><strong>3. Use Token:</strong></p>
+<pre><code language="language-bash" class="language-bash">TOKEN=&#34;eyJhbGciOiJIUzI1NiJ9...&#34;
 
 curl -X POST http://localhost:8080/api/tasks \
   -H &#34;Authorization: Bearer $TOKEN&#34; \
@@ -1250,100 +1190,98 @@ curl -X POST http://localhost:8080/api/tasks \
     &#34;description&#34;: &#34;Testing JWT authentication&#34;
   }&#39;
 </code></pre>
-      <p><strong>4. Get My Tasks:</strong></p>
-      <pre><code language="language-bash" class="language-bash">curl -X GET http://localhost:8080/api/tasks/my-tasks \
+<p><strong>4. Get My Tasks:</strong></p>
+<pre><code language="language-bash" class="language-bash">curl -X GET http://localhost:8080/api/tasks/my-tasks \
   -H &#34;Authorization: Bearer $TOKEN&#34;
 </code></pre>
-      <p><strong>5. Refresh Token:</strong></p>
-      <pre><code language="language-bash" class="language-bash">REFRESH_TOKEN=&#34;eyJhbGciOiJIUzI1NiJ9...&#34;
+<p><strong>5. Refresh Token:</strong></p>
+<pre><code language="language-bash" class="language-bash">REFRESH_TOKEN=&#34;eyJhbGciOiJIUzI1NiJ9...&#34;
 
 curl -X POST http://localhost:8080/api/auth/refresh \
   -H &#34;Content-Type: application/json&#34; \
   -d &#34;{\&#34;refreshToken\&#34;: \&#34;$REFRESH_TOKEN\&#34;}&#34;
 </code></pre>
-      <h2 is-upgraded>Test Config Changes</h2>
-      <p><strong>1. Check current config:</strong></p>
-      <pre><code language="language-bash" class="language-bash">curl http://localhost:8888/task-manager/dev
+<h2 is-upgraded>Test Config Changes</h2>
+<p><strong>1. Check current config:</strong></p>
+<pre><code language="language-bash" class="language-bash">curl http://localhost:8888/task-manager/dev
 </code></pre>
-      <p><strong>2. Update config:</strong></p>
-      <pre><code language="language-bash" class="language-bash">cd ~/config-repo
+<p><strong>2. Update config:</strong></p>
+<pre><code language="language-bash" class="language-bash">cd ~/config-repo
 # Edit task-manager-dev.yml - change jwt.expiration
 git add . &amp;&amp; git commit -m &#34;Update expiration&#34;
 </code></pre>
-      <p><strong>3. Refresh application:</strong></p>
-      <pre><code language="language-bash" class="language-bash">curl -X POST http://localhost:8080/actuator/refresh
+<p><strong>3. Refresh application:</strong></p>
+<pre><code language="language-bash" class="language-bash">curl -X POST http://localhost:8080/actuator/refresh
 </code></pre>
-      <h2 is-upgraded>Test in Swagger</h2>
-      <ol type="1">
-        <li>Visit: http://localhost:8080/swagger-ui.html</li>
-        <li>Try <code>/api/auth/signup</code> or <code>/api/auth/login</code></li>
-        <li>Copy the <code>token</code> from response</li>
-        <li>Click <strong>Authorize</strong> button</li>
-        <li>Enter: <code>Bearer <your-token></code></li>
-        <li>Test protected endpoints</li>
-      </ol>
+<h2 is-upgraded>Test in Swagger</h2>
+<ol type="1">
+<li>Visit: http://localhost:8080/swagger-ui.html</li>
+<li>Try <code>/api/auth/signup</code> or <code>/api/auth/login</code></li>
+<li>Copy the <code>token</code> from response</li>
+<li>Click <strong>Authorize</strong> button</li>
+<li>Enter: <code>Bearer <your-token></code></li>
+<li>Test protected endpoints</li>
+</ol>
 
 
-    </google-codelab-step>
-
-    <google-codelab-step label="Conclusion" duration="2">
-      <p>Congratulations! 🎉 You&#39;ve implemented JWT authentication and Spring Cloud Config!</p>
-      <h2 is-upgraded>What You&#39;ve Learned</h2>
-      <ul>
-        <li>✅ <strong>JWT Basics:</strong> Token structure and flow</li>
-        <li>✅ <strong>Token Generation:</strong> Creating signed JWT tokens</li>
-        <li>✅ <strong>Token Validation:</strong> Verifying signature and expiration</li>
-        <li>✅ <strong>Custom Filter:</strong> JWT authentication filter</li>
-        <li>✅ <strong>Refresh Tokens:</strong> Long-lived token renewal</li>
-        <li>✅ <strong>Config Server:</strong> Centralized configuration management</li>
-        <li>✅ <strong>Git Backend:</strong> Version-controlled configurations</li>
-        <li>✅ <strong>Profile Support:</strong> Environment-specific configs</li>
-        <li>✅ <strong>Runtime Refresh:</strong> Dynamic configuration updates</li>
-      </ul>
-      <h2 is-upgraded>Task Management API v1.4</h2>
-      <p>JWT &amp; Config features:</p>
-      <ul>
-        <li>✅ JWT token-based authentication</li>
-        <li>✅ Stateless API (no server-side sessions)</li>
-        <li>✅ Login and signup endpoints</li>
-        <li>✅ Refresh token mechanism</li>
-        <li>✅ Custom JWT authentication filter</li>
-        <li>✅ Spring Cloud Config Server</li>
-        <li>✅ Externalized configuration</li>
-        <li>✅ Profile-specific configurations</li>
-        <li>✅ Runtime configuration refresh</li>
-        <li>✅ Git-backed configuration storage</li>
-      </ul>
-      <h2 is-upgraded>Microservices Foundation</h2>
-      <p>You&#39;ve now built the foundation for microservices:</p>
-      <ul>
-        <li><strong>Stateless Authentication:</strong> JWT enables horizontal scaling</li>
-        <li><strong>Centralized Config:</strong> Easy multi-service management</li>
-        <li><strong>Service Communication:</strong> Ready for inter-service calls</li>
-      </ul>
-      <h2 is-upgraded>Git Branching</h2>
-      <pre><code language="language-bash" class="language-bash">git add .
+      </google-codelab-step>
+    
+      <google-codelab-step label="Conclusion" duration="2">
+        <p>Congratulations! 🎉 You&#39;ve implemented JWT authentication and Spring Cloud Config!</p>
+<h2 is-upgraded>What You&#39;ve Learned</h2>
+<ul>
+<li>✅ <strong>JWT Basics:</strong> Token structure and flow</li>
+<li>✅ <strong>Token Generation:</strong> Creating signed JWT tokens</li>
+<li>✅ <strong>Token Validation:</strong> Verifying signature and expiration</li>
+<li>✅ <strong>Custom Filter:</strong> JWT authentication filter</li>
+<li>✅ <strong>Refresh Tokens:</strong> Long-lived token renewal</li>
+<li>✅ <strong>Config Server:</strong> Centralized configuration management</li>
+<li>✅ <strong>Git Backend:</strong> Version-controlled configurations</li>
+<li>✅ <strong>Profile Support:</strong> Environment-specific configs</li>
+<li>✅ <strong>Runtime Refresh:</strong> Dynamic configuration updates</li>
+</ul>
+<h2 is-upgraded>Task Management API v1.4</h2>
+<p>JWT &amp; Config features:</p>
+<ul>
+<li>✅ JWT token-based authentication</li>
+<li>✅ Stateless API (no server-side sessions)</li>
+<li>✅ Login and signup endpoints</li>
+<li>✅ Refresh token mechanism</li>
+<li>✅ Custom JWT authentication filter</li>
+<li>✅ Spring Cloud Config Server</li>
+<li>✅ Externalized configuration</li>
+<li>✅ Profile-specific configurations</li>
+<li>✅ Runtime configuration refresh</li>
+<li>✅ Git-backed configuration storage</li>
+</ul>
+<h2 is-upgraded>Microservices Foundation</h2>
+<p>You&#39;ve now built the foundation for microservices:</p>
+<ul>
+<li><strong>Stateless Authentication:</strong> JWT enables horizontal scaling</li>
+<li><strong>Centralized Config:</strong> Easy multi-service management</li>
+<li><strong>Service Communication:</strong> Ready for inter-service calls</li>
+</ul>
+<h2 is-upgraded>Git Branching</h2>
+<pre><code language="language-bash" class="language-bash">git add .
 git commit -m &#34;Codelab 3.5: JWT &amp; Spring Cloud Config complete&#34;
 git tag codelab-3.5
 </code></pre>
-      <h2 is-upgraded>Next Steps</h2>
-      <ul>
-        <li><strong>Codelab 3.6:</strong> Reactive Programming &amp; R2DBC</li>
-      </ul>
-      <h2 is-upgraded>Additional Resources</h2>
-      <ul>
-        <li><a href="https://jwt.io/" target="_blank">JWT.io</a> - JWT debugger and information</li>
-        <li><a href="https://spring.io/projects/spring-cloud-config" target="_blank">Spring Cloud Config</a></li>
-        <li><a href="https://github.com/jwtk/jjwt" target="_blank">JJWT Library</a></li>
-      </ul>
-      <aside class="special">
-        <p><strong>Production Ready!</strong> Your API now has stateless JWT authentication and centralized
-          configuration - key requirements for cloud-native microservices!</p>
-      </aside>
+<h2 is-upgraded>Next Steps</h2>
+<ul>
+<li><strong>Codelab 3.6:</strong> Reactive Programming &amp; R2DBC</li>
+</ul>
+<h2 is-upgraded>Additional Resources</h2>
+<ul>
+<li><a href="https://jwt.io/" target="_blank">JWT.io</a> - JWT debugger and information</li>
+<li><a href="https://spring.io/projects/spring-cloud-config" target="_blank">Spring Cloud Config</a></li>
+<li><a href="https://github.com/jwtk/jjwt" target="_blank">JJWT Library</a></li>
+</ul>
+<aside class="special"><p><strong>Production Ready!</strong> Your API now has stateless JWT authentication and centralized configuration - key requirements for cloud-native microservices!</p>
+</aside>
 
 
-    </google-codelab-step>
-
+      </google-codelab-step>
+    
   </google-codelab>
 
   <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
@@ -1354,10 +1292,18 @@ git tag codelab-3.5
   <script src="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.js"></script>
   <script>
     hljs.highlightAll();
-    hljs.addPlugin(new CopyButtonPlugin({ autohide: false }));
-
+    hljs.addPlugin(new CopyButtonPlugin({ autohide: false}));
+    
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      const homeUrl = "\/springboot_course\/";
+      const arrowBack = document.getElementById('arrow-back');
+      const doneBtn = document.getElementById('done');
+      if (arrowBack) arrowBack.href = homeUrl;
+      if (doneBtn) doneBtn.href = homeUrl;
+    });
+    
   </script>
 
 </body>
-
 </html>

@@ -1,71 +1,70 @@
+
 <!doctype html>
 
 <html>
-
 <head>
-    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
-    <meta name="theme-color" content="#4F7DC9">
-    <meta charset="UTF-8">
-    <title>ORM Concepts &amp; Spring Data JPA</title>
-    <link rel="stylesheet"
-        href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
-    <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
-    <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
-    <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1  /build/styles/monokai.min.css">
-    <link rel="stylesheet" href="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.css">
-    <style>
-        .success {
-            color: #1e8e3e;
-        }
-
-        .error {
-            color: red;
-        }
-    </style>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <title>ORM Concepts &amp; Spring Data JPA</title>
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
+  <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1  /build/styles/monokai.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.css">
+  <style>
+    .success {
+      color: #1e8e3e;
+    }
+    .error {
+      color: red;
+    }
+  </style>
 </head>
-
 <body>
-    <google-codelab-analytics gaid="UA-49880327-14" ga4id=""></google-codelab-analytics>
-    <google-codelab codelab-gaid="" codelab-ga4id="" id="orm-spring-data-jpa" title="ORM Concepts &amp; Spring Data JPA"
-        environment="web" feedback-link="">
-
-        <google-codelab-step label="Introduction" duration="3">
-            <p>Replace the in-memory repository with real database persistence using Spring Data JPA and Hibernate ORM.
-            </p>
-            <h2 class="checklist" is-upgraded>What You&#39;ll Learn</h2>
-            <ul class="checklist">
-                <li><strong>ORM Fundamentals:</strong> Object-Relational Mapping concepts</li>
-                <li><strong>JPA Basics:</strong> Java Persistence API overview</li>
-                <li><strong>Entity Mapping:</strong> @Entity, @Table, @Id, @Column annotations</li>
-                <li><strong>Relationships:</strong> @OneToMany, @ManyToOne, @ManyToMany</li>
-                <li><strong>Spring Data JPA:</strong> Repository pattern and query methods</li>
-                <li><strong>Query Methods:</strong> Derived queries from method names</li>
-                <li><strong>@Query Annotation:</strong> Custom JPQL and native SQL</li>
-                <li><strong>Pagination &amp; Sorting:</strong> Pageable interface</li>
-                <li><strong>Database Configuration:</strong> H2 in-memory, PostgreSQL production</li>
-                <li><strong>Transactions:</strong> @Transactional annotation</li>
-            </ul>
-            <h2 is-upgraded>What You&#39;ll Build</h2>
-            <p>Database-backed Task Management API with:</p>
-            <ul>
-                <li><strong>Task Entity</strong> with JPA annotations</li>
-                <li><strong>User Entity</strong> for task ownership</li>
-                <li><strong>Category Entity</strong> with many-to-many relationship</li>
-                <li><strong>JPA Repositories</strong> replacing in-memory storage</li>
-                <li><strong>Custom Queries</strong> for filtering and searching</li>
-                <li><strong>Pagination</strong> for large result sets</li>
-                <li><strong>H2 Console</strong> for development</li>
-                <li><strong>PostgreSQL</strong> configuration for production</li>
-            </ul>
-            <h2 is-upgraded>Prerequisites</h2>
-            <ul>
-                <li>Completed Codelab 3.2 (REST APIs &amp; Swagger)</li>
-                <li>PostgreSQL installed (optional, we&#39;ll use H2 first)</li>
-            </ul>
-            <h2 is-upgraded>New Dependencies</h2>
-            <p>Add to <code>pom.xml</code>:</p>
-            <pre><code language="language-xml" class="language-xml">&lt;!-- Spring Data JPA --&gt;
+  <google-codelab-analytics gaid="UA-49880327-14" ga4id=""></google-codelab-analytics>
+  <google-codelab codelab-gaid=""
+                  codelab-ga4id=""
+                  id="orm-spring-data-jpa"
+                  title="ORM Concepts &amp; Spring Data JPA"
+                  environment="web"
+                  feedback-link="">
+    
+      <google-codelab-step label="Introduction" duration="3">
+        <p>Replace the in-memory repository with real database persistence using Spring Data JPA and Hibernate ORM.</p>
+<h2 class="checklist" is-upgraded>What You&#39;ll Learn</h2>
+<ul class="checklist">
+<li><strong>ORM Fundamentals:</strong> Object-Relational Mapping concepts</li>
+<li><strong>JPA Basics:</strong> Java Persistence API overview</li>
+<li><strong>Entity Mapping:</strong> @Entity, @Table, @Id, @Column annotations</li>
+<li><strong>Relationships:</strong> @OneToMany, @ManyToOne, @ManyToMany</li>
+<li><strong>Spring Data JPA:</strong> Repository pattern and query methods</li>
+<li><strong>Query Methods:</strong> Derived queries from method names</li>
+<li><strong>@Query Annotation:</strong> Custom JPQL and native SQL</li>
+<li><strong>Pagination &amp; Sorting:</strong> Pageable interface</li>
+<li><strong>Database Configuration:</strong> H2 in-memory, PostgreSQL production</li>
+<li><strong>Transactions:</strong> @Transactional annotation</li>
+</ul>
+<h2 is-upgraded>What You&#39;ll Build</h2>
+<p>Database-backed Task Management API with:</p>
+<ul>
+<li><strong>Task Entity</strong> with JPA annotations</li>
+<li><strong>User Entity</strong> for task ownership</li>
+<li><strong>Category Entity</strong> with many-to-many relationship</li>
+<li><strong>JPA Repositories</strong> replacing in-memory storage</li>
+<li><strong>Custom Queries</strong> for filtering and searching</li>
+<li><strong>Pagination</strong> for large result sets</li>
+<li><strong>H2 Console</strong> for development</li>
+<li><strong>PostgreSQL</strong> configuration for production</li>
+</ul>
+<h2 is-upgraded>Prerequisites</h2>
+<ul>
+<li>Completed Codelab 3.2 (REST APIs &amp; Swagger)</li>
+<li>PostgreSQL installed (optional, we&#39;ll use H2 first)</li>
+</ul>
+<h2 is-upgraded>New Dependencies</h2>
+<p>Add to <code>pom.xml</code>:</p>
+<pre><code language="language-xml" class="language-xml">&lt;!-- Spring Data JPA --&gt;
 &lt;dependency&gt;
     &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
     &lt;artifactId&gt;spring-boot-starter-data-jpa&lt;/artifactId&gt;
@@ -85,20 +84,18 @@
     &lt;scope&gt;runtime&lt;/scope&gt;
 &lt;/dependency&gt;
 </code></pre>
-            <aside class="special">
-                <p><strong>Git Branch:</strong> Start from <code>codelab-3.2</code> or continue from your current work.
-                    This codelab transforms our in-memory API into a real database-backed system.</p>
-            </aside>
+<aside class="special"><p><strong>Git Branch:</strong> Start from <code>codelab-3.2</code> or continue from your current work. This codelab transforms our in-memory API into a real database-backed system.</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Understanding ORM" duration="8">
-            <p>Before diving into code, let&#39;s understand Object-Relational Mapping.</p>
-            <h2 is-upgraded>The Impedance Mismatch</h2>
-            <p><strong>Objects (Java)</strong> vs <strong>Relations (SQL)</strong> have fundamental differences:</p>
-            <p><strong>Java Objects:</strong></p>
-            <pre><code language="language-java" class="language-java">public class Task {
+      </google-codelab-step>
+    
+      <google-codelab-step label="Understanding ORM" duration="8">
+        <p>Before diving into code, let&#39;s understand Object-Relational Mapping.</p>
+<h2 is-upgraded>The Impedance Mismatch</h2>
+<p><strong>Objects (Java)</strong> vs <strong>Relations (SQL)</strong> have fundamental differences:</p>
+<p><strong>Java Objects:</strong></p>
+<pre><code language="language-java" class="language-java">public class Task {
     private Long id;
     private String title;
     private TaskStatus status;
@@ -106,8 +103,8 @@
     private List&lt;Category&gt; categories;  // Collection
 }
 </code></pre>
-            <p><strong>SQL Tables:</strong></p>
-            <pre><code language="language-sql" class="language-sql">CREATE TABLE tasks (
+<p><strong>SQL Tables:</strong></p>
+<pre><code language="language-sql" class="language-sql">CREATE TABLE tasks (
     id BIGINT PRIMARY KEY,
     title VARCHAR(255),
     status VARCHAR(20),
@@ -115,16 +112,16 @@
     -- Can&#39;t store List directly!
 );
 </code></pre>
-            <p><strong>Problems without ORM:</strong></p>
-            <ul>
-                <li>Manual SQL for every operation</li>
-                <li>Type conversions (Java ↔ SQL)</li>
-                <li>Relationship management</li>
-                <li>Boilerplate code</li>
-            </ul>
-            <h2 is-upgraded>ORM to the Rescue</h2>
-            <p><strong>ORM</strong> automates the mapping between objects and database tables:</p>
-            <pre><code language="language-java" class="language-java">// Without ORM - Manual SQL
+<p><strong>Problems without ORM:</strong></p>
+<ul>
+<li>Manual SQL for every operation</li>
+<li>Type conversions (Java ↔ SQL)</li>
+<li>Relationship management</li>
+<li>Boilerplate code</li>
+</ul>
+<h2 is-upgraded>ORM to the Rescue</h2>
+<p><strong>ORM</strong> automates the mapping between objects and database tables:</p>
+<pre><code language="language-java" class="language-java">// Without ORM - Manual SQL
 public Task findById(Long id) {
     String sql = &#34;SELECT * FROM tasks WHERE id = ?&#34;;
     PreparedStatement stmt = connection.prepareStatement(sql);
@@ -146,15 +143,15 @@ public Task findById(Long id) {
     return taskRepository.findById(id).orElse(null);
 }
 </code></pre>
-            <h2 is-upgraded>JPA Overview</h2>
-            <p><strong>JPA (Java Persistence API)</strong> is the standard ORM specification for Java.</p>
-            <p><strong>Key Players:</strong></p>
-            <ul>
-                <li><strong>JPA:</strong> The specification (interface)</li>
-                <li><strong>Hibernate:</strong> Most popular implementation</li>
-                <li><strong>Spring Data JPA:</strong> Simplifies JPA usage</li>
-            </ul>
-            <pre><code>Spring Data JPA
+<h2 is-upgraded>JPA Overview</h2>
+<p><strong>JPA (Java Persistence API)</strong> is the standard ORM specification for Java.</p>
+<p><strong>Key Players:</strong></p>
+<ul>
+<li><strong>JPA:</strong> The specification (interface)</li>
+<li><strong>Hibernate:</strong> Most popular implementation</li>
+<li><strong>Spring Data JPA:</strong> Simplifies JPA usage</li>
+</ul>
+<pre><code>Spring Data JPA
     ↓ (uses)
 JPA Specification
     ↓ (implemented by)
@@ -164,8 +161,8 @@ JDBC
     ↓ (connects to)
 Database (H2, PostgreSQL, MySQL)
 </code></pre>
-            <h2 is-upgraded>Entity Lifecycle</h2>
-            <pre><code>[Transient]  → new Task()
+<h2 is-upgraded>Entity Lifecycle</h2>
+<pre><code>[Transient]  → new Task()
     ↓ persist()
 [Managed]    → entityManager tracks changes
     ↓ commit()
@@ -175,26 +172,19 @@ Database (H2, PostgreSQL, MySQL)
     ↓ remove()
 [Removed]    → scheduled for deletion
 </code></pre>
-            <h2 is-upgraded>JPA Benefits</h2>
-            <p>✅ <strong>Less Boilerplate:</strong> No manual SQL for CRUD ✅ <strong>Database Independence:</strong>
-                Switch DB with config change ✅ <strong>Type Safety:</strong> Compile-time checking ✅
-                <strong>Relationships:</strong> Automatic join handling ✅ <strong>Caching:</strong> First-level cache
-                (EntityManager) ✅ <strong>Lazy Loading:</strong> Load data only when needed ✅ <strong>Query
-                    Methods:</strong> Derive queries from method names
-            </p>
-            <aside class="special">
-                <p><strong>Best Practice:</strong> Use JPA for most operations, but don&#39;t be afraid to use native
-                    SQL for complex queries or performance-critical operations.</p>
-            </aside>
+<h2 is-upgraded>JPA Benefits</h2>
+<p>✅ <strong>Less Boilerplate:</strong> No manual SQL for CRUD ✅ <strong>Database Independence:</strong> Switch DB with config change ✅ <strong>Type Safety:</strong> Compile-time checking ✅ <strong>Relationships:</strong> Automatic join handling ✅ <strong>Caching:</strong> First-level cache (EntityManager) ✅ <strong>Lazy Loading:</strong> Load data only when needed ✅ <strong>Query Methods:</strong> Derive queries from method names</p>
+<aside class="special"><p><strong>Best Practice:</strong> Use JPA for most operations, but don&#39;t be afraid to use native SQL for complex queries or performance-critical operations.</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Configure Database" duration="5">
-            <p>Set up H2 for development and PostgreSQL for production.</p>
-            <h2 is-upgraded>H2 Configuration (Development)</h2>
-            <p><strong>application.yml:</strong></p>
-            <pre><code language="language-yaml" class="language-yaml">spring:
+      </google-codelab-step>
+    
+      <google-codelab-step label="Configure Database" duration="5">
+        <p>Set up H2 for development and PostgreSQL for production.</p>
+<h2 is-upgraded>H2 Configuration (Development)</h2>
+<p><strong>application.yml:</strong></p>
+<pre><code language="language-yaml" class="language-yaml">spring:
   application:
     name: task-manager
 
@@ -228,9 +218,9 @@ logging:
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
 </code></pre>
-            <h2 is-upgraded>PostgreSQL Configuration (Production)</h2>
-            <p><strong>application-prod.yml:</strong></p>
-            <pre><code language="language-yaml" class="language-yaml">spring:
+<h2 is-upgraded>PostgreSQL Configuration (Production)</h2>
+<p><strong>application-prod.yml:</strong></p>
+<pre><code language="language-yaml" class="language-yaml">spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/taskdb
     driver-class-name: org.postgresql.Driver
@@ -243,8 +233,8 @@ logging:
       ddl-auto: validate
     show-sql: false
 </code></pre>
-            <h2 is-upgraded>Hibernate ddl-auto Options</h2>
-            <pre><code language="language-yaml" class="language-yaml">hibernate:
+<h2 is-upgraded>Hibernate ddl-auto Options</h2>
+<pre><code language="language-yaml" class="language-yaml">hibernate:
   ddl-auto: create-drop
   # create-drop: Drop and recreate tables on startup (development)
   # create: Create tables on startup (development)
@@ -252,26 +242,24 @@ logging:
   # validate: Validate schema matches entities (production)
   # none: Do nothing (production with Flyway/Liquibase)
 </code></pre>
-            <h2 is-upgraded>Access H2 Console</h2>
-            <p>Start application and visit: http://localhost:8080/h2-console</p>
-            <p><strong>Connection settings:</strong></p>
-            <ul>
-                <li>JDBC URL: <code>jdbc:h2:mem:taskdb</code></li>
-                <li>Username: <code>sa</code></li>
-                <li>Password: (empty)</li>
-            </ul>
-            <aside class="warning">
-                <p><strong>Production Warning:</strong> Never use <code>create-drop</code> or <code>create</code> in
-                    production! Use <code>validate</code> or <code>none</code> with migration tools like Flyway.</p>
-            </aside>
+<h2 is-upgraded>Access H2 Console</h2>
+<p>Start application and visit: http://localhost:8080/h2-console</p>
+<p><strong>Connection settings:</strong></p>
+<ul>
+<li>JDBC URL: <code>jdbc:h2:mem:taskdb</code></li>
+<li>Username: <code>sa</code></li>
+<li>Password: (empty)</li>
+</ul>
+<aside class="warning"><p><strong>Production Warning:</strong> Never use <code>create-drop</code> or <code>create</code> in production! Use <code>validate</code> or <code>none</code> with migration tools like Flyway.</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Create JPA Entities" duration="12">
-            <p>Transform our model classes into JPA entities.</p>
-            <h2 is-upgraded>Task Entity</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.model;
+      </google-codelab-step>
+    
+      <google-codelab-step label="Create JPA Entities" duration="12">
+        <p>Transform our model classes into JPA entities.</p>
+<h2 is-upgraded>Task Entity</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -333,8 +321,8 @@ public class Task {
     }
 }
 </code></pre>
-            <h2 is-upgraded>User Entity</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.model;
+<h2 is-upgraded>User Entity</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -380,8 +368,8 @@ public class User {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Category Entity</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.model;
+<h2 is-upgraded>Category Entity</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -417,8 +405,8 @@ public class Category {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Understanding JPA Annotations</h2>
-            <pre><code language="language-java" class="language-java">@Entity
+<h2 is-upgraded>Understanding JPA Annotations</h2>
+<pre><code language="language-java" class="language-java">@Entity
 // Marks class as JPA entity (table)
 
 @Table(name = &#34;tasks&#34;)
@@ -450,8 +438,8 @@ public class Category {
 @UpdateTimestamp
 // Automatically update on modification (Hibernate-specific)
 </code></pre>
-            <h2 is-upgraded>Relationship Annotations</h2>
-            <pre><code language="language-java" class="language-java">// One-to-Many: One user has many tasks
+<h2 is-upgraded>Relationship Annotations</h2>
+<pre><code language="language-java" class="language-java">// One-to-Many: One user has many tasks
 @OneToMany(mappedBy = &#34;assignedTo&#34;, cascade = CascadeType.ALL)
 private List&lt;Task&gt; tasks;
 
@@ -469,8 +457,8 @@ private User assignedTo;
 )
 private Set&lt;Category&gt; categories;
 </code></pre>
-            <h2 is-upgraded>Fetch Types</h2>
-            <pre><code language="language-java" class="language-java">FetchType.LAZY   // Load on demand (default for collections)
+<h2 is-upgraded>Fetch Types</h2>
+<pre><code language="language-java" class="language-java">FetchType.LAZY   // Load on demand (default for collections)
 FetchType.EAGER  // Load immediately (default for single entities)
 
 // Example
@@ -480,8 +468,8 @@ private User assignedTo;
 @OneToMany(fetch = FetchType.LAZY)  // Don&#39;t load all tasks immediately
 private List&lt;Task&gt; tasks;
 </code></pre>
-            <h2 is-upgraded>Cascade Types</h2>
-            <pre><code language="language-java" class="language-java">CascadeType.ALL        // Cascade all operations
+<h2 is-upgraded>Cascade Types</h2>
+<pre><code language="language-java" class="language-java">CascadeType.ALL        // Cascade all operations
 CascadeType.PERSIST    // Cascade save
 CascadeType.MERGE      // Cascade update
 CascadeType.REMOVE     // Cascade delete
@@ -492,18 +480,16 @@ CascadeType.DETACH     // Cascade detach
 @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
 private List&lt;Task&gt; tasks;
 </code></pre>
-            <aside class="special">
-                <p><strong>Best Practice:</strong> Use <code>FetchType.LAZY</code> for collections and relationships to
-                    avoid N+1 query problems. Load data only when needed.</p>
-            </aside>
+<aside class="special"><p><strong>Best Practice:</strong> Use <code>FetchType.LAZY</code> for collections and relationships to avoid N+1 query problems. Load data only when needed.</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Spring Data JPA Repositories" duration="10">
-            <p>Replace in-memory repositories with Spring Data JPA repositories.</p>
-            <h2 is-upgraded>TaskRepository</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.repository;
+      </google-codelab-step>
+    
+      <google-codelab-step label="Spring Data JPA Repositories" duration="10">
+        <p>Replace in-memory repositories with Spring Data JPA repositories.</p>
+<h2 is-upgraded>TaskRepository</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.repository;
 
 import com.example.taskmanager.model.Task;
 import com.example.taskmanager.model.TaskStatus;
@@ -563,8 +549,8 @@ public interface TaskRepository extends JpaRepository&lt;Task, Long&gt; {
     List&lt;Object[]&gt; countTasksByStatus();
 }
 </code></pre>
-            <h2 is-upgraded>UserRepository</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.repository;
+<h2 is-upgraded>UserRepository</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.repository;
 
 import com.example.taskmanager.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -588,8 +574,8 @@ public interface UserRepository extends JpaRepository&lt;User, Long&gt; {
     Optional&lt;User&gt; findByIdWithTasks(Long id);
 }
 </code></pre>
-            <h2 is-upgraded>CategoryRepository</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.repository;
+<h2 is-upgraded>CategoryRepository</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.repository;
 
 import com.example.taskmanager.model.Category;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -605,9 +591,9 @@ public interface CategoryRepository extends JpaRepository&lt;Category, Long&gt; 
     boolean existsByName(String name);
 }
 </code></pre>
-            <h2 is-upgraded>Query Method Keywords</h2>
-            <p>Spring Data JPA generates SQL from method names:</p>
-            <pre><code language="language-java" class="language-java">// Keywords and examples:
+<h2 is-upgraded>Query Method Keywords</h2>
+<p>Spring Data JPA generates SQL from method names:</p>
+<pre><code language="language-java" class="language-java">// Keywords and examples:
 findBy...          // SELECT
 countBy...         // COUNT
 deleteBy...        // DELETE
@@ -643,8 +629,8 @@ findByCreatedAtAfter(LocalDateTime date)
 findByTitleContainingIgnoreCaseOrderByCreatedAtDesc(String title)
 // SELECT * FROM tasks WHERE UPPER(title) LIKE UPPER(?) ORDER BY created_at DESC
 </code></pre>
-            <h2 is-upgraded>JpaRepository Methods</h2>
-            <pre><code language="language-java" class="language-java">// Provided by JpaRepository:
+<h2 is-upgraded>JpaRepository Methods</h2>
+<pre><code language="language-java" class="language-java">// Provided by JpaRepository:
 save(T entity)              // INSERT or UPDATE
 saveAll(Iterable&lt;T&gt;)        // Batch save
 findById(ID id)             // SELECT by ID
@@ -658,18 +644,16 @@ deleteAll()                 // DELETE all
 flush()                     // Force sync with DB
 getOne(ID id)               // Get reference (lazy)
 </code></pre>
-            <aside class="special">
-                <p><strong>Magic Methods:</strong> Spring Data JPA automatically implements repository methods based on
-                    naming conventions. You write the interface, Spring provides the implementation!</p>
-            </aside>
+<aside class="special"><p><strong>Magic Methods:</strong> Spring Data JPA automatically implements repository methods based on naming conventions. You write the interface, Spring provides the implementation!</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Update Service Layer" duration="10">
-            <p>Update services to use JPA repositories and handle relationships.</p>
-            <h2 is-upgraded>Enhanced TaskService</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.service;
+      </google-codelab-step>
+    
+      <google-codelab-step label="Update Service Layer" duration="10">
+        <p>Update services to use JPA repositories and handle relationships.</p>
+<h2 is-upgraded>Enhanced TaskService</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.service;
 
 import com.example.taskmanager.exception.InvalidTaskException;
 import com.example.taskmanager.exception.TaskNotFoundException;
@@ -840,8 +824,8 @@ public class TaskService {
     }
 }
 </code></pre>
-            <h2 is-upgraded>UserService</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.service;
+<h2 is-upgraded>UserService</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.service;
 
 import com.example.taskmanager.model.User;
 import com.example.taskmanager.repository.UserRepository;
@@ -900,8 +884,8 @@ public class UserService {
     }
 }
 </code></pre>
-            <h2 is-upgraded>CategoryService</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.service;
+<h2 is-upgraded>CategoryService</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.service;
 
 import com.example.taskmanager.model.Category;
 import com.example.taskmanager.repository.CategoryRepository;
@@ -948,8 +932,8 @@ public class CategoryService {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Understanding @Transactional</h2>
-            <pre><code language="language-java" class="language-java">@Transactional(readOnly = true)  // Class level: all methods read-only
+<h2 is-upgraded>Understanding @Transactional</h2>
+<pre><code language="language-java" class="language-java">@Transactional(readOnly = true)  // Class level: all methods read-only
 public class TaskService {
 
     @Transactional  // Override: this method needs write access
@@ -964,25 +948,23 @@ public class TaskService {
     }
 }
 </code></pre>
-            <p><strong>Benefits:</strong></p>
-            <ul>
-                <li>Automatic transaction management</li>
-                <li>Rollback on exceptions</li>
-                <li>Flush changes to database</li>
-                <li>Connection management</li>
-            </ul>
-            <aside class="special">
-                <p><strong>Performance Tip:</strong> Use <code>@Transactional(readOnly = true)</code> for read
-                    operations. It optimizes performance and prevents accidental writes.</p>
-            </aside>
+<p><strong>Benefits:</strong></p>
+<ul>
+<li>Automatic transaction management</li>
+<li>Rollback on exceptions</li>
+<li>Flush changes to database</li>
+<li>Connection management</li>
+</ul>
+<aside class="special"><p><strong>Performance Tip:</strong> Use <code>@Transactional(readOnly = true)</code> for read operations. It optimizes performance and prevents accidental writes.</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Add Controllers" duration="8">
-            <p>Add controllers for users and categories, update task controller.</p>
-            <h2 is-upgraded>UserController</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.controller;
+      </google-codelab-step>
+    
+      <google-codelab-step label="Add Controllers" duration="8">
+        <p>Add controllers for users and categories, update task controller.</p>
+<h2 is-upgraded>UserController</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.controller;
 
 import com.example.taskmanager.model.User;
 import com.example.taskmanager.service.UserService;
@@ -1047,8 +1029,8 @@ public class UserController {
     }
 }
 </code></pre>
-            <h2 is-upgraded>CategoryController</h2>
-            <pre><code language="language-java" class="language-java">package com.example.taskmanager.controller;
+<h2 is-upgraded>CategoryController</h2>
+<pre><code language="language-java" class="language-java">package com.example.taskmanager.controller;
 
 import com.example.taskmanager.model.Category;
 import com.example.taskmanager.service.CategoryService;
@@ -1097,9 +1079,9 @@ public class CategoryController {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Enhanced TaskController</h2>
-            <p>Add new endpoints to TaskController:</p>
-            <pre><code language="language-java" class="language-java">@Operation(summary = &#34;Assign task to user&#34;)
+<h2 is-upgraded>Enhanced TaskController</h2>
+<p>Add new endpoints to TaskController:</p>
+<pre><code language="language-java" class="language-java">@Operation(summary = &#34;Assign task to user&#34;)
 @PutMapping(&#34;/{taskId}/assign/{userId}&#34;)
 public ResponseEntity&lt;TaskResponse&gt; assignTask(
         @PathVariable Long taskId,
@@ -1152,22 +1134,22 @@ public ResponseEntity&lt;Map&lt;TaskStatus, Long&gt;&gt; getTaskStats() {
 </code></pre>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Testing the Database API" duration="5">
-            <p>Test the database-backed API.</p>
-            <h2 is-upgraded>Start Application</h2>
-            <pre><code language="language-bash" class="language-bash">mvn spring-boot:run
+      </google-codelab-step>
+    
+      <google-codelab-step label="Testing the Database API" duration="5">
+        <p>Test the database-backed API.</p>
+<h2 is-upgraded>Start Application</h2>
+<pre><code language="language-bash" class="language-bash">mvn spring-boot:run
 </code></pre>
-            <p>Check logs for Hibernate SQL:</p>
-            <pre><code>Hibernate: create table tasks (...)
+<p>Check logs for Hibernate SQL:</p>
+<pre><code>Hibernate: create table tasks (...)
 Hibernate: create table users (...)
 Hibernate: create table categories (...)
 Hibernate: create table task_categories (...)
 </code></pre>
-            <h2 is-upgraded>Test Scenarios</h2>
-            <p><strong>1. Create User</strong></p>
-            <pre><code language="language-bash" class="language-bash">curl -X POST http://localhost:8080/api/users \
+<h2 is-upgraded>Test Scenarios</h2>
+<p><strong>1. Create User</strong></p>
+<pre><code language="language-bash" class="language-bash">curl -X POST http://localhost:8080/api/users \
   -H &#34;Content-Type: application/json&#34; \
   -d &#39;{
     &#34;username&#34;: &#34;john_doe&#34;,
@@ -1175,8 +1157,8 @@ Hibernate: create table task_categories (...)
     &#34;fullName&#34;: &#34;John Doe&#34;
   }&#39;
 </code></pre>
-            <p><strong>2. Create Categories</strong></p>
-            <pre><code language="language-bash" class="language-bash">curl -X POST http://localhost:8080/api/categories \
+<p><strong>2. Create Categories</strong></p>
+<pre><code language="language-bash" class="language-bash">curl -X POST http://localhost:8080/api/categories \
   -H &#34;Content-Type: application/json&#34; \
   -d &#39;{&#34;name&#34;: &#34;Work&#34;, &#34;description&#34;: &#34;Work-related tasks&#34;}&#39;
 
@@ -1184,8 +1166,8 @@ curl -X POST http://localhost:8080/api/categories \
   -H &#34;Content-Type: application/json&#34; \
   -d &#39;{&#34;name&#34;: &#34;Personal&#34;, &#34;description&#34;: &#34;Personal tasks&#34;}&#39;
 </code></pre>
-            <p><strong>3. Create Task</strong></p>
-            <pre><code language="language-bash" class="language-bash">curl -X POST http://localhost:8080/api/tasks \
+<p><strong>3. Create Task</strong></p>
+<pre><code language="language-bash" class="language-bash">curl -X POST http://localhost:8080/api/tasks \
   -H &#34;Content-Type: application/json&#34; \
   -d &#39;{
     &#34;title&#34;: &#34;Complete JPA Codelab&#34;,
@@ -1193,27 +1175,27 @@ curl -X POST http://localhost:8080/api/categories \
     &#34;status&#34;: &#34;TODO&#34;
   }&#39;
 </code></pre>
-            <p><strong>4. Assign Task to User</strong></p>
-            <pre><code language="language-bash" class="language-bash">curl -X PUT http://localhost:8080/api/tasks/1/assign/1
+<p><strong>4. Assign Task to User</strong></p>
+<pre><code language="language-bash" class="language-bash">curl -X PUT http://localhost:8080/api/tasks/1/assign/1
 </code></pre>
-            <p><strong>5. Add Categories to Task</strong></p>
-            <pre><code language="language-bash" class="language-bash">curl -X POST http://localhost:8080/api/tasks/1/categories \
+<p><strong>5. Add Categories to Task</strong></p>
+<pre><code language="language-bash" class="language-bash">curl -X POST http://localhost:8080/api/tasks/1/categories \
   -H &#34;Content-Type: application/json&#34; \
   -d &#39;[1, 2]&#39;
 </code></pre>
-            <p><strong>6. Search Tasks</strong></p>
-            <pre><code language="language-bash" class="language-bash">curl &#34;http://localhost:8080/api/tasks/search?keyword=JPA&#34;
+<p><strong>6. Search Tasks</strong></p>
+<pre><code language="language-bash" class="language-bash">curl &#34;http://localhost:8080/api/tasks/search?keyword=JPA&#34;
 </code></pre>
-            <p><strong>7. Get Task Stats</strong></p>
-            <pre><code language="language-bash" class="language-bash">curl http://localhost:8080/api/tasks/stats
+<p><strong>7. Get Task Stats</strong></p>
+<pre><code language="language-bash" class="language-bash">curl http://localhost:8080/api/tasks/stats
 </code></pre>
-            <h2 is-upgraded>Verify in H2 Console</h2>
-            <ol type="1">
-                <li>Visit: http://localhost:8080/h2-console</li>
-                <li>Connect with <code>jdbc:h2:mem:taskdb</code></li>
-                <li>Run queries:</li>
-            </ol>
-            <pre><code language="language-sql" class="language-sql">SELECT * FROM tasks;
+<h2 is-upgraded>Verify in H2 Console</h2>
+<ol type="1">
+<li>Visit: http://localhost:8080/h2-console</li>
+<li>Connect with <code>jdbc:h2:mem:taskdb</code></li>
+<li>Run queries:</li>
+</ol>
+<pre><code language="language-sql" class="language-sql">SELECT * FROM tasks;
 SELECT * FROM users;
 SELECT * FROM categories;
 SELECT * FROM task_categories;
@@ -1227,81 +1209,86 @@ LEFT JOIN categories c ON tc.category_id = c.id;
 </code></pre>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Conclusion" duration="2">
-            <p>Congratulations! 🎉 You&#39;ve added database persistence with Spring Data JPA!</p>
-            <h2 is-upgraded>What You&#39;ve Learned</h2>
-            <ul>
-                <li>✅ <strong>ORM Concepts:</strong> Object-Relational Mapping fundamentals</li>
-                <li>✅ <strong>JPA Entities:</strong> @Entity, @Table, @Column annotations</li>
-                <li>✅ <strong>Relationships:</strong> @OneToMany, @ManyToOne, @ManyToMany</li>
-                <li>✅ <strong>Spring Data JPA:</strong> Magic repository methods</li>
-                <li>✅ <strong>Query Methods:</strong> Derived queries and @Query</li>
-                <li>✅ <strong>Transactions:</strong> @Transactional management</li>
-                <li>✅ <strong>Database Config:</strong> H2 for dev, PostgreSQL for prod</li>
-                <li>✅ <strong>Cascade &amp; Fetch:</strong> Managing relationships</li>
-            </ul>
-            <h2 is-upgraded>Task Management API v1.2</h2>
-            <p>Database-backed features:</p>
-            <ul>
-                <li>✅ JPA entities with relationships</li>
-                <li>✅ User and Category entities</li>
-                <li>✅ Task assignment to users</li>
-                <li>✅ Many-to-many task categories</li>
-                <li>✅ Derived query methods</li>
-                <li>✅ Custom JPQL queries</li>
-                <li>✅ H2 console for development</li>
-                <li>✅ PostgreSQL ready for production</li>
-            </ul>
-            <h2 is-upgraded>Key Takeaways</h2>
-            <ol type="1">
-                <li><strong>Spring Data JPA</strong> eliminates boilerplate CRUD code</li>
-                <li><strong>Lazy loading</strong> prevents N+1 query problems</li>
-                <li><strong>@Transactional</strong> manages database transactions</li>
-                <li><strong>Query methods</strong> are generated from names</li>
-                <li><strong>@Query</strong> for complex queries</li>
-                <li><strong>H2</strong> perfect for development</li>
-                <li><strong>Relationships</strong> handled automatically</li>
-            </ol>
-            <h2 is-upgraded>Git Branching</h2>
-            <pre><code language="language-bash" class="language-bash">git add .
+      </google-codelab-step>
+    
+      <google-codelab-step label="Conclusion" duration="2">
+        <p>Congratulations! 🎉 You&#39;ve added database persistence with Spring Data JPA!</p>
+<h2 is-upgraded>What You&#39;ve Learned</h2>
+<ul>
+<li>✅ <strong>ORM Concepts:</strong> Object-Relational Mapping fundamentals</li>
+<li>✅ <strong>JPA Entities:</strong> @Entity, @Table, @Column annotations</li>
+<li>✅ <strong>Relationships:</strong> @OneToMany, @ManyToOne, @ManyToMany</li>
+<li>✅ <strong>Spring Data JPA:</strong> Magic repository methods</li>
+<li>✅ <strong>Query Methods:</strong> Derived queries and @Query</li>
+<li>✅ <strong>Transactions:</strong> @Transactional management</li>
+<li>✅ <strong>Database Config:</strong> H2 for dev, PostgreSQL for prod</li>
+<li>✅ <strong>Cascade &amp; Fetch:</strong> Managing relationships</li>
+</ul>
+<h2 is-upgraded>Task Management API v1.2</h2>
+<p>Database-backed features:</p>
+<ul>
+<li>✅ JPA entities with relationships</li>
+<li>✅ User and Category entities</li>
+<li>✅ Task assignment to users</li>
+<li>✅ Many-to-many task categories</li>
+<li>✅ Derived query methods</li>
+<li>✅ Custom JPQL queries</li>
+<li>✅ H2 console for development</li>
+<li>✅ PostgreSQL ready for production</li>
+</ul>
+<h2 is-upgraded>Key Takeaways</h2>
+<ol type="1">
+<li><strong>Spring Data JPA</strong> eliminates boilerplate CRUD code</li>
+<li><strong>Lazy loading</strong> prevents N+1 query problems</li>
+<li><strong>@Transactional</strong> manages database transactions</li>
+<li><strong>Query methods</strong> are generated from names</li>
+<li><strong>@Query</strong> for complex queries</li>
+<li><strong>H2</strong> perfect for development</li>
+<li><strong>Relationships</strong> handled automatically</li>
+</ol>
+<h2 is-upgraded>Git Branching</h2>
+<pre><code language="language-bash" class="language-bash">git add .
 git commit -m &#34;Codelab 3.3: ORM &amp; Spring Data JPA complete&#34;
 git tag codelab-3.3
 </code></pre>
-            <h2 is-upgraded>Next Steps</h2>
-            <ul>
-                <li><strong>Codelab 3.4:</strong> JPA Locking &amp; Spring Security</li>
-            </ul>
-            <h2 is-upgraded>Additional Resources</h2>
-            <ul>
-                <li><a href="https://docs.spring.io/spring-data/jpa/docs/current/reference/html/" target="_blank">Spring
-                        Data JPA Reference</a></li>
-                <li><a href="https://jakarta.ee/specifications/persistence/" target="_blank">JPA Specifications</a></li>
-                <li><a href="https://hibernate.org/orm/documentation/" target="_blank">Hibernate Documentation</a></li>
-            </ul>
-            <aside class="special">
-                <p><strong>Database Powered!</strong> Your Task API now has real database persistence with relationships
-                    and query capabilities. Ready for enterprise!</p>
-            </aside>
+<h2 is-upgraded>Next Steps</h2>
+<ul>
+<li><strong>Codelab 3.4:</strong> JPA Locking &amp; Spring Security</li>
+</ul>
+<h2 is-upgraded>Additional Resources</h2>
+<ul>
+<li><a href="https://docs.spring.io/spring-data/jpa/docs/current/reference/html/" target="_blank">Spring Data JPA Reference</a></li>
+<li><a href="https://jakarta.ee/specifications/persistence/" target="_blank">JPA Specifications</a></li>
+<li><a href="https://hibernate.org/orm/documentation/" target="_blank">Hibernate Documentation</a></li>
+</ul>
+<aside class="special"><p><strong>Database Powered!</strong> Your Task API now has real database persistence with relationships and query capabilities. Ready for enterprise!</p>
+</aside>
 
 
-        </google-codelab-step>
+      </google-codelab-step>
+    
+  </google-codelab>
 
-    </google-codelab>
-
-    <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
-    <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
-    <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
-    <script src="//support.google.com/inapp/api.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js"></script>
-    <script src="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.js"></script>
-    <script>
-        hljs.highlightAll();
-        hljs.addPlugin(new CopyButtonPlugin({ autohide: false }));
-
-    </script>
+  <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
+  <script src="//support.google.com/inapp/api.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js"></script>
+  <script src="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.js"></script>
+  <script>
+    hljs.highlightAll();
+    hljs.addPlugin(new CopyButtonPlugin({ autohide: false}));
+    
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      const homeUrl = "\/springboot_course\/";
+      const arrowBack = document.getElementById('arrow-back');
+      const doneBtn = document.getElementById('done');
+      if (arrowBack) arrowBack.href = homeUrl;
+      if (doneBtn) doneBtn.href = homeUrl;
+    });
+    
+  </script>
 
 </body>
-
 </html>

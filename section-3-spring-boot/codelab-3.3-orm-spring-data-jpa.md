@@ -3,6 +3,7 @@ id: orm-spring-data-jpa
 categories: Spring Boot, JPA, Hibernate, Database, ORM
 environments: Web
 status: Published
+home url: /springboot_course/
 
 # ORM Concepts & Spring Data JPA
 

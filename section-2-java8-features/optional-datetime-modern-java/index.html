@@ -1,75 +1,73 @@
+
 <!doctype html>
 
 <html>
-
 <head>
-    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
-    <meta name="theme-color" content="#4F7DC9">
-    <meta charset="UTF-8">
-    <title>Optional, Date/Time &amp; Modern Java Features</title>
-    <link rel="stylesheet"
-        href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
-    <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
-    <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
-    <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1  /build/styles/monokai.min.css">
-    <link rel="stylesheet" href="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.css">
-    <style>
-        .success {
-            color: #1e8e3e;
-        }
-
-        .error {
-            color: red;
-        }
-    </style>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <title>Optional, Date/Time &amp; Modern Java Features</title>
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
+  <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1  /build/styles/monokai.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.css">
+  <style>
+    .success {
+      color: #1e8e3e;
+    }
+    .error {
+      color: red;
+    }
+  </style>
 </head>
-
 <body>
-    <google-codelab-analytics gaid="UA-49880327-14" ga4id=""></google-codelab-analytics>
-    <google-codelab codelab-gaid="" codelab-ga4id="" id="optional-datetime-modern-java"
-        title="Optional, Date/Time &amp; Modern Java Features" environment="web" feedback-link="">
+  <google-codelab-analytics gaid="UA-49880327-14" ga4id=""></google-codelab-analytics>
+  <google-codelab codelab-gaid=""
+                  codelab-ga4id=""
+                  id="optional-datetime-modern-java"
+                  title="Optional, Date/Time &amp; Modern Java Features"
+                  environment="web"
+                  feedback-link="">
+    
+      <google-codelab-step label="Introduction" duration="5">
+        <p>Modern Java (8+) introduced powerful features that make code safer, more readable, and more maintainable. This codelab covers essential modern Java features you&#39;ll use daily.</p>
+<h2 class="checklist" is-upgraded>What You&#39;ll Learn</h2>
+<ul class="checklist">
+<li><strong>Optional API:</strong> Null-safe programming patterns</li>
+<li><strong>Date/Time API:</strong> LocalDate, LocalTime, LocalDateTime, ZonedDateTime</li>
+<li><strong>Period &amp; Duration:</strong> Time-based calculations</li>
+<li><strong>Date Formatting:</strong> DateTimeFormatter patterns</li>
+<li><strong>Immutable Collections:</strong> List.of, Set.of, Map.of (Java 9+)</li>
+<li><strong>Var Keyword:</strong> Local variable type inference (Java 10+)</li>
+<li><strong>Switch Expressions:</strong> Modern switch syntax (Java 14+)</li>
+<li><strong>Text Blocks:</strong> Multi-line strings (Java 15+)</li>
+<li><strong>Records:</strong> Immutable data carriers (Java 16+)</li>
+</ul>
+<h2 is-upgraded>What You&#39;ll Build</h2>
+<p>A comprehensive <strong>Conference Scheduling System</strong> featuring:</p>
+<ul>
+<li>Event management with time zones</li>
+<li>Speaker profile service with Optional null-safety</li>
+<li>Configuration manager using Records and text blocks</li>
+<li>Schedule conflict detection</li>
+<li>Multi-timezone event coordination</li>
+<li>Immutable data structures for thread-safety</li>
+</ul>
+<h2 is-upgraded>Prerequisites</h2>
+<ul>
+<li>Completed Codelab 2.1 (Functional Programming &amp; Streams)</li>
+<li>JDK 17+ installed</li>
+<li>Understanding of basic Java syntax</li>
+</ul>
 
-        <google-codelab-step label="Introduction" duration="5">
-            <p>Modern Java (8+) introduced powerful features that make code safer, more readable, and more maintainable.
-                This codelab covers essential modern Java features you&#39;ll use daily.</p>
-            <h2 class="checklist" is-upgraded>What You&#39;ll Learn</h2>
-            <ul class="checklist">
-                <li><strong>Optional API:</strong> Null-safe programming patterns</li>
-                <li><strong>Date/Time API:</strong> LocalDate, LocalTime, LocalDateTime, ZonedDateTime</li>
-                <li><strong>Period &amp; Duration:</strong> Time-based calculations</li>
-                <li><strong>Date Formatting:</strong> DateTimeFormatter patterns</li>
-                <li><strong>Immutable Collections:</strong> List.of, Set.of, Map.of (Java 9+)</li>
-                <li><strong>Var Keyword:</strong> Local variable type inference (Java 10+)</li>
-                <li><strong>Switch Expressions:</strong> Modern switch syntax (Java 14+)</li>
-                <li><strong>Text Blocks:</strong> Multi-line strings (Java 15+)</li>
-                <li><strong>Records:</strong> Immutable data carriers (Java 16+)</li>
-            </ul>
-            <h2 is-upgraded>What You&#39;ll Build</h2>
-            <p>A comprehensive <strong>Conference Scheduling System</strong> featuring:</p>
-            <ul>
-                <li>Event management with time zones</li>
-                <li>Speaker profile service with Optional null-safety</li>
-                <li>Configuration manager using Records and text blocks</li>
-                <li>Schedule conflict detection</li>
-                <li>Multi-timezone event coordination</li>
-                <li>Immutable data structures for thread-safety</li>
-            </ul>
-            <h2 is-upgraded>Prerequisites</h2>
-            <ul>
-                <li>Completed Codelab 2.1 (Functional Programming &amp; Streams)</li>
-                <li>JDK 17+ installed</li>
-                <li>Understanding of basic Java syntax</li>
-            </ul>
 
-
-        </google-codelab-step>
-
-        <google-codelab-step label="Understanding Optional" duration="12">
-            <p>Optional is a container object that may or may not contain a non-null value. It helps avoid
-                NullPointerException.</p>
-            <h2 is-upgraded>The Problem with Null</h2>
-            <pre><code language="language-java" class="language-java">// Traditional null-checking (error-prone)
+      </google-codelab-step>
+    
+      <google-codelab-step label="Understanding Optional" duration="12">
+        <p>Optional is a container object that may or may not contain a non-null value. It helps avoid NullPointerException.</p>
+<h2 is-upgraded>The Problem with Null</h2>
+<pre><code language="language-java" class="language-java">// Traditional null-checking (error-prone)
 public String getUserEmail(String userId) {
     User user = userRepository.findById(userId);
     if (user != null) {
@@ -84,12 +82,10 @@ public String getUserEmail(String userId) {
     return &#34;N/A&#34;;
 }
 </code></pre>
-            <aside class="warning">
-                <p><strong>The Billion Dollar Mistake:</strong> Tony Hoare, inventor of null references, calls them his
-                    &#34;billion-dollar mistake&#34; due to countless bugs and crashes they&#39;ve caused.</p>
-            </aside>
-            <h2 is-upgraded>Optional to the Rescue</h2>
-            <pre><code language="language-java" class="language-java">// With Optional (clean and safe)
+<aside class="warning"><p><strong>The Billion Dollar Mistake:</strong> Tony Hoare, inventor of null references, calls them his &#34;billion-dollar mistake&#34; due to countless bugs and crashes they&#39;ve caused.</p>
+</aside>
+<h2 is-upgraded>Optional to the Rescue</h2>
+<pre><code language="language-java" class="language-java">// With Optional (clean and safe)
 public String getUserEmail(String userId) {
     return userRepository.findById(userId)
         .map(User::getProfile)
@@ -98,8 +94,8 @@ public String getUserEmail(String userId) {
         .orElse(&#34;N/A&#34;);
 }
 </code></pre>
-            <h2 is-upgraded>Creating Optional</h2>
-            <pre><code language="language-java" class="language-java">import java.util.Optional;
+<h2 is-upgraded>Creating Optional</h2>
+<pre><code language="language-java" class="language-java">import java.util.Optional;
 
 // Empty Optional
 Optional&lt;String&gt; empty = Optional.empty();
@@ -121,8 +117,8 @@ String nonNullValue = &#34;Bob&#34;;
 Optional&lt;String&gt; present = Optional.ofNullable(nonNullValue);
 System.out.println(present.isPresent());  // true
 </code></pre>
-            <h2 is-upgraded>Checking for Values</h2>
-            <pre><code language="language-java" class="language-java">Optional&lt;String&gt; name = Optional.of(&#34;Alice&#34;);
+<h2 is-upgraded>Checking for Values</h2>
+<pre><code language="language-java" class="language-java">Optional&lt;String&gt; name = Optional.of(&#34;Alice&#34;);
 
 // Old way (not recommended)
 if (name.isPresent()) {
@@ -139,8 +135,8 @@ name.ifPresentOrElse(
     () -&gt; System.out.println(&#34;Not found&#34;)
 );
 </code></pre>
-            <h2 is-upgraded>Retrieving Values</h2>
-            <pre><code language="language-java" class="language-java">Optional&lt;String&gt; name = Optional.of(&#34;Alice&#34;);
+<h2 is-upgraded>Retrieving Values</h2>
+<pre><code language="language-java" class="language-java">Optional&lt;String&gt; name = Optional.of(&#34;Alice&#34;);
 Optional&lt;String&gt; empty = Optional.empty();
 
 // get() - throws if empty (avoid!)
@@ -162,14 +158,10 @@ String value6 = empty.orElseThrow(() -&gt;
 // or() - provide alternative Optional (Java 9+)
 Optional&lt;String&gt; alternative = empty.or(() -&gt; Optional.of(&#34;Default&#34;));
 </code></pre>
-            <aside class="special">
-                <p><strong>Best Practice:</strong> Prefer <code>orElse()</code>, <code>orElseGet()</code>, or
-                    <code>orElseThrow()</code> over <code>get()</code>. Never call <code>get()</code> without checking
-                    <code>isPresent()</code>.
-                </p>
-            </aside>
-            <h2 is-upgraded>Transforming Optional</h2>
-            <pre><code language="language-java" class="language-java">// map() - transform value
+<aside class="special"><p><strong>Best Practice:</strong> Prefer <code>orElse()</code>, <code>orElseGet()</code>, or <code>orElseThrow()</code> over <code>get()</code>. Never call <code>get()</code> without checking <code>isPresent()</code>.</p>
+</aside>
+<h2 is-upgraded>Transforming Optional</h2>
+<pre><code language="language-java" class="language-java">// map() - transform value
 Optional&lt;String&gt; name = Optional.of(&#34;alice&#34;);
 Optional&lt;String&gt; upper = name.map(String::toUpperCase);
 System.out.println(upper.get());  // &#34;ALICE&#34;
@@ -208,8 +200,8 @@ Optional&lt;String&gt; city = user
     .flatMap(User::getAddress)
     .map(Address::getCity);
 </code></pre>
-            <h2 is-upgraded>Filtering Optional</h2>
-            <pre><code language="language-java" class="language-java">Optional&lt;Integer&gt; age = Optional.of(25);
+<h2 is-upgraded>Filtering Optional</h2>
+<pre><code language="language-java" class="language-java">Optional&lt;Integer&gt; age = Optional.of(25);
 
 // filter() - keep if predicate matches
 Optional&lt;Integer&gt; adult = age.filter(a -&gt; a &gt;= 18);
@@ -227,8 +219,8 @@ Optional&lt;String&gt; validEmail = email
 
 validEmail.ifPresent(e -&gt; sendEmail(e));
 </code></pre>
-            <h2 is-upgraded>Practical Optional Examples</h2>
-            <pre><code language="language-java" class="language-java">import java.util.*;
+<h2 is-upgraded>Practical Optional Examples</h2>
+<pre><code language="language-java" class="language-java">import java.util.*;
 
 public class OptionalDemo {
     // Repository simulation
@@ -290,19 +282,16 @@ public class OptionalDemo {
     }
 }
 </code></pre>
-            <aside class="special">
-                <p><strong>Key Insight:</strong> Optional is designed for return types, not for fields or parameters.
-                    Use it to express &#34;this method might not return a value.&#34;</p>
-            </aside>
+<aside class="special"><p><strong>Key Insight:</strong> Optional is designed for return types, not for fields or parameters. Use it to express &#34;this method might not return a value.&#34;</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Date and Time API" duration="15">
-            <p>The modern Date/Time API (java.time package) replaces the old Date and Calendar classes with immutable,
-                thread-safe classes.</p>
-            <h2 is-upgraded>Core Classes</h2>
-            <pre><code language="language-java" class="language-java">import java.time.*;
+      </google-codelab-step>
+    
+      <google-codelab-step label="Date and Time API" duration="15">
+        <p>The modern Date/Time API (java.time package) replaces the old Date and Calendar classes with immutable, thread-safe classes.</p>
+<h2 is-upgraded>Core Classes</h2>
+<pre><code language="language-java" class="language-java">import java.time.*;
 
 // Current date
 LocalDate today = LocalDate.now();
@@ -326,8 +315,8 @@ Instant instant = Instant.now();
 System.out.println(&#34;Instant: &#34; + instant);
 // 2024-12-24T09:00:45.123Z (UTC)
 </code></pre>
-            <h2 is-upgraded>LocalDate Operations</h2>
-            <pre><code language="language-java" class="language-java">import java.time.LocalDate;
+<h2 is-upgraded>LocalDate Operations</h2>
+<pre><code language="language-java" class="language-java">import java.time.LocalDate;
 import java.time.Month;
 
 // Create specific dates
@@ -366,8 +355,8 @@ boolean isEqual = date1.isEqual(date4);    // false
 boolean isLeapYear = date1.isLeapYear();
 System.out.println(&#34;Is 2024 a leap year? &#34; + isLeapYear);  // true
 </code></pre>
-            <h2 is-upgraded>LocalTime Operations</h2>
-            <pre><code language="language-java" class="language-java">import java.time.LocalTime;
+<h2 is-upgraded>LocalTime Operations</h2>
+<pre><code language="language-java" class="language-java">import java.time.LocalTime;
 
 // Create specific times
 LocalTime time1 = LocalTime.of(14, 30);          // 14:30
@@ -395,8 +384,8 @@ LocalTime noon = LocalTime.NOON;          // 12:00
 LocalTime max = LocalTime.MAX;            // 23:59:59.999999999
 LocalTime min = LocalTime.MIN;            // 00:00
 </code></pre>
-            <h2 is-upgraded>LocalDateTime Operations</h2>
-            <pre><code language="language-java" class="language-java">import java.time.LocalDateTime;
+<h2 is-upgraded>LocalDateTime Operations</h2>
+<pre><code language="language-java" class="language-java">import java.time.LocalDateTime;
 
 // Combine date and time
 LocalDate date = LocalDate.of(2024, 12, 25);
@@ -418,8 +407,8 @@ LocalDateTime future = dateTime1
 LocalDateTime parsed = LocalDateTime.parse(&#34;2024-12-25T14:30:45&#34;);
 String formatted = dateTime1.toString();  // ISO format
 </code></pre>
-            <h2 is-upgraded>Working with Time Zones</h2>
-            <pre><code language="language-java" class="language-java">import java.time.*;
+<h2 is-upgraded>Working with Time Zones</h2>
+<pre><code language="language-java" class="language-java">import java.time.*;
 
 // Create ZonedDateTime
 ZonedDateTime nyTime = ZonedDateTime.now(ZoneId.of(&#34;America/New_York&#34;));
@@ -451,8 +440,8 @@ System.out.println(&#34;Total time zones: &#34; + allZones.size());
 ZoneOffset offset = ZoneOffset.of(&#34;+05:30&#34;);
 OffsetDateTime offsetDateTime = OffsetDateTime.now(offset);
 </code></pre>
-            <h2 is-upgraded>Period and Duration</h2>
-            <pre><code language="language-java" class="language-java">import java.time.*;
+<h2 is-upgraded>Period and Duration</h2>
+<pre><code language="language-java" class="language-java">import java.time.*;
 
 // Period - date-based (years, months, days)
 LocalDate start = LocalDate.of(2024, 1, 1);
@@ -496,8 +485,8 @@ long days = timeUntilMeeting.toDays();
 long hours = timeUntilMeeting.toHours();
 System.out.println(&#34;Meeting in &#34; + days + &#34; days or &#34; + hours + &#34; hours&#34;);
 </code></pre>
-            <h2 is-upgraded>Date Formatting</h2>
-            <pre><code language="language-java" class="language-java">import java.time.format.DateTimeFormatter;
+<h2 is-upgraded>Date Formatting</h2>
+<pre><code language="language-java" class="language-java">import java.time.format.DateTimeFormatter;
 import java.time.*;
 
 LocalDateTime dateTime = LocalDateTime.of(2024, 12, 25, 14, 30, 45);
@@ -541,12 +530,12 @@ System.out.println(&#34;Parsed: &#34; + parsed);
 </code></pre>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Modern Java Features" duration="15">
-            <p>Java 9+ introduced several features that make code cleaner and more expressive.</p>
-            <h2 is-upgraded>Immutable Collections (Java 9+)</h2>
-            <pre><code language="language-java" class="language-java">import java.util.*;
+      </google-codelab-step>
+    
+      <google-codelab-step label="Modern Java Features" duration="15">
+        <p>Java 9+ introduced several features that make code cleaner and more expressive.</p>
+<h2 is-upgraded>Immutable Collections (Java 9+)</h2>
+<pre><code language="language-java" class="language-java">import java.util.*;
 
 // Old way (mutable)
 List&lt;String&gt; oldList = new ArrayList&lt;&gt;();
@@ -589,12 +578,10 @@ Map&lt;String, String&gt; config = Map.ofEntries(
 List&lt;String&gt; mutableList = new ArrayList&lt;&gt;(fruits);  // Create mutable copy
 List&lt;String&gt; immutableCopy = List.copyOf(mutableList);
 </code></pre>
-            <aside class="special">
-                <p><strong>Performance:</strong> Immutable collections are more memory-efficient and faster than their
-                    mutable counterparts. Use them whenever you don&#39;t need to modify the collection.</p>
-            </aside>
-            <h2 is-upgraded>Var Keyword (Java 10+)</h2>
-            <pre><code language="language-java" class="language-java">// Type inference for local variables
+<aside class="special"><p><strong>Performance:</strong> Immutable collections are more memory-efficient and faster than their mutable counterparts. Use them whenever you don&#39;t need to modify the collection.</p>
+</aside>
+<h2 is-upgraded>Var Keyword (Java 10+)</h2>
+<pre><code language="language-java" class="language-java">// Type inference for local variables
 var message = &#34;Hello&#34;;  // String
 var count = 42;         // int
 var price = 99.99;      // double
@@ -631,12 +618,10 @@ try (var reader = new BufferedReader(new FileReader(&#34;file.txt&#34;))) {
 // var obscure = calculate();  // What type is this?
 int clear = calculate();     // Much better!
 </code></pre>
-            <aside class="warning">
-                <p><strong>Use Judiciously:</strong> var reduces boilerplate but can harm readability. Use it when the
-                    type is obvious from the right-hand side.</p>
-            </aside>
-            <h2 is-upgraded>Switch Expressions (Java 14+)</h2>
-            <pre><code language="language-java" class="language-java">// Old switch statement
+<aside class="warning"><p><strong>Use Judiciously:</strong> var reduces boilerplate but can harm readability. Use it when the type is obvious from the right-hand side.</p>
+</aside>
+<h2 is-upgraded>Switch Expressions (Java 14+)</h2>
+<pre><code language="language-java" class="language-java">// Old switch statement
 String dayType;
 int day = 3;
 switch (day) {
@@ -696,8 +681,8 @@ String message = switch (statusCode) {
     default -&gt; &#34;Unknown Status&#34;;
 };
 </code></pre>
-            <h2 is-upgraded>Text Blocks (Java 15+)</h2>
-            <pre><code language="language-java" class="language-java">// Old way (painful!)
+<h2 is-upgraded>Text Blocks (Java 15+)</h2>
+<pre><code language="language-java" class="language-java">// Old way (painful!)
 String json = &#34;{\n&#34; +
               &#34;  \&#34;name\&#34;: \&#34;Alice\&#34;,\n&#34; +
               &#34;  \&#34;age\&#34;: 25,\n&#34; +
@@ -759,12 +744,10 @@ String code = &#34;&#34;&#34;
     }
     &#34;&#34;&#34;;
 </code></pre>
-            <aside class="special">
-                <p><strong>Readability Win:</strong> Text blocks make multi-line strings readable and maintainable.
-                    Perfect for JSON, SQL, HTML, and code templates!</p>
-            </aside>
-            <h2 is-upgraded>Records (Java 16+)</h2>
-            <pre><code language="language-java" class="language-java">// Old way: POJO with boilerplate
+<aside class="special"><p><strong>Readability Win:</strong> Text blocks make multi-line strings readable and maintainable. Perfect for JSON, SQL, HTML, and code templates!</p>
+</aside>
+<h2 is-upgraded>Records (Java 16+)</h2>
+<pre><code language="language-java" class="language-java">// Old way: POJO with boilerplate
 class PersonOld {
     private final String name;
     private final int age;
@@ -847,13 +830,13 @@ var adults = people.stream()
 </code></pre>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Build Conference Scheduling System" duration="35">
-            <p>Let&#39;s build a complete conference scheduling system using all the modern Java features!</p>
-            <h2 is-upgraded>Project Structure</h2>
-            <p>Create <code>ConferenceScheduler.java</code>:</p>
-            <pre><code language="language-java" class="language-java">import java.time.*;
+      </google-codelab-step>
+    
+      <google-codelab-step label="Build Conference Scheduling System" duration="35">
+        <p>Let&#39;s build a complete conference scheduling system using all the modern Java features!</p>
+<h2 is-upgraded>Project Structure</h2>
+<p>Create <code>ConferenceScheduler.java</code>:</p>
+<pre><code language="language-java" class="language-java">import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.*;
@@ -1322,21 +1305,19 @@ public class ConferenceScheduler {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Run the Application</h2>
-            <pre>$ javac ConferenceScheduler.java
+<h2 is-upgraded>Run the Application</h2>
+<pre>$ javac ConferenceScheduler.java
 $ java ConferenceScheduler
 </pre>
-            <aside class="special">
-                <p><strong>Production Ready:</strong> This scheduler demonstrates real-world use of modern Java features
-                    with proper null-safety, immutability, and time zone handling!</p>
-            </aside>
+<aside class="special"><p><strong>Production Ready:</strong> This scheduler demonstrates real-world use of modern Java features with proper null-safety, immutability, and time zone handling!</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Testing Modern Features" duration="5">
-            <p>Let&#39;s create test cases for our modern Java code:</p>
-            <pre><code language="language-java" class="language-java">import java.util.*;
+      </google-codelab-step>
+    
+      <google-codelab-step label="Testing Modern Features" duration="5">
+        <p>Let&#39;s create test cases for our modern Java code:</p>
+<pre><code language="language-java" class="language-java">import java.util.*;
 import java.time.*;
 
 public class ModernJavaTests {
@@ -1453,86 +1434,90 @@ public class ModernJavaTests {
 </code></pre>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Conclusion" duration="3">
-            <p>Congratulations! 🎉 You&#39;ve mastered modern Java features!</p>
-            <h2 is-upgraded>What You&#39;ve Learned</h2>
-            <ul>
-                <li>✅ <strong>Optional API:</strong> Null-safe programming with proper error handling</li>
-                <li>✅ <strong>Date/Time API:</strong> Modern temporal handling with time zones</li>
-                <li>✅ <strong>Period &amp; Duration:</strong> Time-based calculations</li>
-                <li>✅ <strong>Immutable Collections:</strong> Thread-safe, efficient collections</li>
-                <li>✅ <strong>Var Keyword:</strong> Type inference for cleaner code</li>
-                <li>✅ <strong>Switch Expressions:</strong> Pattern matching and cleaner syntax</li>
-                <li>✅ <strong>Text Blocks:</strong> Multi-line strings made readable</li>
-                <li>✅ <strong>Records:</strong> Concise immutable data classes</li>
-            </ul>
-            <h2 is-upgraded>Key Takeaways</h2>
-            <ol type="1">
-                <li><strong>Optional</strong> prevents NullPointerException and makes APIs clearer</li>
-                <li><strong>java.time</strong> is immutable and thread-safe (unlike old Date/Calendar)</li>
-                <li><strong>Records</strong> eliminate boilerplate for data classes</li>
-                <li><strong>Text blocks</strong> improve readability for multi-line strings</li>
-                <li><strong>Switch expressions</strong> reduce boilerplate and errors</li>
-                <li><strong>Immutable collections</strong> are safer and more efficient</li>
-            </ol>
-            <h2 is-upgraded>Best Practices</h2>
-            <ul>
-                <li>Use Optional for return types, not for fields or parameters</li>
-                <li>Always specify time zones when dealing with timestamps</li>
-                <li>Prefer immutable collections when data doesn&#39;t change</li>
-                <li>Use var when the type is obvious from the right-hand side</li>
-                <li>Use records for simple data carriers</li>
-                <li>Use text blocks for SQL, JSON, HTML, and multi-line text</li>
-            </ul>
-            <h2 is-upgraded>Next Steps</h2>
-            <p>Ready for more? Continue to:</p>
-            <ul>
-                <li><strong>Codelab 2.3:</strong> Asynchronous Programming with CompletableFuture</li>
-                <li><strong>Codelab 2.4:</strong> Logging with Log4j</li>
-                <li><strong>Codelab 2.5:</strong> IDE Debugging Mastery</li>
-            </ul>
-            <h2 is-upgraded>Practice Exercises</h2>
-            <ol type="1">
-                <li><strong>Event Management:</strong> Build an event booking system with time zones</li>
-                <li><strong>User Profile Service:</strong> Implement profile management with Optional</li>
-                <li><strong>Configuration Manager:</strong> Parse JSON/YAML using records and text blocks</li>
-                <li><strong>Time Tracker:</strong> Build time tracking with different time zones</li>
-                <li><strong>Data Transfer Objects:</strong> Convert legacy POJOs to records</li>
-            </ol>
-            <h2 is-upgraded>Additional Resources</h2>
-            <ul>
-                <li><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Optional.html"
-                        target="_blank">Optional JavaDoc</a></li>
-                <li><a href="https://docs.oracle.com/javase/tutorial/datetime/" target="_blank">Date/Time API Guide</a>
-                </li>
-                <li><a href="https://openjdk.org/jeps/395" target="_blank">Records Tutorial</a></li>
-                <li><a href="https://openjdk.org/jeps/378" target="_blank">Text Blocks</a></li>
-                <li><a href="https://openjdk.org/projects/amber/" target="_blank">Pattern Matching</a></li>
-            </ul>
-            <aside class="special">
-                <p><strong>Excellent Progress!</strong> You&#39;re now equipped with modern Java features used in
-                    production applications worldwide. These skills are essential for Spring Boot development!</p>
-            </aside>
+      </google-codelab-step>
+    
+      <google-codelab-step label="Conclusion" duration="3">
+        <p>Congratulations! 🎉 You&#39;ve mastered modern Java features!</p>
+<h2 is-upgraded>What You&#39;ve Learned</h2>
+<ul>
+<li>✅ <strong>Optional API:</strong> Null-safe programming with proper error handling</li>
+<li>✅ <strong>Date/Time API:</strong> Modern temporal handling with time zones</li>
+<li>✅ <strong>Period &amp; Duration:</strong> Time-based calculations</li>
+<li>✅ <strong>Immutable Collections:</strong> Thread-safe, efficient collections</li>
+<li>✅ <strong>Var Keyword:</strong> Type inference for cleaner code</li>
+<li>✅ <strong>Switch Expressions:</strong> Pattern matching and cleaner syntax</li>
+<li>✅ <strong>Text Blocks:</strong> Multi-line strings made readable</li>
+<li>✅ <strong>Records:</strong> Concise immutable data classes</li>
+</ul>
+<h2 is-upgraded>Key Takeaways</h2>
+<ol type="1">
+<li><strong>Optional</strong> prevents NullPointerException and makes APIs clearer</li>
+<li><strong>java.time</strong> is immutable and thread-safe (unlike old Date/Calendar)</li>
+<li><strong>Records</strong> eliminate boilerplate for data classes</li>
+<li><strong>Text blocks</strong> improve readability for multi-line strings</li>
+<li><strong>Switch expressions</strong> reduce boilerplate and errors</li>
+<li><strong>Immutable collections</strong> are safer and more efficient</li>
+</ol>
+<h2 is-upgraded>Best Practices</h2>
+<ul>
+<li>Use Optional for return types, not for fields or parameters</li>
+<li>Always specify time zones when dealing with timestamps</li>
+<li>Prefer immutable collections when data doesn&#39;t change</li>
+<li>Use var when the type is obvious from the right-hand side</li>
+<li>Use records for simple data carriers</li>
+<li>Use text blocks for SQL, JSON, HTML, and multi-line text</li>
+</ul>
+<h2 is-upgraded>Next Steps</h2>
+<p>Ready for more? Continue to:</p>
+<ul>
+<li><strong>Codelab 2.3:</strong> Asynchronous Programming with CompletableFuture</li>
+<li><strong>Codelab 2.4:</strong> Logging with Log4j</li>
+<li><strong>Codelab 2.5:</strong> IDE Debugging Mastery</li>
+</ul>
+<h2 is-upgraded>Practice Exercises</h2>
+<ol type="1">
+<li><strong>Event Management:</strong> Build an event booking system with time zones</li>
+<li><strong>User Profile Service:</strong> Implement profile management with Optional</li>
+<li><strong>Configuration Manager:</strong> Parse JSON/YAML using records and text blocks</li>
+<li><strong>Time Tracker:</strong> Build time tracking with different time zones</li>
+<li><strong>Data Transfer Objects:</strong> Convert legacy POJOs to records</li>
+</ol>
+<h2 is-upgraded>Additional Resources</h2>
+<ul>
+<li><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Optional.html" target="_blank">Optional JavaDoc</a></li>
+<li><a href="https://docs.oracle.com/javase/tutorial/datetime/" target="_blank">Date/Time API Guide</a></li>
+<li><a href="https://openjdk.org/jeps/395" target="_blank">Records Tutorial</a></li>
+<li><a href="https://openjdk.org/jeps/378" target="_blank">Text Blocks</a></li>
+<li><a href="https://openjdk.org/projects/amber/" target="_blank">Pattern Matching</a></li>
+</ul>
+<aside class="special"><p><strong>Excellent Progress!</strong> You&#39;re now equipped with modern Java features used in production applications worldwide. These skills are essential for Spring Boot development!</p>
+</aside>
 
 
-        </google-codelab-step>
+      </google-codelab-step>
+    
+  </google-codelab>
 
-    </google-codelab>
-
-    <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
-    <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
-    <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
-    <script src="//support.google.com/inapp/api.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js"></script>
-    <script src="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.js"></script>
-    <script>
-        hljs.highlightAll();
-        hljs.addPlugin(new CopyButtonPlugin({ autohide: false }));
-
-    </script>
+  <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
+  <script src="//support.google.com/inapp/api.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js"></script>
+  <script src="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.js"></script>
+  <script>
+    hljs.highlightAll();
+    hljs.addPlugin(new CopyButtonPlugin({ autohide: false}));
+    
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      const homeUrl = "\/springboot_course\/";
+      const arrowBack = document.getElementById('arrow-back');
+      const doneBtn = document.getElementById('done');
+      if (arrowBack) arrowBack.href = homeUrl;
+      if (doneBtn) doneBtn.href = homeUrl;
+    });
+    
+  </script>
 
 </body>
-
 </html>

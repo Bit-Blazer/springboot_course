@@ -1,74 +1,72 @@
+
 <!doctype html>
 
 <html>
-
 <head>
-    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
-    <meta name="theme-color" content="#4F7DC9">
-    <meta charset="UTF-8">
-    <title>Exception Handling &amp; File I/O</title>
-    <link rel="stylesheet"
-        href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
-    <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
-    <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
-    <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1  /build/styles/monokai.min.css">
-    <link rel="stylesheet" href="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.css">
-    <style>
-        .success {
-            color: #1e8e3e;
-        }
-
-        .error {
-            color: red;
-        }
-    </style>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <title>Exception Handling &amp; File I/O</title>
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
+  <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1  /build/styles/monokai.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.css">
+  <style>
+    .success {
+      color: #1e8e3e;
+    }
+    .error {
+      color: red;
+    }
+  </style>
 </head>
-
 <body>
-    <google-codelab-analytics gaid="UA-49880327-14" ga4id=""></google-codelab-analytics>
-    <google-codelab codelab-gaid="" codelab-ga4id="" id="exception-handling-file-io"
-        title="Exception Handling &amp; File I/O" environment="web" feedback-link="">
+  <google-codelab-analytics gaid="UA-49880327-14" ga4id=""></google-codelab-analytics>
+  <google-codelab codelab-gaid=""
+                  codelab-ga4id=""
+                  id="exception-handling-file-io"
+                  title="Exception Handling &amp; File I/O"
+                  environment="web"
+                  feedback-link="">
+    
+      <google-codelab-step label="Introduction" duration="2">
+        <p>Robust applications must handle errors gracefully and persist data. In this codelab, you&#39;ll master Java&#39;s exception handling mechanisms and file I/O operations by building a real-world contact management system.</p>
+<h2 class="checklist" is-upgraded>What You&#39;ll Learn</h2>
+<ul class="checklist">
+<li>Exception hierarchy and types (checked vs unchecked)</li>
+<li>Try-catch-finally blocks and error handling patterns</li>
+<li>Throws clause and throw keyword</li>
+<li>Creating custom exceptions</li>
+<li>File class and file operations</li>
+<li>Reading and writing files (FileReader, FileWriter, BufferedReader, BufferedWriter)</li>
+<li>Try-with-resources for automatic resource management</li>
+<li>Best practices for error handling and recovery</li>
+</ul>
+<h2 is-upgraded>What You&#39;ll Build</h2>
+<p>A <strong>Contact Management System</strong> featuring:</p>
+<ul>
+<li>Add, update, delete, and search contacts</li>
+<li>CSV file-based persistent storage</li>
+<li>Comprehensive error handling</li>
+<li>Custom exceptions for validation</li>
+<li>Automatic resource management</li>
+<li>Graceful error recovery</li>
+</ul>
+<h2 is-upgraded>Prerequisites</h2>
+<ul>
+<li>Completed Codelab 1.1 and 1.2</li>
+<li>Understanding of OOP concepts</li>
+<li>Java JDK 17+ installed</li>
+</ul>
 
-        <google-codelab-step label="Introduction" duration="2">
-            <p>Robust applications must handle errors gracefully and persist data. In this codelab, you&#39;ll master
-                Java&#39;s exception handling mechanisms and file I/O operations by building a real-world contact
-                management system.</p>
-            <h2 class="checklist" is-upgraded>What You&#39;ll Learn</h2>
-            <ul class="checklist">
-                <li>Exception hierarchy and types (checked vs unchecked)</li>
-                <li>Try-catch-finally blocks and error handling patterns</li>
-                <li>Throws clause and throw keyword</li>
-                <li>Creating custom exceptions</li>
-                <li>File class and file operations</li>
-                <li>Reading and writing files (FileReader, FileWriter, BufferedReader, BufferedWriter)</li>
-                <li>Try-with-resources for automatic resource management</li>
-                <li>Best practices for error handling and recovery</li>
-            </ul>
-            <h2 is-upgraded>What You&#39;ll Build</h2>
-            <p>A <strong>Contact Management System</strong> featuring:</p>
-            <ul>
-                <li>Add, update, delete, and search contacts</li>
-                <li>CSV file-based persistent storage</li>
-                <li>Comprehensive error handling</li>
-                <li>Custom exceptions for validation</li>
-                <li>Automatic resource management</li>
-                <li>Graceful error recovery</li>
-            </ul>
-            <h2 is-upgraded>Prerequisites</h2>
-            <ul>
-                <li>Completed Codelab 1.1 and 1.2</li>
-                <li>Understanding of OOP concepts</li>
-                <li>Java JDK 17+ installed</li>
-            </ul>
 
-
-        </google-codelab-step>
-
-        <google-codelab-step label="Understanding Exceptions" duration="10">
-            <p>Exceptions are events that disrupt normal program flow. Let&#39;s understand how Java handles them.</p>
-            <h2 is-upgraded>Exception Hierarchy</h2>
-            <pre><code>Throwable
+      </google-codelab-step>
+    
+      <google-codelab-step label="Understanding Exceptions" duration="10">
+        <p>Exceptions are events that disrupt normal program flow. Let&#39;s understand how Java handles them.</p>
+<h2 is-upgraded>Exception Hierarchy</h2>
+<pre><code>Throwable
 ├── Error (unchecked - system errors)
 │   ├── OutOfMemoryError
 │   ├── StackOverflowError
@@ -85,62 +83,58 @@
         ├── ClassNotFoundException
         └── ...
 </code></pre>
-            <h2 is-upgraded>Checked vs Unchecked Exceptions</h2>
-            <p><strong>Checked Exceptions:</strong></p>
-            <ul>
-                <li>Must be handled or declared</li>
-                <li>Compiler enforces handling</li>
-                <li>Examples: IOException, SQLException</li>
-                <li>Represent recoverable conditions</li>
-            </ul>
-            <p><strong>Unchecked Exceptions (RuntimeException):</strong></p>
-            <ul>
-                <li>Not required to be handled</li>
-                <li>Indicate programming errors</li>
-                <li>Examples: NullPointerException, ArrayIndexOutOfBoundsException</li>
-                <li>Should be prevented through better code</li>
-            </ul>
-            <aside class="special">
-                <p><strong>Rule of Thumb:</strong> If a client can reasonably be expected to recover, use checked
-                    exceptions. If nothing can be done, use unchecked exceptions.</p>
-            </aside>
-            <h2 is-upgraded>Common Exception Examples</h2>
-            <p><strong>NullPointerException:</strong></p>
-            <pre><code language="language-java" class="language-java">public class NullPointerDemo {
+<h2 is-upgraded>Checked vs Unchecked Exceptions</h2>
+<p><strong>Checked Exceptions:</strong></p>
+<ul>
+<li>Must be handled or declared</li>
+<li>Compiler enforces handling</li>
+<li>Examples: IOException, SQLException</li>
+<li>Represent recoverable conditions</li>
+</ul>
+<p><strong>Unchecked Exceptions (RuntimeException):</strong></p>
+<ul>
+<li>Not required to be handled</li>
+<li>Indicate programming errors</li>
+<li>Examples: NullPointerException, ArrayIndexOutOfBoundsException</li>
+<li>Should be prevented through better code</li>
+</ul>
+<aside class="special"><p><strong>Rule of Thumb:</strong> If a client can reasonably be expected to recover, use checked exceptions. If nothing can be done, use unchecked exceptions.</p>
+</aside>
+<h2 is-upgraded>Common Exception Examples</h2>
+<p><strong>NullPointerException:</strong></p>
+<pre><code language="language-java" class="language-java">public class NullPointerDemo {
     public static void main(String[] args) {
         String name = null;
         System.out.println(name.length());  // NullPointerException!
     }
 }
 </code></pre>
-            <p><strong>ArrayIndexOutOfBoundsException:</strong></p>
-            <pre><code language="language-java" class="language-java">public class ArrayDemo {
+<p><strong>ArrayIndexOutOfBoundsException:</strong></p>
+<pre><code language="language-java" class="language-java">public class ArrayDemo {
     public static void main(String[] args) {
         int[] numbers = {1, 2, 3};
         System.out.println(numbers[5]);  // ArrayIndexOutOfBoundsException!
     }
 }
 </code></pre>
-            <p><strong>NumberFormatException:</strong></p>
-            <pre><code language="language-java" class="language-java">public class ParseDemo {
+<p><strong>NumberFormatException:</strong></p>
+<pre><code language="language-java" class="language-java">public class ParseDemo {
     public static void main(String[] args) {
         String text = &#34;abc&#34;;
         int number = Integer.parseInt(text);  // NumberFormatException!
     }
 }
 </code></pre>
-            <aside class="warning">
-                <p><strong>Important:</strong> Unchecked exceptions usually indicate bugs in your code. Fix the root
-                    cause instead of catching them!</p>
-            </aside>
+<aside class="warning"><p><strong>Important:</strong> Unchecked exceptions usually indicate bugs in your code. Fix the root cause instead of catching them!</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Try-Catch-Finally" duration="12">
-            <p>The try-catch-finally block is the foundation of exception handling.</p>
-            <h2 is-upgraded>Basic Try-Catch</h2>
-            <pre><code language="language-java" class="language-java">public class BasicExceptionHandling {
+      </google-codelab-step>
+    
+      <google-codelab-step label="Try-Catch-Finally" duration="12">
+        <p>The try-catch-finally block is the foundation of exception handling.</p>
+<h2 is-upgraded>Basic Try-Catch</h2>
+<pre><code language="language-java" class="language-java">public class BasicExceptionHandling {
     public static void main(String[] args) {
         try {
             int result = 10 / 0;  // ArithmeticException
@@ -154,13 +148,13 @@
     }
 }
 </code></pre>
-            <p>Output:</p>
-            <pre>Error: Cannot divide by zero!
+<p>Output:</p>
+<pre>Error: Cannot divide by zero!
 Exception message: / by zero
 Program continues...
 </pre>
-            <h2 is-upgraded>Multiple Catch Blocks</h2>
-            <pre><code language="language-java" class="language-java">public class MultipleCatch {
+<h2 is-upgraded>Multiple Catch Blocks</h2>
+<pre><code language="language-java" class="language-java">public class MultipleCatch {
     public static void main(String[] args) {
         String[] data = {&#34;10&#34;, &#34;20&#34;, &#34;abc&#34;, &#34;30&#34;};
 
@@ -178,17 +172,17 @@ Program continues...
     }
 }
 </code></pre>
-            <h2 is-upgraded>Multi-Catch (Java 7+)</h2>
-            <p>Handle multiple exceptions in one catch block:</p>
-            <pre><code language="language-java" class="language-java">try {
+<h2 is-upgraded>Multi-Catch (Java 7+)</h2>
+<p>Handle multiple exceptions in one catch block:</p>
+<pre><code language="language-java" class="language-java">try {
     // risky code
 } catch (IOException | SQLException e) {
     System.out.println(&#34;Database or file error: &#34; + e.getMessage());
 }
 </code></pre>
-            <h2 is-upgraded>Finally Block</h2>
-            <p><strong>Always executes</strong>, whether exception occurs or not:</p>
-            <pre><code language="language-java" class="language-java">public class FinallyDemo {
+<h2 is-upgraded>Finally Block</h2>
+<p><strong>Always executes</strong>, whether exception occurs or not:</p>
+<pre><code language="language-java" class="language-java">public class FinallyDemo {
     public static void main(String[] args) {
         java.util.Scanner scanner = null;
 
@@ -208,12 +202,10 @@ Program continues...
     }
 }
 </code></pre>
-            <aside class="special">
-                <p><strong>Key Insight:</strong> Finally block is perfect for cleanup operations - closing files,
-                    database connections, network sockets, etc.</p>
-            </aside>
-            <h2 is-upgraded>Complete Try-Catch-Finally Example</h2>
-            <pre><code language="language-java" class="language-java">import java.io.*;
+<aside class="special"><p><strong>Key Insight:</strong> Finally block is perfect for cleanup operations - closing files, database connections, network sockets, etc.</p>
+</aside>
+<h2 is-upgraded>Complete Try-Catch-Finally Example</h2>
+<pre><code language="language-java" class="language-java">import java.io.*;
 
 public class FileReadDemo {
     public static void main(String[] args) {
@@ -239,27 +231,25 @@ public class FileReadDemo {
     }
 }
 </code></pre>
-            <aside class="warning">
-                <p><strong>Watch Out:</strong> Nested try-catch in finally is verbose! Use try-with-resources instead
-                    (next section).</p>
-            </aside>
+<aside class="warning"><p><strong>Watch Out:</strong> Nested try-catch in finally is verbose! Use try-with-resources instead (next section).</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Try-With-Resources" duration="8">
-            <p>Try-with-resources automatically closes resources, making code cleaner and safer.</p>
-            <h2 is-upgraded>Syntax</h2>
-            <pre><code language="language-java" class="language-java">try (ResourceType resource = new ResourceType()) {
+      </google-codelab-step>
+    
+      <google-codelab-step label="Try-With-Resources" duration="8">
+        <p>Try-with-resources automatically closes resources, making code cleaner and safer.</p>
+<h2 is-upgraded>Syntax</h2>
+<pre><code language="language-java" class="language-java">try (ResourceType resource = new ResourceType()) {
     // Use resource
 } catch (Exception e) {
     // Handle exception
 }
 // resource is automatically closed here
 </code></pre>
-            <h2 is-upgraded>File Reading Example</h2>
-            <p><strong>Old way (verbose):</strong></p>
-            <pre><code language="language-java" class="language-java">BufferedReader reader = null;
+<h2 is-upgraded>File Reading Example</h2>
+<p><strong>Old way (verbose):</strong></p>
+<pre><code language="language-java" class="language-java">BufferedReader reader = null;
 try {
     reader = new BufferedReader(new FileReader(&#34;file.txt&#34;));
     String line = reader.readLine();
@@ -273,16 +263,16 @@ try {
     }
 }
 </code></pre>
-            <p><strong>New way (clean):</strong></p>
-            <pre><code language="language-java" class="language-java">try (BufferedReader reader = new BufferedReader(new FileReader(&#34;file.txt&#34;))) {
+<p><strong>New way (clean):</strong></p>
+<pre><code language="language-java" class="language-java">try (BufferedReader reader = new BufferedReader(new FileReader(&#34;file.txt&#34;))) {
     String line = reader.readLine();
     System.out.println(line);
 } catch (IOException e) {
     System.out.println(&#34;Error: &#34; + e.getMessage());
 }
 </code></pre>
-            <h2 is-upgraded>Multiple Resources</h2>
-            <pre><code language="language-java" class="language-java">try (
+<h2 is-upgraded>Multiple Resources</h2>
+<pre><code language="language-java" class="language-java">try (
     FileReader fileReader = new FileReader(&#34;input.txt&#34;);
     BufferedReader bufferedReader = new BufferedReader(fileReader);
     FileWriter fileWriter = new FileWriter(&#34;output.txt&#34;);
@@ -297,10 +287,9 @@ try {
     System.out.println(&#34;Error processing files: &#34; + e.getMessage());
 }
 </code></pre>
-            <h2 is-upgraded>AutoCloseable Interface</h2>
-            <p>Any class implementing <code>AutoCloseable</code> or <code>Closeable</code> can be used with
-                try-with-resources:</p>
-            <pre><code language="language-java" class="language-java">public class CustomResource implements AutoCloseable {
+<h2 is-upgraded>AutoCloseable Interface</h2>
+<p>Any class implementing <code>AutoCloseable</code> or <code>Closeable</code> can be used with try-with-resources:</p>
+<pre><code language="language-java" class="language-java">public class CustomResource implements AutoCloseable {
     public CustomResource() {
         System.out.println(&#34;Resource opened&#34;);
     }
@@ -320,19 +309,17 @@ try (CustomResource resource = new CustomResource()) {
     resource.doWork();
 }
 </code></pre>
-            <aside class="special">
-                <p><strong>Best Practice:</strong> Always use try-with-resources for file operations, database
-                    connections, and network sockets. It&#39;s safer and cleaner!</p>
-            </aside>
+<aside class="special"><p><strong>Best Practice:</strong> Always use try-with-resources for file operations, database connections, and network sockets. It&#39;s safer and cleaner!</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Throws and Throw Keywords" duration="10">
-            <p>The <code>throws</code> clause declares exceptions, while <code>throw</code> explicitly throws them.</p>
-            <h2 is-upgraded>Throws Clause</h2>
-            <p>Declare that a method might throw exceptions:</p>
-            <pre><code language="language-java" class="language-java">public class FileProcessor {
+      </google-codelab-step>
+    
+      <google-codelab-step label="Throws and Throw Keywords" duration="10">
+        <p>The <code>throws</code> clause declares exceptions, while <code>throw</code> explicitly throws them.</p>
+<h2 is-upgraded>Throws Clause</h2>
+<p>Declare that a method might throw exceptions:</p>
+<pre><code language="language-java" class="language-java">public class FileProcessor {
 
     // Declares it might throw IOException
     public String readFile(String filename) throws IOException {
@@ -349,8 +336,8 @@ try (CustomResource resource = new CustomResource()) {
     }
 }
 </code></pre>
-            <p><strong>Caller must handle or declare:</strong></p>
-            <pre><code language="language-java" class="language-java">public class Main {
+<p><strong>Caller must handle or declare:</strong></p>
+<pre><code language="language-java" class="language-java">public class Main {
     public static void main(String[] args) {
         FileProcessor processor = new FileProcessor();
 
@@ -370,9 +357,9 @@ try (CustomResource resource = new CustomResource()) {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Throw Keyword</h2>
-            <p>Explicitly throw an exception:</p>
-            <pre><code language="language-java" class="language-java">public class ValidationExample {
+<h2 is-upgraded>Throw Keyword</h2>
+<p>Explicitly throw an exception:</p>
+<pre><code language="language-java" class="language-java">public class ValidationExample {
 
     public void setAge(int age) {
         if (age &lt; 0 || age &gt; 150) {
@@ -398,8 +385,8 @@ try (CustomResource resource = new CustomResource()) {
     private int age;
 }
 </code></pre>
-            <h2 is-upgraded>Re-throwing Exceptions</h2>
-            <pre><code language="language-java" class="language-java">public void processFile(String filename) throws IOException {
+<h2 is-upgraded>Re-throwing Exceptions</h2>
+<pre><code language="language-java" class="language-java">public void processFile(String filename) throws IOException {
     try {
         // File operations
         BufferedReader reader = new BufferedReader(new FileReader(filename));
@@ -413,19 +400,17 @@ try (CustomResource resource = new CustomResource()) {
     }
 }
 </code></pre>
-            <aside class="special">
-                <p><strong>Tip:</strong> Re-throw exceptions when you want to log/handle locally but still notify the
-                    caller.</p>
-            </aside>
+<aside class="special"><p><strong>Tip:</strong> Re-throw exceptions when you want to log/handle locally but still notify the caller.</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Custom Exceptions" duration="12">
-            <p>Create your own exception classes for domain-specific errors.</p>
-            <h2 is-upgraded>Creating Checked Custom Exceptions</h2>
-            <p><strong>InvalidContactException.java:</strong></p>
-            <pre><code language="language-java" class="language-java">public class InvalidContactException extends Exception {
+      </google-codelab-step>
+    
+      <google-codelab-step label="Custom Exceptions" duration="12">
+        <p>Create your own exception classes for domain-specific errors.</p>
+<h2 is-upgraded>Creating Checked Custom Exceptions</h2>
+<p><strong>InvalidContactException.java:</strong></p>
+<pre><code language="language-java" class="language-java">public class InvalidContactException extends Exception {
 
     // No-arg constructor
     public InvalidContactException() {
@@ -448,8 +433,8 @@ try (CustomResource resource = new CustomResource()) {
     }
 }
 </code></pre>
-            <p><strong>FileOperationException.java:</strong></p>
-            <pre><code language="language-java" class="language-java">public class FileOperationException extends Exception {
+<p><strong>FileOperationException.java:</strong></p>
+<pre><code language="language-java" class="language-java">public class FileOperationException extends Exception {
     private String filename;
     private String operation;
 
@@ -474,9 +459,9 @@ try (CustomResource resource = new CustomResource()) {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Creating Unchecked Custom Exceptions</h2>
-            <p><strong>ContactNotFoundException.java:</strong></p>
-            <pre><code language="language-java" class="language-java">public class ContactNotFoundException extends RuntimeException {
+<h2 is-upgraded>Creating Unchecked Custom Exceptions</h2>
+<p><strong>ContactNotFoundException.java:</strong></p>
+<pre><code language="language-java" class="language-java">public class ContactNotFoundException extends RuntimeException {
     private String contactId;
 
     public ContactNotFoundException(String contactId) {
@@ -489,8 +474,8 @@ try (CustomResource resource = new CustomResource()) {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Using Custom Exceptions</h2>
-            <pre><code language="language-java" class="language-java">public class ContactValidator {
+<h2 is-upgraded>Using Custom Exceptions</h2>
+<pre><code language="language-java" class="language-java">public class ContactValidator {
 
     public void validateEmail(String email) throws InvalidContactException {
         if (email == null || email.trim().isEmpty()) {
@@ -528,18 +513,16 @@ try (CustomResource resource = new CustomResource()) {
     }
 }
 </code></pre>
-            <aside class="special">
-                <p><strong>Design Decision:</strong> Use checked exceptions for recoverable conditions (validation
-                    errors), unchecked for programming errors (null references).</p>
-            </aside>
+<aside class="special"><p><strong>Design Decision:</strong> Use checked exceptions for recoverable conditions (validation errors), unchecked for programming errors (null references).</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="File Operations" duration="15">
-            <p>Let&#39;s explore Java&#39;s file I/O capabilities.</p>
-            <h2 is-upgraded>File Class Basics</h2>
-            <pre><code language="language-java" class="language-java">import java.io.File;
+      </google-codelab-step>
+    
+      <google-codelab-step label="File Operations" duration="15">
+        <p>Let&#39;s explore Java&#39;s file I/O capabilities.</p>
+<h2 is-upgraded>File Class Basics</h2>
+<pre><code language="language-java" class="language-java">import java.io.File;
 
 public class FileBasics {
     public static void main(String[] args) {
@@ -573,8 +556,8 @@ public class FileBasics {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Directory Operations</h2>
-            <pre><code language="language-java" class="language-java">import java.io.File;
+<h2 is-upgraded>Directory Operations</h2>
+<pre><code language="language-java" class="language-java">import java.io.File;
 
 public class DirectoryOperations {
     public static void main(String[] args) {
@@ -607,9 +590,9 @@ public class DirectoryOperations {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Writing to Files</h2>
-            <p><strong>Using FileWriter:</strong></p>
-            <pre><code language="language-java" class="language-java">import java.io.*;
+<h2 is-upgraded>Writing to Files</h2>
+<p><strong>Using FileWriter:</strong></p>
+<pre><code language="language-java" class="language-java">import java.io.*;
 
 public class FileWriteDemo {
     public static void main(String[] args) {
@@ -630,8 +613,8 @@ public class FileWriteDemo {
     }
 }
 </code></pre>
-            <p><strong>Using BufferedWriter (More Efficient):</strong></p>
-            <pre><code language="language-java" class="language-java">import java.io.*;
+<p><strong>Using BufferedWriter (More Efficient):</strong></p>
+<pre><code language="language-java" class="language-java">import java.io.*;
 
 public class BufferedWriteDemo {
     public static void main(String[] args) {
@@ -655,9 +638,9 @@ public class BufferedWriteDemo {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Reading from Files</h2>
-            <p><strong>Using FileReader:</strong></p>
-            <pre><code language="language-java" class="language-java">import java.io.*;
+<h2 is-upgraded>Reading from Files</h2>
+<p><strong>Using FileReader:</strong></p>
+<pre><code language="language-java" class="language-java">import java.io.*;
 
 public class FileReadDemo {
     public static void main(String[] args) {
@@ -674,8 +657,8 @@ public class FileReadDemo {
     }
 }
 </code></pre>
-            <p><strong>Using BufferedReader (More Efficient):</strong></p>
-            <pre><code language="language-java" class="language-java">import java.io.*;
+<p><strong>Using BufferedReader (More Efficient):</strong></p>
+<pre><code language="language-java" class="language-java">import java.io.*;
 
 public class BufferedReadDemo {
     public static void main(String[] args) {
@@ -695,12 +678,10 @@ public class BufferedReadDemo {
     }
 }
 </code></pre>
-            <aside class="special">
-                <p><strong>Performance Tip:</strong> Always use BufferedReader/BufferedWriter for text files.
-                    They&#39;re significantly faster than FileReader/FileWriter for large files!</p>
-            </aside>
-            <h2 is-upgraded>CSV File Operations</h2>
-            <pre><code language="language-java" class="language-java">import java.io.*;
+<aside class="special"><p><strong>Performance Tip:</strong> Always use BufferedReader/BufferedWriter for text files. They&#39;re significantly faster than FileReader/FileWriter for large files!</p>
+</aside>
+<h2 is-upgraded>CSV File Operations</h2>
+<pre><code language="language-java" class="language-java">import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -753,13 +734,13 @@ public class CSVOperations {
 </code></pre>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Build Contact Management System" duration="25">
-            <p>Now let&#39;s build the complete Contact Management System integrating all concepts!</p>
-            <h2 is-upgraded>Contact Model</h2>
-            <p><strong>Contact.java:</strong></p>
-            <pre><code language="language-java" class="language-java">public class Contact {
+      </google-codelab-step>
+    
+      <google-codelab-step label="Build Contact Management System" duration="25">
+        <p>Now let&#39;s build the complete Contact Management System integrating all concepts!</p>
+<h2 is-upgraded>Contact Model</h2>
+<p><strong>Contact.java:</strong></p>
+<pre><code language="language-java" class="language-java">public class Contact {
     private String id;
     private String name;
     private String email;
@@ -825,9 +806,9 @@ public class CSVOperations {
     public void setAddress(String address) { this.address = address; }
 }
 </code></pre>
-            <h2 is-upgraded>Contact Manager Service</h2>
-            <p><strong>ContactManager.java:</strong></p>
-            <pre><code language="language-java" class="language-java">import java.io.*;
+<h2 is-upgraded>Contact Manager Service</h2>
+<p><strong>ContactManager.java:</strong></p>
+<pre><code language="language-java" class="language-java">import java.io.*;
 import java.util.*;
 
 public class ContactManager {
@@ -1011,9 +992,9 @@ public class ContactManager {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Main Application</h2>
-            <p><strong>ContactManagementApp.java:</strong></p>
-            <pre><code language="language-java" class="language-java">import java.util.*;
+<h2 is-upgraded>Main Application</h2>
+<p><strong>ContactManagementApp.java:</strong></p>
+<pre><code language="language-java" class="language-java">import java.util.*;
 
 public class ContactManagementApp {
     private static ContactManager manager;
@@ -1183,39 +1164,39 @@ public class ContactManagementApp {
 </code></pre>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Testing and Error Scenarios" duration="8">
-            <p>Let&#39;s test our system with various scenarios including error cases.</p>
-            <h2 is-upgraded>Test Scenarios</h2>
-            <p><strong>1. Normal Operations:</strong></p>
-            <pre>1. Add contacts with valid data
+      </google-codelab-step>
+    
+      <google-codelab-step label="Testing and Error Scenarios" duration="8">
+        <p>Let&#39;s test our system with various scenarios including error cases.</p>
+<h2 is-upgraded>Test Scenarios</h2>
+<p><strong>1. Normal Operations:</strong></p>
+<pre>1. Add contacts with valid data
 2. View all contacts
 3. Search by name
 4. Update contact information
 5. Delete a contact
 6. Export to backup file
 </pre>
-            <p><strong>2. Validation Errors:</strong></p>
-            <p>Try adding contacts with:</p>
-            <ul>
-                <li>Empty name</li>
-                <li>Invalid email (no @ symbol)</li>
-                <li>Phone with less than 10 digits</li>
-            </ul>
-            <p><strong>3. File Errors:</strong></p>
-            <ul>
-                <li>Delete <code>contacts.csv</code> while app is running</li>
-                <li>Try exporting to a read-only directory</li>
-                <li>Corrupt the CSV file (add invalid lines)</li>
-            </ul>
-            <p><strong>4. Not Found Errors:</strong></p>
-            <ul>
-                <li>Try to update non-existent contact ID</li>
-                <li>Try to delete non-existent contact ID</li>
-            </ul>
-            <h2 is-upgraded>Sample Test Session</h2>
-            <pre>========================================
+<p><strong>2. Validation Errors:</strong></p>
+<p>Try adding contacts with:</p>
+<ul>
+<li>Empty name</li>
+<li>Invalid email (no @ symbol)</li>
+<li>Phone with less than 10 digits</li>
+</ul>
+<p><strong>3. File Errors:</strong></p>
+<ul>
+<li>Delete <code>contacts.csv</code> while app is running</li>
+<li>Try exporting to a read-only directory</li>
+<li>Corrupt the CSV file (add invalid lines)</li>
+</ul>
+<p><strong>4. Not Found Errors:</strong></p>
+<ul>
+<li>Try to update non-existent contact ID</li>
+<li>Try to delete non-existent contact ID</li>
+</ul>
+<h2 is-upgraded>Sample Test Session</h2>
+<pre>========================================
    CONTACT MANAGEMENT SYSTEM v1.0
 ========================================
 
@@ -1251,19 +1232,17 @@ ID       Name                 Email                          Phone           Add
 ----------------------------------------------------------------------------------------------------
 C0001    Alice Johnson        alice@email.com                555-1234-5678   123 Main St, City
 </pre>
-            <aside class="special">
-                <p><strong>Testing Tip:</strong> Always test both happy paths (normal operations) and edge cases
-                    (errors, invalid data) to ensure robust error handling.</p>
-            </aside>
+<aside class="special"><p><strong>Testing Tip:</strong> Always test both happy paths (normal operations) and edge cases (errors, invalid data) to ensure robust error handling.</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Best Practices and Patterns" duration="5">
-            <p>Let&#39;s review best practices for exception handling and file operations.</p>
-            <h2 is-upgraded>Exception Handling Best Practices</h2>
-            <p><strong>1. Be Specific:</strong></p>
-            <pre><code language="language-java" class="language-java">// Bad - too generic
+      </google-codelab-step>
+    
+      <google-codelab-step label="Best Practices and Patterns" duration="5">
+        <p>Let&#39;s review best practices for exception handling and file operations.</p>
+<h2 is-upgraded>Exception Handling Best Practices</h2>
+<p><strong>1. Be Specific:</strong></p>
+<pre><code language="language-java" class="language-java">// Bad - too generic
 catch (Exception e) {
     e.printStackTrace();
 }
@@ -1275,8 +1254,8 @@ catch (FileNotFoundException e) {
     System.out.println(&#34;Error reading file: &#34; + e.getMessage());
 }
 </code></pre>
-            <p><strong>2. Don&#39;t Swallow Exceptions:</strong></p>
-            <pre><code language="language-java" class="language-java">// Bad - silent failure
+<p><strong>2. Don&#39;t Swallow Exceptions:</strong></p>
+<pre><code language="language-java" class="language-java">// Bad - silent failure
 try {
     riskyOperation();
 } catch (Exception e) {
@@ -1291,30 +1270,30 @@ try {
     // Or use logging framework
 }
 </code></pre>
-            <p><strong>3. Clean Up Resources:</strong></p>
-            <pre><code language="language-java" class="language-java">// Always use try-with-resources for AutoCloseable
+<p><strong>3. Clean Up Resources:</strong></p>
+<pre><code language="language-java" class="language-java">// Always use try-with-resources for AutoCloseable
 try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
     // Use reader
 }  // Automatically closed
 </code></pre>
-            <p><strong>4. Provide Context:</strong></p>
-            <pre><code language="language-java" class="language-java">// Good - helpful error messages
+<p><strong>4. Provide Context:</strong></p>
+<pre><code language="language-java" class="language-java">// Good - helpful error messages
 throw new InvalidContactException(
     &#34;Invalid email format: &#34; + email + &#34;. Must contain @ symbol.&#34;
 );
 </code></pre>
-            <h2 is-upgraded>File I/O Best Practices</h2>
-            <p><strong>1. Check File Existence:</strong></p>
-            <pre><code language="language-java" class="language-java">File file = new File(&#34;data.txt&#34;);
+<h2 is-upgraded>File I/O Best Practices</h2>
+<p><strong>1. Check File Existence:</strong></p>
+<pre><code language="language-java" class="language-java">File file = new File(&#34;data.txt&#34;);
 if (!file.exists()) {
     file.createNewFile();
 }
 </code></pre>
-            <p><strong>2. Use Absolute Paths When Possible:</strong></p>
-            <pre><code language="language-java" class="language-java">File file = new File(System.getProperty(&#34;user.home&#34;) + &#34;/data/contacts.csv&#34;);
+<p><strong>2. Use Absolute Paths When Possible:</strong></p>
+<pre><code language="language-java" class="language-java">File file = new File(System.getProperty(&#34;user.home&#34;) + &#34;/data/contacts.csv&#34;);
 </code></pre>
-            <p><strong>3. Handle Large Files Efficiently:</strong></p>
-            <pre><code language="language-java" class="language-java">// Read line by line, don&#39;t load entire file
+<p><strong>3. Handle Large Files Efficiently:</strong></p>
+<pre><code language="language-java" class="language-java">// Read line by line, don&#39;t load entire file
 try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
     String line;
     while ((line = reader.readLine()) != null) {
@@ -1322,89 +1301,91 @@ try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
     }
 }
 </code></pre>
-            <p><strong>4. Use Proper Character Encoding:</strong></p>
-            <pre><code language="language-java" class="language-java">try (BufferedWriter writer = new BufferedWriter(
+<p><strong>4. Use Proper Character Encoding:</strong></p>
+<pre><code language="language-java" class="language-java">try (BufferedWriter writer = new BufferedWriter(
         new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8))) {
     writer.write(&#34;Content with special chars: üñíçödé&#34;);
 }
 </code></pre>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Conclusion" duration="2">
-            <p>Congratulations! 🎉 You&#39;ve mastered exception handling and file I/O in Java!</p>
-            <h2 is-upgraded>What You&#39;ve Learned</h2>
-            <ul>
-                <li>✅ <strong>Exception Hierarchy:</strong> Understanding checked vs unchecked exceptions</li>
-                <li>✅ <strong>Try-Catch-Finally:</strong> Handling errors gracefully</li>
-                <li>✅ <strong>Try-With-Resources:</strong> Automatic resource management</li>
-                <li>✅ <strong>Custom Exceptions:</strong> Domain-specific error handling</li>
-                <li>✅ <strong>Throws/Throw:</strong> Declaring and throwing exceptions</li>
-                <li>✅ <strong>File Operations:</strong> Reading, writing, and managing files</li>
-                <li>✅ <strong>CSV Processing:</strong> Structured data storage</li>
-                <li>✅ <strong>Error Recovery:</strong> Building robust applications</li>
-            </ul>
-            <h2 is-upgraded>Key Takeaways</h2>
-            <ol type="1">
-                <li><strong>Always handle exceptions</strong> - Never let them crash your application</li>
-                <li><strong>Use try-with-resources</strong> - Automatic cleanup is safer</li>
-                <li><strong>Be specific</strong> - Catch specific exceptions, provide helpful messages</li>
-                <li><strong>Validate input</strong> - Prevent errors before they occur</li>
-                <li><strong>Clean up resources</strong> - Close files, connections, streams</li>
-                <li><strong>Custom exceptions</strong> - Create meaningful error types for your domain</li>
-                <li><strong>Fail gracefully</strong> - Provide users with actionable error messages</li>
-            </ol>
-            <h2 is-upgraded>Next Steps</h2>
-            <p>Continue building on these skills:</p>
-            <ul>
-                <li><strong>Codelab 1.4:</strong> Collections Framework &amp; Generics</li>
-                <li><strong>Codelab 1.5:</strong> Memory Management &amp; Garbage Collection</li>
-            </ul>
-            <h2 is-upgraded>Practice Exercises</h2>
-            <p>Enhance your Contact Manager:</p>
-            <ol type="1">
-                <li><strong>Import from CSV</strong> - Allow importing contacts from external CSV files</li>
-                <li><strong>Data Validation</strong> - Add more validation rules (unique emails, phone format)</li>
-                <li><strong>Backup/Restore</strong> - Automatic backups with timestamps</li>
-                <li><strong>Search Enhancement</strong> - Search by email, phone, or any field</li>
-                <li><strong>Logging</strong> - Add proper logging instead of System.out.println</li>
-                <li><strong>JSON Support</strong> - Support JSON format in addition to CSV</li>
-                <li><strong>Duplicate Detection</strong> - Warn when adding similar contacts</li>
-            </ol>
-            <h2 is-upgraded>Additional Resources</h2>
-            <ul>
-                <li><a href="https://docs.oracle.com/javase/tutorial/essential/exceptions/" target="_blank">Java
-                        Exception Handling Guide</a></li>
-                <li><a href="https://docs.oracle.com/javase/tutorial/essential/io/" target="_blank">Java I/O
-                        Tutorial</a></li>
-                <li><a href="https://www.oreilly.com/library/view/effective-java/9780134686097/"
-                        target="_blank">Effective Java - Chapter on Exceptions</a></li>
-                <li><a href="https://docs.oracle.com/javase/tutorial/essential/io/fileio.html" target="_blank">Java NIO
-                        (New I/O)</a></li>
-            </ul>
-            <aside class="special">
-                <p><strong>Excellent Work!</strong> You&#39;ve built a production-quality application with robust error
-                    handling and file persistence. These skills are essential for real-world Java development!</p>
-            </aside>
+      </google-codelab-step>
+    
+      <google-codelab-step label="Conclusion" duration="2">
+        <p>Congratulations! 🎉 You&#39;ve mastered exception handling and file I/O in Java!</p>
+<h2 is-upgraded>What You&#39;ve Learned</h2>
+<ul>
+<li>✅ <strong>Exception Hierarchy:</strong> Understanding checked vs unchecked exceptions</li>
+<li>✅ <strong>Try-Catch-Finally:</strong> Handling errors gracefully</li>
+<li>✅ <strong>Try-With-Resources:</strong> Automatic resource management</li>
+<li>✅ <strong>Custom Exceptions:</strong> Domain-specific error handling</li>
+<li>✅ <strong>Throws/Throw:</strong> Declaring and throwing exceptions</li>
+<li>✅ <strong>File Operations:</strong> Reading, writing, and managing files</li>
+<li>✅ <strong>CSV Processing:</strong> Structured data storage</li>
+<li>✅ <strong>Error Recovery:</strong> Building robust applications</li>
+</ul>
+<h2 is-upgraded>Key Takeaways</h2>
+<ol type="1">
+<li><strong>Always handle exceptions</strong> - Never let them crash your application</li>
+<li><strong>Use try-with-resources</strong> - Automatic cleanup is safer</li>
+<li><strong>Be specific</strong> - Catch specific exceptions, provide helpful messages</li>
+<li><strong>Validate input</strong> - Prevent errors before they occur</li>
+<li><strong>Clean up resources</strong> - Close files, connections, streams</li>
+<li><strong>Custom exceptions</strong> - Create meaningful error types for your domain</li>
+<li><strong>Fail gracefully</strong> - Provide users with actionable error messages</li>
+</ol>
+<h2 is-upgraded>Next Steps</h2>
+<p>Continue building on these skills:</p>
+<ul>
+<li><strong>Codelab 1.4:</strong> Collections Framework &amp; Generics</li>
+<li><strong>Codelab 1.5:</strong> Memory Management &amp; Garbage Collection</li>
+</ul>
+<h2 is-upgraded>Practice Exercises</h2>
+<p>Enhance your Contact Manager:</p>
+<ol type="1">
+<li><strong>Import from CSV</strong> - Allow importing contacts from external CSV files</li>
+<li><strong>Data Validation</strong> - Add more validation rules (unique emails, phone format)</li>
+<li><strong>Backup/Restore</strong> - Automatic backups with timestamps</li>
+<li><strong>Search Enhancement</strong> - Search by email, phone, or any field</li>
+<li><strong>Logging</strong> - Add proper logging instead of System.out.println</li>
+<li><strong>JSON Support</strong> - Support JSON format in addition to CSV</li>
+<li><strong>Duplicate Detection</strong> - Warn when adding similar contacts</li>
+</ol>
+<h2 is-upgraded>Additional Resources</h2>
+<ul>
+<li><a href="https://docs.oracle.com/javase/tutorial/essential/exceptions/" target="_blank">Java Exception Handling Guide</a></li>
+<li><a href="https://docs.oracle.com/javase/tutorial/essential/io/" target="_blank">Java I/O Tutorial</a></li>
+<li><a href="https://www.oreilly.com/library/view/effective-java/9780134686097/" target="_blank">Effective Java - Chapter on Exceptions</a></li>
+<li><a href="https://docs.oracle.com/javase/tutorial/essential/io/fileio.html" target="_blank">Java NIO (New I/O)</a></li>
+</ul>
+<aside class="special"><p><strong>Excellent Work!</strong> You&#39;ve built a production-quality application with robust error handling and file persistence. These skills are essential for real-world Java development!</p>
+</aside>
 
 
-        </google-codelab-step>
+      </google-codelab-step>
+    
+  </google-codelab>
 
-    </google-codelab>
-
-    <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
-    <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
-    <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
-    <script src="//support.google.com/inapp/api.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js"></script>
-    <script src="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.js"></script>
-    <script>
-        hljs.highlightAll();
-        hljs.addPlugin(new CopyButtonPlugin({ autohide: false }));
-
-    </script>
+  <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
+  <script src="//support.google.com/inapp/api.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js"></script>
+  <script src="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.js"></script>
+  <script>
+    hljs.highlightAll();
+    hljs.addPlugin(new CopyButtonPlugin({ autohide: false}));
+    
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      const homeUrl = "\/springboot_course\/";
+      const arrowBack = document.getElementById('arrow-back');
+      const doneBtn = document.getElementById('done');
+      if (arrowBack) arrowBack.href = homeUrl;
+      if (doneBtn) doneBtn.href = homeUrl;
+    });
+    
+  </script>
 
 </body>
-
 </html>

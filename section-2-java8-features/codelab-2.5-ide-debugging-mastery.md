@@ -3,6 +3,7 @@ id: ide-debugging-mastery
 categories: Java, Debugging, IntelliJ, Eclipse, IDE
 environments: Web
 status: Published
+home url: /springboot_course/
 
 # IDE Debugging Mastery
 

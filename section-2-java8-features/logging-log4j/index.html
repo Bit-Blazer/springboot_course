@@ -1,75 +1,72 @@
+
 <!doctype html>
 
 <html>
-
 <head>
-    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
-    <meta name="theme-color" content="#4F7DC9">
-    <meta charset="UTF-8">
-    <title>Logging with Log4j 2</title>
-    <link rel="stylesheet"
-        href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
-    <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
-    <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
-    <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1  /build/styles/monokai.min.css">
-    <link rel="stylesheet" href="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.css">
-    <style>
-        .success {
-            color: #1e8e3e;
-        }
-
-        .error {
-            color: red;
-        }
-    </style>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <title>Logging with Log4j 2</title>
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
+  <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1  /build/styles/monokai.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.css">
+  <style>
+    .success {
+      color: #1e8e3e;
+    }
+    .error {
+      color: red;
+    }
+  </style>
 </head>
-
 <body>
-    <google-codelab-analytics gaid="UA-49880327-14" ga4id=""></google-codelab-analytics>
-    <google-codelab codelab-gaid="" codelab-ga4id="" id="logging-log4j" title="Logging with Log4j 2" environment="web"
-        feedback-link="">
+  <google-codelab-analytics gaid="UA-49880327-14" ga4id=""></google-codelab-analytics>
+  <google-codelab codelab-gaid=""
+                  codelab-ga4id=""
+                  id="logging-log4j"
+                  title="Logging with Log4j 2"
+                  environment="web"
+                  feedback-link="">
+    
+      <google-codelab-step label="Introduction" duration="3">
+        <p>Logging is essential for monitoring, debugging, and maintaining applications in production. Log4j 2 is the most popular logging framework for Java, offering high performance and extensive configuration options.</p>
+<h2 class="checklist" is-upgraded>What You&#39;ll Learn</h2>
+<ul class="checklist">
+<li><strong>Logging Fundamentals:</strong> Why logging matters</li>
+<li><strong>Logging Levels:</strong> TRACE, DEBUG, INFO, WARN, ERROR, FATAL</li>
+<li><strong>Log4j 2 Architecture:</strong> Loggers, Appenders, Layouts</li>
+<li><strong>Configuration:</strong> XML and properties formats</li>
+<li><strong>Appenders:</strong> Console, File, RollingFile</li>
+<li><strong>Patterns:</strong> Custom log formatting</li>
+<li><strong>Best Practices:</strong> Performance, security, structured logging</li>
+<li><strong>Integration:</strong> Using with existing applications</li>
+</ul>
+<h2 is-upgraded>What You&#39;ll Build</h2>
+<p>Transform an existing application with:</p>
+<ul>
+<li>Multi-level logging strategy</li>
+<li>Console and file appenders</li>
+<li>Rolling file policies for production</li>
+<li>Custom log patterns with timestamps</li>
+<li>Async logging for performance</li>
+<li>MDC (Mapped Diagnostic Context) for request tracking</li>
+</ul>
+<h2 is-upgraded>Prerequisites</h2>
+<ul>
+<li>Completed Codelab 1.3 (Exception Handling)</li>
+<li>Understanding of Maven or Gradle</li>
+<li>Basic Java application knowledge</li>
+</ul>
 
-        <google-codelab-step label="Introduction" duration="3">
-            <p>Logging is essential for monitoring, debugging, and maintaining applications in production. Log4j 2 is
-                the most popular logging framework for Java, offering high performance and extensive configuration
-                options.</p>
-            <h2 class="checklist" is-upgraded>What You&#39;ll Learn</h2>
-            <ul class="checklist">
-                <li><strong>Logging Fundamentals:</strong> Why logging matters</li>
-                <li><strong>Logging Levels:</strong> TRACE, DEBUG, INFO, WARN, ERROR, FATAL</li>
-                <li><strong>Log4j 2 Architecture:</strong> Loggers, Appenders, Layouts</li>
-                <li><strong>Configuration:</strong> XML and properties formats</li>
-                <li><strong>Appenders:</strong> Console, File, RollingFile</li>
-                <li><strong>Patterns:</strong> Custom log formatting</li>
-                <li><strong>Best Practices:</strong> Performance, security, structured logging</li>
-                <li><strong>Integration:</strong> Using with existing applications</li>
-            </ul>
-            <h2 is-upgraded>What You&#39;ll Build</h2>
-            <p>Transform an existing application with:</p>
-            <ul>
-                <li>Multi-level logging strategy</li>
-                <li>Console and file appenders</li>
-                <li>Rolling file policies for production</li>
-                <li>Custom log patterns with timestamps</li>
-                <li>Async logging for performance</li>
-                <li>MDC (Mapped Diagnostic Context) for request tracking</li>
-            </ul>
-            <h2 is-upgraded>Prerequisites</h2>
-            <ul>
-                <li>Completed Codelab 1.3 (Exception Handling)</li>
-                <li>Understanding of Maven or Gradle</li>
-                <li>Basic Java application knowledge</li>
-            </ul>
 
-
-        </google-codelab-step>
-
-        <google-codelab-step label="Why Logging Matters" duration="5">
-            <p>Logging is your window into application behavior, especially in production where debugging isn&#39;t
-                possible.</p>
-            <h2 is-upgraded>The Problem with System.out.println</h2>
-            <pre><code language="language-java" class="language-java">// Bad: Using System.out for logging
+      </google-codelab-step>
+    
+      <google-codelab-step label="Why Logging Matters" duration="5">
+        <p>Logging is your window into application behavior, especially in production where debugging isn&#39;t possible.</p>
+<h2 is-upgraded>The Problem with System.out.println</h2>
+<pre><code language="language-java" class="language-java">// Bad: Using System.out for logging
 public class UserService {
     public User findUser(String id) {
         System.out.println(&#34;Finding user: &#34; + id);
@@ -79,17 +76,17 @@ public class UserService {
     }
 }
 </code></pre>
-            <p><strong>Problems:</strong></p>
-            <ul>
-                <li>❌ No log levels (can&#39;t filter by severity)</li>
-                <li>❌ No timestamps</li>
-                <li>❌ Can&#39;t redirect to files</li>
-                <li>❌ No structured format</li>
-                <li>❌ Performance issues (synchronous)</li>
-                <li>❌ Hard to disable in production</li>
-            </ul>
-            <h2 is-upgraded>Proper Logging with Log4j</h2>
-            <pre><code language="language-java" class="language-java">import org.apache.logging.log4j.LogManager;
+<p><strong>Problems:</strong></p>
+<ul>
+<li>❌ No log levels (can&#39;t filter by severity)</li>
+<li>❌ No timestamps</li>
+<li>❌ Can&#39;t redirect to files</li>
+<li>❌ No structured format</li>
+<li>❌ Performance issues (synchronous)</li>
+<li>❌ Hard to disable in production</li>
+</ul>
+<h2 is-upgraded>Proper Logging with Log4j</h2>
+<pre><code language="language-java" class="language-java">import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class UserService {
@@ -109,21 +106,19 @@ public class UserService {
     }
 }
 </code></pre>
-            <p><strong>Benefits:</strong></p>
-            <ul>
-                <li>✅ Log levels for filtering</li>
-                <li>✅ Automatic timestamps</li>
-                <li>✅ Multiple output destinations</li>
-                <li>✅ Structured, parseable format</li>
-                <li>✅ High performance</li>
-                <li>✅ Easy to configure</li>
-            </ul>
-            <aside class="special">
-                <p><strong>Production Ready:</strong> Proper logging is non-negotiable for production applications.
-                    It&#39;s your primary tool for diagnosing issues after deployment.</p>
-            </aside>
-            <h2 is-upgraded>Common Use Cases</h2>
-            <pre><code language="language-java" class="language-java">// 1. Debugging during development
+<p><strong>Benefits:</strong></p>
+<ul>
+<li>✅ Log levels for filtering</li>
+<li>✅ Automatic timestamps</li>
+<li>✅ Multiple output destinations</li>
+<li>✅ Structured, parseable format</li>
+<li>✅ High performance</li>
+<li>✅ Easy to configure</li>
+</ul>
+<aside class="special"><p><strong>Production Ready:</strong> Proper logging is non-negotiable for production applications. It&#39;s your primary tool for diagnosing issues after deployment.</p>
+</aside>
+<h2 is-upgraded>Common Use Cases</h2>
+<pre><code language="language-java" class="language-java">// 1. Debugging during development
 logger.debug(&#34;Request payload: {}&#34;, requestJson);
 
 // 2. Tracking user actions
@@ -145,54 +140,50 @@ logger.info(&#34;Operation completed in {}ms&#34;, System.currentTimeMillis() - 
 </code></pre>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Logging Levels" duration="8">
-            <p>Log4j 2 provides six logging levels, ordered from most verbose to most severe.</p>
-            <h2 is-upgraded>Level Hierarchy</h2>
-            <pre><code>ALL &lt; TRACE &lt; DEBUG &lt; INFO &lt; WARN &lt; ERROR &lt; FATAL &lt; OFF
+      </google-codelab-step>
+    
+      <google-codelab-step label="Logging Levels" duration="8">
+        <p>Log4j 2 provides six logging levels, ordered from most verbose to most severe.</p>
+<h2 is-upgraded>Level Hierarchy</h2>
+<pre><code>ALL &lt; TRACE &lt; DEBUG &lt; INFO &lt; WARN &lt; ERROR &lt; FATAL &lt; OFF
 </code></pre>
-            <h2 is-upgraded>TRACE - Finest Detail</h2>
-            <pre><code language="language-java" class="language-java">logger.trace(&#34;Entering method processOrder()&#34;);
+<h2 is-upgraded>TRACE - Finest Detail</h2>
+<pre><code language="language-java" class="language-java">logger.trace(&#34;Entering method processOrder()&#34;);
 logger.trace(&#34;Processing item: {}&#34;, item);
 logger.trace(&#34;Loop iteration: {}&#34;, i);
 </code></pre>
-            <p><strong>When to use:</strong> Very detailed information, typically only enabled during development or
-                deep troubleshooting.</p>
-            <h2 is-upgraded>DEBUG - Diagnostic Information</h2>
-            <pre><code language="language-java" class="language-java">logger.debug(&#34;Database query: {}&#34;, sql);
+<p><strong>When to use:</strong> Very detailed information, typically only enabled during development or deep troubleshooting.</p>
+<h2 is-upgraded>DEBUG - Diagnostic Information</h2>
+<pre><code language="language-java" class="language-java">logger.debug(&#34;Database query: {}&#34;, sql);
 logger.debug(&#34;Cache hit rate: {}&#34;, hitRate);
 logger.debug(&#34;Request parameters: {}&#34;, params);
 </code></pre>
-            <p><strong>When to use:</strong> Information useful for debugging, typically disabled in production.</p>
-            <h2 is-upgraded>INFO - General Information</h2>
-            <pre><code language="language-java" class="language-java">logger.info(&#34;Application started successfully&#34;);
+<p><strong>When to use:</strong> Information useful for debugging, typically disabled in production.</p>
+<h2 is-upgraded>INFO - General Information</h2>
+<pre><code language="language-java" class="language-java">logger.info(&#34;Application started successfully&#34;);
 logger.info(&#34;User {} created account&#34;, username);
 logger.info(&#34;Processing batch of {} records&#34;, count);
 </code></pre>
-            <p><strong>When to use:</strong> Important events that happen during normal operation. Default production
-                level.</p>
-            <h2 is-upgraded>WARN - Warning Messages</h2>
-            <pre><code language="language-java" class="language-java">logger.warn(&#34;Database connection pool is 80% utilized&#34;);
+<p><strong>When to use:</strong> Important events that happen during normal operation. Default production level.</p>
+<h2 is-upgraded>WARN - Warning Messages</h2>
+<pre><code language="language-java" class="language-java">logger.warn(&#34;Database connection pool is 80% utilized&#34;);
 logger.warn(&#34;API response time exceeded 2 seconds: {}ms&#34;, responseTime);
 logger.warn(&#34;Deprecated method called: {}&#34;, methodName);
 </code></pre>
-            <p><strong>When to use:</strong> Potentially harmful situations that don&#39;t prevent operation but need
-                attention.</p>
-            <h2 is-upgraded>ERROR - Error Events</h2>
-            <pre><code language="language-java" class="language-java">logger.error(&#34;Failed to connect to database&#34;, exception);
+<p><strong>When to use:</strong> Potentially harmful situations that don&#39;t prevent operation but need attention.</p>
+<h2 is-upgraded>ERROR - Error Events</h2>
+<pre><code language="language-java" class="language-java">logger.error(&#34;Failed to connect to database&#34;, exception);
 logger.error(&#34;Payment processing failed for order {}&#34;, orderId, e);
 logger.error(&#34;Invalid configuration: {}&#34;, configKey);
 </code></pre>
-            <p><strong>When to use:</strong> Error events that might still allow the application to continue running.
-            </p>
-            <h2 is-upgraded>FATAL - Critical Errors</h2>
-            <pre><code language="language-java" class="language-java">logger.fatal(&#34;Database is unreachable, shutting down&#34;, exception);
+<p><strong>When to use:</strong> Error events that might still allow the application to continue running.</p>
+<h2 is-upgraded>FATAL - Critical Errors</h2>
+<pre><code language="language-java" class="language-java">logger.fatal(&#34;Database is unreachable, shutting down&#34;, exception);
 logger.fatal(&#34;Critical configuration missing: {}&#34;, requiredConfig);
 </code></pre>
-            <p><strong>When to use:</strong> Severe errors that will presumably lead the application to abort.</p>
-            <h2 is-upgraded>Practical Example</h2>
-            <pre><code language="language-java" class="language-java">import org.apache.logging.log4j.LogManager;
+<p><strong>When to use:</strong> Severe errors that will presumably lead the application to abort.</p>
+<h2 is-upgraded>Practical Example</h2>
+<pre><code language="language-java" class="language-java">import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class OrderProcessor {
@@ -227,8 +218,8 @@ public class OrderProcessor {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Log Level Configuration</h2>
-            <pre><code language="language-xml" class="language-xml">&lt;!-- log4j2.xml --&gt;
+<h2 is-upgraded>Log Level Configuration</h2>
+<pre><code language="language-xml" class="language-xml">&lt;!-- log4j2.xml --&gt;
 &lt;Configuration&gt;
     &lt;Loggers&gt;
         &lt;!-- Root logger: INFO level --&gt;
@@ -243,18 +234,16 @@ public class OrderProcessor {
     &lt;/Loggers&gt;
 &lt;/Configuration&gt;
 </code></pre>
-            <aside class="special">
-                <p><strong>Best Practice:</strong> Use INFO as the default production level. Enable DEBUG or TRACE only
-                    for specific packages when troubleshooting.</p>
-            </aside>
+<aside class="special"><p><strong>Best Practice:</strong> Use INFO as the default production level. Enable DEBUG or TRACE only for specific packages when troubleshooting.</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Log4j 2 Setup" duration="10">
-            <p>Let&#39;s set up Log4j 2 in a Java project.</p>
-            <h2 is-upgraded>Maven Dependencies</h2>
-            <pre><code language="language-xml" class="language-xml">&lt;!-- pom.xml --&gt;
+      </google-codelab-step>
+    
+      <google-codelab-step label="Log4j 2 Setup" duration="10">
+        <p>Let&#39;s set up Log4j 2 in a Java project.</p>
+<h2 is-upgraded>Maven Dependencies</h2>
+<pre><code language="language-xml" class="language-xml">&lt;!-- pom.xml --&gt;
 &lt;dependencies&gt;
     &lt;!-- Log4j 2 Core --&gt;
     &lt;dependency&gt;
@@ -278,8 +267,8 @@ public class OrderProcessor {
     &lt;/dependency&gt;
 &lt;/dependencies&gt;
 </code></pre>
-            <h2 is-upgraded>Gradle Dependencies</h2>
-            <pre><code language="language-gradle" class="language-gradle">// build.gradle
+<h2 is-upgraded>Gradle Dependencies</h2>
+<pre><code language="language-gradle" class="language-gradle">// build.gradle
 dependencies {
     implementation &#39;org.apache.logging.log4j:log4j-core:2.21.1&#39;
     implementation &#39;org.apache.logging.log4j:log4j-api:2.21.1&#39;
@@ -288,9 +277,9 @@ dependencies {
     implementation &#39;org.apache.logging.log4j:log4j-slf4j-impl:2.21.1&#39;
 }
 </code></pre>
-            <h2 is-upgraded>Basic Configuration - log4j2.xml</h2>
-            <p>Create <code>src/main/resources/log4j2.xml</code>:</p>
-            <pre><code language="language-xml" class="language-xml">&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
+<h2 is-upgraded>Basic Configuration - log4j2.xml</h2>
+<p>Create <code>src/main/resources/log4j2.xml</code>:</p>
+<pre><code language="language-xml" class="language-xml">&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
 &lt;Configuration status=&#34;WARN&#34;&gt;
     &lt;Appenders&gt;
         &lt;!-- Console Appender --&gt;
@@ -306,9 +295,9 @@ dependencies {
     &lt;/Loggers&gt;
 &lt;/Configuration&gt;
 </code></pre>
-            <h2 is-upgraded>Alternative - log4j2.properties</h2>
-            <p>Create <code>src/main/resources/log4j2.properties</code>:</p>
-            <pre><code language="language-properties" class="language-properties"># Root logger
+<h2 is-upgraded>Alternative - log4j2.properties</h2>
+<p>Create <code>src/main/resources/log4j2.properties</code>:</p>
+<pre><code language="language-properties" class="language-properties"># Root logger
 rootLogger.level = INFO
 rootLogger.appenderRef.console.ref = Console
 
@@ -318,8 +307,8 @@ appender.console.name = Console
 appender.console.layout.type = PatternLayout
 appender.console.layout.pattern = %d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n
 </code></pre>
-            <h2 is-upgraded>Basic Usage</h2>
-            <pre><code language="language-java" class="language-java">import org.apache.logging.log4j.LogManager;
+<h2 is-upgraded>Basic Usage</h2>
+<pre><code language="language-java" class="language-java">import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class Application {
@@ -341,37 +330,34 @@ public class Application {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Verify Setup</h2>
-            <pre>$ mvn compile
+<h2 is-upgraded>Verify Setup</h2>
+<pre>$ mvn compile
 $ mvn exec:java -Dexec.mainClass=&#34;Application&#34;
 
 14:30:45.123 [main] INFO  Application - Application starting...
 14:30:45.456 [main] INFO  Application - Processing complete
 14:30:45.789 [main] INFO  Application - Application shutting down
 </pre>
-            <aside class="warning">
-                <p><strong>Important:</strong> Place log4j2.xml (or log4j2.properties) in
-                    <code>src/main/resources</code> so it&#39;s included in the classpath.
-                </p>
-            </aside>
+<aside class="warning"><p><strong>Important:</strong> Place log4j2.xml (or log4j2.properties) in <code>src/main/resources</code> so it&#39;s included in the classpath.</p>
+</aside>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Appenders and Layouts" duration="12">
-            <p>Appenders control where logs go. Layouts control how they look.</p>
-            <h2 is-upgraded>Console Appender</h2>
-            <pre><code language="language-xml" class="language-xml">&lt;Console name=&#34;Console&#34; target=&#34;SYSTEM_OUT&#34;&gt;
+      </google-codelab-step>
+    
+      <google-codelab-step label="Appenders and Layouts" duration="12">
+        <p>Appenders control where logs go. Layouts control how they look.</p>
+<h2 is-upgraded>Console Appender</h2>
+<pre><code language="language-xml" class="language-xml">&lt;Console name=&#34;Console&#34; target=&#34;SYSTEM_OUT&#34;&gt;
     &lt;PatternLayout pattern=&#34;%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n&#34;/&gt;
 &lt;/Console&gt;
 </code></pre>
-            <h2 is-upgraded>File Appender</h2>
-            <pre><code language="language-xml" class="language-xml">&lt;File name=&#34;FileLogger&#34; fileName=&#34;logs/application.log&#34;&gt;
+<h2 is-upgraded>File Appender</h2>
+<pre><code language="language-xml" class="language-xml">&lt;File name=&#34;FileLogger&#34; fileName=&#34;logs/application.log&#34;&gt;
     &lt;PatternLayout pattern=&#34;%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level %logger{36} - %msg%n&#34;/&gt;
 &lt;/File&gt;
 </code></pre>
-            <h2 is-upgraded>RollingFile Appender (Production)</h2>
-            <pre><code language="language-xml" class="language-xml">&lt;RollingFile name=&#34;RollingFile&#34;
+<h2 is-upgraded>RollingFile Appender (Production)</h2>
+<pre><code language="language-xml" class="language-xml">&lt;RollingFile name=&#34;RollingFile&#34;
              fileName=&#34;logs/app.log&#34;
              filePattern=&#34;logs/app-%d{yyyy-MM-dd}-%i.log.gz&#34;&gt;
 
@@ -391,8 +377,8 @@ $ mvn exec:java -Dexec.mainClass=&#34;Application&#34;
     &lt;DefaultRolloverStrategy max=&#34;30&#34;/&gt;
 &lt;/RollingFile&gt;
 </code></pre>
-            <h2 is-upgraded>Async Appender (High Performance)</h2>
-            <pre><code language="language-xml" class="language-xml">&lt;Async name=&#34;AsyncConsole&#34;&gt;
+<h2 is-upgraded>Async Appender (High Performance)</h2>
+<pre><code language="language-xml" class="language-xml">&lt;Async name=&#34;AsyncConsole&#34;&gt;
     &lt;AppenderRef ref=&#34;Console&#34;/&gt;
 &lt;/Async&gt;
 
@@ -400,8 +386,8 @@ $ mvn exec:java -Dexec.mainClass=&#34;Application&#34;
     &lt;AppenderRef ref=&#34;RollingFile&#34;/&gt;
 &lt;/Async&gt;
 </code></pre>
-            <h2 is-upgraded>Pattern Layout Syntax</h2>
-            <pre><code>%d{yyyy-MM-dd HH:mm:ss.SSS} - Date/time
+<h2 is-upgraded>Pattern Layout Syntax</h2>
+<pre><code>%d{yyyy-MM-dd HH:mm:ss.SSS} - Date/time
 %t or %thread - Thread name
 %-5level - Log level (left-justified, 5 chars)
 %logger{36} - Logger name (max 36 chars)
@@ -414,8 +400,8 @@ $ mvn exec:java -Dexec.mainClass=&#34;Application&#34;
 %highlight{...} - Colored output
 %X{key} - MDC value
 </code></pre>
-            <h2 is-upgraded>Custom Patterns</h2>
-            <pre><code language="language-xml" class="language-xml">&lt;!-- Simple pattern --&gt;
+<h2 is-upgraded>Custom Patterns</h2>
+<pre><code language="language-xml" class="language-xml">&lt;!-- Simple pattern --&gt;
 &lt;PatternLayout pattern=&#34;%d %level %msg%n&#34;/&gt;
 
 &lt;!-- Detailed pattern --&gt;
@@ -429,8 +415,8 @@ $ mvn exec:java -Dexec.mainClass=&#34;Application&#34;
 &lt;!-- JSON format --&gt;
 &lt;JsonLayout complete=&#34;false&#34; compact=&#34;true&#34;/&gt;
 </code></pre>
-            <h2 is-upgraded>Complete Configuration Example</h2>
-            <pre><code language="language-xml" class="language-xml">&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
+<h2 is-upgraded>Complete Configuration Example</h2>
+<pre><code language="language-xml" class="language-xml">&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
 &lt;Configuration status=&#34;WARN&#34;&gt;
     &lt;Properties&gt;
         &lt;Property name=&#34;LOG_PATTERN&#34;&gt;
@@ -508,11 +494,11 @@ $ mvn exec:java -Dexec.mainClass=&#34;Application&#34;
 </code></pre>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Logging Best Practices" duration="10">
-            <h2 is-upgraded>1. Parameterized Logging</h2>
-            <pre><code language="language-java" class="language-java">// Bad: String concatenation (always evaluated)
+      </google-codelab-step>
+    
+      <google-codelab-step label="Logging Best Practices" duration="10">
+        <h2 is-upgraded>1. Parameterized Logging</h2>
+<pre><code language="language-java" class="language-java">// Bad: String concatenation (always evaluated)
 logger.debug(&#34;User details: &#34; + user.toString());
 
 // Good: Parameterized (only evaluated if DEBUG enabled)
@@ -521,8 +507,8 @@ logger.debug(&#34;User details: {}&#34;, user);
 // Multiple parameters
 logger.info(&#34;User {} logged in from IP {} at {}&#34;, username, ipAddress, timestamp);
 </code></pre>
-            <h2 is-upgraded>2. Guard Expensive Operations</h2>
-            <pre><code language="language-java" class="language-java">// If the operation is expensive
+<h2 is-upgraded>2. Guard Expensive Operations</h2>
+<pre><code language="language-java" class="language-java">// If the operation is expensive
 if (logger.isDebugEnabled()) {
     String expensiveString = generateDetailedReport();
     logger.debug(&#34;Report: {}&#34;, expensiveString);
@@ -531,8 +517,8 @@ if (logger.isDebugEnabled()) {
 // Modern approach with Supplier (Java 8+)
 logger.debug(&#34;Report: {}&#34;, () -&gt; generateDetailedReport());
 </code></pre>
-            <h2 is-upgraded>3. Log Exceptions Properly</h2>
-            <pre><code language="language-java" class="language-java">// Bad: Loses stack trace
+<h2 is-upgraded>3. Log Exceptions Properly</h2>
+<pre><code language="language-java" class="language-java">// Bad: Loses stack trace
 logger.error(&#34;Error occurred: &#34; + e.getMessage());
 
 // Good: Includes full exception
@@ -546,8 +532,8 @@ try {
         order.getId(), order.getCustomerId(), e);
 }
 </code></pre>
-            <h2 is-upgraded>4. Avoid Logging Sensitive Data</h2>
-            <pre><code language="language-java" class="language-java">// Bad: Logs password!
+<h2 is-upgraded>4. Avoid Logging Sensitive Data</h2>
+<pre><code language="language-java" class="language-java">// Bad: Logs password!
 logger.info(&#34;User login: username={}, password={}&#34;, username, password);
 
 // Good: Mask or omit sensitive data
@@ -560,8 +546,8 @@ private String maskCardNumber(String cardNumber) {
     return &#34;**** **** **** &#34; + cardNumber.substring(cardNumber.length() - 4);
 }
 </code></pre>
-            <h2 is-upgraded>5. Use Appropriate Log Levels</h2>
-            <pre><code language="language-java" class="language-java">public class OrderService {
+<h2 is-upgraded>5. Use Appropriate Log Levels</h2>
+<pre><code language="language-java" class="language-java">public class OrderService {
     private static final Logger logger = LogManager.getLogger(OrderService.class);
 
     public void processOrder(Order order) {
@@ -592,8 +578,8 @@ private String maskCardNumber(String cardNumber) {
     }
 }
 </code></pre>
-            <h2 is-upgraded>6. Structured Logging with MDC</h2>
-            <pre><code language="language-java" class="language-java">import org.apache.logging.log4j.ThreadContext;
+<h2 is-upgraded>6. Structured Logging with MDC</h2>
+<pre><code language="language-java" class="language-java">import org.apache.logging.log4j.ThreadContext;
 
 public class RequestFilter {
     public void doFilter(HttpServletRequest request) {
@@ -615,8 +601,8 @@ public class RequestFilter {
 // Access MDC in pattern
 // Pattern: %d [%X{requestId}] [%X{userId}] %-5level %logger - %msg%n
 </code></pre>
-            <h2 is-upgraded>7. Performance Considerations</h2>
-            <pre><code language="language-java" class="language-java">// Use async appenders for high-throughput applications
+<h2 is-upgraded>7. Performance Considerations</h2>
+<pre><code language="language-java" class="language-java">// Use async appenders for high-throughput applications
 &lt;Async name=&#34;AsyncFile&#34;&gt;
     &lt;AppenderRef ref=&#34;RollingFile&#34;/&gt;
 &lt;/Async&gt;
@@ -634,8 +620,8 @@ if (i % 1000 == 0) {
     logger.debug(&#34;Processed {} items so far&#34;, i);
 }
 </code></pre>
-            <h2 is-upgraded>8. Don&#39;t Log and Throw</h2>
-            <pre><code language="language-java" class="language-java">// Bad: Double logging
+<h2 is-upgraded>8. Don&#39;t Log and Throw</h2>
+<pre><code language="language-java" class="language-java">// Bad: Double logging
 try {
     processData();
 } catch (Exception e) {
@@ -657,12 +643,12 @@ try {
 </code></pre>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Build Logged Application" duration="10">
-            <p>Let&#39;s add comprehensive logging to a complete application!</p>
-            <p>Create <code>BankingApplication.java</code>:</p>
-            <pre><code language="language-java" class="language-java">import org.apache.logging.log4j.LogManager;
+      </google-codelab-step>
+    
+      <google-codelab-step label="Build Logged Application" duration="10">
+        <p>Let&#39;s add comprehensive logging to a complete application!</p>
+<p>Create <code>BankingApplication.java</code>:</p>
+<pre><code language="language-java" class="language-java">import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.ThreadContext;
 
@@ -926,8 +912,8 @@ public class BankingApplication {
     }
 }
 </code></pre>
-            <h2 is-upgraded>Create log4j2.xml Configuration</h2>
-            <pre><code language="language-xml" class="language-xml">&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
+<h2 is-upgraded>Create log4j2.xml Configuration</h2>
+<pre><code language="language-xml" class="language-xml">&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
 &lt;Configuration status=&#34;WARN&#34;&gt;
     &lt;Properties&gt;
         &lt;Property name=&#34;LOG_PATTERN&#34;&gt;
@@ -993,8 +979,8 @@ public class BankingApplication {
     &lt;/Loggers&gt;
 &lt;/Configuration&gt;
 </code></pre>
-            <h2 is-upgraded>Run and Observe</h2>
-            <pre>$ mvn compile
+<h2 is-upgraded>Run and Observe</h2>
+<pre>$ mvn compile
 $ mvn exec:java -Dexec.mainClass=&#34;BankingApplication&#34;
 
 14:30:45.123 INFO  [main] BankingApplication - ============================================================
@@ -1008,81 +994,85 @@ $ mvn exec:java -Dexec.mainClass=&#34;BankingApplication&#34;
 </pre>
 
 
-        </google-codelab-step>
-
-        <google-codelab-step label="Conclusion" duration="2">
-            <p>Congratulations! 🎉 You&#39;ve mastered logging with Log4j 2!</p>
-            <h2 is-upgraded>What You&#39;ve Learned</h2>
-            <ul>
-                <li>✅ <strong>Logging Levels:</strong> TRACE, DEBUG, INFO, WARN, ERROR, FATAL</li>
-                <li>✅ <strong>Log4j 2 Architecture:</strong> Loggers, Appenders, Layouts</li>
-                <li>✅ <strong>Configuration:</strong> XML and properties formats</li>
-                <li>✅ <strong>Appenders:</strong> Console, File, RollingFile, Async</li>
-                <li>✅ <strong>Patterns:</strong> Custom formatting with timestamps and context</li>
-                <li>✅ <strong>MDC:</strong> Mapped Diagnostic Context for request tracking</li>
-                <li>✅ <strong>Best Practices:</strong> Performance, security, structured logging</li>
-                <li>✅ <strong>Production Setup:</strong> Rolling files, log retention, async logging</li>
-            </ul>
-            <h2 is-upgraded>Key Takeaways</h2>
-            <ol type="1">
-                <li><strong>Never use System.out</strong> for production logging</li>
-                <li><strong>Use appropriate log levels</strong> - INFO for production default</li>
-                <li><strong>Parameterized logging</strong> prevents unnecessary string operations</li>
-                <li><strong>Always log exceptions</strong> with full stack traces</li>
-                <li><strong>Never log sensitive data</strong> (passwords, credit cards, etc.)</li>
-                <li><strong>Use MDC</strong> for request/transaction tracking</li>
-                <li><strong>Async appenders</strong> improve performance</li>
-                <li><strong>Rolling files</strong> prevent disk space issues</li>
-            </ol>
-            <h2 is-upgraded>Production Checklist</h2>
-            <ul>
-                <li>✅ Use RollingFile appenders with size/time policies</li>
-                <li>✅ Configure log retention (30-90 days typical)</li>
-                <li>✅ Separate error logs for monitoring</li>
-                <li>✅ Use async appenders for high-throughput</li>
-                <li>✅ Set appropriate log levels per package</li>
-                <li>✅ Include MDC context for tracing</li>
-                <li>✅ Implement log rotation and archiving</li>
-                <li>✅ Monitor log file sizes and disk usage</li>
-            </ul>
-            <h2 is-upgraded>Next Steps</h2>
-            <p>Continue to:</p>
-            <ul>
-                <li><strong>Codelab 2.5:</strong> IDE Debugging Mastery</li>
-                <li><strong>Codelab 3.1:</strong> Spring Boot (which integrates with Log4j 2)</li>
-                <li><strong>Codelab 4.1:</strong> Microservices with distributed tracing</li>
-            </ul>
-            <h2 is-upgraded>Additional Resources</h2>
-            <ul>
-                <li><a href="https://logging.apache.org/log4j/2.x/" target="_blank">Log4j 2 Documentation</a></li>
-                <li><a href="https://logging.apache.org/log4j/2.x/manual/configuration.html" target="_blank">Log4j 2
-                        Configuration</a></li>
-                <li><a href="https://logging.apache.org/log4j/2.x/performance.html" target="_blank">Log4j 2
-                        Performance</a></li>
-                <li><a href="https://12factor.net/logs" target="_blank">12-Factor App: Logs</a></li>
-            </ul>
-            <aside class="special">
-                <p><strong>Production Ready!</strong> Proper logging is essential for production systems. You now have
-                    the skills to implement enterprise-grade logging in any Java application!</p>
-            </aside>
+      </google-codelab-step>
+    
+      <google-codelab-step label="Conclusion" duration="2">
+        <p>Congratulations! 🎉 You&#39;ve mastered logging with Log4j 2!</p>
+<h2 is-upgraded>What You&#39;ve Learned</h2>
+<ul>
+<li>✅ <strong>Logging Levels:</strong> TRACE, DEBUG, INFO, WARN, ERROR, FATAL</li>
+<li>✅ <strong>Log4j 2 Architecture:</strong> Loggers, Appenders, Layouts</li>
+<li>✅ <strong>Configuration:</strong> XML and properties formats</li>
+<li>✅ <strong>Appenders:</strong> Console, File, RollingFile, Async</li>
+<li>✅ <strong>Patterns:</strong> Custom formatting with timestamps and context</li>
+<li>✅ <strong>MDC:</strong> Mapped Diagnostic Context for request tracking</li>
+<li>✅ <strong>Best Practices:</strong> Performance, security, structured logging</li>
+<li>✅ <strong>Production Setup:</strong> Rolling files, log retention, async logging</li>
+</ul>
+<h2 is-upgraded>Key Takeaways</h2>
+<ol type="1">
+<li><strong>Never use System.out</strong> for production logging</li>
+<li><strong>Use appropriate log levels</strong> - INFO for production default</li>
+<li><strong>Parameterized logging</strong> prevents unnecessary string operations</li>
+<li><strong>Always log exceptions</strong> with full stack traces</li>
+<li><strong>Never log sensitive data</strong> (passwords, credit cards, etc.)</li>
+<li><strong>Use MDC</strong> for request/transaction tracking</li>
+<li><strong>Async appenders</strong> improve performance</li>
+<li><strong>Rolling files</strong> prevent disk space issues</li>
+</ol>
+<h2 is-upgraded>Production Checklist</h2>
+<ul>
+<li>✅ Use RollingFile appenders with size/time policies</li>
+<li>✅ Configure log retention (30-90 days typical)</li>
+<li>✅ Separate error logs for monitoring</li>
+<li>✅ Use async appenders for high-throughput</li>
+<li>✅ Set appropriate log levels per package</li>
+<li>✅ Include MDC context for tracing</li>
+<li>✅ Implement log rotation and archiving</li>
+<li>✅ Monitor log file sizes and disk usage</li>
+</ul>
+<h2 is-upgraded>Next Steps</h2>
+<p>Continue to:</p>
+<ul>
+<li><strong>Codelab 2.5:</strong> IDE Debugging Mastery</li>
+<li><strong>Codelab 3.1:</strong> Spring Boot (which integrates with Log4j 2)</li>
+<li><strong>Codelab 4.1:</strong> Microservices with distributed tracing</li>
+</ul>
+<h2 is-upgraded>Additional Resources</h2>
+<ul>
+<li><a href="https://logging.apache.org/log4j/2.x/" target="_blank">Log4j 2 Documentation</a></li>
+<li><a href="https://logging.apache.org/log4j/2.x/manual/configuration.html" target="_blank">Log4j 2 Configuration</a></li>
+<li><a href="https://logging.apache.org/log4j/2.x/performance.html" target="_blank">Log4j 2 Performance</a></li>
+<li><a href="https://12factor.net/logs" target="_blank">12-Factor App: Logs</a></li>
+</ul>
+<aside class="special"><p><strong>Production Ready!</strong> Proper logging is essential for production systems. You now have the skills to implement enterprise-grade logging in any Java application!</p>
+</aside>
 
 
-        </google-codelab-step>
+      </google-codelab-step>
+    
+  </google-codelab>
 
-    </google-codelab>
-
-    <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
-    <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
-    <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
-    <script src="//support.google.com/inapp/api.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js"></script>
-    <script src="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.js"></script>
-    <script>
-        hljs.highlightAll();
-        hljs.addPlugin(new CopyButtonPlugin({ autohide: false }));
-
-    </script>
+  <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
+  <script src="//support.google.com/inapp/api.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js"></script>
+  <script src="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.js"></script>
+  <script>
+    hljs.highlightAll();
+    hljs.addPlugin(new CopyButtonPlugin({ autohide: false}));
+    
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      const homeUrl = "\/springboot_course\/";
+      const arrowBack = document.getElementById('arrow-back');
+      const doneBtn = document.getElementById('done');
+      if (arrowBack) arrowBack.href = homeUrl;
+      if (doneBtn) doneBtn.href = homeUrl;
+    });
+    
+  </script>
 
 </body>
-
 </html>

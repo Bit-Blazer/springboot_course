@@ -3,6 +3,7 @@ id: servlets-blocking-reactive
 categories: Java, Servlets, Spring MVC, Spring WebFlux, Reactive Programming
 environments: Web
 status: Published
+home url: /springboot_course/
 
 # Servlets & Blocking vs Reactive Stacks
 

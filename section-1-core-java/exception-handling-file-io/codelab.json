@@ -3,7 +3,7 @@
   "format": "html",
   "prefix": "https://storage.googleapis.com",
   "mainga": "UA-49880327-14",
-  "updated": "2025-12-29T14:49:34+05:30",
+  "updated": "2025-12-29T15:21:21+05:30",
   "id": "exception-handling-file-io",
   "duration": 109,
   "title": "Exception Handling \u0026 File I/O",
@@ -21,5 +21,6 @@
   "tags": [
     "web"
   ],
+  "home_url": "/springboot_course/",
   "url": "exception-handling-file-io"
 }

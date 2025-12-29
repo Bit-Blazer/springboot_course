@@ -3,6 +3,7 @@ id: jpa-locking-spring-security
 categories: Spring Boot, JPA, Spring Security, Authentication, Authorization
 environments: Web
 status: Published
+home url: /springboot_course/
 
 # JPA Locking Mechanisms & Spring Security
 

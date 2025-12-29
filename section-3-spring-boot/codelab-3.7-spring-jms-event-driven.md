@@ -3,6 +3,7 @@ id: spring-jms-event-driven
 categories: Spring Boot, JMS, Messaging, Event-Driven, ActiveMQ
 environments: Web
 status: Published
+home url: /springboot_course/
 
 # Spring JMS & Event-Driven Architecture
 

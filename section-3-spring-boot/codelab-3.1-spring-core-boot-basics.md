@@ -3,6 +3,7 @@ id: spring-core-boot-basics
 categories: Spring Boot, Spring Core, Dependency Injection, REST API
 environments: Web
 status: Published
+home url: /springboot_course/
 
 # Spring Core & Spring Boot Basics
 
