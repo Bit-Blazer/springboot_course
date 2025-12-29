@@ -4,6 +4,7 @@ categories: Spring Boot, JMS, Messaging, Event-Driven, ActiveMQ
 environments: Web
 status: Published
 home url: /springboot_course/
+analytics ga4 account: G-4LV2JBSBPM
 
 # Spring JMS & Event-Driven Architecture
 

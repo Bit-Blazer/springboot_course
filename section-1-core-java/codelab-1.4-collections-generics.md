@@ -4,6 +4,7 @@ categories: Java, Collections, Generics, Data Structures
 environments: Web
 status: Published
 home url: /springboot_course/
+analytics ga4 account: G-4LV2JBSBPM
 
 # Collections Framework & Generics
 

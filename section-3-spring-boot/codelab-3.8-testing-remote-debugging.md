@@ -4,6 +4,7 @@ categories: Spring Boot, Testing, JUnit, Mockito, Testcontainers, Debugging
 environments: Web
 status: Published
 home url: /springboot_course/
+analytics ga4 account: G-4LV2JBSBPM
 
 # Testing & Remote Debugging Spring Boot Apps
 

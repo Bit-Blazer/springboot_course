@@ -4,6 +4,7 @@ categories: Spring Boot, JPA, Hibernate, Database, ORM
 environments: Web
 status: Published
 home url: /springboot_course/
+analytics ga4 account: G-4LV2JBSBPM
 
 # ORM Concepts & Spring Data JPA
 

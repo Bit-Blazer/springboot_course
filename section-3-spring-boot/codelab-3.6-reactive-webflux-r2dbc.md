@@ -4,6 +4,7 @@ categories: Spring Boot, Reactive Programming, WebFlux, R2DBC, Project Reactor
 environments: Web
 status: Published
 home url: /springboot_course/
+analytics ga4 account: G-4LV2JBSBPM
 
 # Reactive Programming with WebFlux & R2DBC
 

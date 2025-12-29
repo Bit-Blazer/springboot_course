@@ -4,6 +4,7 @@ categories: Java, Servlets, Spring MVC, Spring WebFlux, Reactive Programming
 environments: Web
 status: Published
 home url: /springboot_course/
+analytics ga4 account: G-4LV2JBSBPM
 
 # Servlets & Blocking vs Reactive Stacks
 

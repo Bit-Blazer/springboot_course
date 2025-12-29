@@ -4,6 +4,7 @@ categories: Spring Boot, JPA, Spring Security, Authentication, Authorization
 environments: Web
 status: Published
 home url: /springboot_course/
+analytics ga4 account: G-4LV2JBSBPM
 
 # JPA Locking Mechanisms & Spring Security
 

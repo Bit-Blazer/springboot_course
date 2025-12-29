@@ -4,6 +4,7 @@ categories: Spring Boot, Spring Core, Dependency Injection, REST API
 environments: Web
 status: Published
 home url: /springboot_course/
+analytics ga4 account: G-4LV2JBSBPM
 
 # Spring Core & Spring Boot Basics
 

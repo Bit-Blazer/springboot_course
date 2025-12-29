@@ -4,6 +4,7 @@ categories: Java, Logging, Log4j, Best Practices
 environments: Web
 status: Published
 home url: /springboot_course/
+analytics ga4 account: G-4LV2JBSBPM
 
 # Logging with Log4j 2
 

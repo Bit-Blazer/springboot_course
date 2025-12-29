@@ -4,6 +4,7 @@ categories: Java, Asynchronous Programming, Concurrency, CompletableFuture
 environments: Web
 status: Published
 home url: /springboot_course/
+analytics ga4 account: G-4LV2JBSBPM
 
 # Asynchronous Programming Complete
 

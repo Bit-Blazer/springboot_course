@@ -4,6 +4,7 @@ categories: Spring Boot, Microservices, Spring Cloud, Eureka, API Gateway
 environments: Web
 status: Published
 home url: /springboot_course/
+analytics ga4 account: G-4LV2JBSBPM
 
 # Microservices Architecture & Implementation
 

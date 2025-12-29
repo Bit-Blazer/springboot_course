@@ -4,6 +4,7 @@ categories: Java, Java 8, Functional Programming, Streams API
 environments: Web
 status: Published
 home url: /springboot_course/
+analytics ga4 account: G-4LV2JBSBPM
 
 # Functional Programming & Streams API
 

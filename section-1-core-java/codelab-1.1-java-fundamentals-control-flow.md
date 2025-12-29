@@ -4,6 +4,7 @@ categories: Java, Core Java, Programming Fundamentals
 environments: Web
 status: Published
 home url: /springboot_course/
+analytics ga4 account: G-4LV2JBSBPM
 
 # Java Platform, Data Types & Control Flow
 

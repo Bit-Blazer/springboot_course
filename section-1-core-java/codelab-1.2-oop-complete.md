@@ -4,6 +4,7 @@ categories: Java, Object-Oriented Programming, OOP
 environments: Web
 status: Published
 home url: /springboot_course/
+analytics ga4 account: G-4LV2JBSBPM
 
 # Object-Oriented Programming Complete
 

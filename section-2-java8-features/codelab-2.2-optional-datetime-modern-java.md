@@ -4,6 +4,7 @@ categories: Java, Java 8+, Modern Java, Date Time API
 environments: Web
 status: Published
 home url: /springboot_course/
+analytics ga4 account: G-4LV2JBSBPM
 
 # Optional, Date/Time & Modern Java Features
 

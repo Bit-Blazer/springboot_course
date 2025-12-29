@@ -4,6 +4,7 @@ categories: Spring Boot, REST API, Swagger, OpenAPI, Validation
 environments: Web
 status: Published
 home url: /springboot_course/
+analytics ga4 account: G-4LV2JBSBPM
 
 # RESTful APIs, Swagger & Exception Handling
 

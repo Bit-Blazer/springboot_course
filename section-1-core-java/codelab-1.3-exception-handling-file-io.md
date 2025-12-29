@@ -4,6 +4,7 @@ categories: Java, Exception Handling, File I/O
 environments: Web
 status: Published
 home url: /springboot_course/
+analytics ga4 account: G-4LV2JBSBPM
 
 # Exception Handling & File I/O
 

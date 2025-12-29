@@ -4,6 +4,7 @@ categories: Spring Boot, JWT, Spring Cloud, Security, Microservices
 environments: Web
 status: Published
 home url: /springboot_course/
+analytics ga4 account: G-4LV2JBSBPM
 
 # JWT Authentication & Spring Cloud Config
 
