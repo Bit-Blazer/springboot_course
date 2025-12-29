@@ -11,6 +11,9 @@
         href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
     <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1  /build/styles/monokai.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.css">
     <style>
         .success {
             color: #1e8e3e;
@@ -23,9 +26,9 @@
 </head>
 
 <body>
-    <google-codelab-analytics gaid="UA-49880327-14"></google-codelab-analytics>
-    <google-codelab codelab-gaid="" id="spring-jms-event-driven" title="Spring JMS &amp; Event-Driven Architecture"
-        environment="web" feedback-link="">
+    <google-codelab-analytics gaid="UA-49880327-14" ga4id=""></google-codelab-analytics>
+    <google-codelab codelab-gaid="" codelab-ga4id="" id="spring-jms-event-driven"
+        title="Spring JMS &amp; Event-Driven Architecture" environment="web" feedback-link="">
 
         <google-codelab-step label="Introduction" duration="3">
             <p>Add asynchronous messaging and event-driven architecture to the Task Management API using Spring JMS and
@@ -246,13 +249,13 @@ message.setJMSCorrelationID(requestId);
             <pre><code language="language-yaml" class="language-yaml">spring:
   application:
     name: task-manager
-  
+
   # ActiveMQ Artemis Configuration
   artemis:
     mode: embedded
     embedded:
       enabled: true
-      persistent: false  # In-memory for development
+      persistent: false # In-memory for development
       data-directory: ${java.io.tmpdir}/artemis-data
       queues:
         - task.created
@@ -262,17 +265,17 @@ message.setJMSCorrelationID(requestId);
         - task.notification
         - task.audit
         - task.email
-        - task.dlq  # Dead Letter Queue
+        - task.dlq # Dead Letter Queue
       topics:
         - task.events
-  
+
   # JMS Configuration
   jms:
     template:
       default-destination: task.events
       delivery-mode: persistent
       priority: 5
-      time-to-live: 3600000  # 1 hour
+      time-to-live: 3600000 # 1 hour
     listener:
       acknowledge-mode: auto
       concurrency: 3-10
@@ -294,7 +297,7 @@ logging:
     port: 61616
     user: admin
     password: ${ARTEMIS_PASSWORD}
-    
+
   jms:
     template:
       delivery-mode: persistent
@@ -314,7 +317,7 @@ import org.springframework.jms.support.converter.MessageType;
 @Configuration
 @EnableJms
 public class JmsConfig {
-    
+
     @Bean
     public MessageConverter jacksonJmsMessageConverter() {
         MappingJackson2MessageConverter converter = new MappingJackson2MessageConverter();
@@ -328,7 +331,7 @@ public class JmsConfig {
             <pre><code language="language-java" class="language-java">package com.example.taskmanager.messaging;
 
 public class QueueConstants {
-    
+
     // Queues
     public static final String TASK_CREATED_QUEUE = &#34;task.created&#34;;
     public static final String TASK_UPDATED_QUEUE = &#34;task.updated&#34;;
@@ -338,10 +341,10 @@ public class QueueConstants {
     public static final String TASK_AUDIT_QUEUE = &#34;task.audit&#34;;
     public static final String TASK_EMAIL_QUEUE = &#34;task.email&#34;;
     public static final String DEAD_LETTER_QUEUE = &#34;task.dlq&#34;;
-    
+
     // Topics
     public static final String TASK_EVENTS_TOPIC = &#34;task.events&#34;;
-    
+
     private QueueConstants() {}
 }
 </code></pre>
@@ -370,11 +373,11 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public abstract class DomainEvent implements Serializable {
-    
+
     private String eventId;
     private LocalDateTime occurredAt;
     private String eventType;
-    
+
     protected DomainEvent(String eventType) {
         this.eventId = UUID.randomUUID().toString();
         this.occurredAt = LocalDateTime.now();
@@ -396,14 +399,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TaskCreatedEvent extends DomainEvent {
-    
+
     private Long taskId;
     private String title;
     private String description;
     private TaskStatus status;
     private Long userId;
-    
-    public TaskCreatedEvent(Long taskId, String title, String description, 
+
+    public TaskCreatedEvent(Long taskId, String title, String description,
                            TaskStatus status, Long userId) {
         super(&#34;TaskCreated&#34;);
         this.taskId = taskId;
@@ -427,13 +430,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TaskUpdatedEvent extends DomainEvent {
-    
+
     private Long taskId;
     private String title;
     private String description;
     private TaskStatus status;
     private Long userId;
-    
+
     public TaskUpdatedEvent(Long taskId, String title, String description,
                            TaskStatus status, Long userId) {
         super(&#34;TaskUpdated&#34;);
@@ -457,11 +460,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TaskDeletedEvent extends DomainEvent {
-    
+
     private Long taskId;
     private String title;
     private Long userId;
-    
+
     public TaskDeletedEvent(Long taskId, String title, Long userId) {
         super(&#34;TaskDeleted&#34;);
         this.taskId = taskId;
@@ -482,12 +485,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TaskAssignedEvent extends DomainEvent {
-    
+
     private Long taskId;
     private String title;
     private Long fromUserId;
     private Long toUserId;
-    
+
     public TaskAssignedEvent(Long taskId, String title, Long fromUserId, Long toUserId) {
         super(&#34;TaskAssigned&#34;);
         this.taskId = taskId;
@@ -510,14 +513,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TaskStatusChangedEvent extends DomainEvent {
-    
+
     private Long taskId;
     private String title;
     private TaskStatus oldStatus;
     private TaskStatus newStatus;
     private Long userId;
-    
-    public TaskStatusChangedEvent(Long taskId, String title, 
+
+    public TaskStatusChangedEvent(Long taskId, String title,
                                  TaskStatus oldStatus, TaskStatus newStatus, Long userId) {
         super(&#34;TaskStatusChanged&#34;);
         this.taskId = taskId;
@@ -541,13 +544,13 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 public class NotificationEvent implements Serializable {
-    
+
     private Long userId;
     private String email;
     private String subject;
     private String message;
     private NotificationType type;
-    
+
     public enum NotificationType {
         EMAIL,
         SMS,
@@ -577,58 +580,58 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 public class EventPublisher {
-    
+
     private final JmsTemplate jmsTemplate;
-    
+
     public EventPublisher(JmsTemplate jmsTemplate) {
         this.jmsTemplate = jmsTemplate;
     }
-    
+
     public void publishTaskCreated(DomainEvent event) {
         log.info(&#34;Publishing TaskCreated event: {}&#34;, event.getEventId());
         jmsTemplate.convertAndSend(QueueConstants.TASK_CREATED_QUEUE, event);
         publishToTopic(event);
     }
-    
+
     public void publishTaskUpdated(DomainEvent event) {
         log.info(&#34;Publishing TaskUpdated event: {}&#34;, event.getEventId());
         jmsTemplate.convertAndSend(QueueConstants.TASK_UPDATED_QUEUE, event);
         publishToTopic(event);
     }
-    
+
     public void publishTaskDeleted(DomainEvent event) {
         log.info(&#34;Publishing TaskDeleted event: {}&#34;, event.getEventId());
         jmsTemplate.convertAndSend(QueueConstants.TASK_DELETED_QUEUE, event);
         publishToTopic(event);
     }
-    
+
     public void publishTaskAssigned(DomainEvent event) {
         log.info(&#34;Publishing TaskAssigned event: {}&#34;, event.getEventId());
         jmsTemplate.convertAndSend(QueueConstants.TASK_ASSIGNED_QUEUE, event);
         publishToTopic(event);
     }
-    
+
     public void publishNotification(NotificationEvent notification) {
         log.info(&#34;Publishing notification to user: {}&#34;, notification.getUserId());
         jmsTemplate.convertAndSend(QueueConstants.TASK_NOTIFICATION_QUEUE, notification);
     }
-    
+
     public void publishAuditEvent(DomainEvent event) {
         log.info(&#34;Publishing audit event: {}&#34;, event.getEventId());
         jmsTemplate.convertAndSend(QueueConstants.TASK_AUDIT_QUEUE, event);
     }
-    
+
     public void publishEmailNotification(NotificationEvent notification) {
         log.info(&#34;Publishing email notification: {}&#34;, notification.getSubject());
         jmsTemplate.convertAndSend(QueueConstants.TASK_EMAIL_QUEUE, notification);
     }
-    
+
     // Publish to topic for broadcast
     private void publishToTopic(DomainEvent event) {
         log.debug(&#34;Publishing to topic: {}&#34;, QueueConstants.TASK_EVENTS_TOPIC);
         jmsTemplate.convertAndSend(QueueConstants.TASK_EVENTS_TOPIC, event);
     }
-    
+
     // Priority message
     public void publishUrgentNotification(NotificationEvent notification) {
         log.warn(&#34;Publishing URGENT notification: {}&#34;, notification.getSubject());
@@ -637,7 +640,7 @@ public class EventPublisher {
             return message;
         });
     }
-    
+
     // Delayed message
     public void publishDelayedNotification(NotificationEvent notification, long delayMs) {
         log.info(&#34;Publishing delayed notification ({}ms): {}&#34;, delayMs, notification.getSubject());
@@ -667,28 +670,28 @@ import java.util.List;
 @Service
 @Slf4j
 public class TaskService {
-    
+
     private final TaskRepository taskRepository;
     private final EventPublisher eventPublisher;
-    
+
     public TaskService(TaskRepository taskRepository, EventPublisher eventPublisher) {
         this.taskRepository = taskRepository;
         this.eventPublisher = eventPublisher;
     }
-    
+
     @Transactional
     public Task createTask(Task task) {
         log.debug(&#34;Creating task: {}&#34;, task.getTitle());
-        
+
         task.setCreatedAt(LocalDateTime.now());
         task.setUpdatedAt(LocalDateTime.now());
-        
+
         if (task.getStatus() == null) {
             task.setStatus(TaskStatus.TODO);
         }
-        
+
         Task saved = taskRepository.save(task);
-        
+
         // Publish event
         TaskCreatedEvent event = new TaskCreatedEvent(
             saved.getId(),
@@ -698,27 +701,27 @@ public class TaskService {
             saved.getUserId()
         );
         eventPublisher.publishTaskCreated(event);
-        
+
         log.info(&#34;Task created with ID: {}&#34;, saved.getId());
         return saved;
     }
-    
+
     @Transactional
     public Task updateTask(Long id, Task taskDetails) {
         log.debug(&#34;Updating task: {}&#34;, id);
-        
+
         Task task = taskRepository.findById(id)
             .orElseThrow(() -&gt; new TaskNotFoundException(id));
-        
+
         TaskStatus oldStatus = task.getStatus();
-        
+
         task.setTitle(taskDetails.getTitle());
         task.setDescription(taskDetails.getDescription());
         task.setStatus(taskDetails.getStatus());
         task.setUpdatedAt(LocalDateTime.now());
-        
+
         Task updated = taskRepository.save(task);
-        
+
         // Publish events
         TaskUpdatedEvent event = new TaskUpdatedEvent(
             updated.getId(),
@@ -728,7 +731,7 @@ public class TaskService {
             updated.getUserId()
         );
         eventPublisher.publishTaskUpdated(event);
-        
+
         // Publish status change event if status changed
         if (!oldStatus.equals(updated.getStatus())) {
             TaskStatusChangedEvent statusEvent = new TaskStatusChangedEvent(
@@ -740,20 +743,20 @@ public class TaskService {
             );
             eventPublisher.publishTaskUpdated(statusEvent);
         }
-        
+
         log.info(&#34;Task updated: {}&#34;, id);
         return updated;
     }
-    
+
     @Transactional
     public void deleteTask(Long id) {
         log.debug(&#34;Deleting task: {}&#34;, id);
-        
+
         Task task = taskRepository.findById(id)
             .orElseThrow(() -&gt; new TaskNotFoundException(id));
-        
+
         taskRepository.delete(task);
-        
+
         // Publish event
         TaskDeletedEvent event = new TaskDeletedEvent(
             task.getId(),
@@ -761,23 +764,23 @@ public class TaskService {
             task.getUserId()
         );
         eventPublisher.publishTaskDeleted(event);
-        
+
         log.info(&#34;Task deleted: {}&#34;, id);
     }
-    
+
     @Transactional
     public Task assignTaskToUser(Long taskId, Long userId) {
         log.debug(&#34;Assigning task {} to user {}&#34;, taskId, userId);
-        
+
         Task task = taskRepository.findById(taskId)
             .orElseThrow(() -&gt; new TaskNotFoundException(taskId));
-        
+
         Long oldUserId = task.getUserId();
         task.setUserId(userId);
         task.setUpdatedAt(LocalDateTime.now());
-        
+
         Task updated = taskRepository.save(task);
-        
+
         // Publish event
         TaskAssignedEvent event = new TaskAssignedEvent(
             updated.getId(),
@@ -786,10 +789,10 @@ public class TaskService {
             userId
         );
         eventPublisher.publishTaskAssigned(event);
-        
+
         return updated;
     }
-    
+
     // ... other methods remain the same ...
 }
 </code></pre>
@@ -814,17 +817,17 @@ import java.time.LocalDateTime;
 @Component
 @Slf4j
 public class AuditEventListener {
-    
+
     private final AuditLogRepository auditLogRepository;
-    
+
     public AuditEventListener(AuditLogRepository auditLogRepository) {
         this.auditLogRepository = auditLogRepository;
     }
-    
+
     @JmsListener(destination = &#34;task.created&#34;)
     public void handleTaskCreated(TaskCreatedEvent event) {
         log.info(&#34;Audit: Task created - ID: {}, Title: {}&#34;, event.getTaskId(), event.getTitle());
-        
+
         AuditLog auditLog = new AuditLog();
         auditLog.setEventType(&#34;TASK_CREATED&#34;);
         auditLog.setEntityId(event.getTaskId());
@@ -833,31 +836,31 @@ public class AuditEventListener {
         auditLog.setEventData(String.format(&#34;Created task: %s&#34;, event.getTitle()));
         auditLog.setOccurredAt(event.getOccurredAt());
         auditLog.setCreatedAt(LocalDateTime.now());
-        
+
         auditLogRepository.save(auditLog);
     }
-    
+
     @JmsListener(destination = &#34;task.updated&#34;)
     public void handleTaskUpdated(TaskUpdatedEvent event) {
         log.info(&#34;Audit: Task updated - ID: {}&#34;, event.getTaskId());
-        
+
         AuditLog auditLog = new AuditLog();
         auditLog.setEventType(&#34;TASK_UPDATED&#34;);
         auditLog.setEntityId(event.getTaskId());
         auditLog.setEntityType(&#34;Task&#34;);
         auditLog.setUserId(event.getUserId());
-        auditLog.setEventData(String.format(&#34;Updated task: %s (Status: %s)&#34;, 
+        auditLog.setEventData(String.format(&#34;Updated task: %s (Status: %s)&#34;,
             event.getTitle(), event.getStatus()));
         auditLog.setOccurredAt(event.getOccurredAt());
         auditLog.setCreatedAt(LocalDateTime.now());
-        
+
         auditLogRepository.save(auditLog);
     }
-    
+
     @JmsListener(destination = &#34;task.deleted&#34;)
     public void handleTaskDeleted(TaskDeletedEvent event) {
         log.info(&#34;Audit: Task deleted - ID: {}&#34;, event.getTaskId());
-        
+
         AuditLog auditLog = new AuditLog();
         auditLog.setEventType(&#34;TASK_DELETED&#34;);
         auditLog.setEntityId(event.getTaskId());
@@ -866,25 +869,25 @@ public class AuditEventListener {
         auditLog.setEventData(String.format(&#34;Deleted task: %s&#34;, event.getTitle()));
         auditLog.setOccurredAt(event.getOccurredAt());
         auditLog.setCreatedAt(LocalDateTime.now());
-        
+
         auditLogRepository.save(auditLog);
     }
-    
+
     @JmsListener(destination = &#34;task.assigned&#34;)
     public void handleTaskAssigned(TaskAssignedEvent event) {
-        log.info(&#34;Audit: Task assigned - ID: {} to User: {}&#34;, 
+        log.info(&#34;Audit: Task assigned - ID: {} to User: {}&#34;,
             event.getTaskId(), event.getToUserId());
-        
+
         AuditLog auditLog = new AuditLog();
         auditLog.setEventType(&#34;TASK_ASSIGNED&#34;);
         auditLog.setEntityId(event.getTaskId());
         auditLog.setEntityType(&#34;Task&#34;);
         auditLog.setUserId(event.getToUserId());
-        auditLog.setEventData(String.format(&#34;Assigned task &#39;%s&#39; from user %d to user %d&#34;, 
+        auditLog.setEventData(String.format(&#34;Assigned task &#39;%s&#39; from user %d to user %d&#34;,
             event.getTitle(), event.getFromUserId(), event.getToUserId()));
         auditLog.setOccurredAt(event.getOccurredAt());
         auditLog.setCreatedAt(LocalDateTime.now());
-        
+
         auditLogRepository.save(auditLog);
     }
 }
@@ -903,21 +906,21 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 public class NotificationEventListener {
-    
+
     private final UserRepository userRepository;
     private final EventPublisher eventPublisher;
-    
-    public NotificationEventListener(UserRepository userRepository, 
+
+    public NotificationEventListener(UserRepository userRepository,
                                      EventPublisher eventPublisher) {
         this.userRepository = userRepository;
         this.eventPublisher = eventPublisher;
     }
-    
+
     @JmsListener(destination = &#34;task.created&#34;)
     public void handleTaskCreated(TaskCreatedEvent event) {
-        log.info(&#34;Notification: Task created - sending notification to user: {}&#34;, 
+        log.info(&#34;Notification: Task created - sending notification to user: {}&#34;,
             event.getUserId());
-        
+
         if (event.getUserId() != null) {
             userRepository.findById(event.getUserId()).ifPresent(user -&gt; {
                 NotificationEvent notification = new NotificationEvent(
@@ -931,11 +934,11 @@ public class NotificationEventListener {
             });
         }
     }
-    
+
     @JmsListener(destination = &#34;task.assigned&#34;)
     public void handleTaskAssigned(TaskAssignedEvent event) {
         log.info(&#34;Notification: Task assigned - notifying user: {}&#34;, event.getToUserId());
-        
+
         if (event.getToUserId() != null) {
             userRepository.findById(event.getToUserId()).ifPresent(user -&gt; {
                 NotificationEvent notification = new NotificationEvent(
@@ -950,23 +953,23 @@ public class NotificationEventListener {
             });
         }
     }
-    
+
     @JmsListener(destination = &#34;task.updated&#34;)
     public void handleTaskStatusChanged(TaskStatusChangedEvent event) {
         if (event == null || event.getOldStatus().equals(event.getNewStatus())) {
             return;
         }
-        
-        log.info(&#34;Notification: Task status changed - {} to {}&#34;, 
+
+        log.info(&#34;Notification: Task status changed - {} to {}&#34;,
             event.getOldStatus(), event.getNewStatus());
-        
+
         if (event.getUserId() != null) {
             userRepository.findById(event.getUserId()).ifPresent(user -&gt; {
                 NotificationEvent notification = new NotificationEvent(
                     user.getId(),
                     user.getEmail(),
                     &#34;Task Status Changed&#34;,
-                    String.format(&#34;Task &#39;%s&#39; status changed from %s to %s.&#34;, 
+                    String.format(&#34;Task &#39;%s&#39; status changed from %s to %s.&#34;,
                         event.getTitle(), event.getOldStatus(), event.getNewStatus()),
                     NotificationEvent.NotificationType.EMAIL
                 );
@@ -987,15 +990,15 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 public class EmailEventListener {
-    
+
     // Simulate email service (replace with real EmailService in production)
-    
+
     @JmsListener(destination = &#34;task.email&#34;)
     public void handleEmailNotification(NotificationEvent notification) {
         log.info(&#34;📧 Sending email to: {}&#34;, notification.getEmail());
         log.info(&#34;   Subject: {}&#34;, notification.getSubject());
         log.info(&#34;   Message: {}&#34;, notification.getMessage());
-        
+
         // Simulate email sending
         try {
             Thread.sleep(1000); // Simulate network delay
@@ -1019,17 +1022,17 @@ import jakarta.jms.Message;
 @Component
 @Slf4j
 public class DeadLetterQueueListener {
-    
+
     @JmsListener(destination = &#34;task.dlq&#34;)
     public void handleDeadLetter(Message message) {
         try {
             log.error(&#34;💀 Message moved to DLQ: {}&#34;, message.getJMSMessageID());
             log.error(&#34;   Type: {}&#34;, message.getJMSType());
             log.error(&#34;   Timestamp: {}&#34;, message.getJMSTimestamp());
-            
+
             // Log for manual intervention
             // In production: alert admin, store for replay, etc.
-            
+
         } catch (Exception e) {
             log.error(&#34;Error processing DLQ message: {}&#34;, e.getMessage());
         }
@@ -1049,7 +1052,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AuditLog {
-    
+
     private Long id;
     private String eventType;
     private Long entityId;
@@ -1073,10 +1076,10 @@ import java.util.concurrent.atomic.AtomicLong;
 
 @Repository
 public class AuditLogRepository {
-    
+
     private final ConcurrentHashMap&lt;Long, AuditLog&gt; auditLogs = new ConcurrentHashMap&lt;&gt;();
     private final AtomicLong idGenerator = new AtomicLong(1);
-    
+
     public AuditLog save(AuditLog auditLog) {
         if (auditLog.getId() == null) {
             auditLog.setId(idGenerator.getAndIncrement());
@@ -1084,11 +1087,11 @@ public class AuditLogRepository {
         auditLogs.put(auditLog.getId(), auditLog);
         return auditLog;
     }
-    
+
     public List&lt;AuditLog&gt; findAll() {
         return new ArrayList&lt;&gt;(auditLogs.values());
     }
-    
+
     public List&lt;AuditLog&gt; findByEntityId(Long entityId) {
         return auditLogs.values().stream()
             .filter(log -&gt; log.getEntityId().equals(entityId))
@@ -1152,21 +1155,21 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 
 @SpringBootTest
 public class EventPublisherIntegrationTest {
-    
+
     @Autowired
     private EventPublisher eventPublisher;
-    
+
     @Autowired
     private JmsTemplate jmsTemplate;
-    
+
     @Test
     public void testPublishTaskCreatedEvent() {
         TaskCreatedEvent event = new TaskCreatedEvent(
             1L, &#34;Test Task&#34;, &#34;Description&#34;, TaskStatus.TODO, 1L
         );
-        
+
         eventPublisher.publishTaskCreated(event);
-        
+
         // Wait for async processing
         await().atMost(5, SECONDS).untilAsserted(() -&gt; {
             // Verify audit log created
@@ -1279,9 +1282,15 @@ git tag codelab-3.7
 
     <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
     <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
-    <script src="https://storage.googleapis.com/claat-public/prettify.js"></script>
     <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
     <script src="//support.google.com/inapp/api.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js"></script>
+    <script src="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.js"></script>
+    <script>
+        hljs.highlightAll();
+        hljs.addPlugin(new CopyButtonPlugin({ autohide: false }));
+
+    </script>
 
 </body>
 

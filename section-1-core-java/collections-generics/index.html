@@ -11,6 +11,9 @@
         href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
     <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1  /build/styles/monokai.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.css">
     <style>
         .success {
             color: #1e8e3e;
@@ -23,9 +26,9 @@
 </head>
 
 <body>
-    <google-codelab-analytics gaid="UA-49880327-14"></google-codelab-analytics>
-    <google-codelab codelab-gaid="" id="collections-generics" title="Collections Framework &amp; Generics"
-        environment="web" feedback-link="">
+    <google-codelab-analytics gaid="UA-49880327-14" ga4id=""></google-codelab-analytics>
+    <google-codelab codelab-gaid="" codelab-ga4id="" id="collections-generics"
+        title="Collections Framework &amp; Generics" environment="web" feedback-link="">
 
         <google-codelab-step label="Introduction" duration="2">
             <p>Java&#39;s Collections Framework provides powerful data structures for storing and manipulating groups of
@@ -244,45 +247,45 @@ public class ArrayListDemo {
     public static void main(String[] args) {
         // Creating ArrayList
         List&lt;String&gt; fruits = new ArrayList&lt;&gt;();
-        
+
         // Adding elements
         fruits.add(&#34;Apple&#34;);
         fruits.add(&#34;Banana&#34;);
         fruits.add(&#34;Cherry&#34;);
         fruits.add(&#34;Apple&#34;);  // Duplicates allowed
-        
+
         System.out.println(&#34;Fruits: &#34; + fruits);
         System.out.println(&#34;Size: &#34; + fruits.size());
-        
+
         // Accessing elements
         System.out.println(&#34;First fruit: &#34; + fruits.get(0));
         System.out.println(&#34;Last fruit: &#34; + fruits.get(fruits.size() - 1));
-        
+
         // Modifying elements
         fruits.set(1, &#34;Blueberry&#34;);
         System.out.println(&#34;After modification: &#34; + fruits);
-        
+
         // Checking existence
         System.out.println(&#34;Contains Apple: &#34; + fruits.contains(&#34;Apple&#34;));
         System.out.println(&#34;Index of Apple: &#34; + fruits.indexOf(&#34;Apple&#34;));
         System.out.println(&#34;Last index of Apple: &#34; + fruits.lastIndexOf(&#34;Apple&#34;));
-        
+
         // Removing elements
         fruits.remove(&#34;Cherry&#34;);  // Remove by object
         fruits.remove(0);         // Remove by index
         System.out.println(&#34;After removal: &#34; + fruits);
-        
+
         // Iterating
         System.out.println(&#34;\nIterating:&#34;);
         for (String fruit : fruits) {
             System.out.println(&#34;  - &#34; + fruit);
         }
-        
+
         // Bulk operations
         List&lt;String&gt; moreFruits = Arrays.asList(&#34;Date&#34;, &#34;Elderberry&#34;);
         fruits.addAll(moreFruits);
         System.out.println(&#34;After addAll: &#34; + fruits);
-        
+
         // Clearing
         fruits.clear();
         System.out.println(&#34;After clear, is empty: &#34; + fruits.isEmpty());
@@ -303,31 +306,31 @@ public class ArrayListDemo {
 public class LinkedListDemo {
     public static void main(String[] args) {
         LinkedList&lt;Integer&gt; numbers = new LinkedList&lt;&gt;();
-        
+
         // Adding elements
         numbers.add(10);
         numbers.add(20);
         numbers.add(30);
-        
+
         // LinkedList-specific methods
         numbers.addFirst(5);   // Add at beginning
         numbers.addLast(40);   // Add at end
-        
+
         System.out.println(&#34;Numbers: &#34; + numbers);
-        
+
         // Accessing ends
         System.out.println(&#34;First: &#34; + numbers.getFirst());
         System.out.println(&#34;Last: &#34; + numbers.getLast());
-        
+
         // Peek without removing
         System.out.println(&#34;Peek first: &#34; + numbers.peekFirst());
         System.out.println(&#34;Peek last: &#34; + numbers.peekLast());
-        
+
         // Remove from ends
         numbers.removeFirst();
         numbers.removeLast();
         System.out.println(&#34;After removing ends: &#34; + numbers);
-        
+
         // Use as Stack (LIFO)
         LinkedList&lt;String&gt; stack = new LinkedList&lt;&gt;();
         stack.push(&#34;First&#34;);
@@ -336,7 +339,7 @@ public class LinkedListDemo {
         System.out.println(&#34;Stack: &#34; + stack);
         System.out.println(&#34;Pop: &#34; + stack.pop());  // Third
         System.out.println(&#34;After pop: &#34; + stack);
-        
+
         // Use as Queue (FIFO)
         LinkedList&lt;String&gt; queue = new LinkedList&lt;&gt;();
         queue.offer(&#34;First&#34;);
@@ -354,7 +357,7 @@ public class LinkedListDemo {
 public class ListPerformanceComparison {
     public static void main(String[] args) {
         int n = 100000;
-        
+
         // ArrayList - Fast random access
         List&lt;Integer&gt; arrayList = new ArrayList&lt;&gt;();
         long start = System.nanoTime();
@@ -363,14 +366,14 @@ public class ListPerformanceComparison {
         }
         long end = System.nanoTime();
         System.out.println(&#34;ArrayList add: &#34; + (end - start) / 1_000_000 + &#34; ms&#34;);
-        
+
         start = System.nanoTime();
         for (int i = 0; i &lt; n; i++) {
             arrayList.get(i);
         }
         end = System.nanoTime();
         System.out.println(&#34;ArrayList get: &#34; + (end - start) / 1_000_000 + &#34; ms&#34;);
-        
+
         // LinkedList - Fast insertions at ends
         List&lt;Integer&gt; linkedList = new LinkedList&lt;&gt;();
         start = System.nanoTime();
@@ -379,7 +382,7 @@ public class ListPerformanceComparison {
         }
         end = System.nanoTime();
         System.out.println(&#34;LinkedList add: &#34; + (end - start) / 1_000_000 + &#34; ms&#34;);
-        
+
         start = System.nanoTime();
         for (int i = 0; i &lt; n; i++) {
             linkedList.get(i);  // Slow!
@@ -412,44 +415,44 @@ public class ListPerformanceComparison {
 public class HashSetDemo {
     public static void main(String[] args) {
         Set&lt;String&gt; languages = new HashSet&lt;&gt;();
-        
+
         // Adding elements
         languages.add(&#34;Java&#34;);
         languages.add(&#34;Python&#34;);
         languages.add(&#34;JavaScript&#34;);
         languages.add(&#34;Java&#34;);  // Duplicate - ignored!
-        
+
         System.out.println(&#34;Languages: &#34; + languages);  // No duplicates
         System.out.println(&#34;Size: &#34; + languages.size());  // 3, not 4
-        
+
         // Checking existence
         System.out.println(&#34;Contains Python: &#34; + languages.contains(&#34;Python&#34;));
         System.out.println(&#34;Contains C++: &#34; + languages.contains(&#34;C++&#34;));
-        
+
         // Removing
         languages.remove(&#34;JavaScript&#34;);
         System.out.println(&#34;After removal: &#34; + languages);
-        
+
         // Iterating (order not guaranteed)
         System.out.println(&#34;\nIterating:&#34;);
         for (String lang : languages) {
             System.out.println(&#34;  - &#34; + lang);
         }
-        
+
         // Set operations
         Set&lt;String&gt; frontend = new HashSet&lt;&gt;(Arrays.asList(&#34;JavaScript&#34;, &#34;TypeScript&#34;, &#34;HTML&#34;));
         Set&lt;String&gt; backend = new HashSet&lt;&gt;(Arrays.asList(&#34;Java&#34;, &#34;Python&#34;, &#34;JavaScript&#34;));
-        
+
         // Union
         Set&lt;String&gt; union = new HashSet&lt;&gt;(frontend);
         union.addAll(backend);
         System.out.println(&#34;\nUnion: &#34; + union);
-        
+
         // Intersection
         Set&lt;String&gt; intersection = new HashSet&lt;&gt;(frontend);
         intersection.retainAll(backend);
         System.out.println(&#34;Intersection: &#34; + intersection);
-        
+
         // Difference
         Set&lt;String&gt; difference = new HashSet&lt;&gt;(frontend);
         difference.removeAll(backend);
@@ -475,29 +478,29 @@ public class TreeSetDemo {
         names.add(&#34;Alice&#34;);
         names.add(&#34;Bob&#34;);
         names.add(&#34;Diana&#34;);
-        
+
         System.out.println(&#34;Names (sorted): &#34; + names);
         // Output: [Alice, Bob, Charlie, Diana]
-        
+
         // Numbers sorted
         Set&lt;Integer&gt; numbers = new TreeSet&lt;&gt;();
         numbers.add(50);
         numbers.add(10);
         numbers.add(30);
         numbers.add(20);
-        
+
         System.out.println(&#34;Numbers (sorted): &#34; + numbers);
         // Output: [10, 20, 30, 50]
-        
+
         // Custom ordering with Comparator
         Set&lt;String&gt; reversedNames = new TreeSet&lt;&gt;(Comparator.reverseOrder());
         reversedNames.add(&#34;Charlie&#34;);
         reversedNames.add(&#34;Alice&#34;);
         reversedNames.add(&#34;Bob&#34;);
-        
+
         System.out.println(&#34;Names (reversed): &#34; + reversedNames);
         // Output: [Charlie, Bob, Alice]
-        
+
         // TreeSet specific methods
         TreeSet&lt;Integer&gt; scores = new TreeSet&lt;&gt;(Arrays.asList(85, 92, 78, 95, 88));
         System.out.println(&#34;First (lowest): &#34; + scores.first());
@@ -506,7 +509,7 @@ public class TreeSetDemo {
         System.out.println(&#34;Higher than 90: &#34; + scores.higher(90));
         System.out.println(&#34;Ceiling of 90: &#34; + scores.ceiling(90));
         System.out.println(&#34;Floor of 90: &#34; + scores.floor(90));
-        
+
         // Range views
         System.out.println(&#34;Scores &gt;= 85 and &lt; 92: &#34; + scores.subSet(85, 92));
         System.out.println(&#34;Scores &lt; 90: &#34; + scores.headSet(90));
@@ -530,16 +533,16 @@ public class LinkedHashSetDemo {
         orderedSet.add(&#34;Second&#34;);
         orderedSet.add(&#34;Third&#34;);
         orderedSet.add(&#34;First&#34;);  // Duplicate ignored
-        
+
         System.out.println(&#34;LinkedHashSet (insertion order): &#34; + orderedSet);
         // Output: [First, Second, Third]
-        
+
         // Compare with HashSet (no guaranteed order)
         Set&lt;String&gt; unorderedSet = new HashSet&lt;&gt;();
         unorderedSet.add(&#34;First&#34;);
         unorderedSet.add(&#34;Second&#34;);
         unorderedSet.add(&#34;Third&#34;);
-        
+
         System.out.println(&#34;HashSet (no order guarantee): &#34; + unorderedSet);
         // Output: [First, Second, Third] or [Third, First, Second] etc.
     }
@@ -568,68 +571,68 @@ public class LinkedHashSetDemo {
 public class HashMapDemo {
     public static void main(String[] args) {
         Map&lt;String, Integer&gt; ages = new HashMap&lt;&gt;();
-        
+
         // Adding key-value pairs
         ages.put(&#34;Alice&#34;, 25);
         ages.put(&#34;Bob&#34;, 30);
         ages.put(&#34;Charlie&#34;, 28);
         ages.put(&#34;Alice&#34;, 26);  // Updates existing key
-        
+
         System.out.println(&#34;Ages: &#34; + ages);
         System.out.println(&#34;Size: &#34; + ages.size());
-        
+
         // Accessing values
         System.out.println(&#34;Alice&#39;s age: &#34; + ages.get(&#34;Alice&#34;));
         System.out.println(&#34;Diana&#39;s age: &#34; + ages.get(&#34;Diana&#34;));  // null
-        
+
         // Check existence
         System.out.println(&#34;Contains Alice: &#34; + ages.containsKey(&#34;Alice&#34;));
         System.out.println(&#34;Contains age 30: &#34; + ages.containsValue(30));
-        
+
         // Default values
-        System.out.println(&#34;Diana&#39;s age (with default): &#34; + 
+        System.out.println(&#34;Diana&#39;s age (with default): &#34; +
                           ages.getOrDefault(&#34;Diana&#34;, 0));
-        
+
         // putIfAbsent - only adds if key doesn&#39;t exist
         ages.putIfAbsent(&#34;Bob&#34;, 35);  // No change, key exists
         ages.putIfAbsent(&#34;Diana&#34;, 29);  // Adds new entry
         System.out.println(&#34;After putIfAbsent: &#34; + ages);
-        
+
         // Removing
         ages.remove(&#34;Charlie&#34;);
         System.out.println(&#34;After removal: &#34; + ages);
-        
+
         // Iterating over keys
         System.out.println(&#34;\nIterating keys:&#34;);
         for (String name : ages.keySet()) {
             System.out.println(&#34;  &#34; + name);
         }
-        
+
         // Iterating over values
         System.out.println(&#34;\nIterating values:&#34;);
         for (Integer age : ages.values()) {
             System.out.println(&#34;  &#34; + age);
         }
-        
+
         // Iterating over entries
         System.out.println(&#34;\nIterating entries:&#34;);
         for (Map.Entry&lt;String, Integer&gt; entry : ages.entrySet()) {
             System.out.println(&#34;  &#34; + entry.getKey() + &#34; = &#34; + entry.getValue());
         }
-        
+
         // Java 8+ forEach
         System.out.println(&#34;\nUsing forEach:&#34;);
-        ages.forEach((name, age) -&gt; 
+        ages.forEach((name, age) -&gt;
             System.out.println(&#34;  &#34; + name + &#34; is &#34; + age + &#34; years old&#34;)
         );
-        
+
         // compute methods
         ages.compute(&#34;Alice&#34;, (name, age) -&gt; age + 1);  // Increment Alice&#39;s age
         ages.computeIfAbsent(&#34;Eve&#34;, name -&gt; 27);  // Add if absent
         ages.computeIfPresent(&#34;Bob&#34;, (name, age) -&gt; age + 2);  // Update if present
-        
+
         System.out.println(&#34;\nAfter compute operations: &#34; + ages);
-        
+
         // merge method
         ages.merge(&#34;Alice&#34;, 5, (oldValue, newValue) -&gt; oldValue + newValue);
         System.out.println(&#34;After merge: &#34; + ages);
@@ -654,24 +657,24 @@ public class TreeMapDemo {
         prices.put(&#34;Mouse&#34;, 29.99);
         prices.put(&#34;Keyboard&#34;, 79.99);
         prices.put(&#34;Monitor&#34;, 299.99);
-        
+
         System.out.println(&#34;Prices (sorted by product name):&#34;);
-        prices.forEach((product, price) -&gt; 
+        prices.forEach((product, price) -&gt;
             System.out.println(&#34;  &#34; + product + &#34;: $&#34; + price)
         );
-        
+
         // TreeMap specific methods
         TreeMap&lt;Integer, String&gt; grades = new TreeMap&lt;&gt;();
         grades.put(95, &#34;A&#34;);
         grades.put(85, &#34;B&#34;);
         grades.put(75, &#34;C&#34;);
         grades.put(65, &#34;D&#34;);
-        
+
         System.out.println(&#34;\nFirst entry: &#34; + grades.firstEntry());
         System.out.println(&#34;Last entry: &#34; + grades.lastEntry());
         System.out.println(&#34;Entry for 85: &#34; + grades.floorEntry(85));
         System.out.println(&#34;Entry above 85: &#34; + grades.higherEntry(85));
-        
+
         // Range views
         System.out.println(&#34;Grades 70-90: &#34; + grades.subMap(70, 91));
         System.out.println(&#34;Grades below 80: &#34; + grades.headMap(80));
@@ -697,22 +700,22 @@ public class LinkedHashMapDemo {
         capitals.put(&#34;France&#34;, &#34;Paris&#34;);
         capitals.put(&#34;Japan&#34;, &#34;Tokyo&#34;);
         capitals.put(&#34;India&#34;, &#34;New Delhi&#34;);
-        
+
         System.out.println(&#34;Capitals (insertion order):&#34;);
-        capitals.forEach((country, capital) -&gt; 
+        capitals.forEach((country, capital) -&gt;
             System.out.println(&#34;  &#34; + country + &#34; -&gt; &#34; + capital)
         );
-        
+
         // Access order (LRU cache implementation)
         Map&lt;String, Integer&gt; lruCache = new LinkedHashMap&lt;&gt;(16, 0.75f, true);
         lruCache.put(&#34;A&#34;, 1);
         lruCache.put(&#34;B&#34;, 2);
         lruCache.put(&#34;C&#34;, 3);
-        
+
         System.out.println(&#34;\nBefore access: &#34; + lruCache.keySet());
-        
+
         lruCache.get(&#34;A&#34;);  // Access A - moves to end
-        
+
         System.out.println(&#34;After accessing A: &#34; + lruCache.keySet());
         // Output shows A at the end
     }
@@ -746,37 +749,37 @@ public class PriorityQueueDemo {
         numbers.add(10);
         numbers.add(30);
         numbers.add(20);
-        
+
         System.out.println(&#34;Priority Queue: &#34; + numbers);
         // Note: toString() doesn&#39;t show priority order
-        
+
         System.out.println(&#34;\nPolling (removes in priority order):&#34;);
         while (!numbers.isEmpty()) {
             System.out.println(&#34;  &#34; + numbers.poll());  // 10, 20, 30, 50
         }
-        
+
         // Max heap using reverse order
         PriorityQueue&lt;Integer&gt; maxHeap = new PriorityQueue&lt;&gt;(Comparator.reverseOrder());
         maxHeap.addAll(Arrays.asList(50, 10, 30, 20));
-        
+
         System.out.println(&#34;\nMax heap polling:&#34;);
         while (!maxHeap.isEmpty()) {
             System.out.println(&#34;  &#34; + maxHeap.poll());  // 50, 30, 20, 10
         }
-        
+
         // Custom objects with priority
         PriorityQueue&lt;Task&gt; tasks = new PriorityQueue&lt;&gt;(
             Comparator.comparingInt(Task::getPriority).reversed()
         );
-        
+
         tasks.add(new Task(&#34;Low priority&#34;, 1));
         tasks.add(new Task(&#34;High priority&#34;, 5));
         tasks.add(new Task(&#34;Medium priority&#34;, 3));
-        
+
         System.out.println(&#34;\nProcessing tasks by priority:&#34;);
         while (!tasks.isEmpty()) {
             Task task = tasks.poll();
-            System.out.println(&#34;  &#34; + task.getName() + &#34; (priority: &#34; + 
+            System.out.println(&#34;  &#34; + task.getName() + &#34; (priority: &#34; +
                              task.getPriority() + &#34;)&#34;);
         }
     }
@@ -785,12 +788,12 @@ public class PriorityQueueDemo {
 class Task {
     private String name;
     private int priority;
-    
+
     public Task(String name, int priority) {
         this.name = name;
         this.priority = priority;
     }
-    
+
     public String getName() { return name; }
     public int getPriority() { return priority; }
 }
@@ -808,24 +811,24 @@ class Task {
 public class ArrayDequeDemo {
     public static void main(String[] args) {
         Deque&lt;String&gt; deque = new ArrayDeque&lt;&gt;();
-        
+
         // Add to both ends
         deque.addFirst(&#34;First&#34;);
         deque.addLast(&#34;Last&#34;);
         deque.addFirst(&#34;New First&#34;);
         deque.addLast(&#34;New Last&#34;);
-        
+
         System.out.println(&#34;Deque: &#34; + deque);
-        
+
         // Peek both ends
         System.out.println(&#34;Peek first: &#34; + deque.peekFirst());
         System.out.println(&#34;Peek last: &#34; + deque.peekLast());
-        
+
         // Remove from both ends
         System.out.println(&#34;Remove first: &#34; + deque.removeFirst());
         System.out.println(&#34;Remove last: &#34; + deque.removeLast());
         System.out.println(&#34;After removal: &#34; + deque);
-        
+
         // Use as Stack (LIFO)
         Deque&lt;Integer&gt; stack = new ArrayDeque&lt;&gt;();
         stack.push(1);
@@ -833,7 +836,7 @@ public class ArrayDequeDemo {
         stack.push(3);
         System.out.println(&#34;\nStack: &#34; + stack);
         System.out.println(&#34;Pop: &#34; + stack.pop());  // 3
-        
+
         // Use as Queue (FIFO)
         Deque&lt;Integer&gt; queue = new ArrayDeque&lt;&gt;();
         queue.offer(1);
@@ -873,15 +876,15 @@ String s = list.get(0);  // No casting needed
             <pre><code language="language-java" class="language-java">// Generic Box class
 public class Box&lt;T&gt; {
     private T content;
-    
+
     public void set(T content) {
         this.content = content;
     }
-    
+
     public T get() {
         return content;
     }
-    
+
     public boolean isEmpty() {
         return content == null;
     }
@@ -900,15 +903,15 @@ Integer num = intBox.get();
             <pre><code language="language-java" class="language-java">public class Pair&lt;K, V&gt; {
     private K key;
     private V value;
-    
+
     public Pair(K key, V value) {
         this.key = key;
         this.value = value;
     }
-    
+
     public K getKey() { return key; }
     public V getValue() { return value; }
-    
+
     @Override
     public String toString() {
         return &#34;(&#34; + key + &#34;, &#34; + value + &#34;)&#34;;
@@ -924,7 +927,7 @@ System.out.println(idName);   // (101, Bob)
 </code></pre>
             <h2 is-upgraded>Generic Methods</h2>
             <pre><code language="language-java" class="language-java">public class GenericMethods {
-    
+
     // Generic method
     public static &lt;T&gt; void printArray(T[] array) {
         for (T element : array) {
@@ -932,7 +935,7 @@ System.out.println(idName);   // (101, Bob)
         }
         System.out.println();
     }
-    
+
     // Generic method with return type
     public static &lt;T&gt; T getFirst(List&lt;T&gt; list) {
         if (list.isEmpty()) {
@@ -940,19 +943,19 @@ System.out.println(idName);   // (101, Bob)
         }
         return list.get(0);
     }
-    
+
     // Multiple type parameters
     public static &lt;K, V&gt; boolean containsKeyValue(Map&lt;K, V&gt; map, K key, V value) {
         return value.equals(map.get(key));
     }
-    
+
     public static void main(String[] args) {
         Integer[] intArray = {1, 2, 3, 4, 5};
         String[] strArray = {&#34;Hello&#34;, &#34;World&#34;, &#34;Java&#34;};
-        
+
         printArray(intArray);  // 1 2 3 4 5
         printArray(strArray);  // Hello World Java
-        
+
         List&lt;String&gt; names = Arrays.asList(&#34;Alice&#34;, &#34;Bob&#34;, &#34;Charlie&#34;);
         String first = getFirst(names);
         System.out.println(&#34;First: &#34; + first);  // Alice
@@ -964,11 +967,11 @@ System.out.println(idName);   // (101, Bob)
             <pre><code language="language-java" class="language-java">// Upper bound - T must be Number or subclass
 public class NumberBox&lt;T extends Number&gt; {
     private T number;
-    
+
     public NumberBox(T number) {
         this.number = number;
     }
-    
+
     public double getDoubleValue() {
         return number.doubleValue();  // Can call Number methods
     }
@@ -982,11 +985,11 @@ NumberBox&lt;Double&gt; doubleBox = new NumberBox&lt;&gt;(123.45);
 // Multiple bounds
 public class ComparableBox&lt;T extends Number &amp; Comparable&lt;T&gt;&gt; {
     private T value;
-    
+
     public ComparableBox(T value) {
         this.value = value;
     }
-    
+
     public boolean isGreaterThan(T other) {
         return value.compareTo(other) &gt; 0;
     }
@@ -994,7 +997,7 @@ public class ComparableBox&lt;T extends Number &amp; Comparable&lt;T&gt;&gt; {
 </code></pre>
             <h2 is-upgraded>Wildcards</h2>
             <pre><code language="language-java" class="language-java">public class WildcardDemo {
-    
+
     // Upper bounded wildcard - read only
     public static double sumNumbers(List&lt;? extends Number&gt; list) {
         double sum = 0;
@@ -1003,32 +1006,32 @@ public class ComparableBox&lt;T extends Number &amp; Comparable&lt;T&gt;&gt; {
         }
         return sum;
     }
-    
+
     // Lower bounded wildcard - write only
     public static void addNumbers(List&lt;? super Integer&gt; list) {
         for (int i = 1; i &lt;= 5; i++) {
             list.add(i);
         }
     }
-    
+
     // Unbounded wildcard
     public static void printList(List&lt;?&gt; list) {
         for (Object element : list) {
             System.out.println(element);
         }
     }
-    
+
     public static void main(String[] args) {
         List&lt;Integer&gt; integers = Arrays.asList(1, 2, 3);
         List&lt;Double&gt; doubles = Arrays.asList(1.5, 2.5, 3.5);
-        
+
         System.out.println(&#34;Sum of integers: &#34; + sumNumbers(integers));
         System.out.println(&#34;Sum of doubles: &#34; + sumNumbers(doubles));
-        
+
         List&lt;Number&gt; numbers = new ArrayList&lt;&gt;();
         addNumbers(numbers);
         System.out.println(&#34;Numbers: &#34; + numbers);
-        
+
         printList(integers);
         printList(doubles);
     }
@@ -1050,24 +1053,24 @@ public class ComparableBox&lt;T extends Number &amp; Comparable&lt;T&gt;&gt; {
     private String name;
     private double price;
     private int quantity;
-    
+
     public Product(String name, double price, int quantity) {
         this.name = name;
         this.price = price;
         this.quantity = quantity;
     }
-    
+
     @Override
     public int compareTo(Product other) {
         // Natural ordering by price
         return Double.compare(this.price, other.price);
     }
-    
+
     @Override
     public String toString() {
         return name + &#34; ($&#34; + price + &#34;, qty: &#34; + quantity + &#34;)&#34;;
     }
-    
+
     // Getters
     public String getName() { return name; }
     public double getPrice() { return price; }
@@ -1094,7 +1097,7 @@ public class ComparatorDemo {
         products.add(new Product(&#34;Mouse&#34;, 29.99, 50));
         products.add(new Product(&#34;Keyboard&#34;, 79.99, 20));
         products.add(new Product(&#34;Monitor&#34;, 299.99, 10));
-        
+
         // Sort by name
         Collections.sort(products, new Comparator&lt;Product&gt;() {
             @Override
@@ -1103,26 +1106,26 @@ public class ComparatorDemo {
             }
         });
         System.out.println(&#34;Sorted by name: &#34; + products);
-        
+
         // Sort by quantity (lambda)
         products.sort((p1, p2) -&gt; Integer.compare(p1.getQuantity(), p2.getQuantity()));
         System.out.println(&#34;Sorted by quantity: &#34; + products);
-        
+
         // Sort by price (method reference)
         products.sort(Comparator.comparingDouble(Product::getPrice));
         System.out.println(&#34;Sorted by price: &#34; + products);
-        
+
         // Reverse order
         products.sort(Comparator.comparingDouble(Product::getPrice).reversed());
         System.out.println(&#34;Sorted by price (descending): &#34; + products);
-        
+
         // Multiple criteria - by price, then by name
         products.sort(
             Comparator.comparingDouble(Product::getPrice)
                       .thenComparing(Product::getName)
         );
         System.out.println(&#34;Sorted by price, then name: &#34; + products);
-        
+
         // Natural order with nulls
         List&lt;Product&gt; withNulls = new ArrayList&lt;&gt;(products);
         withNulls.add(null);
@@ -1148,7 +1151,7 @@ public class ComparatorDemo {
     private String category;
     private double price;
     private int quantity;
-    
+
     public Product(String id, String name, String category, double price, int quantity) {
         this.id = id;
         this.name = name;
@@ -1156,12 +1159,12 @@ public class ComparatorDemo {
         this.price = price;
         this.quantity = quantity;
     }
-    
+
     @Override
     public int compareTo(Product other) {
         return this.name.compareTo(other.name);
     }
-    
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
@@ -1169,18 +1172,18 @@ public class ComparatorDemo {
         Product product = (Product) obj;
         return id.equals(product.id);
     }
-    
+
     @Override
     public int hashCode() {
         return id.hashCode();
     }
-    
+
     @Override
     public String toString() {
-        return String.format(&#34;%-8s %-20s %-15s $%-8.2f qty:%-4d&#34;, 
+        return String.format(&#34;%-8s %-20s %-15s $%-8.2f qty:%-4d&#34;,
                            id, name, category, price, quantity);
     }
-    
+
     // Getters and setters
     public String getId() { return id; }
     public String getName() { return name; }
@@ -1197,18 +1200,18 @@ public class ComparatorDemo {
 public class InventoryManager {
     // Primary storage - fast lookups by ID
     private Map&lt;String, Product&gt; productsById;
-    
+
     // Category index - products grouped by category
     private Map&lt;String, Set&lt;Product&gt;&gt; productsByCategory;
-    
+
     // Low stock priority queue
     private PriorityQueue&lt;Product&gt; lowStockQueue;
-    
+
     // Order history
     private Deque&lt;Order&gt; orderHistory;
-    
+
     private static final int LOW_STOCK_THRESHOLD = 10;
-    
+
     public InventoryManager() {
         this.productsById = new HashMap&lt;&gt;();
         this.productsByCategory = new HashMap&lt;&gt;();
@@ -1217,82 +1220,82 @@ public class InventoryManager {
         );
         this.orderHistory = new ArrayDeque&lt;&gt;();
     }
-    
+
     public void addProduct(Product product) {
         productsById.put(product.getId(), product);
-        
+
         // Add to category index
         productsByCategory
             .computeIfAbsent(product.getCategory(), k -&gt; new HashSet&lt;&gt;())
             .add(product);
-        
+
         // Add to low stock queue if applicable
         if (product.getQuantity() &lt;= LOW_STOCK_THRESHOLD) {
             lowStockQueue.offer(product);
         }
-        
+
         System.out.println(&#34;Product added: &#34; + product.getId());
     }
-    
+
     public Product getProduct(String id) {
         return productsById.get(id);
     }
-    
+
     public List&lt;Product&gt; getAllProducts() {
         return new ArrayList&lt;&gt;(productsById.values());
     }
-    
+
     public Set&lt;Product&gt; getProductsByCategory(String category) {
         return productsByCategory.getOrDefault(category, new HashSet&lt;&gt;());
     }
-    
+
     public List&lt;Product&gt; searchByName(String keyword) {
         List&lt;Product&gt; results = new ArrayList&lt;&gt;();
         String lowerKeyword = keyword.toLowerCase();
-        
+
         for (Product product : productsById.values()) {
             if (product.getName().toLowerCase().contains(lowerKeyword)) {
                 results.add(product);
             }
         }
-        
+
         return results;
     }
-    
+
     public void updateStock(String productId, int quantity) {
         Product product = productsById.get(productId);
         if (product == null) {
             System.out.println(&#34;Product not found: &#34; + productId);
             return;
         }
-        
+
         int oldQuantity = product.getQuantity();
         product.setQuantity(product.getQuantity() + quantity);
-        
+
         // Update low stock queue
-        if (oldQuantity &gt; LOW_STOCK_THRESHOLD &amp;&amp; 
+        if (oldQuantity &gt; LOW_STOCK_THRESHOLD &amp;&amp;
             product.getQuantity() &lt;= LOW_STOCK_THRESHOLD) {
             lowStockQueue.offer(product);
         }
-        
-        System.out.println(&#34;Stock updated for &#34; + productId + 
+
+        System.out.println(&#34;Stock updated for &#34; + productId +
                          &#34;: &#34; + oldQuantity + &#34; -&gt; &#34; + product.getQuantity());
     }
-    
+
     public boolean placeOrder(String productId, int quantity) {
         Product product = productsById.get(productId);
         if (product == null) {
             System.out.println(&#34;Product not found: &#34; + productId);
             return false;
         }
-        
+
         if (product.getQuantity() &lt; quantity) {
             System.out.println(&#34;Insufficient stock for &#34; + productId);
             return false;
         }
-        
+
         product.setQuantity(product.getQuantity() - quantity);
-        
+
         Order order = new Order(
             &#34;ORD-&#34; + System.currentTimeMillis(),
             productId,
@@ -1300,18 +1303,18 @@ public class InventoryManager {
             quantity,
             product.getPrice() * quantity
         );
-        
+
         orderHistory.addFirst(order);  // Most recent first
-        
+
         // Check low stock
         if (product.getQuantity() &lt;= LOW_STOCK_THRESHOLD) {
             lowStockQueue.offer(product);
         }
-        
+
         System.out.println(&#34;Order placed: &#34; + order.getId());
         return true;
     }
-    
+
     public List&lt;Product&gt; getLowStockProducts() {
         List&lt;Product&gt; lowStock = new ArrayList&lt;&gt;();
         for (Product product : productsById.values()) {
@@ -1322,7 +1325,7 @@ public class InventoryManager {
         lowStock.sort(Comparator.comparingInt(Product::getQuantity));
         return lowStock;
     }
-    
+
     public List&lt;Order&gt; getRecentOrders(int count) {
         List&lt;Order&gt; recent = new ArrayList&lt;&gt;();
         int added = 0;
@@ -1333,43 +1336,43 @@ public class InventoryManager {
         }
         return recent;
     }
-    
+
     public Map&lt;String, Integer&gt; getCategoryStats() {
         Map&lt;String, Integer&gt; stats = new TreeMap&lt;&gt;();  // Sorted by category
-        
+
         for (Map.Entry&lt;String, Set&lt;Product&gt;&gt; entry : productsByCategory.entrySet()) {
             stats.put(entry.getKey(), entry.getValue().size());
         }
-        
+
         return stats;
     }
-    
+
     public void displayInventory() {
         System.out.println(&#34;\n=== INVENTORY ===&#34;);
         System.out.println(&#34;ID       Name                 Category        Price    Quantity&#34;);
         System.out.println(&#34;-&#34;.repeat(80));
-        
+
         List&lt;Product&gt; sorted = getAllProducts();
         Collections.sort(sorted);  // Sort by name
-        
+
         for (Product product : sorted) {
             System.out.println(product);
         }
     }
-    
+
     public void displayLowStock() {
         List&lt;Product&gt; lowStock = getLowStockProducts();
-        
+
         if (lowStock.isEmpty()) {
             System.out.println(&#34;\nNo low stock products.&#34;);
             return;
         }
-        
+
         System.out.println(&#34;\n=== LOW STOCK ALERT ===&#34;);
         System.out.println(&#34;Products with quantity &lt;= &#34; + LOW_STOCK_THRESHOLD + &#34;:&#34;);
         System.out.println(&#34;ID       Name                 Category        Price    Quantity&#34;);
         System.out.println(&#34;-&#34;.repeat(80));
-        
+
         for (Product product : lowStock) {
             System.out.println(product);
         }
@@ -1382,8 +1385,8 @@ class Order {
     private String productName;
     private int quantity;
     private double totalPrice;
-    
-    public Order(String id, String productId, String productName, 
+
+    public Order(String id, String productId, String productName,
                 int quantity, double totalPrice) {
         this.id = id;
         this.productId = productId;
@@ -1391,16 +1394,16 @@ class Order {
         this.quantity = quantity;
         this.totalPrice = totalPrice;
     }
-    
+
     public String getId() { return id; }
     public String getProductId() { return productId; }
     public String getProductName() { return productName; }
     public int getQuantity() { return quantity; }
     public double getTotalPrice() { return totalPrice; }
-    
+
     @Override
     public String toString() {
-        return String.format(&#34;%s: %s x%d ($%.2f)&#34;, 
+        return String.format(&#34;%s: %s x%d ($%.2f)&#34;,
                            id, productName, quantity, totalPrice);
     }
 }
@@ -1411,7 +1414,7 @@ class Order {
 public class InventoryApp {
     public static void main(String[] args) {
         InventoryManager manager = new InventoryManager();
-        
+
         // Add products
         manager.addProduct(new Product(&#34;P001&#34;, &#34;Laptop&#34;, &#34;Electronics&#34;, 999.99, 15));
         manager.addProduct(new Product(&#34;P002&#34;, &#34;Mouse&#34;, &#34;Electronics&#34;, 29.99, 50));
@@ -1421,52 +1424,52 @@ public class InventoryApp {
         manager.addProduct(new Product(&#34;P006&#34;, &#34;Desk&#34;, &#34;Furniture&#34;, 349.99, 3));
         manager.addProduct(new Product(&#34;P007&#34;, &#34;Notebook&#34;, &#34;Stationery&#34;, 4.99, 100));
         manager.addProduct(new Product(&#34;P008&#34;, &#34;Pen Set&#34;, &#34;Stationery&#34;, 12.99, 75));
-        
+
         // Display inventory
         manager.displayInventory();
-        
+
         // Search products
         System.out.println(&#34;\n=== SEARCH RESULTS (keyword: &#39;desk&#39;) ===&#34;);
         List&lt;Product&gt; searchResults = manager.searchByName(&#34;desk&#34;);
         for (Product product : searchResults) {
             System.out.println(product);
         }
-        
+
         // Get products by category
         System.out.println(&#34;\n=== ELECTRONICS CATEGORY ===&#34;);
         Set&lt;Product&gt; electronics = manager.getProductsByCategory(&#34;Electronics&#34;);
         for (Product product : electronics) {
             System.out.println(product);
         }
-        
+
         // Place orders
         System.out.println(&#34;\n=== PLACING ORDERS ===&#34;);
         manager.placeOrder(&#34;P001&#34;, 5);  // Laptop
         manager.placeOrder(&#34;P003&#34;, 3);  // Keyboard
         manager.placeOrder(&#34;P006&#34;, 2);  // Desk
-        
+
         // Display recent orders
         System.out.println(&#34;\n=== RECENT ORDERS ===&#34;);
         List&lt;Order&gt; recentOrders = manager.getRecentOrders(5);
         for (Order order : recentOrders) {
             System.out.println(order);
         }
-        
+
         // Display low stock alert
         manager.displayLowStock();
-        
+
         // Category statistics
         System.out.println(&#34;\n=== CATEGORY STATISTICS ===&#34;);
         Map&lt;String, Integer&gt; stats = manager.getCategoryStats();
-        stats.forEach((category, count) -&gt; 
+        stats.forEach((category, count) -&gt;
             System.out.println(category + &#34;: &#34; + count + &#34; products&#34;)
         );
-        
+
         // Update stock
         System.out.println(&#34;\n=== RESTOCKING ===&#34;);
         manager.updateStock(&#34;P003&#34;, 20);  // Restock keyboard
         manager.updateStock(&#34;P006&#34;, 10);  // Restock desk
-        
+
         // Final inventory
         manager.displayInventory();
         manager.displayLowStock();
@@ -1661,9 +1664,15 @@ public class InventoryApp {
 
     <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
     <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
-    <script src="https://storage.googleapis.com/claat-public/prettify.js"></script>
     <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
     <script src="//support.google.com/inapp/api.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js"></script>
+    <script src="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.js"></script>
+    <script>
+        hljs.highlightAll();
+        hljs.addPlugin(new CopyButtonPlugin({ autohide: false }));
+
+    </script>
 
 </body>
 

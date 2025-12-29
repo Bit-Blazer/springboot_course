@@ -11,6 +11,9 @@
         href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
     <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1  /build/styles/monokai.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.css">
     <style>
         .success {
             color: #1e8e3e;
@@ -23,8 +26,8 @@
 </head>
 
 <body>
-    <google-codelab-analytics gaid="UA-49880327-14"></google-codelab-analytics>
-    <google-codelab codelab-gaid="" id="jpa-locking-spring-security"
+    <google-codelab-analytics gaid="UA-49880327-14" ga4id=""></google-codelab-analytics>
+    <google-codelab codelab-gaid="" codelab-ga4id="" id="jpa-locking-spring-security"
         title="JPA Locking Mechanisms &amp; Spring Security" environment="web" feedback-link="">
 
         <google-codelab-step label="Introduction" duration="3">
@@ -91,29 +94,29 @@
 ----  ----------------------    ----------------------    -------------
 T1    Read task (status=TODO)                            status=TODO
 T2                               Read task (status=TODO)  status=TODO
-T3    Update status=DOING       
-T4                               Update status=DONE       
+T3    Update status=DOING
+T4                               Update status=DONE
 T5    Save (status=DOING)                                 status=DOING
 T6                               Save (status=DONE)       status=DONE ❌
 </code></pre>
             <p><strong>Result:</strong> User A&#39;s update is lost! User B overwrote it.</p>
             <h2 is-upgraded>Dirty Reads</h2>
             <p><strong>Scenario:</strong> One transaction reads uncommitted changes from another.</p>
-            <pre><code>Time  Transaction A             Transaction B             
-----  ----------------------    ----------------------    
-T1    Update task price=100                               
-T2                               Read task price=100      
-T3    ROLLBACK                                            
-T4                               Use price=100 ❌ (dirty) 
+            <pre><code>Time  Transaction A             Transaction B
+----  ----------------------    ----------------------
+T1    Update task price=100
+T2                               Read task price=100
+T3    ROLLBACK
+T4                               Use price=100 ❌ (dirty)
 </code></pre>
             <h2 is-upgraded>Non-Repeatable Reads</h2>
             <p><strong>Scenario:</strong> Reading the same data twice in a transaction gives different results.</p>
-            <pre><code>Time  Transaction A             Transaction B             
-----  ----------------------    ----------------------    
-T1    Read task (status=TODO)                             
-T2                               Update status=DONE       
-T3                               COMMIT                   
-T4    Read task (status=DONE) ❌ Different value!         
+            <pre><code>Time  Transaction A             Transaction B
+----  ----------------------    ----------------------
+T1    Read task (status=TODO)
+T2                               Update status=DONE
+T3                               COMMIT
+T4    Read task (status=DONE) ❌ Different value!
 </code></pre>
             <h2 is-upgraded>Solution: Locking</h2>
             <p>Two approaches to prevent these problems:</p>
@@ -147,25 +150,25 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Task {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     @Column(nullable = false, length = 100)
     private String title;
-    
+
     @Column(length = 500)
     private String description;
-    
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private TaskStatus status;
-    
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = &#34;user_id&#34;)
     private User assignedTo;
-    
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
         name = &#34;task_categories&#34;,
@@ -173,19 +176,19 @@ public class Task {
         inverseJoinColumns = @JoinColumn(name = &#34;category_id&#34;)
     )
     private Set&lt;Category&gt; categories = new HashSet&lt;&gt;();
-    
+
     // ⭐ Optimistic locking version field
     @Version
     private Long version;
-    
+
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
-    
+
     @UpdateTimestamp
     @Column(nullable = false)
     private LocalDateTime updatedAt;
-    
+
     public Task(String title, String description) {
         this.title = title;
         this.description = description;
@@ -200,15 +203,15 @@ User A reads:  Task(id=1, version=0)
 User B reads:  Task(id=1, version=0)
 
 User A updates:
-  UPDATE tasks 
-  SET title=&#39;Fixed bug&#39;, version=1 
+  UPDATE tasks
+  SET title=&#39;Fixed bug&#39;, version=1
   WHERE id=1 AND version=0  ✅ Success (1 row updated)
 
 User B updates:
-  UPDATE tasks 
-  SET title=&#39;Bug fixed&#39;, version=1 
+  UPDATE tasks
+  SET title=&#39;Bug fixed&#39;, version=1
   WHERE id=1 AND version=0  ❌ Fails (0 rows updated)
-  
+
   Throws: OptimisticLockException
 </code></pre>
             <p><strong>Version increments automatically on each update.</strong></p>
@@ -217,10 +220,10 @@ User B updates:
             <pre><code language="language-java" class="language-java">package com.example.taskmanager.exception;
 
 public class TaskVersionConflictException extends RuntimeException {
-    
+
     private final Long taskId;
     private final Long attemptedVersion;
-    
+
     public TaskVersionConflictException(Long taskId, Long attemptedVersion) {
         super(String.format(
             &#34;Task %d was modified by another user. Expected version: %d. &#34; +
@@ -229,11 +232,11 @@ public class TaskVersionConflictException extends RuntimeException {
         this.taskId = taskId;
         this.attemptedVersion = attemptedVersion;
     }
-    
+
     public Long getTaskId() {
         return taskId;
     }
-    
+
     public Long getAttemptedVersion() {
         return attemptedVersion;
     }
@@ -246,16 +249,16 @@ public class TaskVersionConflictException extends RuntimeException {
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
-    
+
     // ... existing handlers ...
-    
+
     @ExceptionHandler(OptimisticLockException.class)
     public ResponseEntity&lt;ErrorResponse&gt; handleOptimisticLock(
             OptimisticLockException ex,
             HttpServletRequest request) {
-        
+
         log.warn(&#34;Optimistic lock conflict: {}&#34;, ex.getMessage());
-        
+
         ErrorResponse error = new ErrorResponse(
             LocalDateTime.now(),
             HttpStatus.CONFLICT.value(),
@@ -264,18 +267,18 @@ public class GlobalExceptionHandler {
             request.getRequestURI(),
             null
         );
-        
+
         return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
     }
-    
+
     @ExceptionHandler(TaskVersionConflictException.class)
     public ResponseEntity&lt;ErrorResponse&gt; handleVersionConflict(
             TaskVersionConflictException ex,
             HttpServletRequest request) {
-        
-        log.warn(&#34;Task version conflict: taskId={}, version={}&#34;, 
+
+        log.warn(&#34;Task version conflict: taskId={}, version={}&#34;,
             ex.getTaskId(), ex.getAttemptedVersion());
-        
+
         ErrorResponse error = new ErrorResponse(
             LocalDateTime.now(),
             HttpStatus.CONFLICT.value(),
@@ -284,7 +287,7 @@ public class GlobalExceptionHandler {
             request.getRequestURI(),
             null
         );
-        
+
         return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
     }
 }
@@ -294,20 +297,20 @@ public class GlobalExceptionHandler {
             <pre><code language="language-java" class="language-java">@Transactional
 public Task updateTask(Long id, Task taskDetails) {
     log.debug(&#34;Updating task with ID: {}&#34;, id);
-    
+
     Task task = taskRepository.findById(id)
         .orElseThrow(() -&gt; new TaskNotFoundException(id));
-    
+
     // Check if client provided version for optimistic locking
-    if (taskDetails.getVersion() != null &amp;&amp; 
+    if (taskDetails.getVersion() != null &amp;&amp;
         !task.getVersion().equals(taskDetails.getVersion())) {
         throw new TaskVersionConflictException(id, taskDetails.getVersion());
     }
-    
+
     task.setTitle(taskDetails.getTitle());
     task.setDescription(taskDetails.getDescription());
     task.setStatus(taskDetails.getStatus());
-    
+
     return taskRepository.save(task);
 }
 </code></pre>
@@ -370,13 +373,13 @@ import java.util.Optional;
 
 @Repository
 public interface TaskRepository extends JpaRepository&lt;Task, Long&gt; {
-    
+
     // ... existing methods ...
-    
+
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query(&#34;SELECT t FROM Task t WHERE t.id = :id&#34;)
     Optional&lt;Task&gt; findByIdWithLock(@Param(&#34;id&#34;) Long id);
-    
+
     @Lock(LockModeType.PESSIMISTIC_READ)
     @Query(&#34;SELECT t FROM Task t WHERE t.status = :status&#34;)
     List&lt;Task&gt; findByStatusWithLock(@Param(&#34;status&#34;) TaskStatus status);
@@ -386,16 +389,16 @@ public interface TaskRepository extends JpaRepository&lt;Task, Long&gt; {
             <pre><code language="language-java" class="language-java">@Transactional
 public Task updateTaskWithLock(Long id, Task taskDetails) {
     log.debug(&#34;Updating task {} with pessimistic lock&#34;, id);
-    
+
     // Acquire write lock (blocks other transactions)
     Task task = taskRepository.findByIdWithLock(id)
         .orElseThrow(() -&gt; new TaskNotFoundException(id));
-    
+
     // Hold lock until transaction commits
     task.setTitle(taskDetails.getTitle());
     task.setDescription(taskDetails.getDescription());
     task.setStatus(taskDetails.getStatus());
-    
+
     return taskRepository.save(task);
     // Lock released when transaction commits
 }
@@ -532,39 +535,39 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     @Column(nullable = false, unique = true, length = 50)
     private String username;
-    
+
     @Column(nullable = false, unique = true, length = 100)
     private String email;
-    
+
     @Column(nullable = false, length = 100)
     private String fullName;
-    
+
     // ⭐ Security fields
     @Column(nullable = false)
     private String password;
-    
+
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = &#34;user_roles&#34;, joinColumns = @JoinColumn(name = &#34;user_id&#34;))
     @Column(name = &#34;role&#34;)
     private Set&lt;String&gt; roles = new HashSet&lt;&gt;();
-    
+
     @Column(nullable = false)
     private boolean enabled = true;
-    
+
     @OneToMany(mappedBy = &#34;assignedTo&#34;, cascade = CascadeType.ALL, orphanRemoval = true)
     private List&lt;Task&gt; tasks = new ArrayList&lt;&gt;();
-    
+
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
-    
+
     public User(String username, String email, String fullName, String password) {
         this.username = username;
         this.email = email;
@@ -592,20 +595,20 @@ import java.util.stream.Collectors;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
-    
+
     private final UserRepository userRepository;
-    
+
     public CustomUserDetailsService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
-    
+
     @Override
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username)
             .orElseThrow(() -&gt; new UsernameNotFoundException(
                 &#34;User not found with username: &#34; + username));
-        
+
         return new org.springframework.security.core.userdetails.User(
             user.getUsername(),
             user.getPassword(),
@@ -616,7 +619,7 @@ public class CustomUserDetailsService implements UserDetailsService {
             getAuthorities(user)
         );
     }
-    
+
     private Collection&lt;? extends GrantedAuthority&gt; getAuthorities(User user) {
         return user.getRoles().stream()
             .map(SimpleGrantedAuthority::new)
@@ -646,13 +649,13 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true, securedEnabled = true)
 public class SecurityConfig {
-    
+
     private final CustomUserDetailsService userDetailsService;
-    
+
     public SecurityConfig(CustomUserDetailsService userDetailsService) {
         this.userDetailsService = userDetailsService;
     }
-    
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -662,32 +665,32 @@ public class SecurityConfig {
                 .requestMatchers(&#34;/h2-console/**&#34;).permitAll()
                 .requestMatchers(&#34;/swagger-ui/**&#34;, &#34;/api-docs/**&#34;).permitAll()
                 .requestMatchers(HttpMethod.POST, &#34;/api/users/register&#34;).permitAll()
-                
+
                 // Admin only endpoints
                 .requestMatchers(&#34;/api/users/**&#34;).hasRole(&#34;ADMIN&#34;)
                 .requestMatchers(HttpMethod.DELETE, &#34;/api/tasks/**&#34;).hasRole(&#34;ADMIN&#34;)
-                
+
                 // Authenticated endpoints
                 .requestMatchers(&#34;/api/tasks/**&#34;).authenticated()
                 .requestMatchers(&#34;/api/categories/**&#34;).authenticated()
-                
+
                 // All other requests require authentication
                 .anyRequest().authenticated()
             )
             .httpBasic(basic -&gt; {})  // Enable HTTP Basic authentication
-            .sessionManagement(session -&gt; 
+            .sessionManagement(session -&gt;
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
             .headers(headers -&gt; headers.frameOptions(frame -&gt; frame.disable())); // For H2 console
-        
+
         return http.build();
     }
-    
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-    
+
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
@@ -695,7 +698,7 @@ public class SecurityConfig {
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
-    
+
     @Bean
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration authConfig) throws Exception {
@@ -753,38 +756,38 @@ import java.util.List;
 @Slf4j
 @Transactional(readOnly = true)
 public class UserService {
-    
+
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    
+
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
-    
+
     @Transactional
     public User registerUser(User user) {
         log.debug(&#34;Registering user: {}&#34;, user.getUsername());
-        
+
         if (userRepository.existsByUsername(user.getUsername())) {
             throw new RuntimeException(&#34;Username already exists: &#34; + user.getUsername());
         }
-        
+
         if (userRepository.existsByEmail(user.getEmail())) {
             throw new RuntimeException(&#34;Email already exists: &#34; + user.getEmail());
         }
-        
+
         // Encode password
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        
+
         // Set default role
         if (user.getRoles().isEmpty()) {
             user.getRoles().add(&#34;ROLE_USER&#34;);
         }
-        
+
         return userRepository.save(user);
     }
-    
+
     @Transactional
     @PreAuthorize(&#34;hasRole(&#39;ADMIN&#39;)&#34;)
     public User createUserAsAdmin(User user, String role) {
@@ -792,18 +795,18 @@ public class UserService {
         user.getRoles().add(role);
         return registerUser(user);
     }
-    
+
     @PreAuthorize(&#34;hasRole(&#39;ADMIN&#39;) or #username == authentication.principal.username&#34;)
     public User getUserByUsername(String username) {
         return userRepository.findByUsername(username)
             .orElseThrow(() -&gt; new RuntimeException(&#34;User not found: &#34; + username));
     }
-    
+
     @PreAuthorize(&#34;hasRole(&#39;ADMIN&#39;)&#34;)
     public List&lt;User&gt; getAllUsers() {
         return userRepository.findAll();
     }
-    
+
     @Transactional
     @PreAuthorize(&#34;hasRole(&#39;ADMIN&#39;) or #id == principal.id&#34;)
     public void deleteUser(Long id) {
@@ -812,7 +815,7 @@ public class UserService {
         }
         userRepository.deleteById(id);
     }
-    
+
     public User getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
@@ -826,57 +829,57 @@ public class UserService {
 @Slf4j
 @Transactional(readOnly = true)
 public class TaskService {
-    
+
     // ... existing fields ...
-    
+
     @Transactional
     @PreAuthorize(&#34;hasRole(&#39;USER&#39;)&#34;)
     public Task createTask(Task task) {
         log.debug(&#34;Creating new task: {}&#34;, task.getTitle());
-        
+
         // Auto-assign to current user
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();
         User currentUser = userRepository.findByUsername(username)
             .orElseThrow(() -&gt; new RuntimeException(&#34;User not found&#34;));
-        
+
         task.setAssignedTo(currentUser);
-        
+
         if (task.getStatus() == null) {
             task.setStatus(TaskStatus.TODO);
         }
-        
+
         Task savedTask = taskRepository.save(task);
         log.info(&#34;Task created with ID: {}&#34;, savedTask.getId());
         return savedTask;
     }
-    
+
     @PreAuthorize(&#34;hasRole(&#39;USER&#39;)&#34;)
     public Task getTaskById(Long id) {
         Task task = taskRepository.findById(id)
             .orElseThrow(() -&gt; new TaskNotFoundException(id));
-        
+
         // Check ownership
         checkTaskOwnership(task);
         return task;
     }
-    
+
     @Transactional
     @PreAuthorize(&#34;hasRole(&#39;USER&#39;)&#34;)
     public Task updateTask(Long id, Task taskDetails) {
         Task task = taskRepository.findById(id)
             .orElseThrow(() -&gt; new TaskNotFoundException(id));
-        
+
         // Check ownership
         checkTaskOwnership(task);
-        
+
         task.setTitle(taskDetails.getTitle());
         task.setDescription(taskDetails.getDescription());
         task.setStatus(taskDetails.getStatus());
-        
+
         return taskRepository.save(task);
     }
-    
+
     @Transactional
     @PreAuthorize(&#34;hasRole(&#39;ADMIN&#39;)&#34;)
     public void deleteTask(Long id) {
@@ -885,28 +888,28 @@ public class TaskService {
         }
         taskRepository.deleteById(id);
     }
-    
+
     @PreAuthorize(&#34;hasRole(&#39;USER&#39;)&#34;)
     public List&lt;Task&gt; getMyTasks() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();
         User user = userRepository.findByUsername(username)
             .orElseThrow(() -&gt; new RuntimeException(&#34;User not found&#34;));
-        
+
         return taskRepository.findByAssignedToId(user.getId());
     }
-    
+
     private void checkTaskOwnership(Task task) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();
-        
-        if (task.getAssignedTo() != null &amp;&amp; 
+
+        if (task.getAssignedTo() != null &amp;&amp;
             !task.getAssignedTo().getUsername().equals(username)) {
-            
+
             // Check if user has ADMIN role
             boolean isAdmin = auth.getAuthorities().stream()
                 .anyMatch(a -&gt; a.getAuthority().equals(&#34;ROLE_ADMIN&#34;));
-            
+
             if (!isAdmin) {
                 throw new RuntimeException(&#34;Access denied: Task belongs to another user&#34;);
             }
@@ -988,13 +991,13 @@ import java.util.List;
 @Tag(name = &#34;User Management&#34;)
 @Slf4j
 public class UserController {
-    
+
     private final UserService userService;
-    
+
     public UserController(UserService userService) {
         this.userService = userService;
     }
-    
+
     @Operation(summary = &#34;Register a new user (public)&#34;)
     @PostMapping(&#34;/register&#34;)
     public ResponseEntity&lt;User&gt; registerUser(@RequestBody User user) {
@@ -1005,7 +1008,7 @@ public class UserController {
         URI location = URI.create(&#34;/api/users/&#34; + registered.getId());
         return ResponseEntity.created(location).body(registered);
     }
-    
+
     @Operation(summary = &#34;Get current user&#34;, security = @SecurityRequirement(name = &#34;basicAuth&#34;))
     @GetMapping(&#34;/me&#34;)
     public ResponseEntity&lt;User&gt; getCurrentUser() {
@@ -1014,7 +1017,7 @@ public class UserController {
         user.setPassword(null);
         return ResponseEntity.ok(user);
     }
-    
+
     @Operation(summary = &#34;Get all users (Admin only)&#34;, security = @SecurityRequirement(name = &#34;basicAuth&#34;))
     @GetMapping
     @PreAuthorize(&#34;hasRole(&#39;ADMIN&#39;)&#34;)
@@ -1024,7 +1027,7 @@ public class UserController {
         users.forEach(u -&gt; u.setPassword(null));
         return ResponseEntity.ok(users);
     }
-    
+
     @Operation(summary = &#34;Get user by username&#34;, security = @SecurityRequirement(name = &#34;basicAuth&#34;))
     @GetMapping(&#34;/username/{username}&#34;)
     public ResponseEntity&lt;User&gt; getUserByUsername(@PathVariable String username) {
@@ -1033,7 +1036,7 @@ public class UserController {
         user.setPassword(null);
         return ResponseEntity.ok(user);
     }
-    
+
     @Operation(summary = &#34;Delete user (Admin only)&#34;, security = @SecurityRequirement(name = &#34;basicAuth&#34;))
     @DeleteMapping(&#34;/{id}&#34;)
     @PreAuthorize(&#34;hasRole(&#39;ADMIN&#39;)&#34;)
@@ -1051,9 +1054,9 @@ public class UserController {
 @SecurityRequirement(name = &#34;basicAuth&#34;)
 @Slf4j
 public class TaskController {
-    
+
     // ... existing code ...
-    
+
     @Operation(summary = &#34;Get my tasks&#34;)
     @GetMapping(&#34;/my-tasks&#34;)
     public ResponseEntity&lt;List&lt;TaskResponse&gt;&gt; getMyTasks() {
@@ -1079,7 +1082,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class OpenAPIConfig {
-    
+
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
@@ -1129,9 +1132,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Configuration
 @Slf4j
 public class DataInitializer {
-    
+
     @Bean
-    public CommandLineRunner initData(UserRepository userRepository, 
+    public CommandLineRunner initData(UserRepository userRepository,
                                        PasswordEncoder passwordEncoder) {
         return args -&gt; {
             if (userRepository.count() == 0) {
@@ -1144,7 +1147,7 @@ public class DataInitializer {
                 admin.getRoles().add(&#34;ROLE_ADMIN&#34;);
                 admin.getRoles().add(&#34;ROLE_USER&#34;);
                 userRepository.save(admin);
-                
+
                 // Create regular user
                 User user = new User();
                 user.setUsername(&#34;john&#34;);
@@ -1153,7 +1156,7 @@ public class DataInitializer {
                 user.setPassword(passwordEncoder.encode(&#34;user123&#34;));
                 user.getRoles().add(&#34;ROLE_USER&#34;);
                 userRepository.save(user);
-                
+
                 log.info(&#34;Test users created: admin/admin123, john/user123&#34;);
             }
         };
@@ -1276,9 +1279,15 @@ git tag codelab-3.4
 
     <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
     <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
-    <script src="https://storage.googleapis.com/claat-public/prettify.js"></script>
     <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
     <script src="//support.google.com/inapp/api.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js"></script>
+    <script src="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.js"></script>
+    <script>
+        hljs.highlightAll();
+        hljs.addPlugin(new CopyButtonPlugin({ autohide: false }));
+
+    </script>
 
 </body>
 

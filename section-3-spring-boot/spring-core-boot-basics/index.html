@@ -11,6 +11,9 @@
         href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
     <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1  /build/styles/monokai.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.css">
     <style>
         .success {
             color: #1e8e3e;
@@ -23,9 +26,9 @@
 </head>
 
 <body>
-    <google-codelab-analytics gaid="UA-49880327-14"></google-codelab-analytics>
-    <google-codelab codelab-gaid="" id="spring-core-boot-basics" title="Spring Core &amp; Spring Boot Basics"
-        environment="web" feedback-link="">
+    <google-codelab-analytics gaid="UA-49880327-14" ga4id=""></google-codelab-analytics>
+    <google-codelab codelab-gaid="" codelab-ga4id="" id="spring-core-boot-basics"
+        title="Spring Core &amp; Spring Boot Basics" environment="web" feedback-link="">
 
         <google-codelab-step label="Introduction" duration="3">
             <p>Welcome to Spring Boot! Spring is the most popular Java framework for building enterprise applications.
@@ -104,12 +107,12 @@
             <pre><code language="language-java" class="language-java">// Tightly coupled code - BAD
 public class TaskService {
     private TaskRepository repository;
-    
+
     public TaskService() {
         // TaskService creates its own dependency
         this.repository = new TaskRepository();
     }
-    
+
     public void saveTask(Task task) {
         repository.save(task);
     }
@@ -128,12 +131,12 @@ public class TaskService {
             <pre><code language="language-java" class="language-java">// Loosely coupled with IoC - GOOD
 public class TaskService {
     private TaskRepository repository;
-    
+
     // Dependencies provided from outside
     public TaskService(TaskRepository repository) {
         this.repository = repository;
     }
-    
+
     public void saveTask(Task task) {
         repository.save(task);
     }
@@ -153,7 +156,7 @@ public class TaskService {
             <pre><code language="language-java" class="language-java">@Service
 public class TaskService {
     private final TaskRepository repository;
-    
+
     // Spring injects TaskRepository through constructor
     @Autowired  // Optional in Spring 4.3+
     public TaskService(TaskRepository repository) {
@@ -166,7 +169,7 @@ public class TaskService {
             <pre><code language="language-java" class="language-java">@Service
 public class TaskService {
     private TaskRepository repository;
-    
+
     // Spring calls this setter to inject dependency
     @Autowired
     public void setRepository(TaskRepository repository) {
@@ -214,7 +217,7 @@ public class Application {
         TaskRepository repository = new InMemoryTaskRepository();
         TaskService service = new TaskService(repository);
         TaskController controller = new TaskController(service);
-        
+
         // Use controller
         controller.getAllTasks();
     }
@@ -226,7 +229,7 @@ public class Application {
     public static void main(String[] args) {
         // Spring creates and wires everything automatically
         SpringApplication.run(Application.class, args);
-        
+
         // Spring container now contains:
         // - TaskRepository bean
         // - TaskService bean (with repository injected)
@@ -289,34 +292,34 @@ public class Application {
             <pre><code language="language-xml" class="language-xml">&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
 &lt;project xmlns=&#34;http://maven.apache.org/POM/4.0.0&#34;
          xmlns:xsi=&#34;http://www.w3.org/2001/XMLSchema-instance&#34;
-         xsi:schemaLocation=&#34;http://maven.apache.org/POM/4.0.0 
+         xsi:schemaLocation=&#34;http://maven.apache.org/POM/4.0.0
          https://maven.apache.org/xsd/maven-4.0.0.xsd&#34;&gt;
     &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
-    
+
     &lt;parent&gt;
         &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
         &lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;
         &lt;version&gt;3.2.0&lt;/version&gt;
         &lt;relativePath/&gt;
     &lt;/parent&gt;
-    
+
     &lt;groupId&gt;com.example&lt;/groupId&gt;
     &lt;artifactId&gt;taskmanager&lt;/artifactId&gt;
     &lt;version&gt;0.0.1-SNAPSHOT&lt;/version&gt;
     &lt;name&gt;Task Manager&lt;/name&gt;
     &lt;description&gt;Task Management API with Spring Boot&lt;/description&gt;
-    
+
     &lt;properties&gt;
         &lt;java.version&gt;17&lt;/java.version&gt;
     &lt;/properties&gt;
-    
+
     &lt;dependencies&gt;
         &lt;!-- Spring Boot Starter Web --&gt;
         &lt;dependency&gt;
             &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
             &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
         &lt;/dependency&gt;
-        
+
         &lt;!-- Spring Boot DevTools --&gt;
         &lt;dependency&gt;
             &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
@@ -324,14 +327,14 @@ public class Application {
             &lt;scope&gt;runtime&lt;/scope&gt;
             &lt;optional&gt;true&lt;/optional&gt;
         &lt;/dependency&gt;
-        
+
         &lt;!-- Lombok --&gt;
         &lt;dependency&gt;
             &lt;groupId&gt;org.projectlombok&lt;/groupId&gt;
             &lt;artifactId&gt;lombok&lt;/artifactId&gt;
             &lt;optional&gt;true&lt;/optional&gt;
         &lt;/dependency&gt;
-        
+
         &lt;!-- Spring Boot Starter Test --&gt;
         &lt;dependency&gt;
             &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
@@ -339,7 +342,7 @@ public class Application {
             &lt;scope&gt;test&lt;/scope&gt;
         &lt;/dependency&gt;
     &lt;/dependencies&gt;
-    
+
     &lt;build&gt;
         &lt;plugins&gt;
             &lt;plugin&gt;
@@ -366,7 +369,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class TaskManagerApplication {
-    
+
     public static void main(String[] args) {
         SpringApplication.run(TaskManagerApplication.class, args);
     }
@@ -436,14 +439,14 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Task {
-    
+
     private Long id;
     private String title;
     private String description;
     private TaskStatus status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    
+
     public Task(String title, String description) {
         this.title = title;
         this.description = description;
@@ -465,7 +468,7 @@ public enum TaskStatus {
 </code></pre>
             <h2 is-upgraded>Understanding Lombok Annotations</h2>
             <pre><code language="language-java" class="language-java">@Data
-// Generates: 
+// Generates:
 // - getters for all fields
 // - setters for all non-final fields
 // - toString()
@@ -489,17 +492,17 @@ public enum TaskStatus {
     private Long id;
     private String title;
     // ... other fields
-    
+
     // 10+ lines of getters
     public Long getId() { return id; }
     public String getTitle() { return title; }
     // ...
-    
+
     // 10+ lines of setters
     public void setId(Long id) { this.id = id; }
     public void setTitle(String title) { this.title = title; }
     // ...
-    
+
     // toString() - 10 lines
     // equals() - 20 lines
     // hashCode() - 10 lines
@@ -545,10 +548,10 @@ import java.util.concurrent.atomic.AtomicLong;
 
 @Repository
 public class InMemoryTaskRepository implements TaskRepository {
-    
+
     private final Map&lt;Long, Task&gt; tasks = new ConcurrentHashMap&lt;&gt;();
     private final AtomicLong idGenerator = new AtomicLong(1);
-    
+
     @Override
     public Task save(Task task) {
         if (task.getId() == null) {
@@ -560,22 +563,22 @@ public class InMemoryTaskRepository implements TaskRepository {
         tasks.put(task.getId(), task);
         return task;
     }
-    
+
     @Override
     public Optional&lt;Task&gt; findById(Long id) {
         return Optional.ofNullable(tasks.get(id));
     }
-    
+
     @Override
     public List&lt;Task&gt; findAll() {
         return new ArrayList&lt;&gt;(tasks.values());
     }
-    
+
     @Override
     public void deleteById(Long id) {
         tasks.remove(id);
     }
-    
+
     @Override
     public boolean existsById(Long id) {
         return tasks.containsKey(id);
@@ -623,50 +626,50 @@ import java.util.Optional;
 @Service
 @Slf4j
 public class TaskService {
-    
+
     private final TaskRepository taskRepository;
-    
+
     // Constructor injection (recommended)
     public TaskService(TaskRepository taskRepository) {
         this.taskRepository = taskRepository;
-        log.info(&#34;TaskService initialized with repository: {}&#34;, 
+        log.info(&#34;TaskService initialized with repository: {}&#34;,
             taskRepository.getClass().getSimpleName());
     }
-    
+
     public Task createTask(Task task) {
         log.debug(&#34;Creating new task: {}&#34;, task.getTitle());
-        
+
         // Business logic: validate and set defaults
         if (task.getStatus() == null) {
             task.setStatus(TaskStatus.TODO);
         }
-        
+
         Task savedTask = taskRepository.save(task);
         log.info(&#34;Task created with ID: {}&#34;, savedTask.getId());
         return savedTask;
     }
-    
+
     public Optional&lt;Task&gt; getTaskById(Long id) {
         log.debug(&#34;Fetching task with ID: {}&#34;, id);
         return taskRepository.findById(id);
     }
-    
+
     public List&lt;Task&gt; getAllTasks() {
         log.debug(&#34;Fetching all tasks&#34;);
         List&lt;Task&gt; tasks = taskRepository.findAll();
         log.info(&#34;Found {} tasks&#34;, tasks.size());
         return tasks;
     }
-    
+
     public Task updateTask(Long id, Task taskDetails) {
         log.debug(&#34;Updating task with ID: {}&#34;, id);
-        
+
         return taskRepository.findById(id)
             .map(task -&gt; {
                 task.setTitle(taskDetails.getTitle());
                 task.setDescription(taskDetails.getDescription());
                 task.setStatus(taskDetails.getStatus());
-                
+
                 Task updatedTask = taskRepository.save(task);
                 log.info(&#34;Task updated: {}&#34;, id);
                 return updatedTask;
@@ -676,22 +679,22 @@ public class TaskService {
                 return new RuntimeException(&#34;Task not found with id: &#34; + id);
             });
     }
-    
+
     public void deleteTask(Long id) {
         log.debug(&#34;Deleting task with ID: {}&#34;, id);
-        
+
         if (!taskRepository.existsById(id)) {
             log.error(&#34;Task not found with ID: {}&#34;, id);
             throw new RuntimeException(&#34;Task not found with id: &#34; + id);
         }
-        
+
         taskRepository.deleteById(id);
         log.info(&#34;Task deleted: {}&#34;, id);
     }
-    
+
     public Task updateTaskStatus(Long id, TaskStatus status) {
         log.debug(&#34;Updating task {} status to {}&#34;, id, status);
-        
+
         return taskRepository.findById(id)
             .map(task -&gt; {
                 task.setStatus(status);
@@ -699,7 +702,7 @@ public class TaskService {
             })
             .orElseThrow(() -&gt; new RuntimeException(&#34;Task not found with id: &#34; + id));
     }
-    
+
     public List&lt;Task&gt; getTasksByStatus(TaskStatus status) {
         log.debug(&#34;Fetching tasks with status: {}&#34;, status);
         return taskRepository.findAll().stream()
@@ -721,7 +724,7 @@ log.error(&#34;Error message&#34;, exception);
             <h2 is-upgraded>Dependency Injection in Action</h2>
             <pre><code language="language-java" class="language-java">public class TaskService {
     private final TaskRepository taskRepository;
-    
+
     // Spring calls this constructor
     // Sees TaskRepository parameter
     // Finds @Repository bean in container
@@ -735,7 +738,7 @@ log.error(&#34;Error message&#34;, exception);
 @Service
 public class TaskService {
     private final TaskRepository taskRepository;
-    
+
     public TaskService(@Qualifier(&#34;inMemoryTaskRepository&#34;) TaskRepository repo) {
         this.taskRepository = repo;
     }
@@ -768,28 +771,28 @@ import java.util.List;
 @RequestMapping(&#34;/api/tasks&#34;)
 @Slf4j
 public class TaskController {
-    
+
     private final TaskService taskService;
-    
+
     public TaskController(TaskService taskService) {
         this.taskService = taskService;
         log.info(&#34;TaskController initialized&#34;);
     }
-    
+
     @PostMapping
     public ResponseEntity&lt;Task&gt; createTask(@RequestBody Task task) {
         log.info(&#34;POST /api/tasks - Creating task: {}&#34;, task.getTitle());
         Task createdTask = taskService.createTask(task);
         return new ResponseEntity&lt;&gt;(createdTask, HttpStatus.CREATED);
     }
-    
+
     @GetMapping
     public ResponseEntity&lt;List&lt;Task&gt;&gt; getAllTasks() {
         log.info(&#34;GET /api/tasks - Fetching all tasks&#34;);
         List&lt;Task&gt; tasks = taskService.getAllTasks();
         return ResponseEntity.ok(tasks);
     }
-    
+
     @GetMapping(&#34;/{id}&#34;)
     public ResponseEntity&lt;Task&gt; getTaskById(@PathVariable Long id) {
         log.info(&#34;GET /api/tasks/{} - Fetching task&#34;, id);
@@ -797,10 +800,10 @@ public class TaskController {
             .map(ResponseEntity::ok)
             .orElse(ResponseEntity.notFound().build());
     }
-    
+
     @PutMapping(&#34;/{id}&#34;)
     public ResponseEntity&lt;Task&gt; updateTask(
-            @PathVariable Long id, 
+            @PathVariable Long id,
             @RequestBody Task taskDetails) {
         log.info(&#34;PUT /api/tasks/{} - Updating task&#34;, id);
         try {
@@ -810,7 +813,7 @@ public class TaskController {
             return ResponseEntity.notFound().build();
         }
     }
-    
+
     @DeleteMapping(&#34;/{id}&#34;)
     public ResponseEntity&lt;Void&gt; deleteTask(@PathVariable Long id) {
         log.info(&#34;DELETE /api/tasks/{} - Deleting task&#34;, id);
@@ -821,7 +824,7 @@ public class TaskController {
             return ResponseEntity.notFound().build();
         }
     }
-    
+
     @PatchMapping(&#34;/{id}/status&#34;)
     public ResponseEntity&lt;Task&gt; updateTaskStatus(
             @PathVariable Long id,
@@ -834,7 +837,7 @@ public class TaskController {
             return ResponseEntity.notFound().build();
         }
     }
-    
+
     @GetMapping(&#34;/status/{status}&#34;)
     public ResponseEntity&lt;List&lt;Task&gt;&gt; getTasksByStatus(@PathVariable TaskStatus status) {
         log.info(&#34;GET /api/tasks/status/{}&#34;, status);
@@ -1084,7 +1087,7 @@ logging:
 spring:
   application:
     name: task-manager
-  
+
   # Jackson (JSON)
   jackson:
     serialization:
@@ -1179,16 +1182,16 @@ public class AppProperties {
 public class TaskService {
     private final TaskRepository taskRepository;
     private final AppProperties appProperties;
-    
+
     public TaskService(TaskRepository taskRepository, AppProperties appProperties) {
         this.taskRepository = taskRepository;
         this.appProperties = appProperties;
-        log.info(&#34;App: {} v{}, Max Tasks: {}&#34;, 
-            appProperties.getName(), 
+        log.info(&#34;App: {} v{}, Max Tasks: {}&#34;,
+            appProperties.getName(),
             appProperties.getVersion(),
             appProperties.getMaxTasks());
     }
-    
+
     public Task createTask(Task task) {
         List&lt;Task&gt; allTasks = taskRepository.findAll();
         if (allTasks.size() &gt;= appProperties.getMaxTasks()) {
@@ -1202,13 +1205,13 @@ public class TaskService {
             <p>For simple property injection:</p>
             <pre><code language="language-java" class="language-java">@Service
 public class TaskService {
-    
+
     @Value(&#34;${app.name}&#34;)
     private String appName;
-    
+
     @Value(&#34;${app.max-tasks:100}&#34;)  // Default value: 100
     private int maxTasks;
-    
+
     @Value(&#34;${feature.enabled:false}&#34;)
     private boolean featureEnabled;
 }
@@ -1262,32 +1265,32 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 public class TaskService {
-    
+
     private final TaskRepository taskRepository;
-    
+
     public TaskService(TaskRepository taskRepository) {
         this.taskRepository = taskRepository;
         log.info(&#34;1. Constructor called&#34;);
     }
-    
+
     @PostConstruct
     public void init() {
         log.info(&#34;2. @PostConstruct - Bean initialized&#34;);
         // Initialize resources, load data, etc.
         // This runs AFTER dependency injection
-        
+
         // Example: Load default tasks
         Task defaultTask = new Task(&#34;Sample Task&#34;, &#34;This is a sample task&#34;);
         taskRepository.save(defaultTask);
         log.info(&#34;Default task created&#34;);
     }
-    
+
     @PreDestroy
     public void cleanup() {
         log.info(&#34;3. @PreDestroy - Bean being destroyed&#34;);
         // Cleanup resources, close connections, etc.
         // This runs BEFORE bean is removed from container
-        
+
         log.info(&#34;Cleaning up resources...&#34;);
     }
 }
@@ -1308,13 +1311,13 @@ import org.springframework.beans.factory.InitializingBean;
 
 @Service
 public class TaskService implements InitializingBean, DisposableBean {
-    
+
     @Override
     public void afterPropertiesSet() throws Exception {
         // Called after properties set (like @PostConstruct)
         log.info(&#34;InitializingBean: afterPropertiesSet()&#34;);
     }
-    
+
     @Override
     public void destroy() throws Exception {
         // Called before bean destruction (like @PreDestroy)
@@ -1429,9 +1432,15 @@ git checkout -b codelab-3.2
 
     <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
     <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
-    <script src="https://storage.googleapis.com/claat-public/prettify.js"></script>
     <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
     <script src="//support.google.com/inapp/api.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js"></script>
+    <script src="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.js"></script>
+    <script>
+        hljs.highlightAll();
+        hljs.addPlugin(new CopyButtonPlugin({ autohide: false }));
+
+    </script>
 
 </body>
 

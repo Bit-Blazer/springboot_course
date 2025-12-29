@@ -1706,9 +1706,11 @@ public class EcommerceApp {
    ```
 
 6. **Fix BUG 6:** Stock rollback
+
    - Breakpoint when `reserved == false`
    - Inspect: previous items already reserved
    - **Fix:**
+
    ```java
    public Order processOrder(ShoppingCart cart) {
        List<CartItem> reserved = new ArrayList<>();

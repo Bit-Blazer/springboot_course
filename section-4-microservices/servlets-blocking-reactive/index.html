@@ -11,6 +11,9 @@
         href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
     <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1  /build/styles/monokai.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.css">
     <style>
         .success {
             color: #1e8e3e;
@@ -23,9 +26,9 @@
 </head>
 
 <body>
-    <google-codelab-analytics gaid="UA-49880327-14"></google-codelab-analytics>
-    <google-codelab codelab-gaid="" id="servlets-blocking-reactive" title="Servlets &amp; Blocking vs Reactive Stacks"
-        environment="web" feedback-link="">
+    <google-codelab-analytics gaid="UA-49880327-14" ga4id=""></google-codelab-analytics>
+    <google-codelab codelab-gaid="" codelab-ga4id="" id="servlets-blocking-reactive"
+        title="Servlets &amp; Blocking vs Reactive Stacks" environment="web" feedback-link="">
 
         <google-codelab-step label="Introduction" duration="3">
             <p>Understand servlet containers, blocking vs reactive architectures, and when to use each approach.</p>
@@ -86,20 +89,20 @@ Request 5 ──┘
             <pre><code language="language-xml" class="language-xml">&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
 &lt;project xmlns=&#34;http://maven.apache.org/POM/4.0.0&#34;
          xmlns:xsi=&#34;http://www.w3.org/2001/XMLSchema-instance&#34;
-         xsi:schemaLocation=&#34;http://maven.apache.org/POM/4.0.0 
+         xsi:schemaLocation=&#34;http://maven.apache.org/POM/4.0.0
          http://maven.apache.org/xsd/maven-4.0.0.xsd&#34;&gt;
     &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
-    
+
     &lt;groupId&gt;com.example&lt;/groupId&gt;
     &lt;artifactId&gt;servlet-task-api&lt;/artifactId&gt;
     &lt;version&gt;1.0.0&lt;/version&gt;
     &lt;packaging&gt;war&lt;/packaging&gt;
-    
+
     &lt;properties&gt;
         &lt;maven.compiler.source&gt;17&lt;/maven.compiler.source&gt;
         &lt;maven.compiler.target&gt;17&lt;/maven.compiler.target&gt;
     &lt;/properties&gt;
-    
+
     &lt;dependencies&gt;
         &lt;dependency&gt;
             &lt;groupId&gt;jakarta.servlet&lt;/groupId&gt;
@@ -113,7 +116,7 @@ Request 5 ──┘
             &lt;version&gt;2.10.1&lt;/version&gt;
         &lt;/dependency&gt;
     &lt;/dependencies&gt;
-    
+
     &lt;build&gt;
         &lt;finalName&gt;servlet-task-api&lt;/finalName&gt;
         &lt;plugins&gt;
@@ -135,26 +138,26 @@ public class Task {
     private String title;
     private String description;
     private String status;
-    
+
     public Task() {}
-    
+
     public Task(Long id, String title, String description, String status) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.status = status;
     }
-    
+
     // Getters and setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
-    
+
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
-    
+
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
-    
+
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
 }
@@ -172,30 +175,30 @@ public class TaskRepository {
     private static final TaskRepository INSTANCE = new TaskRepository();
     private final Map&lt;Long, Task&gt; tasks = new ConcurrentHashMap&lt;&gt;();
     private final AtomicLong idGenerator = new AtomicLong(1);
-    
+
     private TaskRepository() {
         // Initialize with sample data
         createTask(new Task(null, &#34;Sample Task&#34;, &#34;Description&#34;, &#34;TODO&#34;));
     }
-    
+
     public static TaskRepository getInstance() {
         return INSTANCE;
     }
-    
+
     public List&lt;Task&gt; findAll() {
         return new ArrayList&lt;&gt;(tasks.values());
     }
-    
+
     public Optional&lt;Task&gt; findById(Long id) {
         return Optional.ofNullable(tasks.get(id));
     }
-    
+
     public Task createTask(Task task) {
         task.setId(idGenerator.getAndIncrement());
         tasks.put(task.getId(), task);
         return task;
     }
-    
+
     public boolean deleteTask(Long id) {
         return tasks.remove(id) != null;
     }
@@ -216,18 +219,18 @@ import java.util.stream.Collectors;
 
 @WebServlet(name = &#34;TaskServlet&#34;, urlPatterns = {&#34;/api/tasks&#34;, &#34;/api/tasks/*&#34;})
 public class TaskServlet extends HttpServlet {
-    
+
     private final TaskRepository repository = TaskRepository.getInstance();
     private final Gson gson = new Gson();
-    
+
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) 
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        
+
         String pathInfo = req.getPathInfo();
         resp.setContentType(&#34;application/json&#34;);
         resp.setCharacterEncoding(&#34;UTF-8&#34;);
-        
+
         if (pathInfo == null || pathInfo.equals(&#34;/&#34;)) {
             // Get all tasks
             String json = gson.toJson(repository.findAll());
@@ -247,34 +250,34 @@ public class TaskServlet extends HttpServlet {
             );
         }
     }
-    
+
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) 
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        
+
         // Read request body
         String body = req.getReader().lines().collect(Collectors.joining());
         Task task = gson.fromJson(body, Task.class);
-        
+
         // Create task
         Task created = repository.createTask(task);
-        
+
         // Send response
         resp.setContentType(&#34;application/json&#34;);
         resp.setCharacterEncoding(&#34;UTF-8&#34;);
         resp.setStatus(HttpServletResponse.SC_CREATED);
         resp.getWriter().write(gson.toJson(created));
     }
-    
+
     @Override
-    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) 
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        
+
         String pathInfo = req.getPathInfo();
         if (pathInfo != null &amp;&amp; !pathInfo.equals(&#34;/&#34;)) {
             Long id = Long.parseLong(pathInfo.substring(1));
             boolean deleted = repository.deleteTask(id);
-            
+
             if (deleted) {
                 resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
             } else {
@@ -297,28 +300,28 @@ import java.io.IOException;
 
 @WebFilter(urlPatterns = &#34;/api/*&#34;)
 public class LoggingFilter implements Filter {
-    
+
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         System.out.println(&#34;LoggingFilter initialized&#34;);
     }
-    
+
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, 
+    public void doFilter(ServletRequest request, ServletResponse response,
                          FilterChain chain) throws IOException, ServletException {
-        
+
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         long startTime = System.currentTimeMillis();
-        
-        System.out.println(&#34;Request: &#34; + httpRequest.getMethod() + &#34; &#34; + 
+
+        System.out.println(&#34;Request: &#34; + httpRequest.getMethod() + &#34; &#34; +
                           httpRequest.getRequestURI());
-        
+
         chain.doFilter(request, response);
-        
+
         long duration = System.currentTimeMillis() - startTime;
         System.out.println(&#34;Response time: &#34; + duration + &#34;ms&#34;);
     }
-    
+
     @Override
     public void destroy() {
         System.out.println(&#34;LoggingFilter destroyed&#34;);
@@ -350,24 +353,24 @@ public class LoggingFilter implements Filter {
             <pre><code language="language-xml" class="language-xml">&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
 &lt;project xmlns=&#34;http://maven.apache.org/POM/4.0.0&#34;
          xmlns:xsi=&#34;http://www.w3.org/2001/XMLSchema-instance&#34;
-         xsi:schemaLocation=&#34;http://maven.apache.org/POM/4.0.0 
+         xsi:schemaLocation=&#34;http://maven.apache.org/POM/4.0.0
          http://maven.apache.org/xsd/maven-4.0.0.xsd&#34;&gt;
     &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
-    
+
     &lt;parent&gt;
         &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
         &lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;
         &lt;version&gt;3.2.1&lt;/version&gt;
     &lt;/parent&gt;
-    
+
     &lt;groupId&gt;com.example&lt;/groupId&gt;
     &lt;artifactId&gt;blocking-task-api&lt;/artifactId&gt;
     &lt;version&gt;1.0.0&lt;/version&gt;
-    
+
     &lt;properties&gt;
         &lt;java.version&gt;17&lt;/java.version&gt;
     &lt;/properties&gt;
-    
+
     &lt;dependencies&gt;
         &lt;dependency&gt;
             &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
@@ -424,32 +427,32 @@ import java.util.Optional;
 @Repository
 @RequiredArgsConstructor
 public class TaskRepository {
-    
+
     private final JdbcTemplate jdbcTemplate;
-    
+
     private final RowMapper&lt;Task&gt; taskRowMapper = (rs, rowNum) -&gt; new Task(
         rs.getLong(&#34;id&#34;),
         rs.getString(&#34;title&#34;),
         rs.getString(&#34;description&#34;),
         rs.getString(&#34;status&#34;)
     );
-    
+
     public List&lt;Task&gt; findAll() {
         return jdbcTemplate.query(
-            &#34;SELECT * FROM tasks&#34;, 
+            &#34;SELECT * FROM tasks&#34;,
             taskRowMapper
         );
     }
-    
+
     public Optional&lt;Task&gt; findById(Long id) {
         List&lt;Task&gt; tasks = jdbcTemplate.query(
-            &#34;SELECT * FROM tasks WHERE id = ?&#34;, 
-            taskRowMapper, 
+            &#34;SELECT * FROM tasks WHERE id = ?&#34;,
+            taskRowMapper,
             id
         );
         return tasks.isEmpty() ? Optional.empty() : Optional.of(tasks.get(0));
     }
-    
+
     public Task save(Task task) {
         if (task.getId() == null) {
             jdbcTemplate.update(
@@ -457,7 +460,7 @@ public class TaskRepository {
                 task.getTitle(), task.getDescription(), task.getStatus()
             );
             Long id = jdbcTemplate.queryForObject(
-                &#34;SELECT LAST_INSERT_ID()&#34;, 
+                &#34;SELECT LAST_INSERT_ID()&#34;,
                 Long.class
             );
             task.setId(id);
@@ -469,7 +472,7 @@ public class TaskRepository {
         }
         return task;
     }
-    
+
     public void deleteById(Long id) {
         jdbcTemplate.update(&#34;DELETE FROM tasks WHERE id = ?&#34;, id);
     }
@@ -492,33 +495,33 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Slf4j
 public class TaskService {
-    
+
     private final TaskRepository repository;
-    
+
     public List&lt;Task&gt; getAllTasks() {
         log.info(&#34;Getting all tasks - Thread: {}&#34;, Thread.currentThread().getName());
         simulateSlowOperation(); // Simulate I/O delay
         return repository.findAll();
     }
-    
+
     public Optional&lt;Task&gt; getTaskById(Long id) {
         log.info(&#34;Getting task {} - Thread: {}&#34;, id, Thread.currentThread().getName());
         simulateSlowOperation();
         return repository.findById(id);
     }
-    
+
     public Task createTask(Task task) {
         log.info(&#34;Creating task - Thread: {}&#34;, Thread.currentThread().getName());
         simulateSlowOperation();
         return repository.save(task);
     }
-    
+
     public void deleteTask(Long id) {
         log.info(&#34;Deleting task {} - Thread: {}&#34;, id, Thread.currentThread().getName());
         simulateSlowOperation();
         repository.deleteById(id);
     }
-    
+
     private void simulateSlowOperation() {
         try {
             Thread.sleep(100); // Simulate slow database/external API
@@ -544,26 +547,26 @@ import java.util.List;
 @RequestMapping(&#34;/api/tasks&#34;)
 @RequiredArgsConstructor
 public class TaskController {
-    
+
     private final TaskService taskService;
-    
+
     @GetMapping
     public ResponseEntity&lt;List&lt;Task&gt;&gt; getAllTasks() {
         return ResponseEntity.ok(taskService.getAllTasks());
     }
-    
+
     @GetMapping(&#34;/{id}&#34;)
     public ResponseEntity&lt;Task&gt; getTaskById(@PathVariable Long id) {
         return taskService.getTaskById(id)
             .map(ResponseEntity::ok)
             .orElse(ResponseEntity.notFound().build());
     }
-    
+
     @PostMapping
     public ResponseEntity&lt;Task&gt; createTask(@RequestBody Task task) {
         return ResponseEntity.ok(taskService.createTask(task));
     }
-    
+
     @DeleteMapping(&#34;/{id}&#34;)
     public ResponseEntity&lt;Void&gt; deleteTask(@PathVariable Long id) {
         taskService.deleteTask(id);
@@ -576,11 +579,11 @@ public class TaskController {
             <pre><code language="language-yaml" class="language-yaml">spring:
   application:
     name: blocking-task-api
-  
+
   datasource:
     url: jdbc:h2:mem:testdb
     driver-class-name: org.h2.Driver
-  
+
   h2:
     console:
       enabled: true
@@ -589,7 +592,7 @@ server:
   port: 8081
   tomcat:
     threads:
-      max: 200  # Default thread pool size
+      max: 200 # Default thread pool size
 
 logging:
   level:
@@ -603,7 +606,7 @@ logging:
     status VARCHAR(50) NOT NULL
 );
 
-INSERT INTO tasks (title, description, status) VALUES 
+INSERT INTO tasks (title, description, status) VALUES
 (&#39;Sample Task 1&#39;, &#39;Description 1&#39;, &#39;TODO&#39;),
 (&#39;Sample Task 2&#39;, &#39;Description 2&#39;, &#39;IN_PROGRESS&#39;);
 </code></pre>
@@ -626,24 +629,24 @@ curl http://localhost:8081/api/tasks
             <pre><code language="language-xml" class="language-xml">&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
 &lt;project xmlns=&#34;http://maven.apache.org/POM/4.0.0&#34;
          xmlns:xsi=&#34;http://www.w3.org/2001/XMLSchema-instance&#34;
-         xsi:schemaLocation=&#34;http://maven.apache.org/POM/4.0.0 
+         xsi:schemaLocation=&#34;http://maven.apache.org/POM/4.0.0
          http://maven.apache.org/xsd/maven-4.0.0.xsd&#34;&gt;
     &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
-    
+
     &lt;parent&gt;
         &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
         &lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;
         &lt;version&gt;3.2.1&lt;/version&gt;
     &lt;/parent&gt;
-    
+
     &lt;groupId&gt;com.example&lt;/groupId&gt;
     &lt;artifactId&gt;reactive-task-api&lt;/artifactId&gt;
     &lt;version&gt;1.0.0&lt;/version&gt;
-    
+
     &lt;properties&gt;
         &lt;java.version&gt;17&lt;/java.version&gt;
     &lt;/properties&gt;
-    
+
     &lt;dependencies&gt;
         &lt;dependency&gt;
             &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
@@ -719,27 +722,27 @@ import java.time.Duration;
 @RequiredArgsConstructor
 @Slf4j
 public class TaskService {
-    
+
     private final TaskRepository repository;
-    
+
     public Flux&lt;Task&gt; getAllTasks() {
         log.info(&#34;Getting all tasks - Thread: {}&#34;, Thread.currentThread().getName());
         return repository.findAll()
             .delayElements(Duration.ofMillis(100)); // Simulate I/O delay
     }
-    
+
     public Mono&lt;Task&gt; getTaskById(Long id) {
         log.info(&#34;Getting task {} - Thread: {}&#34;, id, Thread.currentThread().getName());
         return repository.findById(id)
             .delayElement(Duration.ofMillis(100));
     }
-    
+
     public Mono&lt;Task&gt; createTask(Task task) {
         log.info(&#34;Creating task - Thread: {}&#34;, Thread.currentThread().getName());
         return repository.save(task)
             .delayElement(Duration.ofMillis(100));
     }
-    
+
     public Mono&lt;Void&gt; deleteTask(Long id) {
         log.info(&#34;Deleting task {} - Thread: {}&#34;, id, Thread.currentThread().getName());
         return repository.deleteById(id)
@@ -763,26 +766,26 @@ import reactor.core.publisher.Mono;
 @RequestMapping(&#34;/api/tasks&#34;)
 @RequiredArgsConstructor
 public class TaskController {
-    
+
     private final TaskService taskService;
-    
+
     @GetMapping
     public Flux&lt;Task&gt; getAllTasks() {
         return taskService.getAllTasks();
     }
-    
+
     @GetMapping(&#34;/{id}&#34;)
     public Mono&lt;ResponseEntity&lt;Task&gt;&gt; getTaskById(@PathVariable Long id) {
         return taskService.getTaskById(id)
             .map(ResponseEntity::ok)
             .defaultIfEmpty(ResponseEntity.notFound().build());
     }
-    
+
     @PostMapping
     public Mono&lt;Task&gt; createTask(@RequestBody Task task) {
         return taskService.createTask(task);
     }
-    
+
     @DeleteMapping(&#34;/{id}&#34;)
     public Mono&lt;ResponseEntity&lt;Void&gt;&gt; deleteTask(@PathVariable Long id) {
         return taskService.deleteTask(id)
@@ -795,7 +798,7 @@ public class TaskController {
             <pre><code language="language-yaml" class="language-yaml">spring:
   application:
     name: reactive-task-api
-  
+
   r2dbc:
     url: r2dbc:h2:mem:///testdb
 
@@ -829,9 +832,9 @@ import reactor.core.publisher.Flux;
 @Component
 @RequiredArgsConstructor
 public class DataInitializer implements CommandLineRunner {
-    
+
     private final TaskRepository repository;
-    
+
     @Override
     public void run(String... args) {
         repository.deleteAll()
@@ -884,7 +887,7 @@ curl http://localhost:8082/api/tasks
           &lt;stringProp name=&#34;HTTPSampler.path&#34;&gt;/api/tasks&lt;/stringProp&gt;
           &lt;stringProp name=&#34;HTTPSampler.method&#34;&gt;GET&lt;/stringProp&gt;
         &lt;/HTTPSamplerProxy&gt;
-        
+
         &lt;ResultCollector guiclass=&#34;SummaryReport&#34; testclass=&#34;ResultCollector&#34; testname=&#34;Summary Report&#34;&gt;
           &lt;boolProp name=&#34;ResultCollector.error_logging&#34;&gt;false&lt;/boolProp&gt;
           &lt;objProp&gt;
@@ -1040,7 +1043,7 @@ jstat -gc &lt;pid&gt; 1000
             <pre><code language="language-bash" class="language-bash">jstack &lt;pid&gt; &gt; blocking-threads.txt
 </code></pre>
             <p><strong>Example blocking threads:</strong></p>
-            <pre><code>&#34;http-nio-8081-exec-1&#34; #25 daemon prio=5 os_prio=0 
+            <pre><code>&#34;http-nio-8081-exec-1&#34; #25 daemon prio=5 os_prio=0
    java.lang.Thread.State: TIMED_WAITING (sleeping)
         at java.lang.Thread.sleep(Native Method)
         at com.example.blocking.service.TaskService.simulateSlowOperation
@@ -1048,7 +1051,7 @@ jstat -gc &lt;pid&gt; 1000
 &#34;http-nio-8081-exec-2&#34; #26 daemon prio=5 os_prio=0
    java.lang.Thread.State: TIMED_WAITING (sleeping)
         at java.lang.Thread.sleep(Native Method)
-        
+
 ... (200 threads)
 </code></pre>
             <p><strong>Reactive API:</strong></p>
@@ -1058,10 +1061,10 @@ jstat -gc &lt;pid&gt; 1000
             <pre><code>&#34;reactor-http-nio-2&#34; #14 daemon prio=5 os_prio=0
    java.lang.Thread.State: RUNNABLE
         at sun.nio.ch.EPoll.wait(Native Method)
-        
+
 &#34;reactor-http-nio-3&#34; #15 daemon prio=5 os_prio=0
    java.lang.Thread.State: RUNNABLE
-        
+
 ... (10-20 threads total)
 </code></pre>
             <h2 is-upgraded>Thread Analysis</h2>
@@ -1209,13 +1212,13 @@ public Flux&lt;Task&gt; getTasks() {
 
 @RestController
 public class HybridController {
-    
+
     // Blocking endpoint
     @GetMapping(&#34;/users&#34;)
     public List&lt;User&gt; getUsers() {
         return userService.findAll(); // JDBC
     }
-    
+
     // Reactive endpoint
     @GetMapping(&#34;/notifications&#34;)
     public Flux&lt;Notification&gt; getNotifications() {
@@ -1306,9 +1309,15 @@ public class HybridController {
 
     <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
     <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
-    <script src="https://storage.googleapis.com/claat-public/prettify.js"></script>
     <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
     <script src="//support.google.com/inapp/api.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js"></script>
+    <script src="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.js"></script>
+    <script>
+        hljs.highlightAll();
+        hljs.addPlugin(new CopyButtonPlugin({ autohide: false }));
+
+    </script>
 
 </body>
 

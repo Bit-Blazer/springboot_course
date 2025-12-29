@@ -11,6 +11,9 @@
     href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
   <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
   <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
+  <link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1  /build/styles/monokai.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.css">
   <style>
     .success {
       color: #1e8e3e;
@@ -23,9 +26,9 @@
 </head>
 
 <body>
-  <google-codelab-analytics gaid="UA-49880327-14"></google-codelab-analytics>
-  <google-codelab codelab-gaid="" id="jwt-spring-cloud" title="JWT Authentication &amp; Spring Cloud Config"
-    environment="web" feedback-link="">
+  <google-codelab-analytics gaid="UA-49880327-14" ga4id=""></google-codelab-analytics>
+  <google-codelab codelab-gaid="" codelab-ga4id="" id="jwt-spring-cloud"
+    title="JWT Authentication &amp; Spring Cloud Config" environment="web" feedback-link="">
 
     <google-codelab-step label="Introduction" duration="3">
       <p>Replace HTTP Basic authentication with JWT tokens and introduce Spring Cloud Config for centralized
@@ -134,19 +137,18 @@
       <p>Base64URL encoded → <code>eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9</code></p>
       <h2 is-upgraded>2. Payload (Claims)</h2>
       <pre><code language="language-json" class="language-json">{
-  &#34;sub&#34;: &#34;john&#34;,           // Subject (username)
-  &#34;iat&#34;: 1616239022,       // Issued at
-  &#34;exp&#34;: 1616242622,       // Expiration (1 hour)
+  &#34;sub&#34;: &#34;john&#34;, // Subject (username)
+  &#34;iat&#34;: 1616239022, // Issued at
+  &#34;exp&#34;: 1616242622, // Expiration (1 hour)
   &#34;roles&#34;: [&#34;ROLE_USER&#34;]
 }
 </code></pre>
       <p>Base64URL encoded → <code>eyJzdWIiOiJqb2huIiwiaWF0IjoxNjE2MjM5MDIyfQ</code></p>
       <h2 is-upgraded>3. Signature</h2>
       <pre><code language="language-javascript" class="language-javascript">HMACSHA256(
-  base64UrlEncode(header) + &#34;.&#34; +
-  base64UrlEncode(payload),
+  base64UrlEncode(header) + &#34;.&#34; + base64UrlEncode(payload),
   secret_key
-)
+);
 </code></pre>
       <p>Result → <code>SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c</code></p>
       <h2 is-upgraded>JWT Authentication Flow</h2>
@@ -291,7 +293,7 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = &#34;jwt&#34;)
 @Data
 public class JwtProperties {
-    
+
     private String secret = &#34;myDefaultSecretKeyThatShouldBeChangedInProduction12345678&#34;;
     private long expiration = 3600000; // 1 hour in milliseconds
     private long refreshExpiration = 86400000; // 24 hours
@@ -323,41 +325,41 @@ import java.util.stream.Collectors;
 @Component
 @Slf4j
 public class JwtTokenUtil {
-    
+
     private final JwtProperties jwtProperties;
     private final SecretKey secretKey;
-    
+
     public JwtTokenUtil(JwtProperties jwtProperties) {
         this.jwtProperties = jwtProperties;
         this.secretKey = Keys.hmacShaKeyFor(
             jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8)
         );
     }
-    
+
     // Generate token with user details
     public String generateToken(UserDetails userDetails) {
         Map&lt;String, Object&gt; claims = new HashMap&lt;&gt;();
-        
+
         // Add roles to claims
         String roles = userDetails.getAuthorities().stream()
             .map(GrantedAuthority::getAuthority)
             .collect(Collectors.joining(&#34;,&#34;));
         claims.put(&#34;roles&#34;, roles);
-        
+
         return createToken(claims, userDetails.getUsername(), jwtProperties.getExpiration());
     }
-    
+
     // Generate refresh token
     public String generateRefreshToken(UserDetails userDetails) {
         Map&lt;String, Object&gt; claims = new HashMap&lt;&gt;();
         return createToken(claims, userDetails.getUsername(), jwtProperties.getRefreshExpiration());
     }
-    
+
     // Create token with claims
     private String createToken(Map&lt;String, Object&gt; claims, String subject, long expiration) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + expiration);
-        
+
         return Jwts.builder()
             .setClaims(claims)
             .setSubject(subject)
@@ -366,23 +368,23 @@ public class JwtTokenUtil {
             .signWith(secretKey, SignatureAlgorithm.HS256)
             .compact();
     }
-    
+
     // Extract username from token
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
-    
+
     // Extract expiration date
     public Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
     }
-    
+
     // Extract specific claim
     public &lt;T&gt; T extractClaim(String token, Function&lt;Claims, T&gt; claimsResolver) {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
-    
+
     // Extract all claims
     private Claims extractAllClaims(String token) {
         return Jwts.parserBuilder()
@@ -391,18 +393,18 @@ public class JwtTokenUtil {
             .parseClaimsJws(token)
             .getBody();
     }
-    
+
     // Check if token is expired
     public boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
-    
+
     // Validate token
     public boolean validateToken(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername()) &amp;&amp; !isTokenExpired(token));
     }
-    
+
     // Extract roles from token
     public String extractRoles(String token) {
         Claims claims = extractAllClaims(token);
@@ -423,10 +425,10 @@ import jakarta.validation.constraints.NotBlank;
 @NoArgsConstructor
 @AllArgsConstructor
 public class LoginRequest {
-    
+
     @NotBlank(message = &#34;Username is required&#34;)
     private String username;
-    
+
     @NotBlank(message = &#34;Password is required&#34;)
     private String password;
 }
@@ -443,7 +445,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AuthResponse {
-    
+
     private String token;
     private String refreshToken;
     private String tokenType = &#34;Bearer&#34;;
@@ -466,18 +468,18 @@ import jakarta.validation.constraints.Size;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SignupRequest {
-    
+
     @NotBlank(message = &#34;Username is required&#34;)
     @Size(min = 3, max = 50)
     private String username;
-    
+
     @NotBlank(message = &#34;Email is required&#34;)
     @Email(message = &#34;Invalid email format&#34;)
     private String email;
-    
+
     @NotBlank(message = &#34;Full name is required&#34;)
     private String fullName;
-    
+
     @NotBlank(message = &#34;Password is required&#34;)
     @Size(min = 6, message = &#34;Password must be at least 6 characters&#34;)
     private String password;
@@ -487,8 +489,8 @@ public class SignupRequest {
       <pre><code language="language-yaml" class="language-yaml"># JWT Configuration
 jwt:
   secret: ${JWT_SECRET:mySecretKeyForDevelopmentOnlyChangeInProduction1234567890}
-  expiration: 3600000  # 1 hour
-  refresh-expiration: 86400000  # 24 hours
+  expiration: 3600000 # 1 hour
+  refresh-expiration: 86400000 # 24 hours
   token-prefix: &#34;Bearer &#34;
   header-string: &#34;Authorization&#34;
 </code></pre>
@@ -524,11 +526,11 @@ import java.io.IOException;
 @Component
 @Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    
+
     private final JwtTokenUtil jwtTokenUtil;
     private final CustomUserDetailsService userDetailsService;
     private final JwtProperties jwtProperties;
-    
+
     public JwtAuthenticationFilter(JwtTokenUtil jwtTokenUtil,
                                    CustomUserDetailsService userDetailsService,
                                    JwtProperties jwtProperties) {
@@ -536,30 +538,30 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         this.userDetailsService = userDetailsService;
         this.jwtProperties = jwtProperties;
     }
-    
+
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-        
+
         try {
             String jwt = extractJwtFromRequest(request);
-            
+
             if (jwt != null &amp;&amp; SecurityContextHolder.getContext().getAuthentication() == null) {
                 String username = jwtTokenUtil.extractUsername(jwt);
-                
+
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                
+
                 if (jwtTokenUtil.validateToken(jwt, userDetails)) {
                     UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(
                             userDetails, null, userDetails.getAuthorities()
                         );
-                    
+
                     authentication.setDetails(
                         new WebAuthenticationDetailsSource().buildDetails(request)
                     );
-                    
+
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                     log.debug(&#34;Set authentication for user: {}&#34;, username);
                 }
@@ -567,17 +569,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         } catch (Exception e) {
             log.error(&#34;Cannot set user authentication: {}&#34;, e.getMessage());
         }
-        
+
         filterChain.doFilter(request, response);
     }
-    
+
     private String extractJwtFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader(jwtProperties.getHeaderString());
-        
+
         if (bearerToken != null &amp;&amp; bearerToken.startsWith(jwtProperties.getTokenPrefix())) {
             return bearerToken.substring(jwtProperties.getTokenPrefix().length());
         }
-        
+
         return null;
     }
 }
@@ -602,26 +604,26 @@ import java.util.Map;
 @Component
 @Slf4j
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
-    
+
     private final ObjectMapper objectMapper = new ObjectMapper();
-    
+
     @Override
     public void commence(HttpServletRequest request,
                          HttpServletResponse response,
                          AuthenticationException authException) throws IOException, ServletException {
-        
+
         log.error(&#34;Unauthorized error: {}&#34;, authException.getMessage());
-        
+
         response.setContentType(&#34;application/json&#34;);
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        
+
         Map&lt;String, Object&gt; errorDetails = new HashMap&lt;&gt;();
         errorDetails.put(&#34;timestamp&#34;, LocalDateTime.now().toString());
         errorDetails.put(&#34;status&#34;, HttpServletResponse.SC_UNAUTHORIZED);
         errorDetails.put(&#34;error&#34;, &#34;Unauthorized&#34;);
         errorDetails.put(&#34;message&#34;, authException.getMessage());
         errorDetails.put(&#34;path&#34;, request.getRequestURI());
-        
+
         response.getWriter().write(objectMapper.writeValueAsString(errorDetails));
     }
 }
@@ -651,11 +653,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true, securedEnabled = true)
 public class SecurityConfig {
-    
+
     private final CustomUserDetailsService userDetailsService;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    
+
     public SecurityConfig(CustomUserDetailsService userDetailsService,
                           JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
                           JwtAuthenticationFilter jwtAuthenticationFilter) {
@@ -663,15 +665,15 @@ public class SecurityConfig {
         this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
-    
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -&gt; csrf.disable())
-            .exceptionHandling(exception -&gt; 
+            .exceptionHandling(exception -&gt;
                 exception.authenticationEntryPoint(jwtAuthenticationEntryPoint)
             )
-            .sessionManagement(session -&gt; 
+            .sessionManagement(session -&gt;
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
             .authorizeHttpRequests(auth -&gt; auth
@@ -679,30 +681,30 @@ public class SecurityConfig {
                 .requestMatchers(&#34;/h2-console/**&#34;).permitAll()
                 .requestMatchers(&#34;/swagger-ui/**&#34;, &#34;/api-docs/**&#34;).permitAll()
                 .requestMatchers(&#34;/api/auth/**&#34;).permitAll()
-                
+
                 // Admin only endpoints
                 .requestMatchers(&#34;/api/users/**&#34;).hasRole(&#34;ADMIN&#34;)
                 .requestMatchers(HttpMethod.DELETE, &#34;/api/tasks/**&#34;).hasRole(&#34;ADMIN&#34;)
-                
+
                 // Authenticated endpoints
                 .requestMatchers(&#34;/api/tasks/**&#34;).authenticated()
                 .requestMatchers(&#34;/api/categories/**&#34;).authenticated()
-                
+
                 .anyRequest().authenticated()
             )
             .headers(headers -&gt; headers.frameOptions(frame -&gt; frame.disable()));
-        
+
         // Add JWT filter
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-        
+
         return http.build();
     }
-    
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-    
+
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
@@ -710,7 +712,7 @@ public class SecurityConfig {
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
-    
+
     @Bean
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration authConfig) throws Exception {
@@ -749,12 +751,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Slf4j
 public class AuthService {
-    
+
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenUtil jwtTokenUtil;
-    
+
     public AuthService(AuthenticationManager authenticationManager,
                        UserRepository userRepository,
                        PasswordEncoder passwordEncoder,
@@ -764,27 +766,27 @@ public class AuthService {
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenUtil = jwtTokenUtil;
     }
-    
+
     public AuthResponse login(LoginRequest loginRequest) {
         log.debug(&#34;Authenticating user: {}&#34;, loginRequest.getUsername());
-        
+
         Authentication authentication = authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(
                 loginRequest.getUsername(),
                 loginRequest.getPassword()
             )
         );
-        
+
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        
+
         String token = jwtTokenUtil.generateToken(userDetails);
         String refreshToken = jwtTokenUtil.generateRefreshToken(userDetails);
-        
+
         User user = userRepository.findByUsername(loginRequest.getUsername())
             .orElseThrow(() -&gt; new RuntimeException(&#34;User not found&#34;));
-        
+
         log.info(&#34;User logged in: {}&#34;, loginRequest.getUsername());
-        
+
         return new AuthResponse(
             token,
             refreshToken,
@@ -794,42 +796,42 @@ public class AuthService {
             user.getRoles()
         );
     }
-    
+
     @Transactional
     public AuthResponse signup(SignupRequest signupRequest) {
         log.debug(&#34;Registering new user: {}&#34;, signupRequest.getUsername());
-        
+
         if (userRepository.existsByUsername(signupRequest.getUsername())) {
             throw new RuntimeException(&#34;Username already exists&#34;);
         }
-        
+
         if (userRepository.existsByEmail(signupRequest.getEmail())) {
             throw new RuntimeException(&#34;Email already exists&#34;);
         }
-        
+
         User user = new User();
         user.setUsername(signupRequest.getUsername());
         user.setEmail(signupRequest.getEmail());
         user.setFullName(signupRequest.getFullName());
         user.setPassword(passwordEncoder.encode(signupRequest.getPassword()));
         user.getRoles().add(&#34;ROLE_USER&#34;);
-        
+
         userRepository.save(user);
-        
+
         log.info(&#34;User registered: {}&#34;, signupRequest.getUsername());
-        
+
         // Auto-login after signup
         LoginRequest loginRequest = new LoginRequest(
             signupRequest.getUsername(),
             signupRequest.getPassword()
         );
-        
+
         return login(loginRequest);
     }
-    
+
     public AuthResponse refreshToken(String refreshToken) {
         String username = jwtTokenUtil.extractUsername(refreshToken);
-        
+
         UserDetails userDetails = userRepository.findByUsername(username)
             .map(user -&gt; org.springframework.security.core.userdetails.User.builder()
                 .username(user.getUsername())
@@ -837,12 +839,12 @@ public class AuthService {
                 .authorities(user.getRoles().toArray(new String[0]))
                 .build())
             .orElseThrow(() -&gt; new RuntimeException(&#34;User not found&#34;));
-        
+
         if (jwtTokenUtil.validateToken(refreshToken, userDetails)) {
             String newToken = jwtTokenUtil.generateToken(userDetails);
-            
+
             User user = userRepository.findByUsername(username).get();
-            
+
             return new AuthResponse(
                 newToken,
                 refreshToken,
@@ -852,7 +854,7 @@ public class AuthService {
                 user.getRoles()
             );
         }
-        
+
         throw new RuntimeException(&#34;Invalid refresh token&#34;);
     }
 }
@@ -878,13 +880,13 @@ import java.util.Map;
 @Tag(name = &#34;Authentication&#34;)
 @Slf4j
 public class AuthController {
-    
+
     private final AuthService authService;
-    
+
     public AuthController(AuthService authService) {
         this.authService = authService;
     }
-    
+
     @Operation(summary = &#34;User login - Get JWT token&#34;)
     @PostMapping(&#34;/login&#34;)
     public ResponseEntity&lt;AuthResponse&gt; login(@Valid @RequestBody LoginRequest loginRequest) {
@@ -892,7 +894,7 @@ public class AuthController {
         AuthResponse response = authService.login(loginRequest);
         return ResponseEntity.ok(response);
     }
-    
+
     @Operation(summary = &#34;User signup - Register and get JWT token&#34;)
     @PostMapping(&#34;/signup&#34;)
     public ResponseEntity&lt;AuthResponse&gt; signup(@Valid @RequestBody SignupRequest signupRequest) {
@@ -900,7 +902,7 @@ public class AuthController {
         AuthResponse response = authService.signup(signupRequest);
         return ResponseEntity.ok(response);
     }
-    
+
     @Operation(summary = &#34;Refresh JWT token&#34;)
     @PostMapping(&#34;/refresh&#34;)
     public ResponseEntity&lt;AuthResponse&gt; refreshToken(@RequestBody Map&lt;String, String&gt; request) {
@@ -926,36 +928,36 @@ public class AuthController {
          xsi:schemaLocation=&#34;http://maven.apache.org/POM/4.0.0
          http://maven.apache.org/xsd/maven-4.0.0.xsd&#34;&gt;
     &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
-    
+
     &lt;parent&gt;
         &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
         &lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;
         &lt;version&gt;3.2.0&lt;/version&gt;
         &lt;relativePath/&gt;
     &lt;/parent&gt;
-    
+
     &lt;groupId&gt;com.example&lt;/groupId&gt;
     &lt;artifactId&gt;config-server&lt;/artifactId&gt;
     &lt;version&gt;1.0.0&lt;/version&gt;
     &lt;name&gt;Config Server&lt;/name&gt;
-    
+
     &lt;properties&gt;
         &lt;java.version&gt;17&lt;/java.version&gt;
         &lt;spring-cloud.version&gt;2023.0.0&lt;/spring-cloud.version&gt;
     &lt;/properties&gt;
-    
+
     &lt;dependencies&gt;
         &lt;dependency&gt;
             &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
             &lt;artifactId&gt;spring-cloud-config-server&lt;/artifactId&gt;
         &lt;/dependency&gt;
-        
+
         &lt;dependency&gt;
             &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
             &lt;artifactId&gt;spring-boot-starter-actuator&lt;/artifactId&gt;
         &lt;/dependency&gt;
     &lt;/dependencies&gt;
-    
+
     &lt;dependencyManagement&gt;
         &lt;dependencies&gt;
             &lt;dependency&gt;
@@ -967,7 +969,7 @@ public class AuthController {
             &lt;/dependency&gt;
         &lt;/dependencies&gt;
     &lt;/dependencyManagement&gt;
-    
+
     &lt;build&gt;
         &lt;plugins&gt;
             &lt;plugin&gt;
@@ -988,7 +990,7 @@ import org.springframework.cloud.config.server.EnableConfigServer;
 @SpringBootApplication
 @EnableConfigServer
 public class ConfigServerApplication {
-    
+
     public static void main(String[] args) {
         SpringApplication.run(ConfigServerApplication.class, args);
     }
@@ -1002,7 +1004,7 @@ public class ConfigServerApplication {
 spring:
   application:
     name: config-server
-  
+
   cloud:
     config:
       server:
@@ -1038,8 +1040,8 @@ spring:
       ddl-auto: update
 
 jwt:
-  expiration: 3600000  # 1 hour
-  refresh-expiration: 86400000  # 24 hours
+  expiration: 3600000 # 1 hour
+  refresh-expiration: 86400000 # 24 hours
 
 logging:
   level:
@@ -1053,11 +1055,11 @@ spring:
     driver-class-name: org.h2.Driver
     username: sa
     password:
-  
+
   h2:
     console:
       enabled: true
-  
+
   jpa:
     show-sql: true
     hibernate:
@@ -1075,15 +1077,15 @@ spring:
     url: jdbc:postgresql://localhost:5432/taskdb
     driver-class-name: org.postgresql.Driver
     username: postgres
-    password: &#39;{cipher}AQA1234...&#39;  # Encrypted password
-  
+    password: &#34;{cipher}AQA1234...&#34; # Encrypted password
+
   jpa:
     show-sql: false
     hibernate:
       ddl-auto: validate
 
 jwt:
-  secret: &#39;{cipher}AQB5678...&#39;  # Encrypted JWT secret
+  secret: &#34;{cipher}AQB5678...&#34; # Encrypted JWT secret
 
 logging:
   level:
@@ -1118,7 +1120,7 @@ git commit -m &#34;Initial configuration&#34;
       <pre><code language="language-yaml" class="language-yaml">spring:
   application:
     name: task-manager
-  
+
   cloud:
     config:
       uri: http://localhost:8888
@@ -1128,7 +1130,7 @@ git commit -m &#34;Initial configuration&#34;
         max-attempts: 6
         max-interval: 2000
         multiplier: 1.1
-  
+
   profiles:
     active: dev
 </code></pre>
@@ -1346,9 +1348,15 @@ git tag codelab-3.5
 
   <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
   <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
-  <script src="https://storage.googleapis.com/claat-public/prettify.js"></script>
   <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
   <script src="//support.google.com/inapp/api.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js"></script>
+  <script src="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.js"></script>
+  <script>
+    hljs.highlightAll();
+    hljs.addPlugin(new CopyButtonPlugin({ autohide: false }));
+
+  </script>
 
 </body>
 

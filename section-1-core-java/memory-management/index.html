@@ -11,6 +11,9 @@
         href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
     <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1  /build/styles/monokai.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.css">
     <style>
         .success {
             color: #1e8e3e;
@@ -23,9 +26,9 @@
 </head>
 
 <body>
-    <google-codelab-analytics gaid="UA-49880327-14"></google-codelab-analytics>
-    <google-codelab codelab-gaid="" id="memory-management" title="Memory Management &amp; Garbage Collection"
-        environment="web" feedback-link="">
+    <google-codelab-analytics gaid="UA-49880327-14" ga4id=""></google-codelab-analytics>
+    <google-codelab codelab-gaid="" codelab-ga4id="" id="memory-management"
+        title="Memory Management &amp; Garbage Collection" environment="web" feedback-link="">
 
         <google-codelab-step label="Introduction" duration="2">
             <p>Understanding memory management is crucial for building performant Java applications. In this codelab,
@@ -116,66 +119,66 @@
             </ul>
             <h2 is-upgraded>Demonstration: Stack vs Heap</h2>
             <pre><code language="language-java" class="language-java">public class MemoryDemo {
-    
+
     // Class variable (Method Area/Metaspace)
     private static int classCounter = 0;
-    
+
     // Instance variable (Heap)
     private String name;
     private int value;
-    
+
     public MemoryDemo(String name, int value) {
         this.name = name;  // Heap
         this.value = value;  // Heap
         classCounter++;  // Method Area
     }
-    
+
     public void demonstrateMemory() {
         // Local primitive variable (Stack)
         int localNumber = 42;
-        
+
         // Local object reference (Stack), object itself (Heap)
         String localString = &#34;Hello&#34;;
-        
+
         // Array reference (Stack), array object (Heap)
         int[] localArray = new int[5];
-        
+
         System.out.println(&#34;Method execution:&#34;);
         System.out.println(&#34;  localNumber (stack): &#34; + localNumber);
         System.out.println(&#34;  localString reference (stack), object (heap): &#34; + localString);
         System.out.println(&#34;  localArray reference (stack), array (heap): &#34; + localArray.length);
     }
-    
+
     public static void main(String[] args) {
         // Object reference (Stack), object (Heap)
         MemoryDemo demo = new MemoryDemo(&#34;Example&#34;, 100);
         demo.demonstrateMemory();
-        
-        // After method returns, localNumber, localString reference, 
+
+        // After method returns, localNumber, localString reference,
         // and localArray reference are removed from stack
         // But objects remain in heap until GC collects them
-        
+
         System.out.println(&#34;\nClass counter: &#34; + classCounter);
     }
 }
 </code></pre>
             <h2 is-upgraded>Object Lifecycle</h2>
             <pre><code language="language-java" class="language-java">public class ObjectLifecycle {
-    
+
     public static void main(String[] args) {
         // 1. Object Creation - allocated in Eden space
         Person person = new Person(&#34;Alice&#34;, 25);
-        
+
         // 2. Object in use - lives in heap
         System.out.println(person.getName());
-        
+
         // 3. Object becomes unreachable - eligible for GC
         person = null;  // No more references to original object
-        
+
         // 4. Garbage Collection - JVM reclaims memory (eventually)
         // We can suggest GC (but JVM decides when to actually run it)
         System.gc();
-        
+
         // 5. finalize() called before reclamation (deprecated in Java 9+)
         // Modern alternative: try-with-resources or Cleaner API
     }
@@ -184,15 +187,15 @@
 class Person {
     private String name;
     private int age;
-    
+
     public Person(String name, int age) {
         this.name = name;
         this.age = age;
         System.out.println(&#34;Person created: &#34; + name);
     }
-    
+
     public String getName() { return name; }
-    
+
     // Deprecated since Java 9 - shown for educational purposes
     @Override
     protected void finalize() throws Throwable {
@@ -207,15 +210,15 @@ class Person {
             </aside>
             <h2 is-upgraded>Viewing Memory Usage</h2>
             <pre><code language="language-java" class="language-java">public class MemoryUsageDemo {
-    
+
     public static void printMemoryStats() {
         Runtime runtime = Runtime.getRuntime();
-        
+
         long maxMemory = runtime.maxMemory();      // -Xmx
         long totalMemory = runtime.totalMemory();  // Current heap size
         long freeMemory = runtime.freeMemory();    // Free heap
         long usedMemory = totalMemory - freeMemory;
-        
+
         System.out.println(&#34;=== MEMORY STATISTICS ===&#34;);
         System.out.println(&#34;Max Memory:   &#34; + formatBytes(maxMemory));
         System.out.println(&#34;Total Memory: &#34; + formatBytes(totalMemory));
@@ -223,35 +226,35 @@ class Person {
         System.out.println(&#34;Free Memory:  &#34; + formatBytes(freeMemory));
         System.out.println(&#34;Used %:       &#34; + (usedMemory * 100 / totalMemory) + &#34;%&#34;);
     }
-    
+
     private static String formatBytes(long bytes) {
         if (bytes &lt; 1024) return bytes + &#34; B&#34;;
         if (bytes &lt; 1024 * 1024) return (bytes / 1024) + &#34; KB&#34;;
         if (bytes &lt; 1024 * 1024 * 1024) return (bytes / (1024 * 1024)) + &#34; MB&#34;;
         return (bytes / (1024 * 1024 * 1024)) + &#34; GB&#34;;
     }
-    
+
     public static void main(String[] args) {
         printMemoryStats();
-        
+
         System.out.println(&#34;\nCreating 1 million objects...&#34;);
         String[] strings = new String[1_000_000];
         for (int i = 0; i &lt; strings.length; i++) {
             strings[i] = &#34;String &#34; + i;
         }
-        
+
         printMemoryStats();
-        
+
         System.out.println(&#34;\nClearing references...&#34;);
         strings = null;
         System.gc();  // Suggest garbage collection
-        
+
         try {
             Thread.sleep(100);  // Give GC time to run
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        
+
         printMemoryStats();
     }
 }
@@ -300,18 +303,18 @@ class Person {
 </code></pre>
             <h2 is-upgraded>GC Demonstration</h2>
             <pre><code language="language-java" class="language-java">public class GCDemo {
-    
+
     private static final int ITERATIONS = 10;
     private static final int OBJECTS_PER_ITERATION = 100_000;
-    
+
     public static void main(String[] args) {
         System.out.println(&#34;Starting GC demonstration...\n&#34;);
-        
+
         for (int i = 0; i &lt; ITERATIONS; i++) {
             System.out.println(&#34;--- Iteration &#34; + (i + 1) + &#34; ---&#34;);
             allocateObjects();
             printMemoryAndGC();
-            
+
             try {
                 Thread.sleep(500);  // Pause between iterations
             } catch (InterruptedException e) {
@@ -319,7 +322,7 @@ class Person {
             }
         }
     }
-    
+
     private static void allocateObjects() {
         // Create temporary objects
         for (int i = 0; i &lt; OBJECTS_PER_ITERATION; i++) {
@@ -327,13 +330,13 @@ class Person {
             // Object becomes eligible for GC immediately after creation
         }
     }
-    
+
     private static void printMemoryAndGC() {
         Runtime runtime = Runtime.getRuntime();
         long totalMemory = runtime.totalMemory();
         long freeMemory = runtime.freeMemory();
         long usedMemory = totalMemory - freeMemory;
-        
+
         System.out.printf(&#34;Used: %d MB, Free: %d MB, Total: %d MB%n&#34;,
             usedMemory / (1024 * 1024),
             freeMemory / (1024 * 1024),
@@ -388,10 +391,10 @@ class Person {
             </ul>
             <h2 is-upgraded>Comparing GC Algorithms</h2>
             <pre><code language="language-java" class="language-java">public class GCComparison {
-    
+
     private static final int HEAP_SIZE_MB = 512;
     private static final int ITERATIONS = 100;
-    
+
     public static void main(String[] args) {
         System.out.println(&#34;=== GC PERFORMANCE COMPARISON ===&#34;);
         System.out.println(&#34;Heap Size: &#34; + HEAP_SIZE_MB + &#34; MB&#34;);
@@ -401,24 +404,24 @@ class Person {
         System.out.println(&#34;  java -Xms512m -Xmx512m -XX:+UseParallelGC GCComparison&#34;);
         System.out.println(&#34;  java -Xms512m -Xmx512m -XX:+UseG1GC GCComparison&#34;);
         System.out.println();
-        
+
         long startTime = System.currentTimeMillis();
-        
+
         for (int i = 0; i &lt; ITERATIONS; i++) {
             createGarbage();
             if (i % 10 == 0) {
                 System.out.println(&#34;Iteration &#34; + i + &#34; completed&#34;);
             }
         }
-        
+
         long endTime = System.currentTimeMillis();
         long duration = endTime - startTime;
-        
+
         System.out.println(&#34;\n=== RESULTS ===&#34;);
         System.out.println(&#34;Total time: &#34; + duration + &#34; ms&#34;);
         System.out.println(&#34;Average per iteration: &#34; + (duration / ITERATIONS) + &#34; ms&#34;);
     }
-    
+
     private static void createGarbage() {
         // Create many short-lived objects
         List&lt;String&gt; temp = new ArrayList&lt;&gt;();
@@ -445,7 +448,7 @@ class Person {
             <pre><code language="language-java" class="language-java">public class LeakExample1 {
     // BAD: Grows forever!
     private static List&lt;User&gt; users = new ArrayList&lt;&gt;();
-    
+
     public void registerUser(String name) {
         User user = new User(name);
         users.add(user);
@@ -478,7 +481,7 @@ class Person {
             <pre><code language="language-java" class="language-java">public class LeakExample3 {
     // BAD: Static collection never garbage collected
     private static Map&lt;String, byte[]&gt; cache = new HashMap&lt;&gt;();
-    
+
     public byte[] getData(String key) {
         if (!cache.containsKey(key)) {
             byte[] data = loadFromDatabase(key);
@@ -499,7 +502,7 @@ class Person {
             <p><strong>4. Anonymous Inner Classes</strong></p>
             <pre><code language="language-java" class="language-java">public class LeakExample4 {
     private String largeData = &#34;...&#34; ; // Large string
-    
+
     public ActionListener createListener() {
         // BAD: Anonymous class holds reference to outer class
         return new ActionListener() {
@@ -523,7 +526,7 @@ class Person {
             <pre><code language="language-java" class="language-java">public class LeakExample5 {
     // BAD: ThreadLocal not cleaned up
     private static ThreadLocal&lt;HeavyObject&gt; threadLocal = new ThreadLocal&lt;&gt;();
-    
+
     public void processRequest() {
         threadLocal.set(new HeavyObject());
         // Process request
@@ -545,40 +548,40 @@ class Person {
             <pre><code language="language-java" class="language-java">import java.util.*;
 
 public class MemoryLeakDetection {
-    
+
     // Intentional memory leak for demonstration
     private static List&lt;byte[]&gt; leakyList = new ArrayList&lt;&gt;();
-    
+
     public static void main(String[] args) {
         System.out.println(&#34;Starting memory leak demonstration...&#34;);
         System.out.println(&#34;Monitor with jconsole or VisualVM&#34;);
         System.out.println(&#34;Watch heap memory grow continuously\n&#34;);
-        
+
         Runtime runtime = Runtime.getRuntime();
         int iteration = 0;
-        
+
         while (true) {
             // Create 1MB of data each iteration
             byte[] leak = new byte[1024 * 1024];  // 1 MB
             leakyList.add(leak);  // Never removed!
-            
+
             iteration++;
-            
+
             if (iteration % 100 == 0) {
                 long usedMemory = (runtime.totalMemory() - runtime.freeMemory()) / (1024 * 1024);
                 long maxMemory = runtime.maxMemory() / (1024 * 1024);
-                
+
                 System.out.printf(&#34;Iteration %d: Used %d MB / %d MB (%.1f%%)%n&#34;,
-                    iteration, usedMemory, maxMemory, 
+                    iteration, usedMemory, maxMemory,
                     (usedMemory * 100.0 / maxMemory));
             }
-            
+
             try {
                 Thread.sleep(100);  // 100ms delay
             } catch (InterruptedException e) {
                 break;
             }
-            
+
             // Eventually will throw OutOfMemoryError
         }
     }
@@ -631,32 +634,32 @@ $ jconsole 12345
 public class ProfileMe {
     private static List&lt;Customer&gt; customers = new ArrayList&lt;&gt;();
     private static Random random = new Random();
-    
+
     public static void main(String[] args) throws InterruptedException {
         System.out.println(&#34;Application started. Profile with VisualVM!&#34;);
         System.out.println(&#34;PID: &#34; + ProcessHandle.current().pid());
-        
+
         while (true) {
             simulateWork();
             Thread.sleep(1000);
         }
     }
-    
+
     private static void simulateWork() {
         // Simulate user registration
         for (int i = 0; i &lt; 100; i++) {
             registerCustomer();
         }
-        
+
         // Simulate some processing
         processOrders();
-        
+
         // Simulate cleanup (prevents memory leak)
         if (customers.size() &gt; 10000) {
             customers.subList(0, 5000).clear();
         }
     }
-    
+
     private static void registerCustomer() {
         Customer customer = new Customer(
             &#34;Customer&#34; + random.nextInt(1000000),
@@ -664,7 +667,7 @@ public class ProfileMe {
         );
         customers.add(customer);
     }
-    
+
     private static void processOrders() {
         // Simulate expensive computation
         double sum = 0;
@@ -678,7 +681,7 @@ class Customer {
     private String name;
     private String email;
     private List&lt;Order&gt; orders;
-    
+
     public Customer(String name, String email) {
         this.name = name;
         this.email = email;
@@ -689,7 +692,7 @@ class Customer {
 class Order {
     private String orderId;
     private double amount;
-    
+
     public Order(String orderId, double amount) {
         this.orderId = orderId;
         this.amount = amount;
@@ -734,7 +737,7 @@ $ jmap -dump:format=b,file=heap.bin &lt;PID&gt;
                 <li><strong>TERMINATED:</strong> Finished execution</li>
             </ul>
             <pre><code language="language-java" class="language-java">public class ThreadDumpDemo {
-    
+
     public static void main(String[] args) throws InterruptedException {
         // Runnable thread
         Thread worker = new Thread(() -&gt; {
@@ -748,11 +751,11 @@ $ jmap -dump:format=b,file=heap.bin &lt;PID&gt;
             }
         }, &#34;Worker-Thread&#34;);
         worker.start();
-        
+
         // Blocked thread (deadlock example)
         final Object lock1 = new Object();
         final Object lock2 = new Object();
-        
+
         Thread thread1 = new Thread(() -&gt; {
             synchronized (lock1) {
                 System.out.println(&#34;Thread1 locked lock1&#34;);
@@ -762,7 +765,7 @@ $ jmap -dump:format=b,file=heap.bin &lt;PID&gt;
                 }
             }
         }, &#34;Deadlock-Thread-1&#34;);
-        
+
         Thread thread2 = new Thread(() -&gt; {
             synchronized (lock2) {
                 System.out.println(&#34;Thread2 locked lock2&#34;);
@@ -772,13 +775,13 @@ $ jmap -dump:format=b,file=heap.bin &lt;PID&gt;
                 }
             }
         }, &#34;Deadlock-Thread-2&#34;);
-        
+
         thread1.start();
         thread2.start();
-        
+
         System.out.println(&#34;Take thread dump to see deadlock!&#34;);
         System.out.println(&#34;PID: &#34; + ProcessHandle.current().pid());
-        
+
         // Keep main thread alive
         Thread.sleep(Long.MAX_VALUE);
     }
@@ -799,50 +802,50 @@ $ jmap -dump:format=b,file=heap.bin &lt;PID&gt;
             <pre><code language="language-java" class="language-java">import java.util.concurrent.*;
 
 public class ObjectPoolDemo {
-    
+
     // Thread pool - reuses threads
     private static ExecutorService executor = Executors.newFixedThreadPool(10);
-    
+
     // Custom object pool
     static class ExpensiveObject {
         private byte[] data = new byte[1024 * 1024];  // 1 MB
-        
+
         public void reset() {
             // Reset state for reuse
             Arrays.fill(data, (byte) 0);
         }
     }
-    
+
     static class ObjectPool {
         private BlockingQueue&lt;ExpensiveObject&gt; pool;
-        
+
         public ObjectPool(int size) {
             pool = new ArrayBlockingQueue&lt;&gt;(size);
             for (int i = 0; i &lt; size; i++) {
                 pool.offer(new ExpensiveObject());
             }
         }
-        
+
         public ExpensiveObject borrow() throws InterruptedException {
             return pool.take();
         }
-        
+
         public void returnObject(ExpensiveObject obj) {
             obj.reset();
             pool.offer(obj);
         }
     }
-    
+
     public static void main(String[] args) throws InterruptedException {
         ObjectPool pool = new ObjectPool(10);
-        
+
         // Reuse objects instead of creating new ones
         for (int i = 0; i &lt; 100; i++) {
             ExpensiveObject obj = pool.borrow();
             // Use object
             pool.returnObject(obj);
         }
-        
+
         System.out.println(&#34;Created only 10 objects, reused 100 times!&#34;);
     }
 }
@@ -850,19 +853,19 @@ public class ObjectPoolDemo {
             <h2 is-upgraded>2. Lazy Initialization</h2>
             <p>Create objects only when needed:</p>
             <pre><code language="language-java" class="language-java">public class LazyInitialization {
-    
+
     private HeavyResource resource;  // Not initialized yet
-    
+
     public HeavyResource getResource() {
         if (resource == null) {
             resource = new HeavyResource();  // Create only when needed
         }
         return resource;
     }
-    
+
     // Thread-safe lazy initialization
     private volatile HeavyResource threadSafeResource;
-    
+
     public HeavyResource getThreadSafeResource() {
         if (threadSafeResource == null) {
             synchronized (this) {
@@ -873,12 +876,12 @@ public class ObjectPoolDemo {
         }
         return threadSafeResource;
     }
-    
+
     // Best: Initialization-on-demand holder
     private static class ResourceHolder {
         private static final HeavyResource INSTANCE = new HeavyResource();
     }
-    
+
     public static HeavyResource getInstance() {
         return ResourceHolder.INSTANCE;  // Lazy + thread-safe
     }
@@ -886,7 +889,7 @@ public class ObjectPoolDemo {
 
 class HeavyResource {
     private byte[] data = new byte[10 * 1024 * 1024];  // 10 MB
-    
+
     public HeavyResource() {
         System.out.println(&#34;HeavyResource created&#34;);
     }
@@ -898,34 +901,34 @@ class HeavyResource {
 import java.util.*;
 
 public class WeakReferenceDemo {
-    
+
     // Strong reference - never GC&#39;d while referenced
     private Object strongRef = new Object();
-    
+
     // Weak reference - GC&#39;d when memory needed
     private WeakReference&lt;Object&gt; weakRef = new WeakReference&lt;&gt;(new Object());
-    
+
     // Soft reference - GC&#39;d only when memory critically low
     private SoftReference&lt;Object&gt; softRef = new SoftReference&lt;&gt;(new Object());
-    
+
     public static void main(String[] args) {
         // Example: Image cache with soft references
         Map&lt;String, SoftReference&lt;byte[]&gt;&gt; imageCache = new HashMap&lt;&gt;();
-        
+
         // Load images
         for (int i = 0; i &lt; 100; i++) {
             byte[] image = new byte[1024 * 1024];  // 1 MB image
             imageCache.put(&#34;image&#34; + i, new SoftReference&lt;&gt;(image));
         }
-        
+
         // Images stay in cache until memory pressure
         // Then GC can reclaim them
-        
+
         System.out.println(&#34;Cache size: &#34; + imageCache.size());
-        
+
         // Force GC
         System.gc();
-        
+
         // Check what survived
         int survived = 0;
         for (SoftReference&lt;byte[]&gt; ref : imageCache.values()) {
@@ -933,14 +936,14 @@ public class WeakReferenceDemo {
                 survived++;
             }
         }
-        
+
         System.out.println(&#34;Images survived GC: &#34; + survived);
     }
 }
 </code></pre>
             <h2 is-upgraded>4. String Optimization</h2>
             <pre><code language="language-java" class="language-java">public class StringOptimization {
-    
+
     public static void main(String[] args) {
         // BAD: String concatenation in loop
         String result = &#34;&#34;;
@@ -950,7 +953,7 @@ public class WeakReferenceDemo {
         }
         long end = System.nanoTime();
         System.out.println(&#34;String concat: &#34; + (end - start) / 1_000_000 + &#34; ms&#34;);
-        
+
         // GOOD: StringBuilder
         StringBuilder sb = new StringBuilder();
         start = System.nanoTime();
@@ -960,7 +963,7 @@ public class WeakReferenceDemo {
         String result2 = sb.toString();
         end = System.nanoTime();
         System.out.println(&#34;StringBuilder: &#34; + (end - start) / 1_000_000 + &#34; ms&#34;);
-        
+
         // String interning (use carefully)
         String s1 = new String(&#34;Hello&#34;).intern();
         String s2 = new String(&#34;Hello&#34;).intern();
@@ -970,20 +973,20 @@ public class WeakReferenceDemo {
 </code></pre>
             <h2 is-upgraded>5. Collection Sizing</h2>
             <pre><code language="language-java" class="language-java">public class CollectionSizing {
-    
+
     public static void main(String[] args) {
         // BAD: Default size, many resizes
         List&lt;Integer&gt; list1 = new ArrayList&lt;&gt;();  // Initial capacity: 10
         for (int i = 0; i &lt; 10000; i++) {
             list1.add(i);  // Resizes multiple times!
         }
-        
+
         // GOOD: Pre-sized
         List&lt;Integer&gt; list2 = new ArrayList&lt;&gt;(10000);  // No resizing needed
         for (int i = 0; i &lt; 10000; i++) {
             list2.add(i);  // Efficient
         }
-        
+
         // HashMap sizing
         // Default: 16 capacity, 0.75 load factor
         // If you know size, specify: new HashMap&lt;&gt;(expectedSize / 0.75)
@@ -1144,9 +1147,15 @@ public class WeakReferenceDemo {
 
     <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
     <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
-    <script src="https://storage.googleapis.com/claat-public/prettify.js"></script>
     <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
     <script src="//support.google.com/inapp/api.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js"></script>
+    <script src="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.js"></script>
+    <script>
+        hljs.highlightAll();
+        hljs.addPlugin(new CopyButtonPlugin({ autohide: false }));
+
+    </script>
 
 </body>
 

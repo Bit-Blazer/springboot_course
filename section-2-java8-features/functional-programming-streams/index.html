@@ -11,6 +11,9 @@
         href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
     <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1  /build/styles/monokai.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.css">
     <style>
         .success {
             color: #1e8e3e;
@@ -23,9 +26,9 @@
 </head>
 
 <body>
-    <google-codelab-analytics gaid="UA-49880327-14"></google-codelab-analytics>
-    <google-codelab codelab-gaid="" id="functional-programming-streams" title="Functional Programming &amp; Streams API"
-        environment="web" feedback-link="">
+    <google-codelab-analytics gaid="UA-49880327-14" ga4id=""></google-codelab-analytics>
+    <google-codelab codelab-gaid="" codelab-ga4id="" id="functional-programming-streams"
+        title="Functional Programming &amp; Streams API" environment="web" feedback-link="">
 
         <google-codelab-step label="Introduction" duration="5">
             <p>Welcome to the world of functional programming in Java! Java 8 introduced a paradigm shift with lambda
@@ -93,7 +96,8 @@ System.out.println(result);
 </code></pre>
             <aside class="special">
                 <p><strong>Key Difference:</strong> Functional style describes <strong>what</strong> you want, not
-                    <strong>how</strong> to do it. It&#39;s declarative, not imperative.</p>
+                    <strong>how</strong> to do it. It&#39;s declarative, not imperative.
+                </p>
             </aside>
             <h2 is-upgraded>Core Principles</h2>
             <p><strong>1. Immutability:</strong></p>
@@ -194,7 +198,7 @@ public class LambdaExamples {
         Map&lt;String, Integer&gt; ages = new HashMap&lt;&gt;();
         ages.put(&#34;Alice&#34;, 25);
         ages.put(&#34;Bob&#34;, 30);
-        ages.forEach((name, age) -&gt; 
+        ages.forEach((name, age) -&gt;
             System.out.println(name + &#34; is &#34; + age + &#34; years old&#34;)
         );
 
@@ -311,7 +315,7 @@ System.out.println(concat.apply(&#34;Hi&#34;, &#34;!&#34;));   // Hi!
             <pre><code language="language-java" class="language-java">@FunctionalInterface
 public interface Calculator {
     int calculate(int a, int b);
-    
+
     // Default methods allowed
     default void printResult(int a, int b) {
         System.out.println(&#34;Result: &#34; + calculate(a, b));
@@ -322,10 +326,10 @@ public class FunctionalInterfaceDemo {
     public static void main(String[] args) {
         Calculator add = (a, b) -&gt; a + b;
         Calculator multiply = (a, b) -&gt; a * b;
-        
+
         System.out.println(add.calculate(5, 3));       // 8
         System.out.println(multiply.calculate(5, 3));  // 15
-        
+
         add.printResult(10, 20);  // Result: 30
     }
 }
@@ -520,24 +524,24 @@ import java.util.stream.*;
 public class MethodReferenceDemo {
     public static void main(String[] args) {
         List&lt;String&gt; names = Arrays.asList(&#34;Alice&#34;, &#34;bob&#34;, &#34;CHARLIE&#34;);
-        
+
         // 1. Static method reference
         List&lt;Integer&gt; numbers = Arrays.asList(&#34;1&#34;, &#34;2&#34;, &#34;3&#34;).stream()
             .map(Integer::parseInt)
             .collect(Collectors.toList());
-        
+
         // 2. Instance method (specific object)
         names.forEach(System.out::println);
-        
+
         // 3. Instance method (arbitrary object)
         List&lt;String&gt; upperNames = names.stream()
             .map(String::toUpperCase)
             .collect(Collectors.toList());
-        
+
         // 4. Constructor reference
         Set&lt;String&gt; nameSet = names.stream()
             .collect(Collectors.toCollection(HashSet::new));
-        
+
         // Comparison with method reference
         names.sort(String::compareToIgnoreCase);
         System.out.println(&#34;Sorted: &#34; + names);
@@ -602,45 +606,45 @@ import java.util.stream.*;
 public class StreamBasics {
     public static void main(String[] args) {
         List&lt;Integer&gt; numbers = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
-        
+
         // Filter - keep elements matching condition
         List&lt;Integer&gt; evens = numbers.stream()
             .filter(n -&gt; n % 2 == 0)
             .collect(Collectors.toList());
         System.out.println(&#34;Evens: &#34; + evens);  // [2, 4, 6, 8, 10]
-        
+
         // Map - transform each element
         List&lt;Integer&gt; squared = numbers.stream()
             .map(n -&gt; n * n)
             .collect(Collectors.toList());
         System.out.println(&#34;Squared: &#34; + squared);
-        
+
         // Limit - take first N elements
         List&lt;Integer&gt; firstThree = numbers.stream()
             .limit(3)
             .collect(Collectors.toList());
         System.out.println(&#34;First 3: &#34; + firstThree);  // [1, 2, 3]
-        
+
         // Skip - skip first N elements
         List&lt;Integer&gt; afterFive = numbers.stream()
             .skip(5)
             .collect(Collectors.toList());
         System.out.println(&#34;After 5: &#34; + afterFive);  // [6, 7, 8, 9, 10]
-        
+
         // Distinct - remove duplicates
         List&lt;Integer&gt; duplicates = Arrays.asList(1, 2, 2, 3, 3, 3);
         List&lt;Integer&gt; unique = duplicates.stream()
             .distinct()
             .collect(Collectors.toList());
         System.out.println(&#34;Unique: &#34; + unique);  // [1, 2, 3]
-        
+
         // Sorted - natural order
         List&lt;Integer&gt; shuffled = Arrays.asList(5, 2, 8, 1, 9);
         List&lt;Integer&gt; sorted = shuffled.stream()
             .sorted()
             .collect(Collectors.toList());
         System.out.println(&#34;Sorted: &#34; + sorted);  // [1, 2, 5, 8, 9]
-        
+
         // Sorted with comparator
         List&lt;String&gt; names = Arrays.asList(&#34;Charlie&#34;, &#34;Alice&#34;, &#34;Bob&#34;);
         List&lt;String&gt; sortedNames = names.stream()
@@ -661,7 +665,8 @@ public class StreamBasics {
 </code></pre>
             <aside class="special">
                 <p><strong>Peek vs forEach:</strong> Use <code>peek()</code> for debugging (intermediate),
-                    <code>forEach()</code> for final actions (terminal).</p>
+                    <code>forEach()</code> for final actions (terminal).
+                </p>
             </aside>
             <h2 is-upgraded>Lazy Evaluation</h2>
             <p>Intermediate operations are lazy - they don&#39;t execute until a terminal operation is called:</p>
@@ -905,7 +910,8 @@ names.parallelStream()
 </code></pre>
             <aside class="warning">
                 <p><strong>Warning: </strong><code>forEach()</code> order is not guaranteed in parallel streams. Use
-                    <code>forEachOrdered()</code> when order matters.</p>
+                    <code>forEachOrdered()</code> when order matters.
+                </p>
             </aside>
             <h2 is-upgraded>count(), min(), max()</h2>
             <pre><code language="language-java" class="language-java">List&lt;Integer&gt; numbers = Arrays.asList(1, 2, 3, 4, 5);
@@ -1030,13 +1036,13 @@ System.out.println(any.get());  // Any matching name
     String name;
     String department;
     double salary;
-    
+
     Employee(String name, String department, double salary) {
         this.name = name;
         this.department = department;
         this.salary = salary;
     }
-    
+
     // Getters
     public String getName() { return name; }
     public String getDepartment() { return department; }
@@ -1198,8 +1204,8 @@ class Sale {
     private LocalDate date;
     private String region;
     private String salesperson;
-    
-    public Sale(String id, String product, String category, double amount, 
+
+    public Sale(String id, String product, String category, double amount,
                 int quantity, LocalDate date, String region, String salesperson) {
         this.id = id;
         this.product = product;
@@ -1210,7 +1216,7 @@ class Sale {
         this.region = region;
         this.salesperson = salesperson;
     }
-    
+
     // Getters
     public String getId() { return id; }
     public String getProduct() { return product; }
@@ -1220,7 +1226,7 @@ class Sale {
     public LocalDate getDate() { return date; }
     public String getRegion() { return region; }
     public String getSalesperson() { return salesperson; }
-    
+
     @Override
     public String toString() {
         return String.format(&#34;%s: %s ($%.2f)&#34;, id, product, amount);
@@ -1229,43 +1235,43 @@ class Sale {
 
 public class SalesAnalytics {
     private List&lt;Sale&gt; sales;
-    
+
     public SalesAnalytics() {
         this.sales = generateSampleData();
     }
-    
+
     private List&lt;Sale&gt; generateSampleData() {
         return Arrays.asList(
-            new Sale(&#34;S001&#34;, &#34;Laptop&#34;, &#34;Electronics&#34;, 1200.00, 2, 
+            new Sale(&#34;S001&#34;, &#34;Laptop&#34;, &#34;Electronics&#34;, 1200.00, 2,
                      LocalDate.of(2024, 1, 15), &#34;North&#34;, &#34;Alice&#34;),
-            new Sale(&#34;S002&#34;, &#34;Mouse&#34;, &#34;Electronics&#34;, 25.00, 10, 
+            new Sale(&#34;S002&#34;, &#34;Mouse&#34;, &#34;Electronics&#34;, 25.00, 10,
                      LocalDate.of(2024, 1, 16), &#34;South&#34;, &#34;Bob&#34;),
-            new Sale(&#34;S003&#34;, &#34;Desk&#34;, &#34;Furniture&#34;, 450.00, 3, 
+            new Sale(&#34;S003&#34;, &#34;Desk&#34;, &#34;Furniture&#34;, 450.00, 3,
                      LocalDate.of(2024, 1, 17), &#34;East&#34;, &#34;Charlie&#34;),
-            new Sale(&#34;S004&#34;, &#34;Chair&#34;, &#34;Furniture&#34;, 180.00, 5, 
+            new Sale(&#34;S004&#34;, &#34;Chair&#34;, &#34;Furniture&#34;, 180.00, 5,
                      LocalDate.of(2024, 1, 18), &#34;West&#34;, &#34;Alice&#34;),
-            new Sale(&#34;S005&#34;, &#34;Monitor&#34;, &#34;Electronics&#34;, 300.00, 4, 
+            new Sale(&#34;S005&#34;, &#34;Monitor&#34;, &#34;Electronics&#34;, 300.00, 4,
                      LocalDate.of(2024, 1, 19), &#34;North&#34;, &#34;David&#34;),
-            new Sale(&#34;S006&#34;, &#34;Keyboard&#34;, &#34;Electronics&#34;, 75.00, 8, 
+            new Sale(&#34;S006&#34;, &#34;Keyboard&#34;, &#34;Electronics&#34;, 75.00, 8,
                      LocalDate.of(2024, 1, 20), &#34;South&#34;, &#34;Bob&#34;),
-            new Sale(&#34;S007&#34;, &#34;Bookshelf&#34;, &#34;Furniture&#34;, 200.00, 2, 
+            new Sale(&#34;S007&#34;, &#34;Bookshelf&#34;, &#34;Furniture&#34;, 200.00, 2,
                      LocalDate.of(2024, 2, 1), &#34;East&#34;, &#34;Charlie&#34;),
-            new Sale(&#34;S008&#34;, &#34;Laptop&#34;, &#34;Electronics&#34;, 1400.00, 1, 
+            new Sale(&#34;S008&#34;, &#34;Laptop&#34;, &#34;Electronics&#34;, 1400.00, 1,
                      LocalDate.of(2024, 2, 5), &#34;North&#34;, &#34;Alice&#34;),
-            new Sale(&#34;S009&#34;, &#34;Desk Lamp&#34;, &#34;Electronics&#34;, 40.00, 15, 
+            new Sale(&#34;S009&#34;, &#34;Desk Lamp&#34;, &#34;Electronics&#34;, 40.00, 15,
                      LocalDate.of(2024, 2, 10), &#34;West&#34;, &#34;David&#34;),
-            new Sale(&#34;S010&#34;, &#34;Office Chair&#34;, &#34;Furniture&#34;, 250.00, 6, 
+            new Sale(&#34;S010&#34;, &#34;Office Chair&#34;, &#34;Furniture&#34;, 250.00, 6,
                      LocalDate.of(2024, 2, 15), &#34;South&#34;, &#34;Bob&#34;)
         );
     }
-    
+
     // 1. Total Revenue
     public double calculateTotalRevenue() {
         return sales.stream()
             .mapToDouble(Sale::getAmount)
             .sum();
     }
-    
+
     // 2. Revenue by Category
     public Map&lt;String, Double&gt; revenueByCategory() {
         return sales.stream()
@@ -1274,7 +1280,7 @@ public class SalesAnalytics {
                 Collectors.summingDouble(Sale::getAmount)
             ));
     }
-    
+
     // 3. Top Products by Revenue
     public List&lt;Map.Entry&lt;String, Double&gt;&gt; topProducts(int n) {
         return sales.stream()
@@ -1288,7 +1294,7 @@ public class SalesAnalytics {
             .limit(n)
             .collect(Collectors.toList());
     }
-    
+
     // 4. Sales by Region
     public Map&lt;String, Long&gt; salesCountByRegion() {
         return sales.stream()
@@ -1297,7 +1303,7 @@ public class SalesAnalytics {
                 Collectors.counting()
             ));
     }
-    
+
     // 5. Average Sale Amount by Salesperson
     public Map&lt;String, Double&gt; averageSalesBySalesperson() {
         return sales.stream()
@@ -1306,7 +1312,7 @@ public class SalesAnalytics {
                 Collectors.averagingDouble(Sale::getAmount)
             ));
     }
-    
+
     // 6. High-Value Sales (above threshold)
     public List&lt;Sale&gt; getHighValueSales(double threshold) {
         return sales.stream()
@@ -1314,7 +1320,7 @@ public class SalesAnalytics {
             .sorted(Comparator.comparingDouble(Sale::getAmount).reversed())
             .collect(Collectors.toList());
     }
-    
+
     // 7. Monthly Revenue
     public Map&lt;Integer, Double&gt; revenueByMonth() {
         return sales.stream()
@@ -1323,7 +1329,7 @@ public class SalesAnalytics {
                 Collectors.summingDouble(Sale::getAmount)
             ));
     }
-    
+
     // 8. Product Performance Statistics
     public void productStatistics() {
         Map&lt;String, DoubleSummaryStatistics&gt; stats = sales.stream()
@@ -1331,7 +1337,7 @@ public class SalesAnalytics {
                 Sale::getCategory,
                 Collectors.summarizingDouble(Sale::getAmount)
             ));
-        
+
         stats.forEach((category, stat) -&gt; {
             System.out.println(&#34;\nCategory: &#34; + category);
             System.out.printf(&#34;  Count: %d%n&#34;, stat.getCount());
@@ -1341,7 +1347,7 @@ public class SalesAnalytics {
             System.out.printf(&#34;  Max: $%.2f%n&#34;, stat.getMax());
         });
     }
-    
+
     // 9. Top Salesperson
     public Map.Entry&lt;String, Double&gt; topSalesperson() {
         return sales.stream()
@@ -1354,7 +1360,7 @@ public class SalesAnalytics {
             .max(Map.Entry.comparingByValue())
             .orElse(null);
     }
-    
+
     // 10. Sales Distribution (Partition by amount)
     public Map&lt;Boolean, List&lt;Sale&gt;&gt; partitionSales(double threshold) {
         return sales.stream()
@@ -1362,7 +1368,7 @@ public class SalesAnalytics {
                 sale -&gt; sale.getAmount() &gt;= threshold
             ));
     }
-    
+
     // 11. Complex Query: Region-Category Matrix
     public Map&lt;String, Map&lt;String, Double&gt;&gt; regionCategoryMatrix() {
         return sales.stream()
@@ -1374,7 +1380,7 @@ public class SalesAnalytics {
                 )
             ));
     }
-    
+
     // 12. Find sales by multiple criteria
     public List&lt;Sale&gt; findSales(String category, String region, double minAmount) {
         return sales.stream()
@@ -1383,73 +1389,73 @@ public class SalesAnalytics {
             .filter(sale -&gt; sale.getAmount() &gt;= minAmount)
             .collect(Collectors.toList());
     }
-    
+
     public void runAnalytics() {
         System.out.println(&#34;=== SALES ANALYTICS DASHBOARD ===\n&#34;);
-        
+
         // Total Revenue
         System.out.printf(&#34;Total Revenue: $%.2f%n%n&#34;, calculateTotalRevenue());
-        
+
         // Revenue by Category
         System.out.println(&#34;Revenue by Category:&#34;);
-        revenueByCategory().forEach((category, revenue) -&gt; 
+        revenueByCategory().forEach((category, revenue) -&gt;
             System.out.printf(&#34;  %s: $%.2f%n&#34;, category, revenue)
         );
-        
+
         // Top 3 Products
         System.out.println(&#34;\nTop 3 Products:&#34;);
-        topProducts(3).forEach(entry -&gt; 
+        topProducts(3).forEach(entry -&gt;
             System.out.printf(&#34;  %s: $%.2f%n&#34;, entry.getKey(), entry.getValue())
         );
-        
+
         // Sales by Region
         System.out.println(&#34;\nSales Count by Region:&#34;);
-        salesCountByRegion().forEach((region, count) -&gt; 
+        salesCountByRegion().forEach((region, count) -&gt;
             System.out.printf(&#34;  %s: %d sales%n&#34;, region, count)
         );
-        
+
         // Average by Salesperson
         System.out.println(&#34;\nAverage Sale by Salesperson:&#34;);
-        averageSalesBySalesperson().forEach((person, avg) -&gt; 
+        averageSalesBySalesperson().forEach((person, avg) -&gt;
             System.out.printf(&#34;  %s: $%.2f%n&#34;, person, avg)
         );
-        
+
         // High-value sales
         System.out.println(&#34;\nHigh-Value Sales (&gt;$500):&#34;);
-        getHighValueSales(500.0).forEach(sale -&gt; 
+        getHighValueSales(500.0).forEach(sale -&gt;
             System.out.println(&#34;  &#34; + sale)
         );
-        
+
         // Monthly revenue
         System.out.println(&#34;\nRevenue by Month:&#34;);
-        revenueByMonth().forEach((month, revenue) -&gt; 
+        revenueByMonth().forEach((month, revenue) -&gt;
             System.out.printf(&#34;  Month %d: $%.2f%n&#34;, month, revenue)
         );
-        
+
         // Product statistics
         productStatistics();
-        
+
         // Top salesperson
         Map.Entry&lt;String, Double&gt; top = topSalesperson();
-        System.out.printf(&#34;%nTop Salesperson: %s ($%.2f)%n&#34;, 
+        System.out.printf(&#34;%nTop Salesperson: %s ($%.2f)%n&#34;,
             top.getKey(), top.getValue());
-        
+
         // Sales partition
         System.out.println(&#34;\nSales Partition (threshold: $200):&#34;);
         Map&lt;Boolean, List&lt;Sale&gt;&gt; partitioned = partitionSales(200.0);
         System.out.println(&#34;  High-value sales: &#34; + partitioned.get(true).size());
         System.out.println(&#34;  Low-value sales: &#34; + partitioned.get(false).size());
-        
+
         // Region-Category Matrix
         System.out.println(&#34;\nRegion-Category Revenue Matrix:&#34;);
         regionCategoryMatrix().forEach((region, categories) -&gt; {
             System.out.println(&#34;  &#34; + region + &#34;:&#34;);
-            categories.forEach((category, revenue) -&gt; 
+            categories.forEach((category, revenue) -&gt;
                 System.out.printf(&#34;    %s: $%.2f%n&#34;, category, revenue)
             );
         });
     }
-    
+
     public static void main(String[] args) {
         SalesAnalytics analytics = new SalesAnalytics();
         analytics.runAnalytics();
@@ -1513,7 +1519,7 @@ public class ParallelStreamDemo {
         List&lt;Integer&gt; numbers = IntStream.rangeClosed(1, 10_000_000)
             .boxed()
             .collect(Collectors.toList());
-        
+
         // Sequential processing
         long startSeq = System.currentTimeMillis();
         long sumSeq = numbers.stream()
@@ -1521,10 +1527,10 @@ public class ParallelStreamDemo {
             .mapToLong(n -&gt; n * n)
             .sum();
         long endSeq = System.currentTimeMillis();
-        
+
         System.out.println(&#34;Sequential Result: &#34; + sumSeq);
         System.out.println(&#34;Sequential Time: &#34; + (endSeq - startSeq) + &#34;ms&#34;);
-        
+
         // Parallel processing
         long startPar = System.currentTimeMillis();
         long sumPar = numbers.parallelStream()
@@ -1532,10 +1538,10 @@ public class ParallelStreamDemo {
             .mapToLong(n -&gt; n * n)
             .sum();
         long endPar = System.currentTimeMillis();
-        
+
         System.out.println(&#34;\nParallel Result: &#34; + sumPar);
         System.out.println(&#34;Parallel Time: &#34; + (endPar - startPar) + &#34;ms&#34;);
-        
+
         double speedup = (double)(endSeq - startSeq) / (endPar - startPar);
         System.out.printf(&#34;\nSpeedup: %.2fx%n&#34;, speedup);
     }
@@ -1629,7 +1635,8 @@ List&lt;Integer&gt; best = numbers.parallelStream()
             <h2 is-upgraded>Key Takeaways</h2>
             <ol type="1">
                 <li><strong>Functional style</strong> is declarative - describe <strong>what</strong>, not
-                    <strong>how</strong></li>
+                    <strong>how</strong>
+                </li>
                 <li><strong>Lambdas</strong> make code concise and expressive</li>
                 <li><strong>Streams</strong> enable powerful data transformations</li>
                 <li><strong>Collectors</strong> provide sophisticated aggregation capabilities</li>
@@ -1683,9 +1690,15 @@ List&lt;Integer&gt; best = numbers.parallelStream()
 
     <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
     <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
-    <script src="https://storage.googleapis.com/claat-public/prettify.js"></script>
     <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
     <script src="//support.google.com/inapp/api.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js"></script>
+    <script src="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.js"></script>
+    <script>
+        hljs.highlightAll();
+        hljs.addPlugin(new CopyButtonPlugin({ autohide: false }));
+
+    </script>
 
 </body>
 

@@ -11,6 +11,9 @@
         href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
     <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1  /build/styles/monokai.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.css">
     <style>
         .success {
             color: #1e8e3e;
@@ -23,9 +26,9 @@
 </head>
 
 <body>
-    <google-codelab-analytics gaid="UA-49880327-14"></google-codelab-analytics>
-    <google-codelab codelab-gaid="" id="async-programming-complete" title="Asynchronous Programming Complete"
-        environment="web" feedback-link="">
+    <google-codelab-analytics gaid="UA-49880327-14" ga4id=""></google-codelab-analytics>
+    <google-codelab codelab-gaid="" codelab-ga4id="" id="async-programming-complete"
+        title="Asynchronous Programming Complete" environment="web" feedback-link="">
 
         <google-codelab-step label="Introduction" duration="5">
             <p>Asynchronous programming enables efficient use of system resources by allowing tasks to run concurrently
@@ -70,14 +73,14 @@
 Runnable task1 = new Runnable() {
     @Override
     public void run() {
-        System.out.println(&#34;Running in thread: &#34; + 
+        System.out.println(&#34;Running in thread: &#34; +
             Thread.currentThread().getName());
     }
 };
 
 // Modern way: Lambda
 Runnable task2 = () -&gt; {
-    System.out.println(&#34;Running in thread: &#34; + 
+    System.out.println(&#34;Running in thread: &#34; +
         Thread.currentThread().getName());
 };
 
@@ -116,19 +119,19 @@ Callable&lt;String&gt; fetchData = () -&gt; {
                 System.out.println(&#34;Thread 1&#34;);
             }
         };
-        
+
         // Method 2: Implement Runnable
         Runnable task = () -&gt; System.out.println(&#34;Thread 2&#34;);
         Thread t2 = new Thread(task);
-        
+
         // Start threads
         t1.start();
         t2.start();
-        
+
         // Wait for completion
         t1.join();
         t2.join();
-        
+
         System.out.println(&#34;All threads completed&#34;);
     }
 }
@@ -143,15 +146,15 @@ Callable&lt;String&gt; fetchData = () -&gt; {
                 e.printStackTrace();
             }
         });
-        
+
         System.out.println(&#34;State: &#34; + thread.getState());  // NEW
-        
+
         thread.start();
         System.out.println(&#34;State: &#34; + thread.getState());  // RUNNABLE
-        
+
         Thread.sleep(100);
         System.out.println(&#34;State: &#34; + thread.getState());  // TIMED_WAITING
-        
+
         thread.join();
         System.out.println(&#34;State: &#34; + thread.getState());  // TERMINATED
     }
@@ -191,22 +194,22 @@ executor1.shutdown();
 public class ExecutorDemo {
     public static void main(String[] args) throws Exception {
         ExecutorService executor = Executors.newFixedThreadPool(3);
-        
+
         // Submit Runnable (no return value)
         executor.submit(() -&gt; {
             System.out.println(&#34;Task 1 in &#34; + Thread.currentThread().getName());
         });
-        
+
         // Submit Callable (returns Future)
         Future&lt;Integer&gt; future = executor.submit(() -&gt; {
             Thread.sleep(1000);
             return 42;
         });
-        
+
         // Get result (blocks until complete)
         Integer result = future.get();
         System.out.println(&#34;Result: &#34; + result);
-        
+
         // Submit multiple tasks
         for (int i = 0; i &lt; 5; i++) {
             final int taskId = i;
@@ -214,7 +217,7 @@ public class ExecutorDemo {
                 System.out.println(&#34;Task &#34; + taskId + &#34; executed&#34;);
             });
         }
-        
+
         // Shutdown executor
         executor.shutdown();
         executor.awaitTermination(5, TimeUnit.SECONDS);
@@ -227,41 +230,41 @@ public class ExecutorDemo {
 public class FutureExample {
     public static void main(String[] args) throws Exception {
         ExecutorService executor = Executors.newFixedThreadPool(2);
-        
+
         // Submit long-running task
         Future&lt;String&gt; future = executor.submit(() -&gt; {
             Thread.sleep(3000);
             return &#34;Task completed&#34;;
         });
-        
+
         // Check if done (non-blocking)
         System.out.println(&#34;Is done? &#34; + future.isDone());  // false
-        
+
         // Do other work while task runs
         System.out.println(&#34;Doing other work...&#34;);
         Thread.sleep(1000);
-        
+
         // Check again
         System.out.println(&#34;Is done? &#34; + future.isDone());  // false
-        
+
         // Get result (blocks until complete)
         System.out.println(&#34;Waiting for result...&#34;);
         String result = future.get();  // Blocks here
         System.out.println(&#34;Result: &#34; + result);
-        
+
         // Get with timeout
         Future&lt;String&gt; future2 = executor.submit(() -&gt; {
             Thread.sleep(5000);
             return &#34;Slow task&#34;;
         });
-        
+
         try {
             String result2 = future2.get(2, TimeUnit.SECONDS);
         } catch (TimeoutException e) {
             System.out.println(&#34;Task timed out!&#34;);
             future2.cancel(true);  // Cancel the task
         }
-        
+
         executor.shutdown();
     }
 }
@@ -273,24 +276,24 @@ import java.util.concurrent.*;
 public class BulkOperations {
     public static void main(String[] args) throws Exception {
         ExecutorService executor = Executors.newFixedThreadPool(4);
-        
+
         // Create multiple tasks
         List&lt;Callable&lt;Integer&gt;&gt; tasks = Arrays.asList(
             () -&gt; { Thread.sleep(1000); return 1; },
             () -&gt; { Thread.sleep(2000); return 2; },
             () -&gt; { Thread.sleep(1500); return 3; }
         );
-        
+
         // invokeAll: Execute all, wait for all
         List&lt;Future&lt;Integer&gt;&gt; futures = executor.invokeAll(tasks);
         for (Future&lt;Integer&gt; future : futures) {
             System.out.println(&#34;Result: &#34; + future.get());
         }
-        
+
         // invokeAny: Execute all, return first completed
         Integer firstResult = executor.invokeAny(tasks);
         System.out.println(&#34;First result: &#34; + firstResult);
-        
+
         executor.shutdown();
     }
 }
@@ -303,34 +306,34 @@ import java.util.stream.*;
 public class ParallelProcessor {
     public static void main(String[] args) throws Exception {
         ExecutorService executor = Executors.newFixedThreadPool(4);
-        
+
         // Process 100 items in parallel
         List&lt;Integer&gt; items = IntStream.rangeClosed(1, 100)
             .boxed()
             .collect(Collectors.toList());
-        
+
         long start = System.currentTimeMillis();
-        
+
         List&lt;Future&lt;Integer&gt;&gt; futures = new ArrayList&lt;&gt;();
         for (Integer item : items) {
             Future&lt;Integer&gt; future = executor.submit(() -&gt; processItem(item));
             futures.add(future);
         }
-        
+
         // Collect results
         List&lt;Integer&gt; results = new ArrayList&lt;&gt;();
         for (Future&lt;Integer&gt; future : futures) {
             results.add(future.get());
         }
-        
+
         long end = System.currentTimeMillis();
-        
+
         System.out.println(&#34;Processed &#34; + results.size() + &#34; items&#34;);
         System.out.println(&#34;Time taken: &#34; + (end - start) + &#34;ms&#34;);
-        
+
         executor.shutdown();
     }
-    
+
     private static Integer processItem(Integer item) throws InterruptedException {
         Thread.sleep(100);  // Simulate work
         return item * 2;
@@ -379,18 +382,18 @@ public class ChainingDemo {
         CompletableFuture&lt;Integer&gt; future = CompletableFuture.supplyAsync(() -&gt; 5)
             .thenApply(n -&gt; n * 2)      // 10
             .thenApply(n -&gt; n + 3);     // 13
-        
+
         System.out.println(future.join());  // 13
-        
+
         // thenAccept: Consume result (no return)
         CompletableFuture.supplyAsync(() -&gt; &#34;Hello&#34;)
             .thenApply(String::toUpperCase)
             .thenAccept(s -&gt; System.out.println(&#34;Result: &#34; + s));
-        
+
         // thenRun: Execute action (no input, no output)
         CompletableFuture.supplyAsync(() -&gt; &#34;Done&#34;)
             .thenRun(() -&gt; System.out.println(&#34;Task completed&#34;));
-        
+
         // Async variants
         CompletableFuture.supplyAsync(() -&gt; &#34;Data&#34;)
             .thenApplyAsync(String::toUpperCase)  // Runs in separate thread
@@ -406,35 +409,35 @@ public class CombiningFutures {
         // thenCompose: Flatten nested futures
         CompletableFuture&lt;String&gt; future1 = CompletableFuture.supplyAsync(() -&gt; &#34;User123&#34;)
             .thenCompose(userId -&gt; fetchUserDetails(userId));
-        
+
         System.out.println(future1.join());
-        
+
         // thenCombine: Combine two independent futures
         CompletableFuture&lt;Integer&gt; age = CompletableFuture.supplyAsync(() -&gt; 25);
         CompletableFuture&lt;String&gt; name = CompletableFuture.supplyAsync(() -&gt; &#34;Alice&#34;);
-        
+
         CompletableFuture&lt;String&gt; combined = age.thenCombine(name, (a, n) -&gt; {
             return n + &#34; is &#34; + a + &#34; years old&#34;;
         });
-        
+
         System.out.println(combined.join());
-        
+
         // allOf: Wait for all futures
         CompletableFuture&lt;String&gt; f1 = CompletableFuture.supplyAsync(() -&gt; &#34;Task1&#34;);
         CompletableFuture&lt;String&gt; f2 = CompletableFuture.supplyAsync(() -&gt; &#34;Task2&#34;);
         CompletableFuture&lt;String&gt; f3 = CompletableFuture.supplyAsync(() -&gt; &#34;Task3&#34;);
-        
+
         CompletableFuture&lt;Void&gt; all = CompletableFuture.allOf(f1, f2, f3);
         all.join();  // Wait for all to complete
-        
+
         System.out.println(&#34;All tasks completed!&#34;);
         System.out.println(f1.join() + &#34;, &#34; + f2.join() + &#34;, &#34; + f3.join());
-        
+
         // anyOf: Wait for first completed
         CompletableFuture&lt;Object&gt; first = CompletableFuture.anyOf(f1, f2, f3);
         System.out.println(&#34;First completed: &#34; + first.join());
     }
-    
+
     static CompletableFuture&lt;String&gt; fetchUserDetails(String userId) {
         return CompletableFuture.supplyAsync(() -&gt; {
             // Simulate API call
@@ -458,9 +461,9 @@ public class ErrorHandling {
             System.out.println(&#34;Error: &#34; + ex.getMessage());
             return &#34;Default value&#34;;
         });
-        
+
         System.out.println(future1.join());
-        
+
         // handle: Handle both success and error
         CompletableFuture&lt;String&gt; future2 = CompletableFuture.supplyAsync(() -&gt; {
             if (Math.random() &gt; 0.5) {
@@ -473,9 +476,9 @@ public class ErrorHandling {
             }
             return result;
         });
-        
+
         System.out.println(future2.join());
-        
+
         // whenComplete: Side effect (doesn&#39;t transform)
         CompletableFuture.supplyAsync(() -&gt; &#34;Data&#34;)
             .whenComplete((result, ex) -&gt; {
@@ -503,9 +506,9 @@ public class TimeoutDemo {
             return &#34;Slow result&#34;;
         }).orTimeout(2, TimeUnit.SECONDS)
           .exceptionally(ex -&gt; &#34;Timeout!&#34;);
-        
+
         System.out.println(future1.join());
-        
+
         // completeOnTimeout: Provide default if timeout
         CompletableFuture&lt;String&gt; future2 = CompletableFuture.supplyAsync(() -&gt; {
             try {
@@ -515,7 +518,7 @@ public class TimeoutDemo {
             }
             return &#34;Slow result&#34;;
         }).completeOnTimeout(&#34;Default value&#34;, 2, TimeUnit.SECONDS);
-        
+
         System.out.println(future2.join());
     }
 }
@@ -533,55 +536,55 @@ import java.net.URI;
 
 public class AsyncApiCalls {
     private static final HttpClient client = HttpClient.newHttpClient();
-    
+
     public static CompletableFuture&lt;String&gt; fetchUser(String userId) {
         return CompletableFuture.supplyAsync(() -&gt; {
             simulateDelay(1000);
             return &#34;{\&#34;id\&#34;: \&#34;&#34; + userId + &#34;\&#34;, \&#34;name\&#34;: \&#34;User&#34; + userId + &#34;\&#34;}&#34;;
         });
     }
-    
+
     public static CompletableFuture&lt;String&gt; fetchOrders(String userId) {
         return CompletableFuture.supplyAsync(() -&gt; {
             simulateDelay(800);
             return &#34;[{\&#34;id\&#34;: \&#34;O1\&#34;, \&#34;amount\&#34;: 100}]&#34;;
         });
     }
-    
+
     public static CompletableFuture&lt;String&gt; fetchRecommendations(String userId) {
         return CompletableFuture.supplyAsync(() -&gt; {
             simulateDelay(1200);
             return &#34;[\&#34;Product1\&#34;, \&#34;Product2\&#34;]&#34;;
         });
     }
-    
+
     public static void main(String[] args) {
         long start = System.currentTimeMillis();
-        
+
         String userId = &#34;123&#34;;
-        
+
         // Sequential approach (slow)
         // Total: 1000 + 800 + 1200 = 3000ms
-        
+
         // Parallel approach (fast)
         CompletableFuture&lt;String&gt; userFuture = fetchUser(userId);
         CompletableFuture&lt;String&gt; ordersFuture = fetchOrders(userId);
         CompletableFuture&lt;String&gt; recommendationsFuture = fetchRecommendations(userId);
-        
+
         // Combine all results
         CompletableFuture&lt;String&gt; combined = userFuture.thenCombine(ordersFuture, (user, orders) -&gt; {
             return user + &#34;, &#34; + orders;
         }).thenCombine(recommendationsFuture, (combined1, recommendations) -&gt; {
             return combined1 + &#34;, &#34; + recommendations;
         });
-        
+
         String result = combined.join();
         long end = System.currentTimeMillis();
-        
+
         System.out.println(&#34;Result: &#34; + result);
         System.out.println(&#34;Time taken: &#34; + (end - start) + &#34;ms&#34;);  // ~1200ms (slowest)
     }
-    
+
     private static void simulateDelay(int ms) {
         try {
             Thread.sleep(ms);
@@ -598,7 +601,7 @@ import java.util.function.Supplier;
 public class RetryPattern {
     public static &lt;T&gt; CompletableFuture&lt;T&gt; retry(Supplier&lt;CompletableFuture&lt;T&gt;&gt; action, int maxAttempts) {
         CompletableFuture&lt;T&gt; future = action.get();
-        
+
         for (int i = 1; i &lt; maxAttempts; i++) {
             final int attempt = i;
             future = future.exceptionally(ex -&gt; {
@@ -611,25 +614,25 @@ public class RetryPattern {
                 return CompletableFuture.completedFuture(result);
             });
         }
-        
+
         return future;
     }
-    
+
     public static void main(String[] args) {
         int[] attempts = {0};
-        
+
         Supplier&lt;CompletableFuture&lt;String&gt;&gt; unreliableService = () -&gt; {
             return CompletableFuture.supplyAsync(() -&gt; {
                 attempts[0]++;
                 System.out.println(&#34;Calling service (attempt &#34; + attempts[0] + &#34;)&#34;);
-                
+
                 if (attempts[0] &lt; 3) {
                     throw new RuntimeException(&#34;Service unavailable&#34;);
                 }
                 return &#34;Success!&#34;;
             });
         };
-        
+
         CompletableFuture&lt;String&gt; result = retry(unreliableService, 5);
         System.out.println(&#34;Final result: &#34; + result.join());
     }
@@ -647,17 +650,17 @@ public class FallbackPattern {
             throw new RuntimeException(&#34;Primary failed&#34;);
         });
     }
-    
+
     public static CompletableFuture&lt;String&gt; fetchFromSecondary() {
         return CompletableFuture.supplyAsync(() -&gt; {
             return &#34;Data from secondary (fallback)&#34;;
         });
     }
-    
+
     public static CompletableFuture&lt;String&gt; fetchFromCache() {
         return CompletableFuture.completedFuture(&#34;Data from cache&#34;);
     }
-    
+
     public static void main(String[] args) {
         // Try primary, fallback to secondary, then cache
         CompletableFuture&lt;String&gt; result = fetchFromPrimary()
@@ -675,7 +678,7 @@ public class FallbackPattern {
                 System.out.println(&#34;Secondary failed, using cache...&#34;);
                 return fetchFromCache().join();
             });
-        
+
         System.out.println(&#34;Result: &#34; + result.join());
     }
 }
@@ -688,49 +691,49 @@ import java.util.stream.Collectors;
 public class ParallelAggregation {
     public static void main(String[] args) {
         List&lt;String&gt; userIds = Arrays.asList(&#34;1&#34;, &#34;2&#34;, &#34;3&#34;, &#34;4&#34;, &#34;5&#34;);
-        
+
         long start = System.currentTimeMillis();
-        
+
         // Fetch all users in parallel
         List&lt;CompletableFuture&lt;User&gt;&gt; futures = userIds.stream()
             .map(id -&gt; fetchUserAsync(id))
             .collect(Collectors.toList());
-        
+
         // Wait for all to complete
         CompletableFuture&lt;Void&gt; allOf = CompletableFuture.allOf(
             futures.toArray(new CompletableFuture[0])
         );
-        
+
         // Collect results
         CompletableFuture&lt;List&lt;User&gt;&gt; allUsers = allOf.thenApply(v -&gt; {
             return futures.stream()
                 .map(CompletableFuture::join)
                 .collect(Collectors.toList());
         });
-        
+
         List&lt;User&gt; users = allUsers.join();
         long end = System.currentTimeMillis();
-        
+
         System.out.println(&#34;Fetched &#34; + users.size() + &#34; users&#34;);
         users.forEach(System.out::println);
         System.out.println(&#34;Time taken: &#34; + (end - start) + &#34;ms&#34;);
     }
-    
+
     static class User {
         String id;
         String name;
-        
+
         User(String id, String name) {
             this.id = id;
             this.name = name;
         }
-        
+
         @Override
         public String toString() {
             return &#34;User{id=&#39;&#34; + id + &#34;&#39;, name=&#39;&#34; + name + &#34;&#39;}&#34;;
         }
     }
-    
+
     static CompletableFuture&lt;User&gt; fetchUserAsync(String id) {
         return CompletableFuture.supplyAsync(() -&gt; {
             try {
@@ -760,18 +763,18 @@ record DataSource(String name, String url, int latencyMs) {
         return CompletableFuture.supplyAsync(() -&gt; {
             System.out.println(&#34;[&#34; + name + &#34;] Fetching data...&#34;);
             simulateLatency(latencyMs);
-            
+
             // Simulate data
             List&lt;String&gt; data = new ArrayList&lt;&gt;();
             for (int i = 1; i &lt;= 5; i++) {
                 data.add(name + &#34;-Data&#34; + i);
             }
-            
+
             System.out.println(&#34;[&#34; + name + &#34;] Fetched &#34; + data.size() + &#34; items&#34;);
             return data;
         });
     }
-    
+
     private void simulateLatency(int ms) {
         try {
             Thread.sleep(ms);
@@ -784,18 +787,18 @@ record DataSource(String name, String url, int latencyMs) {
 record ProcessedData(String source, String value, Instant timestamp) {
     @Override
     public String toString() {
-        return String.format(&#34;%s: %s (processed at %s)&#34;, 
+        return String.format(&#34;%s: %s (processed at %s)&#34;,
             source, value, timestamp);
     }
 }
 
 class DataProcessor {
     private final ExecutorService executor;
-    
+
     public DataProcessor(int threadPoolSize) {
         this.executor = Executors.newFixedThreadPool(threadPoolSize);
     }
-    
+
     public CompletableFuture&lt;ProcessedData&gt; process(String source, String data) {
         return CompletableFuture.supplyAsync(() -&gt; {
             // Simulate processing
@@ -804,12 +807,12 @@ class DataProcessor {
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
-            
+
             String processed = data.toUpperCase() + &#34;-PROCESSED&#34;;
             return new ProcessedData(source, processed, Instant.now());
         }, executor);
     }
-    
+
     public void shutdown() {
         executor.shutdown();
     }
@@ -823,7 +826,7 @@ class DataAggregator {
                 .collect(Collectors.groupingBy(ProcessedData::source));
         });
     }
-    
+
     public CompletableFuture&lt;Statistics&gt; calculateStatistics(List&lt;ProcessedData&gt; data) {
         return CompletableFuture.supplyAsync(() -&gt; {
             Map&lt;String, Long&gt; countBySource = data.stream()
@@ -831,7 +834,7 @@ class DataAggregator {
                     ProcessedData::source,
                     Collectors.counting()
                 ));
-            
+
             return new Statistics(
                 data.size(),
                 countBySource.size(),
@@ -849,7 +852,7 @@ record Statistics(int totalItems, int totalSources, Map&lt;String, Long&gt; coun
         sb.append(&#34;  Total items: &#34;).append(totalItems).append(&#34;\n&#34;);
         sb.append(&#34;  Total sources: &#34;).append(totalSources).append(&#34;\n&#34;);
         sb.append(&#34;  Breakdown:\n&#34;);
-        countBySource.forEach((source, count) -&gt; 
+        countBySource.forEach((source, count) -&gt;
             sb.append(&#34;    &#34;).append(source).append(&#34;: &#34;).append(count).append(&#34;\n&#34;)
         );
         return sb.toString();
@@ -860,7 +863,7 @@ public class DataProcessingSystem {
     private final List&lt;DataSource&gt; dataSources;
     private final DataProcessor processor;
     private final DataAggregator aggregator;
-    
+
     public DataProcessingSystem() {
         this.dataSources = List.of(
             new DataSource(&#34;API-1&#34;, &#34;http://api1.example.com&#34;, 1000),
@@ -872,14 +875,14 @@ public class DataProcessingSystem {
         this.processor = new DataProcessor(10);
         this.aggregator = new DataAggregator();
     }
-    
+
     // Scenario 1: Sequential processing (slow)
     public List&lt;ProcessedData&gt; processSequentially() {
         System.out.println(&#34;\n=== SEQUENTIAL PROCESSING ===&#34;);
         long start = System.currentTimeMillis();
-        
+
         List&lt;ProcessedData&gt; allProcessed = new ArrayList&lt;&gt;();
-        
+
         for (DataSource source : dataSources) {
             List&lt;String&gt; data = source.fetch().join();
             for (String item : data) {
@@ -887,68 +890,68 @@ public class DataProcessingSystem {
                 allProcessed.add(processed);
             }
         }
-        
+
         long end = System.currentTimeMillis();
         System.out.println(&#34;Sequential time: &#34; + (end - start) + &#34;ms&#34;);
-        
+
         return allProcessed;
     }
-    
+
     // Scenario 2: Parallel processing (fast)
     public CompletableFuture&lt;List&lt;ProcessedData&gt;&gt; processParallel() {
         System.out.println(&#34;\n=== PARALLEL PROCESSING ===&#34;);
         long start = System.currentTimeMillis();
-        
+
         // Fetch from all sources in parallel
         List&lt;CompletableFuture&lt;List&lt;String&gt;&gt;&gt; fetchFutures = dataSources.stream()
             .map(DataSource::fetch)
             .collect(Collectors.toList());
-        
+
         // Wait for all fetches to complete
         CompletableFuture&lt;Void&gt; allFetches = CompletableFuture.allOf(
             fetchFutures.toArray(new CompletableFuture[0])
         );
-        
+
         // Process all fetched data
         return allFetches.thenCompose(v -&gt; {
             List&lt;CompletableFuture&lt;ProcessedData&gt;&gt; processFutures = new ArrayList&lt;&gt;();
-            
+
             for (int i = 0; i &lt; dataSources.size(); i++) {
                 DataSource source = dataSources.get(i);
                 List&lt;String&gt; data = fetchFutures.get(i).join();
-                
+
                 for (String item : data) {
-                    CompletableFuture&lt;ProcessedData&gt; processFuture = 
+                    CompletableFuture&lt;ProcessedData&gt; processFuture =
                         processor.process(source.name(), item);
                     processFutures.add(processFuture);
                 }
             }
-            
+
             CompletableFuture&lt;Void&gt; allProcessed = CompletableFuture.allOf(
                 processFutures.toArray(new CompletableFuture[0])
             );
-            
+
             return allProcessed.thenApply(v2 -&gt; {
                 long end = System.currentTimeMillis();
                 System.out.println(&#34;Parallel time: &#34; + (end - start) + &#34;ms&#34;);
-                
+
                 return processFutures.stream()
                     .map(CompletableFuture::join)
                     .collect(Collectors.toList());
             });
         });
     }
-    
+
     // Scenario 3: Fastest source wins
     public CompletableFuture&lt;List&lt;String&gt;&gt; fetchFastest() {
         System.out.println(&#34;\n=== FETCH FROM FASTEST SOURCE ===&#34;);
         long start = System.currentTimeMillis();
-        
+
         @SuppressWarnings(&#34;unchecked&#34;)
         CompletableFuture&lt;List&lt;String&gt;&gt;[] futures = dataSources.stream()
             .map(DataSource::fetch)
             .toArray(CompletableFuture[]::new);
-        
+
         return (CompletableFuture&lt;List&lt;String&gt;&gt;) CompletableFuture.anyOf(futures)
             .thenApply(result -&gt; {
                 long end = System.currentTimeMillis();
@@ -956,15 +959,15 @@ public class DataProcessingSystem {
                 return (List&lt;String&gt;) result;
             });
     }
-    
+
     // Scenario 4: Error handling and fallbacks
     public CompletableFuture&lt;List&lt;String&gt;&gt; fetchWithFallback() {
         System.out.println(&#34;\n=== FETCH WITH FALLBACK ===&#34;);
-        
+
         DataSource primary = new DataSource(&#34;Primary&#34;, &#34;http://primary.com&#34;, 500);
         DataSource secondary = new DataSource(&#34;Secondary&#34;, &#34;http://secondary.com&#34;, 700);
         DataSource cache = new DataSource(&#34;Cache&#34;, &#34;cache://local&#34;, 100);
-        
+
         return primary.fetch()
             .exceptionally(ex -&gt; {
                 System.out.println(&#34;Primary failed: &#34; + ex.getMessage());
@@ -975,7 +978,7 @@ public class DataProcessingSystem {
                     System.out.println(&#34;✓ Using primary data&#34;);
                     return CompletableFuture.completedFuture(data);
                 }
-                
+
                 System.out.println(&#34;Trying secondary...&#34;);
                 return secondary.fetch();
             })
@@ -988,7 +991,7 @@ public class DataProcessingSystem {
                     System.out.println(&#34;✓ Using secondary data&#34;);
                     return CompletableFuture.completedFuture(data);
                 }
-                
+
                 System.out.println(&#34;Using cache...&#34;);
                 return cache.fetch();
             })
@@ -997,13 +1000,13 @@ public class DataProcessingSystem {
                 return data;
             });
     }
-    
+
     // Scenario 5: Timeout handling
     public CompletableFuture&lt;List&lt;String&gt;&gt; fetchWithTimeout(int timeoutSeconds) {
         System.out.println(&#34;\n=== FETCH WITH TIMEOUT ===&#34;);
-        
+
         DataSource slowSource = new DataSource(&#34;SlowAPI&#34;, &#34;http://slow.com&#34;, 3000);
-        
+
         return slowSource.fetch()
             .orTimeout(timeoutSeconds, TimeUnit.SECONDS)
             .exceptionally(ex -&gt; {
@@ -1014,12 +1017,12 @@ public class DataProcessingSystem {
                 throw new RuntimeException(ex);
             });
     }
-    
+
     // Scenario 6: Complete pipeline
     public void runCompletePipeline() {
         System.out.println(&#34;\n=== COMPLETE PROCESSING PIPELINE ===&#34;);
         long start = System.currentTimeMillis();
-        
+
         CompletableFuture&lt;Statistics&gt; pipeline = processParallel()
             .thenCompose(processedData -&gt; {
                 System.out.println(&#34;\n✓ Processing complete, aggregating...&#34;);
@@ -1044,37 +1047,37 @@ public class DataProcessingSystem {
                     System.out.println(&#34;Total pipeline time: &#34; + (end - start) + &#34;ms&#34;);
                 }
             });
-        
+
         pipeline.join();
     }
-    
+
     public void shutdown() {
         processor.shutdown();
     }
-    
+
     public static void main(String[] args) {
         DataProcessingSystem system = new DataProcessingSystem();
-        
+
         try {
             // Demonstrate different scenarios
-            
+
             // 1. Sequential vs Parallel comparison
             system.processSequentially();
             system.processParallel().join();
-            
+
             // 2. Fastest source
             List&lt;String&gt; fastestData = system.fetchFastest().join();
             System.out.println(&#34;Got &#34; + fastestData.size() + &#34; items from fastest source&#34;);
-            
+
             // 3. Fallback mechanism
             system.fetchWithFallback().join();
-            
+
             // 4. Timeout handling
             system.fetchWithTimeout(2).join();
-            
+
             // 5. Complete pipeline
             system.runCompletePipeline();
-            
+
         } finally {
             system.shutdown();
         }
@@ -1093,7 +1096,7 @@ import java.util.concurrent.atomic.*;
 // Bad: Not thread-safe
 class UnsafeCounter {
     private int count = 0;
-    
+
     public void increment() {
         count++;  // Race condition!
     }
@@ -1102,7 +1105,7 @@ class UnsafeCounter {
 // Good: Thread-safe
 class SafeCounter {
     private final AtomicInteger count = new AtomicInteger(0);
-    
+
     public void increment() {
         count.incrementAndGet();
     }
@@ -1111,7 +1114,7 @@ class SafeCounter {
 // Good: Using synchronized
 class SynchronizedCounter {
     private int count = 0;
-    
+
     public synchronized void increment() {
         count++;
     }
@@ -1238,9 +1241,15 @@ CompletableFuture&lt;String&gt; future = CompletableFuture.supplyAsync(() -&gt; 
 
     <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
     <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
-    <script src="https://storage.googleapis.com/claat-public/prettify.js"></script>
     <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
     <script src="//support.google.com/inapp/api.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js"></script>
+    <script src="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.js"></script>
+    <script>
+        hljs.highlightAll();
+        hljs.addPlugin(new CopyButtonPlugin({ autohide: false }));
+
+    </script>
 
 </body>
 

@@ -11,6 +11,9 @@
         href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
     <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1  /build/styles/monokai.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.css">
     <style>
         .success {
             color: #1e8e3e;
@@ -23,8 +26,8 @@
 </head>
 
 <body>
-    <google-codelab-analytics gaid="UA-49880327-14"></google-codelab-analytics>
-    <google-codelab codelab-gaid="" id="orm-spring-data-jpa" title="ORM Concepts &amp; Spring Data JPA"
+    <google-codelab-analytics gaid="UA-49880327-14" ga4id=""></google-codelab-analytics>
+    <google-codelab codelab-gaid="" codelab-ga4id="" id="orm-spring-data-jpa" title="ORM Concepts &amp; Spring Data JPA"
         environment="web" feedback-link="">
 
         <google-codelab-step label="Introduction" duration="3">
@@ -127,7 +130,7 @@ public Task findById(Long id) {
     PreparedStatement stmt = connection.prepareStatement(sql);
     stmt.setLong(1, id);
     ResultSet rs = stmt.executeQuery();
-    
+
     Task task = new Task();
     if (rs.next()) {
         task.setId(rs.getLong(&#34;id&#34;));
@@ -194,20 +197,20 @@ Database (H2, PostgreSQL, MySQL)
             <pre><code language="language-yaml" class="language-yaml">spring:
   application:
     name: task-manager
-  
+
   # H2 Database
   datasource:
     url: jdbc:h2:mem:taskdb
     driver-class-name: org.h2.Driver
     username: sa
     password:
-  
+
   # H2 Console
   h2:
     console:
       enabled: true
       path: /h2-console
-  
+
   # JPA/Hibernate
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
@@ -233,7 +236,7 @@ logging:
     driver-class-name: org.postgresql.Driver
     username: postgres
     password: your_password
-  
+
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
@@ -287,25 +290,25 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Task {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     @Column(nullable = false, length = 100)
     private String title;
-    
+
     @Column(length = 500)
     private String description;
-    
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private TaskStatus status;
-    
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = &#34;user_id&#34;)
     private User assignedTo;
-    
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
         name = &#34;task_categories&#34;,
@@ -313,15 +316,15 @@ public class Task {
         inverseJoinColumns = @JoinColumn(name = &#34;category_id&#34;)
     )
     private Set&lt;Category&gt; categories = new HashSet&lt;&gt;();
-    
+
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
-    
+
     @UpdateTimestamp
     @Column(nullable = false)
     private LocalDateTime updatedAt;
-    
+
     // Constructor for basic task creation
     public Task(String title, String description) {
         this.title = title;
@@ -349,27 +352,27 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     @Column(nullable = false, unique = true, length = 50)
     private String username;
-    
+
     @Column(nullable = false, unique = true, length = 100)
     private String email;
-    
+
     @Column(nullable = false, length = 100)
     private String fullName;
-    
+
     @OneToMany(mappedBy = &#34;assignedTo&#34;, cascade = CascadeType.ALL, orphanRemoval = true)
     private List&lt;Task&gt; tasks = new ArrayList&lt;&gt;();
-    
+
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
-    
+
     public User(String username, String email, String fullName) {
         this.username = username;
         this.email = email;
@@ -394,20 +397,20 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Category {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     @Column(nullable = false, unique = true, length = 50)
     private String name;
-    
+
     @Column(length = 255)
     private String description;
-    
+
     @ManyToMany(mappedBy = &#34;categories&#34;)
     private Set&lt;Task&gt; tasks = new HashSet&lt;&gt;();
-    
+
     public Category(String name, String description) {
         this.name = name;
         this.description = description;
@@ -516,46 +519,46 @@ import java.util.List;
 
 @Repository
 public interface TaskRepository extends JpaRepository&lt;Task, Long&gt; {
-    
+
     // Derived query methods (Spring Data generates SQL automatically)
-    
+
     List&lt;Task&gt; findByStatus(TaskStatus status);
-    
+
     List&lt;Task&gt; findByAssignedToId(Long userId);
-    
+
     List&lt;Task&gt; findByTitleContainingIgnoreCase(String title);
-    
+
     List&lt;Task&gt; findByStatusAndAssignedToId(TaskStatus status, Long userId);
-    
+
     List&lt;Task&gt; findByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
-    
+
     Page&lt;Task&gt; findByStatus(TaskStatus status, Pageable pageable);
-    
+
     long countByStatus(TaskStatus status);
-    
+
     boolean existsByTitleAndAssignedToId(String title, Long userId);
-    
+
     // Custom JPQL queries
-    
+
     @Query(&#34;SELECT t FROM Task t WHERE t.status = :status AND t.assignedTo.id = :userId&#34;)
     List&lt;Task&gt; findTasksByStatusAndUser(
         @Param(&#34;status&#34;) TaskStatus status,
         @Param(&#34;userId&#34;) Long userId
     );
-    
+
     @Query(&#34;SELECT t FROM Task t LEFT JOIN FETCH t.categories WHERE t.id = :id&#34;)
     Task findByIdWithCategories(@Param(&#34;id&#34;) Long id);
-    
+
     @Query(&#34;SELECT t FROM Task t LEFT JOIN FETCH t.assignedTo WHERE t.status = :status&#34;)
     List&lt;Task&gt; findByStatusWithUser(@Param(&#34;status&#34;) TaskStatus status);
-    
+
     // Native SQL query
-    
+
     @Query(value = &#34;SELECT * FROM tasks t WHERE t.created_at &gt; :date&#34;, nativeQuery = true)
     List&lt;Task&gt; findRecentTasks(@Param(&#34;date&#34;) LocalDateTime date);
-    
+
     // Aggregation query
-    
+
     @Query(&#34;SELECT t.status, COUNT(t) FROM Task t GROUP BY t.status&#34;)
     List&lt;Object[]&gt; countTasksByStatus();
 }
@@ -572,15 +575,15 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository&lt;User, Long&gt; {
-    
+
     Optional&lt;User&gt; findByUsername(String username);
-    
+
     Optional&lt;User&gt; findByEmail(String email);
-    
+
     boolean existsByUsername(String username);
-    
+
     boolean existsByEmail(String email);
-    
+
     @Query(&#34;SELECT u FROM User u LEFT JOIN FETCH u.tasks WHERE u.id = :id&#34;)
     Optional&lt;User&gt; findByIdWithTasks(Long id);
 }
@@ -596,9 +599,9 @@ import java.util.Optional;
 
 @Repository
 public interface CategoryRepository extends JpaRepository&lt;Category, Long&gt; {
-    
+
     Optional&lt;Category&gt; findByName(String name);
-    
+
     boolean existsByName(String name);
 }
 </code></pre>
@@ -691,11 +694,11 @@ import java.util.Set;
 @Slf4j
 @Transactional(readOnly = true)
 public class TaskService {
-    
+
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
-    
+
     public TaskService(TaskRepository taskRepository,
                        UserRepository userRepository,
                        CategoryRepository categoryRepository) {
@@ -704,133 +707,133 @@ public class TaskService {
         this.categoryRepository = categoryRepository;
         log.info(&#34;TaskService initialized with JPA repositories&#34;);
     }
-    
+
     @Transactional
     public Task createTask(Task task) {
         log.debug(&#34;Creating new task: {}&#34;, task.getTitle());
-        
+
         if (task.getTitle() == null || task.getTitle().isBlank()) {
             throw new InvalidTaskException(&#34;Task title cannot be empty&#34;);
         }
-        
+
         if (task.getStatus() == null) {
             task.setStatus(TaskStatus.TODO);
         }
-        
+
         Task savedTask = taskRepository.save(task);
         log.info(&#34;Task created with ID: {}&#34;, savedTask.getId());
         return savedTask;
     }
-    
+
     public Task getTaskById(Long id) {
         log.debug(&#34;Fetching task with ID: {}&#34;, id);
         return taskRepository.findById(id)
             .orElseThrow(() -&gt; new TaskNotFoundException(id));
     }
-    
+
     public List&lt;Task&gt; getAllTasks() {
         log.debug(&#34;Fetching all tasks&#34;);
         List&lt;Task&gt; tasks = taskRepository.findAll();
         log.info(&#34;Found {} tasks&#34;, tasks.size());
         return tasks;
     }
-    
+
     public Page&lt;Task&gt; getAllTasks(Pageable pageable) {
-        log.debug(&#34;Fetching tasks page: {}, size: {}&#34;, 
+        log.debug(&#34;Fetching tasks page: {}, size: {}&#34;,
             pageable.getPageNumber(), pageable.getPageSize());
         return taskRepository.findAll(pageable);
     }
-    
+
     @Transactional
     public Task updateTask(Long id, Task taskDetails) {
         log.debug(&#34;Updating task with ID: {}&#34;, id);
-        
+
         Task task = taskRepository.findById(id)
             .orElseThrow(() -&gt; new TaskNotFoundException(id));
-        
+
         task.setTitle(taskDetails.getTitle());
         task.setDescription(taskDetails.getDescription());
         task.setStatus(taskDetails.getStatus());
-        
+
         Task updatedTask = taskRepository.save(task);
         log.info(&#34;Task updated: {}&#34;, id);
         return updatedTask;
     }
-    
+
     @Transactional
     public void deleteTask(Long id) {
         log.debug(&#34;Deleting task with ID: {}&#34;, id);
-        
+
         if (!taskRepository.existsById(id)) {
             throw new TaskNotFoundException(id);
         }
-        
+
         taskRepository.deleteById(id);
         log.info(&#34;Task deleted: {}&#34;, id);
     }
-    
+
     @Transactional
     public Task updateTaskStatus(Long id, TaskStatus status) {
         log.debug(&#34;Updating task {} status to {}&#34;, id, status);
-        
+
         Task task = taskRepository.findById(id)
             .orElseThrow(() -&gt; new TaskNotFoundException(id));
-        
+
         task.setStatus(status);
         return taskRepository.save(task);
     }
-    
+
     public List&lt;Task&gt; getTasksByStatus(TaskStatus status) {
         log.debug(&#34;Fetching tasks with status: {}&#34;, status);
         return taskRepository.findByStatus(status);
     }
-    
+
     public Page&lt;Task&gt; getTasksByStatus(TaskStatus status, Pageable pageable) {
         log.debug(&#34;Fetching tasks with status: {} (paginated)&#34;, status);
         return taskRepository.findByStatus(status, pageable);
     }
-    
+
     public List&lt;Task&gt; getTasksByUser(Long userId) {
         log.debug(&#34;Fetching tasks for user: {}&#34;, userId);
         return taskRepository.findByAssignedToId(userId);
     }
-    
+
     public List&lt;Task&gt; searchTasks(String keyword) {
         log.debug(&#34;Searching tasks with keyword: {}&#34;, keyword);
         return taskRepository.findByTitleContainingIgnoreCase(keyword);
     }
-    
+
     @Transactional
     public Task assignTaskToUser(Long taskId, Long userId) {
         log.debug(&#34;Assigning task {} to user {}&#34;, taskId, userId);
-        
+
         Task task = taskRepository.findById(taskId)
             .orElseThrow(() -&gt; new TaskNotFoundException(taskId));
-        
+
         User user = userRepository.findById(userId)
             .orElseThrow(() -&gt; new RuntimeException(&#34;User not found with id: &#34; + userId));
-        
+
         task.setAssignedTo(user);
         return taskRepository.save(task);
     }
-    
+
     @Transactional
     public Task addCategoriesToTask(Long taskId, Set&lt;Long&gt; categoryIds) {
         log.debug(&#34;Adding {} categories to task {}&#34;, categoryIds.size(), taskId);
-        
+
         Task task = taskRepository.findById(taskId)
             .orElseThrow(() -&gt; new TaskNotFoundException(taskId));
-        
+
         Set&lt;Category&gt; categories = Set.copyOf(categoryRepository.findAllById(categoryIds));
         task.getCategories().addAll(categories);
-        
+
         return taskRepository.save(task);
     }
-    
+
     public long countTasksByStatus(TaskStatus status) {
         return taskRepository.countByStatus(status);
     }
-    
+
     public List&lt;Task&gt; getRecentTasks(int days) {
         LocalDateTime since = LocalDateTime.now().minusDays(days);
         return taskRepository.findByCreatedAtBetween(since, LocalDateTime.now());
@@ -852,42 +855,42 @@ import java.util.List;
 @Slf4j
 @Transactional(readOnly = true)
 public class UserService {
-    
+
     private final UserRepository userRepository;
-    
+
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
-    
+
     @Transactional
     public User createUser(User user) {
         log.debug(&#34;Creating user: {}&#34;, user.getUsername());
-        
+
         if (userRepository.existsByUsername(user.getUsername())) {
             throw new RuntimeException(&#34;Username already exists: &#34; + user.getUsername());
         }
-        
+
         if (userRepository.existsByEmail(user.getEmail())) {
             throw new RuntimeException(&#34;Email already exists: &#34; + user.getEmail());
         }
-        
+
         return userRepository.save(user);
     }
-    
+
     public User getUserById(Long id) {
         return userRepository.findById(id)
             .orElseThrow(() -&gt; new RuntimeException(&#34;User not found with id: &#34; + id));
     }
-    
+
     public User getUserByUsername(String username) {
         return userRepository.findByUsername(username)
             .orElseThrow(() -&gt; new RuntimeException(&#34;User not found with username: &#34; + username));
     }
-    
+
     public List&lt;User&gt; getAllUsers() {
         return userRepository.findAll();
     }
-    
+
     @Transactional
     public void deleteUser(Long id) {
         if (!userRepository.existsById(id)) {
@@ -912,34 +915,34 @@ import java.util.List;
 @Slf4j
 @Transactional(readOnly = true)
 public class CategoryService {
-    
+
     private final CategoryRepository categoryRepository;
-    
+
     public CategoryService(CategoryRepository categoryRepository) {
         this.categoryRepository = categoryRepository;
     }
-    
+
     @Transactional
     public Category createCategory(Category category) {
         log.debug(&#34;Creating category: {}&#34;, category.getName());
-        
+
         if (categoryRepository.existsByName(category.getName())) {
             throw new RuntimeException(&#34;Category already exists: &#34; + category.getName());
         }
-        
+
         return categoryRepository.save(category);
     }
-    
+
     public Category getCategoryById(Long id) {
         return categoryRepository.findById(id)
             .orElseThrow(() -&gt; new RuntimeException(&#34;Category not found with id: &#34; + id));
     }
-    
+
     public Category getCategoryByName(String name) {
         return categoryRepository.findByName(name)
             .orElseThrow(() -&gt; new RuntimeException(&#34;Category not found: &#34; + name));
     }
-    
+
     public List&lt;Category&gt; getAllCategories() {
         return categoryRepository.findAll();
     }
@@ -948,13 +951,13 @@ public class CategoryService {
             <h2 is-upgraded>Understanding @Transactional</h2>
             <pre><code language="language-java" class="language-java">@Transactional(readOnly = true)  // Class level: all methods read-only
 public class TaskService {
-    
+
     @Transactional  // Override: this method needs write access
     public Task createTask(Task task) {
         // Will commit changes to database
         return taskRepository.save(task);
     }
-    
+
     // Inherits readOnly = true from class
     public List&lt;Task&gt; getAllTasks() {
         return taskRepository.findAll();
@@ -998,13 +1001,13 @@ import java.util.List;
 @Tag(name = &#34;User Management&#34;)
 @Slf4j
 public class UserController {
-    
+
     private final UserService userService;
-    
+
     public UserController(UserService userService) {
         this.userService = userService;
     }
-    
+
     @Operation(summary = &#34;Create a new user&#34;)
     @PostMapping
     public ResponseEntity&lt;User&gt; createUser(@RequestBody User user) {
@@ -1013,28 +1016,28 @@ public class UserController {
         URI location = URI.create(&#34;/api/users/&#34; + createdUser.getId());
         return ResponseEntity.created(location).body(createdUser);
     }
-    
+
     @Operation(summary = &#34;Get all users&#34;)
     @GetMapping
     public ResponseEntity&lt;List&lt;User&gt;&gt; getAllUsers() {
         log.info(&#34;GET /api/users&#34;);
         return ResponseEntity.ok(userService.getAllUsers());
     }
-    
+
     @Operation(summary = &#34;Get user by ID&#34;)
     @GetMapping(&#34;/{id}&#34;)
     public ResponseEntity&lt;User&gt; getUserById(@PathVariable Long id) {
         log.info(&#34;GET /api/users/{}&#34;, id);
         return ResponseEntity.ok(userService.getUserById(id));
     }
-    
+
     @Operation(summary = &#34;Get user by username&#34;)
     @GetMapping(&#34;/username/{username}&#34;)
     public ResponseEntity&lt;User&gt; getUserByUsername(@PathVariable String username) {
         log.info(&#34;GET /api/users/username/{}&#34;, username);
         return ResponseEntity.ok(userService.getUserByUsername(username));
     }
-    
+
     @Operation(summary = &#34;Delete user&#34;)
     @DeleteMapping(&#34;/{id}&#34;)
     public ResponseEntity&lt;Void&gt; deleteUser(@PathVariable Long id) {
@@ -1063,13 +1066,13 @@ import java.util.List;
 @Tag(name = &#34;Category Management&#34;)
 @Slf4j
 public class CategoryController {
-    
+
     private final CategoryService categoryService;
-    
+
     public CategoryController(CategoryService categoryService) {
         this.categoryService = categoryService;
     }
-    
+
     @Operation(summary = &#34;Create a new category&#34;)
     @PostMapping
     public ResponseEntity&lt;Category&gt; createCategory(@RequestBody Category category) {
@@ -1078,14 +1081,14 @@ public class CategoryController {
         URI location = URI.create(&#34;/api/categories/&#34; + created.getId());
         return ResponseEntity.created(location).body(created);
     }
-    
+
     @Operation(summary = &#34;Get all categories&#34;)
     @GetMapping
     public ResponseEntity&lt;List&lt;Category&gt;&gt; getAllCategories() {
         log.info(&#34;GET /api/categories&#34;);
         return ResponseEntity.ok(categoryService.getAllCategories());
     }
-    
+
     @Operation(summary = &#34;Get category by ID&#34;)
     @GetMapping(&#34;/{id}&#34;)
     public ResponseEntity&lt;Category&gt; getCategoryById(@PathVariable Long id) {
@@ -1289,9 +1292,15 @@ git tag codelab-3.3
 
     <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
     <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
-    <script src="https://storage.googleapis.com/claat-public/prettify.js"></script>
     <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
     <script src="//support.google.com/inapp/api.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js"></script>
+    <script src="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.js"></script>
+    <script>
+        hljs.highlightAll();
+        hljs.addPlugin(new CopyButtonPlugin({ autohide: false }));
+
+    </script>
 
 </body>
 

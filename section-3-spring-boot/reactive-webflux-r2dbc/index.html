@@ -11,6 +11,9 @@
         href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
     <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1  /build/styles/monokai.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.css">
     <style>
         .success {
             color: #1e8e3e;
@@ -23,9 +26,9 @@
 </head>
 
 <body>
-    <google-codelab-analytics gaid="UA-49880327-14"></google-codelab-analytics>
-    <google-codelab codelab-gaid="" id="reactive-webflux-r2dbc" title="Reactive Programming with WebFlux &amp; R2DBC"
-        environment="web" feedback-link="">
+    <google-codelab-analytics gaid="UA-49880327-14" ga4id=""></google-codelab-analytics>
+    <google-codelab codelab-gaid="" codelab-ga4id="" id="reactive-webflux-r2dbc"
+        title="Reactive Programming with WebFlux &amp; R2DBC" environment="web" feedback-link="">
 
         <google-codelab-step label="Introduction" duration="3">
             <p>Transform the blocking Task Management API into a fully reactive, non-blocking application using Spring
@@ -224,12 +227,12 @@ Thread Pool → Response
 Flux&lt;String&gt; titles = flux.map(Task::getTitle);
 
 // flatMap: Transform to Publisher and flatten
-Flux&lt;User&gt; users = flux.flatMap(task -&gt; 
+Flux&lt;User&gt; users = flux.flatMap(task -&gt;
     userRepository.findById(task.getUserId())
 );
 
 // filter: Keep elements matching predicate
-Flux&lt;Task&gt; todoTasks = flux.filter(task -&gt; 
+Flux&lt;Task&gt; todoTasks = flux.filter(task -&gt;
     task.getStatus() == TaskStatus.TODO
 );
 
@@ -246,7 +249,7 @@ Flux&lt;Task&gt; all = Flux.merge(flux1, flux2);
 Mono&lt;List&lt;Task&gt;&gt; list = flux.collectList();
 
 // flatMapMany: Mono → Flux
-Flux&lt;Task&gt; tasks = userMono.flatMapMany(user -&gt; 
+Flux&lt;Task&gt; tasks = userMono.flatMapMany(user -&gt;
     taskRepository.findByUserId(user.getId())
 );
 </code></pre>
@@ -330,13 +333,13 @@ Solution: Backpressure
             <pre><code language="language-yaml" class="language-yaml">spring:
   application:
     name: task-manager-reactive
-  
+
   # R2DBC Configuration (H2)
   r2dbc:
     url: r2dbc:h2:mem:///taskdb?options=DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
     username: sa
     password:
-  
+
   # H2 Console (optional, for debugging)
   h2:
     console:
@@ -440,15 +443,15 @@ import org.springframework.r2dbc.connection.init.ResourceDatabasePopulator;
 
 @Configuration
 public class R2dbcConfig {
-    
+
     @Bean
     public ConnectionFactoryInitializer initializer(ConnectionFactory connectionFactory) {
         ConnectionFactoryInitializer initializer = new ConnectionFactoryInitializer();
         initializer.setConnectionFactory(connectionFactory);
-        
+
         ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
         populator.addScript(new ClassPathResource(&#34;schema.sql&#34;));
-        
+
         initializer.setDatabasePopulator(populator);
         return initializer;
     }
@@ -482,31 +485,31 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Task {
-    
+
     @Id
     private Long id;
-    
+
     @Column(&#34;title&#34;)
     private String title;
-    
+
     @Column(&#34;description&#34;)
     private String description;
-    
+
     @Column(&#34;status&#34;)
     private TaskStatus status;
-    
+
     @Column(&#34;user_id&#34;)
     private Long userId;
-    
+
     @Version
     private Long version;
-    
+
     @Column(&#34;created_at&#34;)
     private LocalDateTime createdAt;
-    
+
     @Column(&#34;updated_at&#34;)
     private LocalDateTime updatedAt;
-    
+
     public Task(String title, String description) {
         this.title = title;
         this.description = description;
@@ -546,32 +549,32 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {
-    
+
     @Id
     private Long id;
-    
+
     @Column(&#34;username&#34;)
     private String username;
-    
+
     @Column(&#34;email&#34;)
     private String email;
-    
+
     @Column(&#34;full_name&#34;)
     private String fullName;
-    
+
     @Column(&#34;password&#34;)
     private String password;
-    
+
     @Column(&#34;enabled&#34;)
     private Boolean enabled = true;
-    
+
     @Column(&#34;created_at&#34;)
     private LocalDateTime createdAt;
-    
+
     // Roles loaded separately (no direct mapping in R2DBC)
     @Transient
     private Set&lt;String&gt; roles = new HashSet&lt;&gt;();
-    
+
     public User(String username, String email, String fullName, String password) {
         this.username = username;
         this.email = email;
@@ -598,16 +601,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Category {
-    
+
     @Id
     private Long id;
-    
+
     @Column(&#34;name&#34;)
     private String name;
-    
+
     @Column(&#34;description&#34;)
     private String description;
-    
+
     public Category(String name, String description) {
         this.name = name;
         this.description = description;
@@ -712,25 +715,25 @@ import reactor.core.publisher.Mono;
 
 @Repository
 public interface TaskRepository extends R2dbcRepository&lt;Task, Long&gt; {
-    
+
     // Derived query methods
     Flux&lt;Task&gt; findByStatus(TaskStatus status);
-    
+
     Flux&lt;Task&gt; findByUserId(Long userId);
-    
+
     Flux&lt;Task&gt; findByTitleContainingIgnoreCase(String title);
-    
+
     Mono&lt;Long&gt; countByStatus(TaskStatus status);
-    
+
     Mono&lt;Boolean&gt; existsByTitleAndUserId(String title, Long userId);
-    
+
     // Custom queries
     @Query(&#34;SELECT * FROM tasks WHERE status = :status AND user_id = :userId&#34;)
     Flux&lt;Task&gt; findByStatusAndUserId(TaskStatus status, Long userId);
-    
+
     @Query(&#34;SELECT * FROM tasks WHERE created_at &gt; :since ORDER BY created_at DESC&#34;)
     Flux&lt;Task&gt; findRecentTasks(String since);
-    
+
     @Query(&#34;DELETE FROM tasks WHERE status = :status&#34;)
     Mono&lt;Void&gt; deleteByStatus(TaskStatus status);
 }
@@ -747,15 +750,15 @@ import reactor.core.publisher.Mono;
 
 @Repository
 public interface UserRepository extends R2dbcRepository&lt;User, Long&gt; {
-    
+
     Mono&lt;User&gt; findByUsername(String username);
-    
+
     Mono&lt;User&gt; findByEmail(String email);
-    
+
     Mono&lt;Boolean&gt; existsByUsername(String username);
-    
+
     Mono&lt;Boolean&gt; existsByEmail(String email);
-    
+
     @Query(&#34;SELECT r.role FROM user_roles r WHERE r.user_id = :userId&#34;)
     Flux&lt;String&gt; findRolesByUserId(Long userId);
 }
@@ -771,13 +774,13 @@ import reactor.core.publisher.Mono;
 
 @Repository
 public interface UserRoleRepository extends ReactiveCrudRepository&lt;UserRole, Long&gt; {
-    
+
     @Query(&#34;INSERT INTO user_roles (user_id, role) VALUES (:userId, :role)&#34;)
     Mono&lt;Void&gt; insertRole(Long userId, String role);
-    
+
     @Query(&#34;DELETE FROM user_roles WHERE user_id = :userId AND role = :role&#34;)
     Mono&lt;Void&gt; deleteRole(Long userId, String role);
-    
+
     @Query(&#34;SELECT role FROM user_roles WHERE user_id = :userId&#34;)
     Flux&lt;String&gt; findRolesByUserId(Long userId);
 }
@@ -792,9 +795,9 @@ import reactor.core.publisher.Mono;
 
 @Repository
 public interface CategoryRepository extends R2dbcRepository&lt;Category, Long&gt; {
-    
+
     Mono&lt;Category&gt; findByName(String name);
-    
+
     Mono&lt;Boolean&gt; existsByName(String name);
 }
 </code></pre>
@@ -839,45 +842,45 @@ import java.time.LocalDateTime;
 @Service
 @Slf4j
 public class TaskService {
-    
+
     private final TaskRepository taskRepository;
-    
+
     public TaskService(TaskRepository taskRepository) {
         this.taskRepository = taskRepository;
     }
-    
+
     public Mono&lt;Task&gt; createTask(Task task) {
         log.debug(&#34;Creating task: {}&#34;, task.getTitle());
-        
+
         task.setCreatedAt(LocalDateTime.now());
         task.setUpdatedAt(LocalDateTime.now());
-        
+
         if (task.getStatus() == null) {
             task.setStatus(TaskStatus.TODO);
         }
-        
+
         return taskRepository.save(task)
             .doOnSuccess(saved -&gt; log.info(&#34;Task created with ID: {}&#34;, saved.getId()))
             .doOnError(error -&gt; log.error(&#34;Error creating task: {}&#34;, error.getMessage()));
     }
-    
+
     public Mono&lt;Task&gt; getTaskById(Long id) {
         log.debug(&#34;Fetching task: {}&#34;, id);
-        
+
         return taskRepository.findById(id)
             .switchIfEmpty(Mono.error(new TaskNotFoundException(id)))
             .doOnSuccess(task -&gt; log.debug(&#34;Found task: {}&#34;, task.getTitle()));
     }
-    
+
     public Flux&lt;Task&gt; getAllTasks() {
         log.debug(&#34;Fetching all tasks&#34;);
         return taskRepository.findAll()
             .doOnComplete(() -&gt; log.debug(&#34;Fetched all tasks&#34;));
     }
-    
+
     public Mono&lt;Task&gt; updateTask(Long id, Task taskDetails) {
         log.debug(&#34;Updating task: {}&#34;, id);
-        
+
         return taskRepository.findById(id)
             .switchIfEmpty(Mono.error(new TaskNotFoundException(id)))
             .flatMap(task -&gt; {
@@ -889,10 +892,10 @@ public class TaskService {
             })
             .doOnSuccess(updated -&gt; log.info(&#34;Task updated: {}&#34;, id));
     }
-    
+
     public Mono&lt;Void&gt; deleteTask(Long id) {
         log.debug(&#34;Deleting task: {}&#34;, id);
-        
+
         return taskRepository.existsById(id)
             .flatMap(exists -&gt; {
                 if (!exists) {
@@ -902,10 +905,10 @@ public class TaskService {
             })
             .doOnSuccess(v -&gt; log.info(&#34;Task deleted: {}&#34;, id));
     }
-    
+
     public Mono&lt;Task&gt; updateTaskStatus(Long id, TaskStatus status) {
         log.debug(&#34;Updating task {} status to {}&#34;, id, status);
-        
+
         return taskRepository.findById(id)
             .switchIfEmpty(Mono.error(new TaskNotFoundException(id)))
             .flatMap(task -&gt; {
@@ -914,25 +917,25 @@ public class TaskService {
                 return taskRepository.save(task);
             });
     }
-    
+
     public Flux&lt;Task&gt; getTasksByStatus(TaskStatus status) {
         log.debug(&#34;Fetching tasks with status: {}&#34;, status);
         return taskRepository.findByStatus(status);
     }
-    
+
     public Flux&lt;Task&gt; getTasksByUser(Long userId) {
         log.debug(&#34;Fetching tasks for user: {}&#34;, userId);
         return taskRepository.findByUserId(userId);
     }
-    
+
     public Flux&lt;Task&gt; searchTasks(String keyword) {
         log.debug(&#34;Searching tasks with keyword: {}&#34;, keyword);
         return taskRepository.findByTitleContainingIgnoreCase(keyword);
     }
-    
+
     public Mono&lt;Task&gt; assignTaskToUser(Long taskId, Long userId) {
         log.debug(&#34;Assigning task {} to user {}&#34;, taskId, userId);
-        
+
         return taskRepository.findById(taskId)
             .switchIfEmpty(Mono.error(new TaskNotFoundException(taskId)))
             .flatMap(task -&gt; {
@@ -941,16 +944,16 @@ public class TaskService {
                 return taskRepository.save(task);
             });
     }
-    
+
     public Mono&lt;Long&gt; countTasksByStatus(TaskStatus status) {
         return taskRepository.countByStatus(status);
     }
-    
+
     public Flux&lt;Task&gt; getRecentTasks(int days) {
         LocalDateTime since = LocalDateTime.now().minusDays(days);
         return taskRepository.findRecentTasks(since.toString());
     }
-    
+
     // Reactive batch operation
     public Flux&lt;Task&gt; createMultipleTasks(Flux&lt;Task&gt; tasks) {
         return tasks
@@ -983,11 +986,11 @@ import java.time.LocalDateTime;
 @Service
 @Slf4j
 public class UserService {
-    
+
     private final UserRepository userRepository;
     private final UserRoleRepository userRoleRepository;
     private final PasswordEncoder passwordEncoder;
-    
+
     public UserService(UserRepository userRepository,
                        UserRoleRepository userRoleRepository,
                        PasswordEncoder passwordEncoder) {
@@ -995,10 +998,10 @@ public class UserService {
         this.userRoleRepository = userRoleRepository;
         this.passwordEncoder = passwordEncoder;
     }
-    
+
     public Mono&lt;User&gt; registerUser(User user) {
         log.debug(&#34;Registering user: {}&#34;, user.getUsername());
-        
+
         return userRepository.existsByUsername(user.getUsername())
             .flatMap(exists -&gt; {
                 if (exists) {
@@ -1010,11 +1013,11 @@ public class UserService {
                 if (exists) {
                     return Mono.error(new RuntimeException(&#34;Email already exists&#34;));
                 }
-                
+
                 user.setPassword(passwordEncoder.encode(user.getPassword()));
                 user.setCreatedAt(LocalDateTime.now());
                 user.setEnabled(true);
-                
+
                 return userRepository.save(user);
             })
             .flatMap(savedUser -&gt; {
@@ -1024,24 +1027,24 @@ public class UserService {
             })
             .doOnSuccess(u -&gt; log.info(&#34;User registered: {}&#34;, u.getUsername()));
     }
-    
+
     public Mono&lt;User&gt; getUserById(Long id) {
         return userRepository.findById(id)
             .switchIfEmpty(Mono.error(new RuntimeException(&#34;User not found&#34;)))
             .flatMap(this::loadUserRoles);
     }
-    
+
     public Mono&lt;User&gt; getUserByUsername(String username) {
         return userRepository.findByUsername(username)
             .switchIfEmpty(Mono.error(new RuntimeException(&#34;User not found&#34;)))
             .flatMap(this::loadUserRoles);
     }
-    
+
     public Flux&lt;User&gt; getAllUsers() {
         return userRepository.findAll()
             .flatMap(this::loadUserRoles);
     }
-    
+
     public Mono&lt;Void&gt; deleteUser(Long id) {
         return userRepository.existsById(id)
             .flatMap(exists -&gt; {
@@ -1051,7 +1054,7 @@ public class UserService {
                 return userRepository.deleteById(id);
             });
     }
-    
+
     // Helper: Load user roles
     private Mono&lt;User&gt; loadUserRoles(User user) {
         return userRoleRepository.findRolesByUserId(user.getId())
@@ -1132,32 +1135,32 @@ import java.util.Map;
 @SecurityRequirement(name = &#34;bearer-jwt&#34;)
 @Slf4j
 public class TaskController {
-    
+
     private final TaskService taskService;
-    
+
     public TaskController(TaskService taskService) {
         this.taskService = taskService;
     }
-    
+
     @Operation(summary = &#34;Create a new task&#34;)
     @PostMapping
     public Mono&lt;ResponseEntity&lt;TaskResponse&gt;&gt; createTask(
             @Valid @RequestBody CreateTaskRequest request) {
-        
+
         log.info(&#34;POST /api/tasks - Creating task: {}&#34;, request.getTitle());
-        
+
         Task task = new Task();
         task.setTitle(request.getTitle());
         task.setDescription(request.getDescription());
         task.setStatus(request.getStatus() != null ? request.getStatus() : TaskStatus.TODO);
-        
+
         return taskService.createTask(task)
             .map(TaskResponse::new)
             .map(response -&gt; ResponseEntity
                 .created(URI.create(&#34;/api/tasks/&#34; + response.getId()))
                 .body(response));
     }
-    
+
     @Operation(summary = &#34;Get all tasks&#34;)
     @GetMapping
     public Flux&lt;TaskResponse&gt; getAllTasks() {
@@ -1165,7 +1168,7 @@ public class TaskController {
         return taskService.getAllTasks()
             .map(TaskResponse::new);
     }
-    
+
     @Operation(summary = &#34;Get task by ID&#34;)
     @GetMapping(&#34;/{id}&#34;)
     public Mono&lt;ResponseEntity&lt;TaskResponse&gt;&gt; getTaskById(@PathVariable Long id) {
@@ -1175,25 +1178,25 @@ public class TaskController {
             .map(ResponseEntity::ok)
             .defaultIfEmpty(ResponseEntity.notFound().build());
     }
-    
+
     @Operation(summary = &#34;Update task&#34;)
     @PutMapping(&#34;/{id}&#34;)
     public Mono&lt;ResponseEntity&lt;TaskResponse&gt;&gt; updateTask(
             @PathVariable Long id,
             @Valid @RequestBody UpdateTaskRequest request) {
-        
+
         log.info(&#34;PUT /api/tasks/{}&#34;, id);
-        
+
         Task task = new Task();
         task.setTitle(request.getTitle());
         task.setDescription(request.getDescription());
         task.setStatus(request.getStatus());
-        
+
         return taskService.updateTask(id, task)
             .map(TaskResponse::new)
             .map(ResponseEntity::ok);
     }
-    
+
     @Operation(summary = &#34;Delete task&#34;)
     @DeleteMapping(&#34;/{id}&#34;)
     public Mono&lt;ResponseEntity&lt;Void&gt;&gt; deleteTask(@PathVariable Long id) {
@@ -1201,21 +1204,21 @@ public class TaskController {
         return taskService.deleteTask(id)
             .then(Mono.just(ResponseEntity.noContent().&lt;Void&gt;build()));
     }
-    
+
     @Operation(summary = &#34;Update task status&#34;)
     @PatchMapping(&#34;/{id}/status&#34;)
     public Mono&lt;ResponseEntity&lt;TaskResponse&gt;&gt; updateTaskStatus(
             @PathVariable Long id,
             @RequestBody Map&lt;String, TaskStatus&gt; request) {
-        
+
         log.info(&#34;PATCH /api/tasks/{}/status&#34;, id);
         TaskStatus status = request.get(&#34;status&#34;);
-        
+
         return taskService.updateTaskStatus(id, status)
             .map(TaskResponse::new)
             .map(ResponseEntity::ok);
     }
-    
+
     @Operation(summary = &#34;Get tasks by status&#34;)
     @GetMapping(&#34;/status/{status}&#34;)
     public Flux&lt;TaskResponse&gt; getTasksByStatus(@PathVariable TaskStatus status) {
@@ -1223,7 +1226,7 @@ public class TaskController {
         return taskService.getTasksByStatus(status)
             .map(TaskResponse::new);
     }
-    
+
     @Operation(summary = &#34;Search tasks&#34;)
     @GetMapping(&#34;/search&#34;)
     public Flux&lt;TaskResponse&gt; searchTasks(@RequestParam String keyword) {
@@ -1231,26 +1234,26 @@ public class TaskController {
         return taskService.searchTasks(keyword)
             .map(TaskResponse::new);
     }
-    
+
     @Operation(summary = &#34;Get task statistics&#34;)
     @GetMapping(&#34;/stats&#34;)
     public Mono&lt;Map&lt;TaskStatus, Long&gt;&gt; getTaskStats() {
         log.info(&#34;GET /api/tasks/stats&#34;);
-        
+
         return Flux.fromArray(TaskStatus.values())
-            .flatMap(status -&gt; 
+            .flatMap(status -&gt;
                 taskService.countTasksByStatus(status)
                     .map(count -&gt; Map.entry(status, count))
             )
             .collectMap(Map.Entry::getKey, Map.Entry::getValue);
     }
-    
+
     // Server-Sent Events (SSE) - Real-time task updates
     @Operation(summary = &#34;Stream task updates (SSE)&#34;)
     @GetMapping(value = &#34;/stream&#34;, produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux&lt;TaskResponse&gt; streamTasks() {
         log.info(&#34;GET /api/tasks/stream - SSE connection established&#34;);
-        
+
         return taskService.getAllTasks()
             .map(TaskResponse::new)
             .delayElements(Duration.ofSeconds(1)); // Emit one task per second
@@ -1277,28 +1280,28 @@ import reactor.core.publisher.Mono;
 @Tag(name = &#34;Authentication (Reactive)&#34;)
 @Slf4j
 public class AuthController {
-    
+
     private final AuthService authService;
-    
+
     public AuthController(AuthService authService) {
         this.authService = authService;
     }
-    
+
     @Operation(summary = &#34;User login - Get JWT token&#34;)
     @PostMapping(&#34;/login&#34;)
     public Mono&lt;ResponseEntity&lt;AuthResponse&gt;&gt; login(
             @Valid @RequestBody LoginRequest loginRequest) {
-        
+
         log.info(&#34;POST /api/auth/login - User: {}&#34;, loginRequest.getUsername());
         return authService.login(loginRequest)
             .map(ResponseEntity::ok);
     }
-    
+
     @Operation(summary = &#34;User signup - Register and get JWT token&#34;)
     @PostMapping(&#34;/signup&#34;)
     public Mono&lt;ResponseEntity&lt;AuthResponse&gt;&gt; signup(
             @Valid @RequestBody SignupRequest signupRequest) {
-        
+
         log.info(&#34;POST /api/auth/signup - User: {}&#34;, signupRequest.getUsername());
         return authService.signup(signupRequest)
             .map(ResponseEntity::ok);
@@ -1341,10 +1344,10 @@ import reactor.core.publisher.Mono;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebTestClient
 public class TaskControllerIntegrationTest {
-    
+
     @Autowired
     private WebTestClient webTestClient;
-    
+
     @Test
     public void testCreateTask() {
         CreateTaskRequest request = new CreateTaskRequest(
@@ -1352,7 +1355,7 @@ public class TaskControllerIntegrationTest {
             &#34;Test Description&#34;,
             TaskStatus.TODO
         );
-        
+
         webTestClient.post()
             .uri(&#34;/api/tasks&#34;)
             .contentType(MediaType.APPLICATION_JSON)
@@ -1365,7 +1368,7 @@ public class TaskControllerIntegrationTest {
                 assert response.getStatus() == TaskStatus.TODO;
             });
     }
-    
+
     @Test
     public void testGetAllTasks() {
         webTestClient.get()
@@ -1375,7 +1378,7 @@ public class TaskControllerIntegrationTest {
             .expectBodyList(TaskResponse.class)
             .hasSize(0); // Assuming empty database
     }
-    
+
     @Test
     public void testStreamTasks() {
         webTestClient.get()
@@ -1408,36 +1411,36 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class TaskServiceTest {
-    
+
     @Mock
     private TaskRepository taskRepository;
-    
+
     @InjectMocks
     private TaskService taskService;
-    
+
     @Test
     public void testCreateTask() {
         Task task = new Task(&#34;Test&#34;, &#34;Description&#34;);
         task.setId(1L);
-        
+
         when(taskRepository.save(any(Task.class))).thenReturn(Mono.just(task));
-        
+
         Mono&lt;Task&gt; result = taskService.createTask(task);
-        
+
         StepVerifier.create(result)
             .expectNextMatches(t -&gt; t.getId().equals(1L))
             .verifyComplete();
     }
-    
+
     @Test
     public void testGetAllTasks() {
         Task task1 = new Task(&#34;Task 1&#34;, &#34;Desc 1&#34;);
         Task task2 = new Task(&#34;Task 2&#34;, &#34;Desc 2&#34;);
-        
+
         when(taskRepository.findAll()).thenReturn(Flux.just(task1, task2));
-        
+
         Flux&lt;Task&gt; result = taskService.getAllTasks();
-        
+
         StepVerifier.create(result)
             .expectNext(task1)
             .expectNext(task2)
@@ -1526,9 +1529,15 @@ git tag codelab-3.6
 
     <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
     <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
-    <script src="https://storage.googleapis.com/claat-public/prettify.js"></script>
     <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
     <script src="//support.google.com/inapp/api.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js"></script>
+    <script src="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.js"></script>
+    <script>
+        hljs.highlightAll();
+        hljs.addPlugin(new CopyButtonPlugin({ autohide: false }));
+
+    </script>
 
 </body>
 

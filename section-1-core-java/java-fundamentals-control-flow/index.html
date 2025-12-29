@@ -11,6 +11,9 @@
         href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
     <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1  /build/styles/monokai.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.css">
     <style>
         .success {
             color: #1e8e3e;
@@ -23,8 +26,8 @@
 </head>
 
 <body>
-    <google-codelab-analytics gaid="UA-49880327-14"></google-codelab-analytics>
-    <google-codelab codelab-gaid="" id="java-fundamentals-control-flow"
+    <google-codelab-analytics gaid="UA-49880327-14" ga4id=""></google-codelab-analytics>
+    <google-codelab codelab-gaid="" codelab-ga4id="" id="java-fundamentals-control-flow"
         title="Java Platform, Data Types &amp; Control Flow" environment="web" feedback-link="">
 
         <google-codelab-step label="Introduction" duration="3">
@@ -117,22 +120,8 @@ javac 17.0.1
         <google-codelab-step label="Understanding Java Platform" duration="10">
             <p>Before writing code, let&#39;s understand what makes Java special - its platform architecture.</p>
             <h2 is-upgraded>The Java Ecosystem: JVM, JRE, JDK</h2>
-            <p>Java&#39;s power comes from its three-tier architecture:</p>
-            <pre><code>┌─────────────────────────────────────┐
-│            JDK                       │
-│  ┌──────────────────────────────┐   │
-│  │         JRE                   │   │
-│  │  ┌───────────────────────┐   │   │
-│  │  │       JVM             │   │   │
-│  │  │  - Class Loader       │   │   │
-│  │  │  - Runtime Data Areas │   │   │
-│  │  │  - Execution Engine   │   │   │
-│  │  └───────────────────────┘   │   │
-│  │  + Standard Libraries        │   │
-│  └──────────────────────────────┘   │
-│  + Development Tools (javac, etc)   │
-└─────────────────────────────────────┘
-</code></pre>
+            <p>Java&#39;s power comes from its three-tier architecture: <img alt="alt text"
+                    src="img\\705745bef52006b8.png"></p>
             <p><strong>JVM (Java Virtual Machine):</strong></p>
             <ul>
                 <li>The runtime engine that executes Java bytecode</li>
@@ -1170,9 +1159,15 @@ Enter your choice: 7
 
     <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
     <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
-    <script src="https://storage.googleapis.com/claat-public/prettify.js"></script>
     <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
     <script src="//support.google.com/inapp/api.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js"></script>
+    <script src="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.js"></script>
+    <script>
+        hljs.highlightAll();
+        hljs.addPlugin(new CopyButtonPlugin({ autohide: false }));
+
+    </script>
 
 </body>
 

@@ -11,6 +11,9 @@
         href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
     <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1  /build/styles/monokai.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.css">
     <style>
         .success {
             color: #1e8e3e;
@@ -23,9 +26,9 @@
 </head>
 
 <body>
-    <google-codelab-analytics gaid="UA-49880327-14"></google-codelab-analytics>
-    <google-codelab codelab-gaid="" id="ide-debugging-mastery" title="IDE Debugging Mastery" environment="web"
-        feedback-link="">
+    <google-codelab-analytics gaid="UA-49880327-14" ga4id=""></google-codelab-analytics>
+    <google-codelab codelab-gaid="" codelab-ga4id="" id="ide-debugging-mastery" title="IDE Debugging Mastery"
+        environment="web" feedback-link="">
 
         <google-codelab-step label="Introduction" duration="3">
             <p>Debugging is one of the most critical skills for any developer. While logging helps in production,
@@ -97,7 +100,7 @@
         int result = a + b;  // ← Set breakpoint here
         return result;
     }
-    
+
     public static void main(String[] args) {
         Calculator calc = new Calculator();
         int sum = calc.add(5, 10);  // Execution pauses when this calls add()
@@ -166,15 +169,15 @@
     public static void main(String[] args) {
         // 1. Set line breakpoint here
         int x = 10;
-        
+
         // 2. Set conditional breakpoint: i == 5
         for (int i = 0; i &lt; 10; i++) {
             System.out.println(i);
         }
-        
+
         // 3. Set method breakpoint on calculate()
         int result = calculate(x);
-        
+
         // 4. Exception breakpoint will catch this
         try {
             int error = 10 / 0;
@@ -182,7 +185,7 @@
             e.printStackTrace();
         }
     }
-    
+
     private static int calculate(int value) {
         return value * 2;
     }
@@ -279,32 +282,32 @@ public void processOrder(Order order) {
         Order order = new Order();
         order.addItem(new Item(&#34;Laptop&#34;, 1000.0));
         order.addItem(new Item(&#34;Mouse&#34;, 25.0));
-        
+
         processor.processOrder(order);  // ← Start debugging here
     }
-    
+
     public void processOrder(Order order) {
         System.out.println(&#34;Processing order...&#34;);
-        
+
         // Step Into to see validation logic
         boolean valid = validateOrder(order);
-        
+
         if (valid) {
             // Step Into to see calculation
             double total = calculateTotal(order);
-            
+
             // Step Over - trust this method
             applyDiscount(order, total);
-            
+
             // Step Into to see save logic
             saveOrder(order);
         }
     }
-    
+
     private boolean validateOrder(Order order) {
         return order != null &amp;&amp; !order.getItems().isEmpty();
     }
-    
+
     private double calculateTotal(Order order) {
         double total = 0;
         for (Item item : order.getItems()) {
@@ -313,13 +316,13 @@ public void processOrder(Order order) {
         }
         return total;
     }
-    
+
     private void applyDiscount(Order order, double total) {
         if (total &gt; 500) {
             order.setDiscount(0.1);  // 10% discount
         }
     }
-    
+
     private void saveOrder(Order order) {
         System.out.println(&#34;Order saved: &#34; + order);
     }
@@ -328,7 +331,7 @@ public void processOrder(Order order) {
 class Order {
     private List&lt;Item&gt; items = new ArrayList&lt;&gt;();
     private double discount;
-    
+
     public void addItem(Item item) { items.add(item); }
     public List&lt;Item&gt; getItems() { return items; }
     public void setDiscount(double discount) { this.discount = discount; }
@@ -337,12 +340,12 @@ class Order {
 class Item {
     private String name;
     private double price;
-    
+
     public Item(String name, double price) {
         this.name = name;
         this.price = price;
     }
-    
+
     public double getPrice() { return price; }
 }
 </code></pre>
@@ -374,14 +377,14 @@ class Item {
     double subtotal = order.getSubtotal();     // Visible in Variables
     double taxRate = 0.08;                      // Visible in Variables
     double tax = subtotal * taxRate;            // Visible in Variables
-    
+
     String couponCode = order.getCouponCode();  // Can inspect this
     double discount = 0;
-    
+
     if (couponCode != null) {
         discount = lookupDiscount(couponCode);  // Expand to see object details
     }
-    
+
     double total = subtotal + tax - discount;   // All visible
 }
 </code></pre>
@@ -396,7 +399,7 @@ class Item {
             <pre><code language="language-java" class="language-java">public void processItems(List&lt;Item&gt; items) {
     double total = 0;
     int count = 0;
-    
+
     for (Item item : items) {
         total += item.getPrice();
         count++;
@@ -429,7 +432,7 @@ Math.max(price1, price2)
             <p>Evaluate any Java expression in the current context.</p>
             <pre><code language="language-java" class="language-java">public void complexCalculation(int a, int b, int c) {
     int result = a + b * c;  // ← Set breakpoint here
-    
+
     // Press Alt + F8 (IntelliJ) or Ctrl + Shift + I (Eclipse)
     // Evaluate:
     // - a + b + c
@@ -454,7 +457,7 @@ Math.max(price1, price2)
     // Right-click on &#39;discount&#39; in Variables view
     // Set Value → Enter: 0.20
     // Continue debugging with new value
-    
+
     double total = order.getSubtotal() * (1 - discount);
     order.setTotal(total);
 }
@@ -469,7 +472,7 @@ Math.max(price1, price2)
             <pre><code language="language-java" class="language-java">public void processUser(User user) {
     // Breakpoint here, expand &#39;user&#39; in Variables view
     String name = user.getName();
-    
+
     // You&#39;ll see:
     // user (User)
     //   ├─ id = &#34;12345&#34;
@@ -491,42 +494,42 @@ public class ShoppingCart {
         cart.addItem(&#34;Laptop&#34;, 1000.0, 1);
         cart.addItem(&#34;Mouse&#34;, 25.0, 2);
         cart.addItem(&#34;Keyboard&#34;, 75.0, 1);
-        
+
         double total = cart.calculateTotal();  // ← Breakpoint here
         System.out.println(&#34;Total: $&#34; + total);
     }
-    
+
     private List&lt;CartItem&gt; items = new ArrayList&lt;&gt;();
-    
+
     public void addItem(String name, double price, int quantity) {
         items.add(new CartItem(name, price, quantity));
     }
-    
+
     public double calculateTotal() {
         double total = 0;
-        
+
         for (CartItem item : items) {
             // Breakpoint here
             double itemTotal = item.price * item.quantity;
             total += itemTotal;
-            
+
             // In Variables view, you can see:
             // - item (with all fields)
             // - itemTotal
             // - total (accumulated)
-            
+
             // Add watch: total / items.size() (average so far)
             // Evaluate: item.price * item.quantity * 1.08 (with tax)
         }
-        
+
         return total;
     }
-    
+
     static class CartItem {
         String name;
         double price;
         int quantity;
-        
+
         CartItem(String name, double price, int quantity) {
             this.name = name;
             this.price = price;
@@ -561,20 +564,20 @@ public class ShoppingCart {
 public class MultiThreadedApp {
     public static void main(String[] args) {
         ExecutorService executor = Executors.newFixedThreadPool(3);
-        
+
         for (int i = 0; i &lt; 5; i++) {
             int taskId = i;
             executor.submit(() -&gt; processTask(taskId));
         }
-        
+
         executor.shutdown();
     }
-    
+
     private static void processTask(int taskId) {
         // Breakpoint here - you&#39;ll see multiple threads
-        System.out.println(&#34;Task &#34; + taskId + &#34; on &#34; + 
+        System.out.println(&#34;Task &#34; + taskId + &#34; on &#34; +
             Thread.currentThread().getName());
-        
+
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
@@ -604,12 +607,12 @@ public class MultiThreadedApp {
             </ul>
             <pre><code language="language-java" class="language-java">public class ConcurrentCounter {
     private int count = 0;
-    
+
     public void increment() {
         // Breakpoint with &#34;Suspend All&#34; - all threads freeze
         count++;
     }
-    
+
     public void decrement() {
         // Breakpoint with &#34;Suspend Thread&#34; - only this thread freezes
         count--;
@@ -620,39 +623,39 @@ public class MultiThreadedApp {
             <pre><code language="language-java" class="language-java">public class DeadlockExample {
     private final Object lock1 = new Object();
     private final Object lock2 = new Object();
-    
+
     public void method1() {
         synchronized (lock1) {
             System.out.println(&#34;Thread 1: Holding lock1...&#34;);
             sleep(100);
-            
+
             synchronized (lock2) {  // ← Waiting for lock2
                 System.out.println(&#34;Thread 1: Holding lock1 &amp; lock2&#34;);
             }
         }
     }
-    
+
     public void method2() {
         synchronized (lock2) {
             System.out.println(&#34;Thread 2: Holding lock2...&#34;);
             sleep(100);
-            
+
             synchronized (lock1) {  // ← Waiting for lock1
                 System.out.println(&#34;Thread 2: Holding lock1 &amp; lock2&#34;);
             }
         }
     }
-    
+
     private void sleep(long ms) {
         try { Thread.sleep(ms); } catch (InterruptedException e) {}
     }
-    
+
     public static void main(String[] args) {
         DeadlockExample example = new DeadlockExample();
-        
+
         new Thread(() -&gt; example.method1()).start();
         new Thread(() -&gt; example.method2()).start();
-        
+
         // Debugger will show both threads in BLOCKED state
         // IntelliJ: Run → Dump Threads to see deadlock
     }
@@ -667,28 +670,28 @@ public class MultiThreadedApp {
             <h2 is-upgraded>Race Condition Debugging</h2>
             <pre><code language="language-java" class="language-java">public class RaceConditionExample {
     private int balance = 1000;
-    
+
     public void withdraw(int amount) {
         // Set conditional breakpoint: Thread.currentThread().getName().equals(&#34;Thread-1&#34;)
         if (balance &gt;= amount) {
             // Another thread might execute here before we subtract!
-            System.out.println(Thread.currentThread().getName() + 
+            System.out.println(Thread.currentThread().getName() +
                 &#34; withdrawing &#34; + amount);
             balance -= amount;  // ← Breakpoint here to see race condition
             System.out.println(&#34;New balance: &#34; + balance);
         }
     }
-    
+
     public static void main(String[] args) {
         RaceConditionExample account = new RaceConditionExample();
-        
+
         // Two threads trying to withdraw simultaneously
         Thread t1 = new Thread(() -&gt; account.withdraw(600));
         Thread t2 = new Thread(() -&gt; account.withdraw(600));
-        
+
         t1.start();
         t2.start();
-        
+
         // Without synchronization, balance might go negative!
     }
 }
@@ -706,54 +709,54 @@ import java.util.*;
 
 public class InventoryManager {
     private Map&lt;String, Integer&gt; inventory = new ConcurrentHashMap&lt;&gt;();
-    
+
     public InventoryManager() {
         inventory.put(&#34;LAPTOP&#34;, 10);
         inventory.put(&#34;MOUSE&#34;, 50);
         inventory.put(&#34;KEYBOARD&#34;, 30);
     }
-    
+
     public boolean reserveItem(String productId, int quantity) {
         // Breakpoint here - observe multiple threads
         Integer available = inventory.get(productId);
-        
+
         if (available == null) {
             return false;
         }
-        
+
         // Add watch: Thread.currentThread().getName()
         // Add watch: available &gt;= quantity
-        
+
         if (available &gt;= quantity) {
             // Potential race condition! Another thread might reserve
             // between the check and the update
             try {
                 Thread.sleep(100);  // Simulate processing delay
             } catch (InterruptedException e) {}
-            
+
             inventory.put(productId, available - quantity);
-            System.out.println(Thread.currentThread().getName() + 
+            System.out.println(Thread.currentThread().getName() +
                 &#34; reserved &#34; + quantity + &#34; of &#34; + productId);
             return true;
         }
-        
+
         return false;
     }
-    
+
     public static void main(String[] args) throws InterruptedException {
         InventoryManager manager = new InventoryManager();
         ExecutorService executor = Executors.newFixedThreadPool(3);
-        
+
         // Multiple threads trying to reserve the same item
         for (int i = 0; i &lt; 5; i++) {
             executor.submit(() -&gt; {
                 manager.reserveItem(&#34;LAPTOP&#34;, 3);
             });
         }
-        
+
         executor.shutdown();
         executor.awaitTermination(10, TimeUnit.SECONDS);
-        
+
         System.out.println(&#34;Final inventory: &#34; + manager.inventory);
         // Should be -5 (bug!), but with proper synchronization would be 0
     }
@@ -789,12 +792,12 @@ public class InventoryManager {
     public static void main(String[] args) {
         List&lt;Integer&gt; numbers = Arrays.asList(5, 2, 8, 1, 9, 3);
         int threshold = 5;
-        
+
         // Breakpoint here
         List&lt;Integer&gt; filtered = numbers.stream()
             .filter(n -&gt; n &gt; threshold)
             .collect(Collectors.toList());
-        
+
         System.out.println(filtered);
     }
 }
@@ -836,10 +839,10 @@ numbers.stream().filter(n -&gt; n &gt;= threshold).collect(Collectors.toList())
             <pre><code language="language-java" class="language-java">public void processOrder(Order order) {
     double total = calculateTotal(order);
     double tax = total * 0.08;  // ← Breakpoint here
-    
+
     // Evaluate (Alt + F8):
     // total * 0.10  // Returns: 100.0
-    
+
     // Execute in Debug Console:
     // tax = total * 0.10  // Changes tax variable!
     // System.out.println(&#34;Tax: &#34; + tax)  // Prints to console
@@ -852,13 +855,13 @@ numbers.stream().filter(n -&gt; n &gt;= threshold).collect(Collectors.toList())
         for (int i = 0; i &lt; 10; i++) {
             String message = getMessage(i);  // ← Breakpoint here
             System.out.println(message);
-            
+
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {}
         }
     }
-    
+
     private static String getMessage(int i) {
         return &#34;Count: &#34; + i;  // While paused, change to: &#34;Number: &#34; + i
         // Save file, debugger reloads code!
@@ -896,7 +899,7 @@ private void processItem(Item item) {
     double price = item.getPrice();
     double tax = price * 0.08;
     double total = price + tax;
-    
+
     // Oops, tax calculation is wrong!
     // 1. Right-click on method in call stack
     // 2. &#34;Drop Frame&#34; or &#34;Rerun Frame&#34;
@@ -911,61 +914,61 @@ import java.util.stream.*;
 public class DataProcessor {
     public static void main(String[] args) {
         DataProcessor processor = new DataProcessor();
-        
+
         List&lt;Transaction&gt; transactions = Arrays.asList(
             new Transaction(&#34;T1&#34;, 100.0, &#34;SALE&#34;),
             new Transaction(&#34;T2&#34;, 50.0, &#34;RETURN&#34;),
             new Transaction(&#34;T3&#34;, 200.0, &#34;SALE&#34;),
             new Transaction(&#34;T4&#34;, 75.0, &#34;RETURN&#34;)
         );
-        
+
         // Breakpoint here
         Report report = processor.generateReport(transactions);
         System.out.println(report);
     }
-    
+
     public Report generateReport(List&lt;Transaction&gt; transactions) {
         Report report = new Report();
-        
+
         // Breakpoint here - now use Debug Console
         double totalSales = transactions.stream()
             .filter(t -&gt; t.type.equals(&#34;SALE&#34;))
             .mapToDouble(t -&gt; t.amount)
             .sum();
-        
+
         // In Debug Console, test:
         // transactions.stream().filter(t -&gt; t.type.equals(&#34;RETURN&#34;)).count()
         // transactions.stream().mapToDouble(t -&gt; t.amount).average()
-        
+
         double totalReturns = transactions.stream()
             .filter(t -&gt; t.type.equals(&#34;RETURN&#34;))
             .mapToDouble(t -&gt; t.amount)
             .sum();
-        
+
         report.totalSales = totalSales;
         report.totalReturns = totalReturns;
         report.netSales = totalSales - totalReturns;
-        
+
         return report;
     }
-    
+
     static class Transaction {
         String id;
         double amount;
         String type;
-        
+
         Transaction(String id, double amount, String type) {
             this.id = id;
             this.amount = amount;
             this.type = type;
         }
     }
-    
+
     static class Report {
         double totalSales;
         double totalReturns;
         double netSales;
-        
+
         @Override
         public String toString() {
             return String.format(&#34;Sales: $%.2f, Returns: $%.2f, Net: $%.2f&#34;,
@@ -1055,30 +1058,30 @@ import java.util.concurrent.TimeUnit;
 
 public class RemoteApp {
     private static int counter = 0;
-    
+
     public static void main(String[] args) throws Exception {
         System.out.println(&#34;Remote application started...&#34;);
         System.out.println(&#34;Attach debugger to port 5005&#34;);
-        
+
         while (true) {
             processData();
             Thread.sleep(2000);
         }
     }
-    
+
     private static void processData() {
         counter++;
         System.out.println(&#34;Processing... Count: &#34; + counter);
-        
+
         // Set breakpoint here when debugging remotely
         int result = calculate(counter);
         System.out.println(&#34;Result: &#34; + result);
-        
+
         if (counter % 5 == 0) {
             System.out.println(&#34;Milestone reached!&#34;);
         }
     }
-    
+
     private static int calculate(int value) {
         // Complex calculation - set breakpoint to debug
         return value * 2 + 10;
@@ -1136,13 +1139,13 @@ EXPOSE 5005
 ENTRYPOINT [&#34;java&#34;, &#34;-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005&#34;, &#34;-jar&#34;, &#34;myapp.jar&#34;]
 </code></pre>
             <p><strong>docker-compose.yml:</strong></p>
-            <pre><code language="language-yaml" class="language-yaml">version: &#39;3.8&#39;
+            <pre><code language="language-yaml" class="language-yaml">version: &#34;3.8&#34;
 services:
   app:
     build: .
     ports:
       - &#34;8080:8080&#34;
-      - &#34;5005:5005&#34;  # Debug port
+      - &#34;5005:5005&#34; # Debug port
     environment:
       - JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
 </code></pre>
@@ -1181,38 +1184,38 @@ public class WebService {
         ServerSocket serverSocket = new ServerSocket(port);
         System.out.println(&#34;Server listening on port &#34; + port);
         System.out.println(&#34;Debug on port 5005&#34;);
-        
+
         while (true) {
             Socket client = serverSocket.accept();
             handleClient(client);
         }
     }
-    
+
     private static void handleClient(Socket client) throws Exception {
         BufferedReader in = new BufferedReader(
             new InputStreamReader(client.getInputStream()));
         PrintWriter out = new PrintWriter(client.getOutputStream(), true);
-        
+
         String request = in.readLine();
         System.out.println(&#34;Received: &#34; + request);
-        
+
         // Set breakpoint here for remote debugging
         String response = processRequest(request);
-        
+
         out.println(&#34;HTTP/1.1 200 OK&#34;);
         out.println(&#34;Content-Type: text/plain&#34;);
         out.println();
         out.println(response);
-        
+
         client.close();
     }
-    
+
     private static String processRequest(String request) {
         // Breakpoint here to debug request processing
         if (request == null || request.isEmpty()) {
             return &#34;Empty request&#34;;
         }
-        
+
         return &#34;Processed: &#34; + request.toUpperCase();
     }
 }
@@ -1247,7 +1250,7 @@ class Product {
     String name;
     double price;
     int stock;
-    
+
     Product(String id, String name, double price, int stock) {
         this.id = id;
         this.name = name;
@@ -1259,12 +1262,12 @@ class Product {
 class CartItem {
     Product product;
     int quantity;
-    
+
     CartItem(Product product, int quantity) {
         this.product = product;
         this.quantity = quantity;
     }
-    
+
     double getSubtotal() {
         return product.price * quantity;
     }
@@ -1273,34 +1276,34 @@ class CartItem {
 class ShoppingCart {
     private List&lt;CartItem&gt; items = new ArrayList&lt;&gt;();
     private String couponCode;
-    
+
     public void addItem(Product product, int quantity) {
         // BUG 1: Doesn&#39;t check if product already in cart
         items.add(new CartItem(product, quantity));
     }
-    
+
     public void applyCoupon(String code) {
         this.couponCode = code;
     }
-    
+
     public double calculateTotal() {
         double subtotal = 0;
-        
+
         for (CartItem item : items) {
             subtotal += item.getSubtotal();
         }
-        
+
         double discount = calculateDiscount(subtotal);
         double tax = subtotal * 0.08;  // BUG 2: Tax calculated before discount
-        
+
         return subtotal - discount + tax;
     }
-    
+
     private double calculateDiscount(double subtotal) {
         if (couponCode == null) {
             return 0;
         }
-        
+
         // BUG 3: Logic error in discount calculation
         if (couponCode.equals(&#34;SAVE10&#34;)) {
             return subtotal * 0.10;
@@ -1309,10 +1312,10 @@ class ShoppingCart {
         } else if (couponCode.equals(&#34;FREESHIP&#34;)) {
             return 10.0;  // Free shipping
         }
-        
+
         return 0;
     }
-    
+
     public List&lt;CartItem&gt; getItems() {
         return items;
     }
@@ -1320,37 +1323,37 @@ class ShoppingCart {
 
 class InventoryManager {
     private Map&lt;String, Product&gt; products = new ConcurrentHashMap&lt;&gt;();
-    
+
     public InventoryManager() {
         products.put(&#34;P1&#34;, new Product(&#34;P1&#34;, &#34;Laptop&#34;, 1000.0, 10));
         products.put(&#34;P2&#34;, new Product(&#34;P2&#34;, &#34;Mouse&#34;, 25.0, 50));
         products.put(&#34;P3&#34;, new Product(&#34;P3&#34;, &#34;Keyboard&#34;, 75.0, 30));
     }
-    
+
     public Product getProduct(String id) {
         return products.get(id);
     }
-    
+
     public boolean reserveStock(String productId, int quantity) {
         Product product = products.get(productId);
-        
+
         if (product == null) {
             return false;
         }
-        
+
         // BUG 5: Race condition - not thread-safe
         if (product.stock &gt;= quantity) {
             try {
                 Thread.sleep(50);  // Simulate processing delay
             } catch (InterruptedException e) {}
-            
+
             product.stock -= quantity;
             return true;
         }
-        
+
         return false;
     }
-    
+
     public void restoreStock(String productId, int quantity) {
         Product product = products.get(productId);
         if (product != null) {
@@ -1363,7 +1366,7 @@ class Order {
     String orderId;
     ShoppingCart cart;
     double total;
-    
+
     Order(String orderId, ShoppingCart cart) {
         this.orderId = orderId;
         this.cart = cart;
@@ -1374,32 +1377,32 @@ class Order {
 class OrderProcessor {
     private InventoryManager inventory;
     private List&lt;Order&gt; orders = new ArrayList&lt;&gt;();
-    
+
     public OrderProcessor(InventoryManager inventory) {
         this.inventory = inventory;
     }
-    
+
     public Order processOrder(ShoppingCart cart) {
         // Reserve stock for all items
         for (CartItem item : cart.getItems()) {
             boolean reserved = inventory.reserveStock(
                 item.product.id, item.quantity);
-            
+
             if (!reserved) {
                 // BUG 6: Doesn&#39;t restore previously reserved stock on failure
                 System.out.println(&#34;Failed to reserve: &#34; + item.product.name);
                 return null;
             }
         }
-        
+
         // Create order
         String orderId = &#34;ORD&#34; + (orders.size() + 1);
         Order order = new Order(orderId, cart);
         orders.add(order);
-        
+
         return order;
     }
-    
+
     public List&lt;Order&gt; getOrders() {
         return orders;
     }
@@ -1409,61 +1412,61 @@ public class EcommerceApp {
     public static void main(String[] args) throws Exception {
         InventoryManager inventory = new InventoryManager();
         OrderProcessor orderProcessor = new OrderProcessor(inventory);
-        
+
         // Test 1: Basic order
         System.out.println(&#34;=== Test 1: Basic Order ===&#34;);
         ShoppingCart cart1 = new ShoppingCart();
         cart1.addItem(inventory.getProduct(&#34;P1&#34;), 1);
         cart1.addItem(inventory.getProduct(&#34;P2&#34;), 2);
-        
+
         Order order1 = orderProcessor.processOrder(cart1);
         System.out.println(&#34;Order total: $&#34; + order1.total);
         System.out.println(&#34;Expected: $1058.0 (1000 + 50 + 8% tax)&#34;);
-        
+
         // Test 2: With coupon
         System.out.println(&#34;\n=== Test 2: With Coupon ===&#34;);
         ShoppingCart cart2 = new ShoppingCart();
         cart2.addItem(inventory.getProduct(&#34;P1&#34;), 1);
         cart2.applyCoupon(&#34;SAVE10&#34;);
-        
+
         Order order2 = orderProcessor.processOrder(cart2);
         System.out.println(&#34;Order total: $&#34; + order2.total);
         System.out.println(&#34;Expected: $972.0 (1000 - 100 discount + 72 tax)&#34;);
-        
+
         // Test 3: Duplicate items
         System.out.println(&#34;\n=== Test 3: Duplicate Items ===&#34;);
         ShoppingCart cart3 = new ShoppingCart();
         cart3.addItem(inventory.getProduct(&#34;P2&#34;), 2);
         cart3.addItem(inventory.getProduct(&#34;P2&#34;), 3);  // Same product again
-        
+
         Order order3 = orderProcessor.processOrder(cart3);
         System.out.println(&#34;Cart items count: &#34; + cart3.getItems().size());
         System.out.println(&#34;Expected: 1 item with quantity 5&#34;);
         System.out.println(&#34;Actual: &#34; + cart3.getItems().size() + &#34; items&#34;);
-        
+
         // Test 4: Concurrent orders (race condition)
         System.out.println(&#34;\n=== Test 4: Concurrent Orders ===&#34;);
         ExecutorService executor = Executors.newFixedThreadPool(3);
-        
+
         for (int i = 0; i &lt; 5; i++) {
             executor.submit(() -&gt; {
                 ShoppingCart cart = new ShoppingCart();
                 cart.addItem(inventory.getProduct(&#34;P2&#34;), 15);
-                
+
                 Order order = orderProcessor.processOrder(cart);
                 if (order != null) {
-                    System.out.println(Thread.currentThread().getName() + 
+                    System.out.println(Thread.currentThread().getName() +
                         &#34;: Order created&#34;);
                 } else {
-                    System.out.println(Thread.currentThread().getName() + 
+                    System.out.println(Thread.currentThread().getName() +
                         &#34;: Order failed - out of stock&#34;);
                 }
             });
         }
-        
+
         executor.shutdown();
         executor.awaitTermination(10, TimeUnit.SECONDS);
-        
+
         // Check final stock
         Product mouse = inventory.getProduct(&#34;P2&#34;);
         System.out.println(&#34;Final mouse stock: &#34; + mouse.stock);
@@ -1716,9 +1719,15 @@ Actual: OK
 
     <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
     <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
-    <script src="https://storage.googleapis.com/claat-public/prettify.js"></script>
     <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
     <script src="//support.google.com/inapp/api.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js"></script>
+    <script src="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.js"></script>
+    <script>
+        hljs.highlightAll();
+        hljs.addPlugin(new CopyButtonPlugin({ autohide: false }));
+
+    </script>
 
 </body>
 

@@ -11,6 +11,9 @@
         href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
     <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1  /build/styles/monokai.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.css">
     <style>
         .success {
             color: #1e8e3e;
@@ -23,8 +26,8 @@
 </head>
 
 <body>
-    <google-codelab-analytics gaid="UA-49880327-14"></google-codelab-analytics>
-    <google-codelab codelab-gaid="" id="optional-datetime-modern-java"
+    <google-codelab-analytics gaid="UA-49880327-14" ga4id=""></google-codelab-analytics>
+    <google-codelab codelab-gaid="" codelab-ga4id="" id="optional-datetime-modern-java"
         title="Optional, Date/Time &amp; Modern Java Features" environment="web" feedback-link="">
 
         <google-codelab-step label="Introduction" duration="5">
@@ -152,7 +155,7 @@ String value4 = empty.orElse(&#34;Unknown&#34;);  // &#34;Unknown&#34;
 String value5 = empty.orElseGet(() -&gt; fetchDefaultName());
 
 // orElseThrow() - custom exception
-String value6 = empty.orElseThrow(() -&gt; 
+String value6 = empty.orElseThrow(() -&gt;
     new IllegalStateException(&#34;Name not found&#34;)
 );
 
@@ -162,7 +165,8 @@ Optional&lt;String&gt; alternative = empty.or(() -&gt; Optional.of(&#34;Default&
             <aside class="special">
                 <p><strong>Best Practice:</strong> Prefer <code>orElse()</code>, <code>orElseGet()</code>, or
                     <code>orElseThrow()</code> over <code>get()</code>. Never call <code>get()</code> without checking
-                    <code>isPresent()</code>.</p>
+                    <code>isPresent()</code>.
+                </p>
             </aside>
             <h2 is-upgraded>Transforming Optional</h2>
             <pre><code language="language-java" class="language-java">// map() - transform value
@@ -177,7 +181,7 @@ System.out.println(length.get());  // 5
 class User {
     private String name;
     private Optional&lt;Address&gt; address;
-    
+
     public Optional&lt;Address&gt; getAddress() {
         return address;
     }
@@ -185,7 +189,7 @@ class User {
 
 class Address {
     private String city;
-    
+
     public String getCity() {
         return city;
     }
@@ -230,41 +234,41 @@ public class OptionalDemo {
     // Repository simulation
     static class UserRepository {
         private Map&lt;String, User&gt; users = new HashMap&lt;&gt;();
-        
+
         public UserRepository() {
             users.put(&#34;1&#34;, new User(&#34;Alice&#34;, &#34;alice@example.com&#34;));
             users.put(&#34;2&#34;, new User(&#34;Bob&#34;, null));
         }
-        
+
         public Optional&lt;User&gt; findById(String id) {
             return Optional.ofNullable(users.get(id));
         }
     }
-    
+
     static class User {
         private String name;
         private String email;
-        
+
         public User(String name, String email) {
             this.name = name;
             this.email = email;
         }
-        
+
         public String getName() { return name; }
-        public Optional&lt;String&gt; getEmail() { 
-            return Optional.ofNullable(email); 
+        public Optional&lt;String&gt; getEmail() {
+            return Optional.ofNullable(email);
         }
     }
-    
+
     public static void main(String[] args) {
         UserRepository repo = new UserRepository();
-        
+
         // Example 1: Safe retrieval
         String email1 = repo.findById(&#34;1&#34;)
             .flatMap(User::getEmail)
             .orElse(&#34;no-email@example.com&#34;);
         System.out.println(&#34;User 1 email: &#34; + email1);
-        
+
         // Example 2: Chaining with filter
         repo.findById(&#34;2&#34;)
             .flatMap(User::getEmail)
@@ -273,7 +277,7 @@ public class OptionalDemo {
                 email -&gt; System.out.println(&#34;Valid email: &#34; + email),
                 () -&gt; System.out.println(&#34;No valid email found&#34;)
             );
-        
+
         // Example 3: Transformation
         List&lt;String&gt; userNames = Arrays.asList(&#34;1&#34;, &#34;2&#34;, &#34;3&#34;).stream()
             .map(repo::findById)
@@ -281,7 +285,7 @@ public class OptionalDemo {
             .map(Optional::get)
             .map(User::getName)
             .toList();  // Java 16+
-        
+
         System.out.println(&#34;User names: &#34; + userNames);
     }
 }
@@ -764,21 +768,21 @@ String code = &#34;&#34;&#34;
 class PersonOld {
     private final String name;
     private final int age;
-    
+
     public PersonOld(String name, int age) {
         this.name = name;
         this.age = age;
     }
-    
+
     public String getName() { return name; }
     public int getAge() { return age; }
-    
+
     @Override
     public boolean equals(Object o) { /* ... */ }
-    
+
     @Override
     public int hashCode() { /* ... */ }
-    
+
     @Override
     public String toString() { /* ... */ }
 }
@@ -804,12 +808,12 @@ record Rectangle(double width, double height) {
             throw new IllegalArgumentException(&#34;Dimensions must be positive&#34;);
         }
     }
-    
+
     // Custom method
     public double area() {
         return width * height;
     }
-    
+
     // Static factory method
     public static Rectangle square(double side) {
         return new Rectangle(side, side);
@@ -855,15 +859,15 @@ import java.util.*;
 import java.util.stream.*;
 
 // Records for data modeling
-record Speaker(String id, String name, Optional&lt;String&gt; email, 
+record Speaker(String id, String name, Optional&lt;String&gt; email,
                Optional&lt;String&gt; bio, String expertise) {
-    
+
     public Speaker {
         if (name == null || name.isBlank()) {
             throw new IllegalArgumentException(&#34;Speaker name cannot be blank&#34;);
         }
     }
-    
+
     public String displayInfo() {
         var emailStr = email.orElse(&#34;No email provided&#34;);
         var bioStr = bio.orElse(&#34;No bio available&#34;);
@@ -876,25 +880,25 @@ record Speaker(String id, String name, Optional&lt;String&gt; email,
     }
 }
 
-record Session(String id, String title, Speaker speaker, 
-               LocalDateTime startTime, Duration duration, 
+record Session(String id, String title, Speaker speaker,
+               LocalDateTime startTime, Duration duration,
                String room, String track) {
-    
+
     public Session {
         if (duration.isNegative() || duration.isZero()) {
             throw new IllegalArgumentException(&#34;Duration must be positive&#34;);
         }
     }
-    
+
     public LocalDateTime endTime() {
         return startTime.plus(duration);
     }
-    
+
     public boolean overlapsWith(Session other) {
-        return !this.endTime().isBefore(other.startTime) &amp;&amp; 
+        return !this.endTime().isBefore(other.startTime) &amp;&amp;
                !other.endTime().isBefore(this.startTime);
     }
-    
+
     public String formatSchedule() {
         var formatter = DateTimeFormatter.ofPattern(&#34;MMM dd, yyyy HH:mm&#34;);
         return &#34;&#34;&#34;
@@ -917,15 +921,15 @@ record Session(String id, String title, Speaker speaker,
 
 record Conference(String name, LocalDate startDate, LocalDate endDate,
                  ZoneId timeZone, String venue) {
-    
+
     public Period duration() {
         return Period.between(startDate, endDate);
     }
-    
+
     public boolean isActive(LocalDate date) {
         return !date.isBefore(startDate) &amp;&amp; !date.isAfter(endDate);
     }
-    
+
     public String formatInfo() {
         var formatter = DateTimeFormatter.ofPattern(&#34;MMM dd, yyyy&#34;);
         return &#34;&#34;&#34;
@@ -945,13 +949,13 @@ record Conference(String name, LocalDate startDate, LocalDate endDate,
     }
 }
 
-record Attendee(String id, String name, String email, 
+record Attendee(String id, String name, String email,
                 Set&lt;String&gt; registeredSessions, String category) {
-    
+
     public Attendee {
         registeredSessions = Set.copyOf(registeredSessions);  // Immutable
     }
-    
+
     public boolean isRegistered(String sessionId) {
         return registeredSessions.contains(sessionId);
     }
@@ -962,14 +966,14 @@ public class ConferenceScheduler {
     private final List&lt;Speaker&gt; speakers;
     private final List&lt;Session&gt; sessions;
     private final List&lt;Attendee&gt; attendees;
-    
+
     public ConferenceScheduler() {
         this.conference = createConference();
         this.speakers = createSpeakers();
         this.sessions = createSessions();
         this.attendees = createAttendees();
     }
-    
+
     private Conference createConference() {
         return new Conference(
             &#34;Java Developer Conference 2024&#34;,
@@ -979,10 +983,10 @@ public class ConferenceScheduler {
             &#34;Convention Center, New York&#34;
         );
     }
-    
+
     private List&lt;Speaker&gt; createSpeakers() {
         return List.of(
-            new Speaker(&#34;S1&#34;, &#34;Alice Johnson&#34;, 
+            new Speaker(&#34;S1&#34;, &#34;Alice Johnson&#34;,
                 Optional.of(&#34;alice@example.com&#34;),
                 Optional.of(&#34;10+ years in Java development&#34;),
                 &#34;Spring Boot&#34;),
@@ -1004,55 +1008,55 @@ public class ConferenceScheduler {
                 &#34;Reactive Programming&#34;)
         );
     }
-    
+
     private List&lt;Session&gt; createSessions() {
         var day1 = LocalDate.of(2024, 12, 15);
         var day2 = LocalDate.of(2024, 12, 16);
         var day3 = LocalDate.of(2024, 12, 17);
-        
+
         return List.of(
             new Session(&#34;SE1&#34;, &#34;Spring Boot Best Practices&#34;,
                 findSpeaker(&#34;S1&#34;).orElseThrow(),
                 LocalDateTime.of(day1, LocalTime.of(9, 0)),
                 Duration.ofMinutes(90),
                 &#34;Room A&#34;, &#34;Backend&#34;),
-            
+
             new Session(&#34;SE2&#34;, &#34;Microservices Architecture&#34;,
                 findSpeaker(&#34;S2&#34;).orElseThrow(),
                 LocalDateTime.of(day1, LocalTime.of(11, 0)),
                 Duration.ofMinutes(90),
                 &#34;Room B&#34;, &#34;Architecture&#34;),
-            
+
             new Session(&#34;SE3&#34;, &#34;Cloud Native Java&#34;,
                 findSpeaker(&#34;S3&#34;).orElseThrow(),
                 LocalDateTime.of(day1, LocalTime.of(14, 0)),
                 Duration.ofMinutes(60),
                 &#34;Room A&#34;, &#34;Cloud&#34;),
-            
+
             new Session(&#34;SE4&#34;, &#34;JVM Performance Tuning&#34;,
                 findSpeaker(&#34;S4&#34;).orElseThrow(),
                 LocalDateTime.of(day2, LocalTime.of(9, 0)),
                 Duration.ofMinutes(120),
                 &#34;Room A&#34;, &#34;Performance&#34;),
-            
+
             new Session(&#34;SE5&#34;, &#34;Reactive Programming with Spring&#34;,
                 findSpeaker(&#34;S5&#34;).orElseThrow(),
                 LocalDateTime.of(day2, LocalTime.of(11, 30)),
                 Duration.ofMinutes(90),
                 &#34;Room B&#34;, &#34;Backend&#34;),
-            
+
             new Session(&#34;SE6&#34;, &#34;Advanced Spring Boot&#34;,
                 findSpeaker(&#34;S1&#34;).orElseThrow(),
                 LocalDateTime.of(day2, LocalTime.of(14, 0)),
                 Duration.ofMinutes(90),
                 &#34;Room A&#34;, &#34;Backend&#34;),
-            
+
             new Session(&#34;SE7&#34;, &#34;Kubernetes for Java Developers&#34;,
                 findSpeaker(&#34;S3&#34;).orElseThrow(),
                 LocalDateTime.of(day3, LocalTime.of(9, 0)),
                 Duration.ofMinutes(120),
                 &#34;Room B&#34;, &#34;Cloud&#34;),
-            
+
             new Session(&#34;SE8&#34;, &#34;Monitoring and Observability&#34;,
                 findSpeaker(&#34;S2&#34;).orElseThrow(),
                 LocalDateTime.of(day3, LocalTime.of(11, 30)),
@@ -1060,7 +1064,7 @@ public class ConferenceScheduler {
                 &#34;Room A&#34;, &#34;DevOps&#34;)
         );
     }
-    
+
     private List&lt;Attendee&gt; createAttendees() {
         return List.of(
             new Attendee(&#34;A1&#34;, &#34;John Doe&#34;, &#34;john@example.com&#34;,
@@ -1071,14 +1075,14 @@ public class ConferenceScheduler {
                 Set.of(&#34;SE1&#34;, &#34;SE4&#34;, &#34;SE6&#34;, &#34;SE8&#34;), &#34;Senior Developer&#34;)
         );
     }
-    
+
     // 1. Find speaker by ID
     public Optional&lt;Speaker&gt; findSpeaker(String speakerId) {
         return speakers.stream()
             .filter(s -&gt; s.id().equals(speakerId))
             .findFirst();
     }
-    
+
     // 2. Find sessions by speaker
     public List&lt;Session&gt; findSessionsBySpeaker(String speakerName) {
         return sessions.stream()
@@ -1086,7 +1090,7 @@ public class ConferenceScheduler {
             .sorted(Comparator.comparing(Session::startTime))
             .toList();
     }
-    
+
     // 3. Find sessions by track
     public Map&lt;String, List&lt;Session&gt;&gt; groupByTrack() {
         return sessions.stream()
@@ -1100,7 +1104,7 @@ public class ConferenceScheduler {
                 )
             ));
     }
-    
+
     // 4. Find sessions by date
     public List&lt;Session&gt; findSessionsByDate(LocalDate date) {
         return sessions.stream()
@@ -1108,7 +1112,7 @@ public class ConferenceScheduler {
             .sorted(Comparator.comparing(Session::startTime))
             .toList();
     }
-    
+
     // 5. Check for schedule conflicts
     public List&lt;Session&gt; findConflictingSessions(Session session) {
         return sessions.stream()
@@ -1117,7 +1121,7 @@ public class ConferenceScheduler {
             .filter(session::overlapsWith)
             .toList();
     }
-    
+
     // 6. Get sessions in time range
     public List&lt;Session&gt; findSessionsInRange(LocalDateTime start, LocalDateTime end) {
         return sessions.stream()
@@ -1125,14 +1129,14 @@ public class ConferenceScheduler {
             .sorted(Comparator.comparing(Session::startTime))
             .toList();
     }
-    
+
     // 7. Calculate total session duration
     public Duration calculateTotalDuration() {
         return sessions.stream()
             .map(Session::duration)
             .reduce(Duration.ZERO, Duration::plus);
     }
-    
+
     // 8. Find sessions by duration
     public List&lt;Session&gt; findSessionsByDuration(int minMinutes, int maxMinutes) {
         return sessions.stream()
@@ -1140,7 +1144,7 @@ public class ConferenceScheduler {
             .filter(s -&gt; s.duration().toMinutes() &lt;= maxMinutes)
             .toList();
     }
-    
+
     // 9. Get speaker statistics
     public Map&lt;Speaker, Long&gt; getSpeakerSessionCounts() {
         return sessions.stream()
@@ -1149,7 +1153,7 @@ public class ConferenceScheduler {
                 Collectors.counting()
             ));
     }
-    
+
     // 10. Find popular sessions (most registered)
     public List&lt;Map.Entry&lt;Session, Long&gt;&gt; findPopularSessions(int topN) {
         Map&lt;String, Long&gt; registrationCounts = attendees.stream()
@@ -1158,7 +1162,7 @@ public class ConferenceScheduler {
                 sessionId -&gt; sessionId,
                 Collectors.counting()
             ));
-        
+
         return sessions.stream()
             .map(session -&gt; Map.entry(
                 session,
@@ -1168,77 +1172,77 @@ public class ConferenceScheduler {
             .limit(topN)
             .toList();
     }
-    
+
     // 11. Convert to different time zone
     public ZonedDateTime convertToTimeZone(LocalDateTime localTime, ZoneId targetZone) {
         return ZonedDateTime.of(localTime, conference.timeZone())
             .withZoneSameInstant(targetZone);
     }
-    
+
     // 12. Generate daily schedule
     public String generateDailySchedule(LocalDate date) {
         var sessionsForDay = findSessionsByDate(date);
-        
+
         if (sessionsForDay.isEmpty()) {
             return &#34;No sessions scheduled for &#34; + date;
         }
-        
+
         var schedule = new StringBuilder();
         schedule.append(&#34;&#34;&#34;
-            
+
             =====================================
             SCHEDULE FOR %s
             =====================================
-            
+
             &#34;&#34;&#34;.formatted(date.format(DateTimeFormatter.ofPattern(&#34;EEEE, MMMM dd, yyyy&#34;))));
-        
-        sessionsForDay.forEach(session -&gt; 
+
+        sessionsForDay.forEach(session -&gt;
             schedule.append(session.formatSchedule()).append(&#34;\n&#34;)
         );
-        
+
         return schedule.toString();
     }
-    
+
     // 13. Find attendee&#39;s personalized schedule
     public String generateAttendeeSchedule(String attendeeId) {
         var attendee = attendees.stream()
             .filter(a -&gt; a.id().equals(attendeeId))
             .findFirst()
             .orElseThrow(() -&gt; new IllegalArgumentException(&#34;Attendee not found&#34;));
-        
+
         var registeredSessions = sessions.stream()
             .filter(s -&gt; attendee.isRegistered(s.id()))
             .sorted(Comparator.comparing(Session::startTime))
             .toList();
-        
+
         var schedule = new StringBuilder();
         schedule.append(&#34;&#34;&#34;
-            
+
             =====================================
             PERSONAL SCHEDULE FOR %s
             =====================================
             Email: %s
             Category: %s
             Registered Sessions: %d
-            
+
             &#34;&#34;&#34;.formatted(
                 attendee.name(),
                 attendee.email(),
                 attendee.category(),
                 registeredSessions.size()
             ));
-        
+
         registeredSessions.forEach(session -&gt;
             schedule.append(session.formatSchedule()).append(&#34;\n&#34;)
         );
-        
+
         return schedule.toString();
     }
-    
+
     // 14. Validate schedule (find conflicts)
     public List&lt;String&gt; validateSchedule() {
         var conflicts = new ArrayList&lt;String&gt;();
-        
+
         for (var session : sessions) {
             var conflicting = findConflictingSessions(session);
             if (!conflicting.isEmpty()) {
@@ -1246,62 +1250,62 @@ public class ConferenceScheduler {
                     .formatted(session.title(), conflicting.size(), session.room()));
             }
         }
-        
+
         return conflicts;
     }
-    
+
     public void runScheduler() {
         System.out.println(&#34;\n&#34; + &#34;=&#34;.repeat(60));
         System.out.println(&#34;CONFERENCE SCHEDULING SYSTEM&#34;);
         System.out.println(&#34;=&#34;.repeat(60));
-        
+
         // Conference info
         System.out.println(conference.formatInfo());
-        
+
         // Speaker statistics
         System.out.println(&#34;\n--- SPEAKER STATISTICS ---&#34;);
         getSpeakerSessionCounts().forEach((speaker, count) -&gt;
             System.out.printf(&#34;%s: %d session(s)%n&#34;, speaker.name(), count)
         );
-        
+
         // Sessions by track
         System.out.println(&#34;\n--- SESSIONS BY TRACK ---&#34;);
         groupByTrack().forEach((track, trackSessions) -&gt; {
             System.out.printf(&#34;\n%s Track (%d sessions):%n&#34;, track, trackSessions.size());
-            trackSessions.forEach(s -&gt; 
+            trackSessions.forEach(s -&gt;
                 System.out.printf(&#34;  - %s (%d min)%n&#34;, s.title(), s.duration().toMinutes())
             );
         });
-        
+
         // Daily schedules
         var confDates = conference.startDate().datesUntil(
             conference.endDate().plusDays(1)
         ).toList();
-        
-        confDates.forEach(date -&gt; 
+
+        confDates.forEach(date -&gt;
             System.out.println(generateDailySchedule(date))
         );
-        
+
         // Popular sessions
         System.out.println(&#34;\n--- TOP 3 POPULAR SESSIONS ---&#34;);
         findPopularSessions(3).forEach(entry -&gt;
             System.out.printf(&#34;%s - %d registrations%n&#34;,
                 entry.getKey().title(), entry.getValue())
         );
-        
+
         // Total duration
         var totalDuration = calculateTotalDuration();
         System.out.printf(&#34;%nTotal content duration: %d hours %d minutes%n&#34;,
             totalDuration.toHours(), totalDuration.toMinutesPart());
-        
+
         // Time zone conversion example
         var firstSession = sessions.get(0);
         var istTime = convertToTimeZone(firstSession.startTime(), ZoneId.of(&#34;Asia/Kolkata&#34;));
         System.out.printf(&#34;%nFirst session in IST: %s%n&#34;, istTime);
-        
+
         // Attendee schedule
         System.out.println(generateAttendeeSchedule(&#34;A1&#34;));
-        
+
         // Validate schedule
         var conflicts = validateSchedule();
         if (conflicts.isEmpty()) {
@@ -1311,7 +1315,7 @@ public class ConferenceScheduler {
             conflicts.forEach(System.out::println);
         }
     }
-    
+
     public static void main(String[] args) {
         var scheduler = new ConferenceScheduler();
         scheduler.runScheduler();
@@ -1343,50 +1347,50 @@ public class ModernJavaTests {
         testSwitchExpressions();
         System.out.println(&#34;\n✓ All tests passed!&#34;);
     }
-    
+
     static void testOptional() {
         // Test 1: Optional creation
         var present = Optional.of(&#34;Hello&#34;);
         var empty = Optional.empty();
         var nullable = Optional.ofNullable(null);
-        
+
         assert present.isPresent();
         assert !empty.isPresent();
         assert nullable.isEmpty();
-        
+
         // Test 2: Optional transformation
         var result = present
             .map(String::toUpperCase)
             .filter(s -&gt; s.length() &gt; 3)
             .orElse(&#34;DEFAULT&#34;);
         assert result.equals(&#34;HELLO&#34;);
-        
+
         // Test 3: Optional chaining
         var length = present
             .map(String::length)
             .orElse(0);
         assert length == 5;
-        
+
         System.out.println(&#34;✓ Optional tests passed&#34;);
     }
-    
+
     static void testDateTime() {
         // Test 1: Date creation
         var date = LocalDate.of(2024, 12, 25);
         assert date.getYear() == 2024;
         assert date.getMonthValue() == 12;
         assert date.getDayOfMonth() == 25;
-        
+
         // Test 2: Date arithmetic
         var tomorrow = date.plusDays(1);
         assert tomorrow.getDayOfMonth() == 26;
-        
+
         // Test 3: Period calculation
         var start = LocalDate.of(2024, 1, 1);
         var end = LocalDate.of(2024, 12, 31);
         var period = Period.between(start, end);
         assert period.getMonths() == 11;
-        
+
         // Test 4: Time zones
         var nyTime = ZonedDateTime.of(
             LocalDateTime.of(2024, 12, 25, 12, 0),
@@ -1394,34 +1398,34 @@ public class ModernJavaTests {
         );
         var tokyoTime = nyTime.withZoneSameInstant(ZoneId.of(&#34;Asia/Tokyo&#34;));
         assert tokyoTime.getHour() != nyTime.getHour();
-        
+
         System.out.println(&#34;✓ DateTime tests passed&#34;);
     }
-    
+
     static void testRecords() {
         // Test 1: Record creation
         record Point(int x, int y) {}
         var p1 = new Point(1, 2);
         var p2 = new Point(1, 2);
         var p3 = new Point(2, 3);
-        
+
         // Test 2: Auto-generated equals
         assert p1.equals(p2);
         assert !p1.equals(p3);
-        
+
         // Test 3: Auto-generated hashCode
         assert p1.hashCode() == p2.hashCode();
-        
+
         // Test 4: Auto-generated toString
         assert p1.toString().contains(&#34;Point&#34;);
-        
+
         // Test 5: Immutability
         var list = List.of(p1, p2, p3);
         assert list.size() == 3;
-        
+
         System.out.println(&#34;✓ Record tests passed&#34;);
     }
-    
+
     static void testSwitchExpressions() {
         // Test 1: Basic switch expression
         var day = 3;
@@ -1431,7 +1435,7 @@ public class ModernJavaTests {
             default -&gt; &#34;Invalid&#34;;
         };
         assert type.equals(&#34;Weekday&#34;);
-        
+
         // Test 2: Switch with yield
         var result = switch (day) {
             case 1 -&gt; &#34;Monday&#34;;
@@ -1442,7 +1446,7 @@ public class ModernJavaTests {
             default -&gt; &#34;Other&#34;;
         };
         assert result.equals(&#34;Wednesday&#34;);
-        
+
         System.out.println(&#34;✓ Switch expression tests passed&#34;);
     }
 }
@@ -1519,9 +1523,15 @@ public class ModernJavaTests {
 
     <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
     <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
-    <script src="https://storage.googleapis.com/claat-public/prettify.js"></script>
     <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
     <script src="//support.google.com/inapp/api.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js"></script>
+    <script src="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.js"></script>
+    <script>
+        hljs.highlightAll();
+        hljs.addPlugin(new CopyButtonPlugin({ autohide: false }));
+
+    </script>
 
 </body>
 
