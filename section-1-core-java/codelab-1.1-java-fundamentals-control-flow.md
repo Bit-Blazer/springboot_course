@@ -106,6 +106,7 @@ Before writing code, let's understand what makes Java special - its platform arc
 ### The Java Ecosystem: JVM, JRE, JDK
 
 Java's power comes from its three-tier architecture:
+
 ![alt text](Java_Ecosystem.png)
 
 **JVM (Java Virtual Machine):**
