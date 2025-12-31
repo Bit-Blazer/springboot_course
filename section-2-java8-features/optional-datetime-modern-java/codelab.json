@@ -3,7 +3,7 @@
   "format": "html",
   "prefix": "https://storage.googleapis.com",
   "mainga4": "G-XXXXXXXXXX",
-  "updated": "2025-12-29T17:07:20+05:30",
+  "updated": "2025-12-31T10:24:05+05:30",
   "id": "optional-datetime-modern-java",
   "duration": 90,
   "title": "Optional, Date/Time \u0026 Modern Java Features",
@@ -20,6 +20,7 @@
   "tags": [
     "web"
   ],
+  "feedback_link": "https://github.com/Bit-Blazer/springboot_course/issues/new",
   "ga4": "G-4LV2JBSBPM",
   "home_url": "/springboot_course/"
 }

@@ -5,6 +5,7 @@ environments: Web
 status: Published
 home url: /springboot_course/
 analytics ga4 account: G-4LV2JBSBPM
+feedback link: https://github.com/Bit-Blazer/springboot_course/issues/new
 
 # Reactive Programming with WebFlux & R2DBC
 
