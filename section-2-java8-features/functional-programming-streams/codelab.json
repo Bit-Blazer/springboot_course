@@ -2,7 +2,7 @@
   "environment": "web",
   "format": "html",
   "prefix": "https://storage.googleapis.com",
-  "mainga": "UA-49880327-14",
+  "mainga4": "G-XXXXXXXXXX",
   "updated": "2025-12-29T17:07:20+05:30",
   "id": "functional-programming-streams",
   "duration": 120,
@@ -10,10 +10,8 @@
   "summary": "Master functional programming with lambdas, functional interfaces, Stream API operations, and collectors by building a sales analytics application",
   "source": "codelab-2.1-functional-programming-streams.md",
   "theme": "",
-  "status": [
-    "published"
-  ],
-  "category": [
+  "status": "Published",
+  "categories": [
     "java",
     "java8",
     "functionalprogramming",
@@ -23,6 +21,5 @@
     "web"
   ],
   "ga4": "G-4LV2JBSBPM",
-  "home_url": "/springboot_course/",
-  "url": "functional-programming-streams"
+  "home_url": "/springboot_course/"
 }

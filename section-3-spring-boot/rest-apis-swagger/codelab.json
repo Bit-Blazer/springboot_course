@@ -2,7 +2,7 @@
   "environment": "web",
   "format": "html",
   "prefix": "https://storage.googleapis.com",
-  "mainga": "UA-49880327-14",
+  "mainga4": "G-XXXXXXXXXX",
   "updated": "2025-12-29T17:07:20+05:30",
   "id": "rest-apis-swagger",
   "duration": 60,
@@ -10,10 +10,8 @@
   "summary": "Master RESTful API design, validation, exception handling, and Swagger/OpenAPI documentation by enhancing the Task Management API",
   "source": "codelab-3.2-rest-apis-swagger.md",
   "theme": "",
-  "status": [
-    "published"
-  ],
-  "category": [
+  "status": "Published",
+  "categories": [
     "springboot",
     "restapi",
     "swagger",
@@ -24,6 +22,5 @@
     "web"
   ],
   "ga4": "G-4LV2JBSBPM",
-  "home_url": "/springboot_course/",
-  "url": "rest-apis-swagger"
+  "home_url": "/springboot_course/"
 }

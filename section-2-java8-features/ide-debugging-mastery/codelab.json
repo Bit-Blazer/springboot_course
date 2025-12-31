@@ -2,7 +2,7 @@
   "environment": "web",
   "format": "html",
   "prefix": "https://storage.googleapis.com",
-  "mainga": "UA-49880327-14",
+  "mainga4": "G-XXXXXXXXXX",
   "updated": "2025-12-29T17:07:20+05:30",
   "id": "ide-debugging-mastery",
   "duration": 92,
@@ -10,10 +10,8 @@
   "summary": "Master IDE debugging techniques including breakpoints, step debugging, variables inspection, threads, and remote debugging by fixing a buggy application",
   "source": "codelab-2.5-ide-debugging-mastery.md",
   "theme": "",
-  "status": [
-    "published"
-  ],
-  "category": [
+  "status": "Published",
+  "categories": [
     "java",
     "debugging",
     "intellij",
@@ -24,6 +22,5 @@
     "web"
   ],
   "ga4": "G-4LV2JBSBPM",
-  "home_url": "/springboot_course/",
-  "url": "ide-debugging-mastery"
+  "home_url": "/springboot_course/"
 }

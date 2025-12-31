@@ -2,7 +2,7 @@
   "environment": "web",
   "format": "html",
   "prefix": "https://storage.googleapis.com",
-  "mainga": "UA-49880327-14",
+  "mainga4": "G-XXXXXXXXXX",
   "updated": "2025-12-29T17:07:20+05:30",
   "id": "testing-remote-debugging",
   "duration": 64,
@@ -10,10 +10,8 @@
   "summary": "Master comprehensive testing strategies with JUnit 5, Mockito, Spring Boot Test, Testcontainers for integration tests, and remote debugging techniques for Spring Boot applications",
   "source": "codelab-3.8-testing-remote-debugging.md",
   "theme": "",
-  "status": [
-    "published"
-  ],
-  "category": [
+  "status": "Published",
+  "categories": [
     "springboot",
     "testing",
     "junit",
@@ -25,6 +23,5 @@
     "web"
   ],
   "ga4": "G-4LV2JBSBPM",
-  "home_url": "/springboot_course/",
-  "url": "testing-remote-debugging"
+  "home_url": "/springboot_course/"
 }

@@ -2,7 +2,7 @@
   "environment": "web",
   "format": "html",
   "prefix": "https://storage.googleapis.com",
-  "mainga": "UA-49880327-14",
+  "mainga4": "G-XXXXXXXXXX",
   "updated": "2025-12-29T17:07:20+05:30",
   "id": "oop-complete",
   "duration": 98,
@@ -10,10 +10,8 @@
   "summary": "Master object-oriented programming concepts including classes, inheritance, interfaces, abstract classes, polymorphism, and packages through building a banking system",
   "source": "codelab-1.2-oop-complete.md",
   "theme": "",
-  "status": [
-    "published"
-  ],
-  "category": [
+  "status": "Published",
+  "categories": [
     "java",
     "object-orientedprogramming",
     "oop"
@@ -22,6 +20,5 @@
     "web"
   ],
   "ga4": "G-4LV2JBSBPM",
-  "home_url": "/springboot_course/",
-  "url": "oop-complete"
+  "home_url": "/springboot_course/"
 }

@@ -2,7 +2,7 @@
   "environment": "web",
   "format": "html",
   "prefix": "https://storage.googleapis.com",
-  "mainga": "UA-49880327-14",
+  "mainga4": "G-XXXXXXXXXX",
   "updated": "2025-12-29T17:07:20+05:30",
   "id": "memory-management",
   "duration": 70,
@@ -10,10 +10,8 @@
   "summary": "Understand JVM memory architecture, garbage collection algorithms, memory leaks, and performance optimization through hands-on profiling and monitoring exercises",
   "source": "codelab-1.5-memory-management.md",
   "theme": "",
-  "status": [
-    "published"
-  ],
-  "category": [
+  "status": "Published",
+  "categories": [
     "java",
     "jvm",
     "memorymanagement",
@@ -23,6 +21,5 @@
     "web"
   ],
   "ga4": "G-4LV2JBSBPM",
-  "home_url": "/springboot_course/",
-  "url": "memory-management"
+  "home_url": "/springboot_course/"
 }

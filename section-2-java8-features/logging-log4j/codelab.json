@@ -2,7 +2,7 @@
   "environment": "web",
   "format": "html",
   "prefix": "https://storage.googleapis.com",
-  "mainga": "UA-49880327-14",
+  "mainga4": "G-XXXXXXXXXX",
   "updated": "2025-12-29T17:07:20+05:30",
   "id": "logging-log4j",
   "duration": 60,
@@ -10,10 +10,8 @@
   "summary": "Master logging with Log4j 2 including levels, configuration, appenders, patterns, and best practices by adding comprehensive logging to applications",
   "source": "codelab-2.4-logging-log4j.md",
   "theme": "",
-  "status": [
-    "published"
-  ],
-  "category": [
+  "status": "Published",
+  "categories": [
     "java",
     "logging",
     "log4j",
@@ -23,6 +21,5 @@
     "web"
   ],
   "ga4": "G-4LV2JBSBPM",
-  "home_url": "/springboot_course/",
-  "url": "logging-log4j"
+  "home_url": "/springboot_course/"
 }
